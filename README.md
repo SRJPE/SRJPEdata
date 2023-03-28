@@ -1,2 +1,2 @@
-# sr-jpe-data
+# SRJPEdata
 Data package to support SR JPE model
