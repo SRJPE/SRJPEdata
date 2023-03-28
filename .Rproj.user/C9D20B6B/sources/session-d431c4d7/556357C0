@@ -1,0 +1,24 @@
+{
+    "id": "556357C0",
+    "path": "~/Documents/Git/JPE/SRJPEdata/data-raw/pull_standard_format_adult_data.R",
+    "project_path": "data-raw/pull_standard_format_adult_data.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1680037075412.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1680037075,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1680037075,
+    "read_only": false,
+    "read_only_alternatives": []
+}
