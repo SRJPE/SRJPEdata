@@ -1,0 +1,19 @@
+---
+title: "trap_effort"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{trap_effort}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SRJPEdata)
+```
