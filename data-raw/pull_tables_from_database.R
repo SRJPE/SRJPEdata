@@ -1,6 +1,7 @@
 # Pull data from Azure Database 
 library(DBI)
 library(tidyverse)
+library(lubridate)
 
 # Use DBI - dbConnect to connect to database - keep user id and password sectret
 con <- DBI::dbConnect(drv = RPostgres::Postgres(),
@@ -28,14 +29,20 @@ glimpse(catch)
 # Trap table 
 # TODO effort analysis vigentte
 trap <-  dbGetQuery(con, 
-                    "SELECT tv.trap_visit_time_start, tv.trap_visit_time_end, tl.stream, tl.site, tl.subsite, 
-                    tf.definition, tv.in_half_cone_configuration, fp.definition, tv.rpm_start, tv.rpm_end, tv.total_revolutions,
+                    "SELECT tv.trap_visit_time_start as trap_start_date, vt.definition as visit_type, tv.trap_visit_time_end as trap_stop_date, tl.stream, tl.site, tl.subsite, 
+                    tf.definition as trap_functioning, tv.in_half_cone_configuration, fp.definition as fish_processed, tv.rpm_start, tv.rpm_end, tv.total_revolutions,
                     tv.debris_volume, tv.discharge, tv.water_velocity, tv.water_temp, tv.turbidity, tv.include
                     FROM trap_visit tv
+                    left join visit_type vt on tv.visit_type_id = vt.id
                     left join trap_location tl on tv.trap_location_id = tl.id
                     left join trap_functioning tf on tv.trap_functioning_id = tf.id
                     left join fish_processed fp on tv.fish_processed_id = fp.id
-                    left join debris_level d on tv.debris_level_id = d.id") 
+                    left join debris_level d on tv.debris_level_id = d.id") |> 
+  mutate(trap_start_time = hms::as_hms(trap_start_date),
+         trap_start_date = as_date(trap_start_date), 
+         trap_stop_time = hms::as_hms(trap_stop_date),
+         trap_stop_date = as_date(trap_stop_date)
+  )
 glimpse(trap)
 
 # TODO add mark recap tables 

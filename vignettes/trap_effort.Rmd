@@ -1,5 +1,5 @@
 ---
-title: "trap_effort"
+title: "Calculating Trap Effort"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{trap_effort}
@@ -8,12 +8,231 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+library(tidyverse)
+library(lubridate)
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+  message = FALSE,
+  warning = FALSE,
+  fig.width=10, fig.height=8
 )
 ```
 
 ```{r setup}
 library(SRJPEdata)
+source("data-raw/pull_tables_from_database.R")
+```
+
+Hours fished is not included as a variable in the data and needs to be calculated.
+This file calculates hours fished by date, stream and site.
+
+Data were checked and cleaned in scripts available [here](https://github.com/FlowWest/JPE-datasets/tree/main/scripts/rst).
+Cleaned data were saved on the JPE cloud database and pulled using the `pull_tables_from_database.R` script. 
+
+## Method
+
+We explored three primary methods to calculate hours fished. Methods were chosen based on data collected at the RST site. When no times, trap revolutions, or trap RPMs were collected we assume 24 hours for each day that trap is fishing. The trap revolution method is commonly used by RST programs but we were not able to get reasonable results for most programs we tried it on so we ended up relying on trap times instead of revolutions. This may be due to different methods for determining cone rotation rate. For instance, Battle measures the average time per rotation whereas Feather River and Knights Landing measure the revolutions per minute. Using total revolutions and the cone rotation rate to calculate sampling period may be useful in the future when methods are more similar.  
+
+1) Use start and stop time. 
+2) Use rpms start, rpms end, and total revolutions (Method 2 was used as a comparison method but was ultimatly not picked as the final method used for any traps.)
+3) Use start time only 
+
+Below is the code for each of the methods described above: 
+
+1) If the start and stop date/time of the sampling period are available, simply subtract the difference in time.
+
+```{r, helpers}
+# calculating hours fished when have start and stop datetime
+hours_fished <- function(dat){
+  dat %>%
+    filter(!is.na(trap_stop_time), !is.na(trap_start_time)) %>%
+    mutate(start_datetime = ymd_hms(paste(trap_start_date, trap_start_time)),
+           stop_datetime = ymd_hms(paste(trap_stop_date, trap_stop_time)),
+           hours_fished = round(difftime(stop_datetime, start_datetime, units = "hours"), 2))
+}
+```
+
+2) If the RPMs start, RPMs end, and total revolutions are available, 
+take the average cone RPMs and divide `total_revolutions`/average RMP/60 to get total hours fished.
+
+```{r, helpers2}
+# calculating hours fished when have start and stop datetime
+revolution_calculated_hours_fished <- function(dat){
+  dat %>%
+    filter(!is.na(rpm_start) | !is.na(rpm_end), !is.na(total_revolutions)) %>% 
+    mutate(prior_day_rpm = ifelse(is.na(rpm_end), NA, lag(rpm_end)),
+           sum_rpms = ifelse(is.na(prior_day_rpm), rpm_start, rpm_start + prior_day_rpm), 
+           cone_rpms = sum_rpms / 2,
+           hours_fished = case_when(is.na(rpm_start) ~ round(total_revolutions/rpm_end/60, 2),
+                                    is.na(rpm_end) ~ round(total_revolutions/rpm_start/60, 2), 
+                                    TRUE ~ round(total_revolutions/cone_rpms/60, 2)))
+}
+```
+
+3) If only one date is available, assume that the end date is the date sampled on the following day.
+
+```{r, helper3}
+# calculating hours fished when have only date and time
+hours_fished_one_date <- function(dat) {
+  dat %>%
+  arrange(site, subsite, start_datetime) %>%
+  mutate(end_datetime = lead(start_datetime),
+         end_datetime = case_when(difftime(end_datetime, start_datetime, units = "hours") > 120 ~ start_datetime + hours(24), 
+                                  T ~ end_datetime),
+         hours_fished = round(difftime(end_datetime, start_datetime, units = "hours"), 2))
+}
+```
+
+### Other Assumptions
+
+Based on protocols and information from monitoring programs, sampling periods are typically 24 hours,
+unless flows are very high in which traps are checked more frequently. Calculating hours fished based
+on time and date provided in data provides more specificity, however, there are typos and errors resulting
+in nonsensical hours fished. In these cases, we assume 24 hour sampling periods. 
+
+- If only a date is available and no time, assume 24 hour sampling periods for each date.
+- If information is missing or there are typos, assume 24 hour sampling periods.
+
+## Hours fished {.tabset}
+
+## Method 1) Battle creek, Clear Creek, Feather, Kinghts, Tisdale
+
+The above creeks have data available to calculate the hours fished. There are a few
+cases when start date is NA. For these we fill in the start date assuming
+it is the sample date of the previous record.
+
+```{r, battle}
+method_one_hours_fished <- filter(trap, stream %in% 
+                                c("battle creek", "clear creek", 
+                                  "feather river", "sacramento river")) %>% 
+  select(trap_start_date, trap_start_time, trap_stop_date, trap_stop_time, 
+         stream, site, subsite, ) %>% 
+  arrange(site, subsite, trap_stop_date, trap_stop_time) %>% 
+  mutate(hours_fished_methodology = "using start time and stop time") %>% 
+  hours_fished()
+
+knitr::kable(head(method_one_hours_fished, 5))
+```
+
+### QC
+
+```{r}
+method_one_hours_fished %>% 
+  ggplot(aes(x = stop_datetime, y = hours_fished, color = stream)) +
+  geom_point()+
+  theme_minimal()
+
+method_one_hours_fished %>% 
+  ggplot(aes(x = hours_fished, fill = stream)) +
+  geom_histogram(position = "dodge") +
+  theme_minimal()
+```
+
+
+## Method 3: Butte creek & Yuba 
+
+Hours fished are calculated by taking the difference between the date/time at each 
+observation. 
+
+```{r, butte, yuba}
+## Butte ####
+method_three_hours_fished <- filter(trap, stream %in% c("butte creek", "yuba river")) %>%
+  distinct(trap_stop_date, trap_stop_time, site, subsite, stream) %>%
+  mutate(start_datetime = ymd_hms(paste(trap_stop_date, trap_stop_time))) %>%
+  mutate(hours_fished_methodology = "using only start time") %>% 
+  hours_fished_one_date() %>% 
+  mutate(end_datetime = case_when(trap_stop_date == "2007-05-03" ~ ymd_hms("2007-05-04 08:00:00"),
+                                  trap_stop_date == "2008-04-23" ~ ymd_hms("2008-04-24 07:15:00"),
+                                  trap_stop_date == "2015-06-03" ~ ymd_hms("2015-06-04 08:00:00"),
+                                  T ~ end_datetime),
+         hours_fished = round(difftime(end_datetime, start_datetime, units = "hours"), 2),
+         hours_fished = ifelse(hours_fished < 0, 24, hours_fished))
+# tried treating post 2015 differnt since it is cAMP data and has start and end dates but caused a lot of huge outliers
+knitr::kable(head(method_three_hours_fished, 5))
+```
+
+### QC
+
+```{r}
+method_three_hours_fished %>% 
+  ggplot(aes(x = trap_stop_time, y = hours_fished, color = stream)) +
+  geom_point()
+# trying to figure out where to set cut of for effort
+# decided to set as 5 days - 120 hours
+method_three_hours_fished %>% 
+  filter(hours_fished < 200) %>% 
+  ggplot(aes(x = hours_fished, fill = stream)) +
+  geom_histogram(position = "dodge") + theme_minimal()
+# these are typos and will be fixed by assuming 24 hours fished
+# butte_hours_fished %>% 
+#   filter(hours_fished > 5000) %>% tally()
+```
+
+## Mill & Deer creek
+
+Mill & Deer Creek do not have data available (no time variable) to calculate hours
+Mill & Deer Creek also does not have sample period revolutions so we cannot use trap revolutions 
+fished so assume 24 hours for every day with data. 
+
+```{r, deer & mill}
+## Deer & mill #####
+deer_mill_hours_fished <- filter(trap, stream %in% c("deer creek", "mill creek")) %>% 
+  distinct(trap_stop_date, stream, site, subsite) %>% 
+  mutate(hours_fished_methodology = "24 hour assumption") %>% 
+  mutate(hours_fished = 24)
+
+knitr::kable(head(deer_mill_hours_fished, 5))
+```
+
+
+# Combine data
+
+```{r}
+# all wee need is stop_date, hours_fished, stream, site
+# do not sum by subsites. this can be done in further analysis
+
+method_one <- method_one_hours_fished %>% 
+  select(stream, site, subsite, trap_stop_date, trap_stop_time, hours_fished) %>% 
+  mutate(hours_fished = as.numeric(hours_fished))
+
+method_three <- method_three_hours_fished %>% 
+  select(stream, site, subsite, trap_stop_date, trap_stop_time, hours_fished) %>% 
+  mutate(hours_fished = as.numeric(hours_fished))
+
+mill_and_deer <- deer_mill_hours_fished %>% 
+  select(stream, site, subsite, trap_stop_date, hours_fished) %>% 
+  mutate(hours_fished = as.numeric(hours_fished))
+
+hours_fished_combined <- bind_rows(method_one,
+                                   method_three,
+                                   mill_and_deer) %>% 
+  # if hours fished NA assumed 24 hours
+  mutate(hours_fished = ifelse(is.na(hours_fished), 24, hours_fished)) %>% 
+  rename(date = trap_stop_date) %>% 
+  group_by(stream, site, subsite, date) %>% 
+  summarize(hours_fished = sum(hours_fished)) 
+```
+
+## Summarized by week
+
+```{r}
+hours_fished_weekly <- hours_fished_combined %>% 
+  mutate(week = week(date),
+         year = year(date)) %>% 
+  group_by(stream, site, subsite, week, year) %>% 
+  summarize(hours_fished = sum(hours_fished)) 
+```
+
+### QC
+
+```{r}
+hours_fished_weekly %>% 
+  ggplot(aes(x = week, y = hours_fished, color = year)) +
+  geom_point() + 
+  facet_wrap(~stream)+ 
+  theme_minimal()
+
+hours_fished_weekly %>% 
+  ggplot(aes(x = hours_fished, fill = stream)) +
+  geom_histogram(alpha = .75, position = 'dodge') +
+  theme_minimal()
 ```
