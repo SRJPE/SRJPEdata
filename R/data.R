@@ -1,10 +1,161 @@
-# specify parameters for submodels
+# specify parameters for submodels following the below structure:
 
-# survival model
+#' Standard Recapture
+#' @description A dataset containing the standardized mark-recapture datasets for the following tribs:
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_recapture"
 
-# adult model
+#' Standard Release
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_release"
 
-# stock-recruit model
 
-# juvenile production
+# RST Monitoring Data
+#' Standard Catch
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_catch"
 
+#' Standard Trap
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_trap"
+
+#' Standard Effort
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_effort"
+
+#' Standard Environmental
+#' @description standard environmental covariate data collected during RST monitoring
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_environmental"
+
+#' RST site locations
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"rst_trap_locations"
+
+
+# Standard Environmental Covariate Data
+#' Standard Flow
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_flow"
+
+#' Standard Temperature
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_temp"
+
+# Adult Data
+#' Standard Adult Upstream Passage
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_adult_upstream"
+
+#' Standard Adult Holding Survey
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_holding"
+
+#' Standard Annual Redd Survey 
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_annual_redd"
+
+#' Standard Daily Redd Survey 
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_daily_redd"
+
+
+#' Standard Carcass Survey
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"standard_carcass"
