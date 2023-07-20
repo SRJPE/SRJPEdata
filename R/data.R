@@ -113,7 +113,18 @@
 #' @details How was this calculated?
 #'
 #'
-"standard_adult_upstream"
+"upstream_passage"
+
+#' Standard Adult Upstream Passage Estimates
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"upstream_passage_estimates"
 
 #' Standard Adult Holding Survey
 #' @description 
@@ -124,7 +135,7 @@
 #' @details How was this calculated?
 #'
 #'
-"standard_holding"
+"holding"
 
 #' Standard Annual Redd Survey 
 #' @description 
@@ -135,7 +146,7 @@
 #' @details How was this calculated?
 #'
 #'
-"standard_annual_redd"
+"redd"
 
 #' Standard Daily Redd Survey 
 #' @description 
@@ -158,4 +169,37 @@
 #' @details How was this calculated?
 #'
 #'
-"standard_carcass"
+"carcass"
+
+#' Standard Carcass CJS Estimates
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"carcass_estimates"
+
+#' Adult Model Input
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"adult_model_input"
+
+#' Adult Model Covariates - Standardized
+#' @description 
+#'
+#'
+#' @format a X by Y dataframe with columns [A, B, C]
+#'
+#' @details How was this calculated?
+#'
+#'
+"adult_model_covariates_standard"

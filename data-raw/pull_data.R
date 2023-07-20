@@ -75,6 +75,13 @@ gcs_get_object(object_name = "standard-format-data/standard_adult_upstream_passa
                overwrite = TRUE)
 standard_upstream <- read_csv("data-raw/database-tables/standard_adult_upstream.csv")
 
+# Adult Upstream Estimates Data
+gcs_get_object(object_name = "standard-format-data/standard_adult_passage_estimate.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data-raw/database-tables/standard_adult_passage_estimate.csv",
+               overwrite = TRUE)
+standard_upstream_estimates <- read_csv("data-raw/database-tables/standard_adult_passage_estimate.csv")
+
 # Adult Holding Data
 gcs_get_object(object_name = "standard-format-data/standard_holding.csv",
                bucket = gcs_get_global_bucket(),
@@ -94,3 +101,15 @@ gcs_get_object(object_name = "standard-format-data/standard_daily_redd.csv",
                saveToDisk = "data-raw/database-tables/standard_daily_redd.csv",
                overwrite = TRUE)
 standard_daily_redd <- read_csv("data-raw/database-tables/standard_daily_redd.csv")
+
+gcs_get_object(object_name = "standard-format-data/standard_carcass.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data-raw/database-tables/standard_carcass.csv",
+               overwrite = TRUE)
+standard_carcass <- read_csv("data-raw/database-tables/standard_carcass.csv")
+
+gcs_get_object(object_name = "standard-format-data/standard_carcass_cjs_estimate.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data-raw/database-tables/standard_carcass_cjs_estimate.csv",
+               overwrite = TRUE)
+standard_carcass_estimates <- read_csv("data-raw/database-tables/standard_carcass_cjs_estimate.csv")
