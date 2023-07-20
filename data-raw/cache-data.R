@@ -2,7 +2,7 @@ library(tidyverse)
 library(waterYearType)
 
 # upstream passage - use these data for passage timing calculations
-upstream_passage <- read_csv("data-raw/database-tables/standard_adult_upstream.csv") |>
+upstream_passage <- read_csv("data-raw/standard_adult_upstream.csv") |>
   filter(!is.na(date)) |>
   mutate(stream = tolower(stream),
          year = year(date)) |>
@@ -24,19 +24,19 @@ upstream_passage <- read_csv("data-raw/database-tables/standard_adult_upstream.c
 
 usethis::use_data(upstream_passage, overwrite = TRUE)
 
-upstream_passage_estimates <- read_csv("data-raw/database-tables/standard_adult_passage_estimate.csv") |>
+upstream_passage_estimates <- read_csv("data-raw/standard_adult_passage_estimate.csv") |>
   mutate(upstream_count = round(passage_estimate, 0))
 
 usethis::use_data(upstream_passage_estimates, overwrite = TRUE)
 
-holding <- read_csv("data-raw/database-tables/standard_holding.csv") |>
+holding <- read_csv("data-raw/standard_holding.csv") |>
   group_by(year, stream) |>
   summarise(count = sum(count, na.rm = T)) |>
   ungroup()
 
 usethis::use_data(holding, overwrite = TRUE)
 
-redd <- read_csv("data-raw/database-tables/standard_annual_redd.csv") |>
+redd <- read_csv("data-raw/standard_annual_redd.csv") |>
   filter(run %in% c("spring", "not recorded")) |>
   # redds in these reaches are likely fall, so set to 0 for battle & clear
   mutate(max_yearly_redd_count = case_when(reach %in% c("R6", "R6A", "R6B", "R7") &
@@ -49,7 +49,7 @@ redd <- read_csv("data-raw/database-tables/standard_annual_redd.csv") |>
 
 usethis::use_data(redd, overwrite = TRUE)
 
-carcass <- standard_carcass <- read_csv("data-raw/database-tables/standard_carcass.csv") |>
+carcass <- standard_carcass <- read_csv("data-raw/standard_carcass.csv") |>
   filter(run %in% c("spring", NA, "unknown")) |>
   group_by(year(date), stream) |>
   summarise(count = sum(count, na.rm = T)) |>
@@ -58,7 +58,7 @@ carcass <- standard_carcass <- read_csv("data-raw/database-tables/standard_carca
 
 usethis::use_data(carcass, overwrite = TRUE)
 
-carcass_estimates <- standard_carcass_estimates <- read_csv("data-raw/database-tables/standard_carcass_cjs_estimate.csv") |>
+carcass_estimates <- standard_carcass_estimates <- read_csv("data-raw/standard_carcass_cjs_estimate.csv") |>
   rename(carcass_spawner_estimate = spawner_abundance_estimate)
 
 usethis::use_data(carcass_estimates, overwrite = TRUE)
@@ -92,7 +92,7 @@ usethis::use_data(adult_model_input, overwrite = TRUE)
 
 temperature_threshold <- 20 # https://www.noaa.gov/sites/default/files/legacy/document/2020/Oct/07354626766.pdf
 
-standard_temperature <- read_csv("data-raw/database-tables/standard_temperature.csv")
+standard_temperature <- read_csv("data-raw/standard_temperature.csv")
 
 migratory_temp <- standard_temperature |>
   filter(stream == "sacramento river") |>
@@ -140,7 +140,7 @@ temperature_index <- left_join(temp_index_trib, temp_index_sac, by = c("year")) 
   mutate(gdd_sac = ifelse(is.na(gdd_sac), 0, gdd_sac),
          gdd_total = round(gdd_sac + gdd_trib, 2))
 
-flow_index <- read_csv("data-raw/database-tables/standard_flow.csv") |>
+flow_index <- read_csv("data-raw/standard_flow.csv") |>
   filter(month(date) %in% 3:8) |>
   mutate(year = year(date)) |>
   group_by(stream, year) |>
