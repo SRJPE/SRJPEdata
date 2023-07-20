@@ -171,4 +171,18 @@ adult_model_covariates_standard <- full_join(flow_index,
 usethis::use_data(adult_model_covariates_standard, overwrite = TRUE)
 
 
+# Flora data inputs -------------------------------------------------------
+# TODO
+
+# Josh data inputs --------------------------------------------------------
+# TODO
+
+# Noble data inputs -------------------------------------------------------
+# TODO
+
+# stock recruit data inputs -----------------------------------------------
+# TODO
+
+
+
 
