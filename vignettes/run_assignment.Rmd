@@ -1,0 +1,25 @@
+---
+title: "Run Assignment"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Run Assignment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(SRJPEdata)
+```
+
+
+```{r}
+# how many records have no information for run?
+# ~15% of battle creek have no run; ~3% of clear creek have no run
+```
