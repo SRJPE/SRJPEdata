@@ -1,7 +1,7 @@
 Package: SRJPEdata
 Title: Stores Monitoring Data to Be Used in the Spring Run Juvenile Production Estimate Model 
 Version: 0.0.0.9000
-Authors@R: 
+Authors: 
     person("Erin", "Cain", , "ecain@flowwest.com", role = c("aut", "cre")),
     person("Liz", "Stebbins", , "lstebbins@flowwest.com", role = c("aut", "cre")),
     person("Ashley", "Vizek", , "avizek@flowwest.com", role = c("aut", "cre")).
@@ -13,3 +13,7 @@ RoxygenNote: 7.2.3
 Depends: 
     R (>= 2.10)
 LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
