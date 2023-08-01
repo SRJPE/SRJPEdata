@@ -19,17 +19,18 @@ knitr::opts_chunk$set(
 
 ```{r setup, include = FALSE}
 library(SRJPEdata)
+library(waterYearType)
 source("data-raw/build_model_datasets.R")
 ```
-
 The run variable in RST data is incomplete for several streams. Run assignment in the JPE will eventually be assigned using a Probability of Length-at-Date (PLAD) model, but for initial model development run was assigned using weekly averages within streams and sites.  
 
-This file calculates proportion of spring run by week, stream, and site.
+This file explores variability in historical run type as assigned by stream teams, and describes the methods used to calculated proportion of spring run by week, stream, and site using historical averages.
 
 Data were checked and cleaned in scripts available [here](https://github.com/FlowWest/JPE-datasets/tree/main/scripts/rst).
-Cleaned data were saved on the JPE cloud database and pulled using the `pull_tables_from_database.R` script. 
+Cleaned data were saved on the JPE cloud database and pulled using the `pull_tables_from_database.R` script. Data tables were initially processed in the `build_model_datasets.R` script.
 
-## Methods
+
+## Variability in Spring Run Proportions
 
 Initial inspection of RST data available showed that, for several tributaries, run data were incomplete. Deer and Mill Creek do not record run information, `28.9%` of Yuba River's run records were `NA`, and Battle Creek and Sacramento River records were `14.9%` and `13.7% NA`, respectively. Butte Creek, Clear Creek, and Feather River had the most complete run data out of all tributaries:
 
@@ -40,6 +41,127 @@ updated_standard_catch |>
   summarise(proportion_NA = sum(is.na(run))/n()) |> 
   arrange(desc(proportion_NA))
 ```
+
+Here we analyze how run proportions vary by `year`, `water year type`, `stream`, and `site`.
+
+### Data preparation
+
+First, we standardize run type assignment across the entire dataset:
+```{r}
+standardized_run <- updated_standard_catch |> 
+  mutate(run = case_when(run %in% c("not recorded", "unknown") ~ NA,
+                         run %in% c("late fall", "fall", "winter") ~ "not_spring",
+                         TRUE ~ run))
+
+standardized_run |> 
+  distinct(run)
+
+```
+
+### Stream
+
+By proportion of total count, Butte and Battle Creek show the most spring run Chinook salmon. Deer Creek and Mill Creek do not collect run data, and so all their run type assignments are `NA`. Feather River, Sacramento River, Yuba River, and Clear Creek show higher proportions of other runs. 
+
+```{r}
+standardized_run |> 
+  group_by(stream, year) |> 
+  count(run) |> 
+  mutate(freq = n / sum(n)) |> 
+  ggplot(aes(x = year, y = freq, fill = run)) + 
+  geom_bar(stat = "identity") +
+  facet_wrap(~stream, scales = "free_y") +
+  xlab("Year") +
+  ylab("Proportion of count by run") +
+  ggtitle("Proportions of spring run Chinook by stream and year") + 
+  theme_minimal()
+```
+
+## Year
+
+In earlier years, few records were assigned run type and so `NA` dominates. However, in later years the proportion of records assigned `NA` decrease and the ratio of `spring` to `not_spring` run records appears to stabilize.
+
+```{r}
+standardized_run |> 
+  group_by(year) |> 
+  count(run) |> 
+  mutate(freq = n / sum(n)) |> 
+  ggplot(aes(x = year, y = freq, fill = run)) + 
+  geom_bar(stat = "identity") +
+  xlab("Year") +
+  ylab("Proportion of count by run") +
+  ggtitle("Proportions of spring run Chinook by year") + 
+  theme_minimal()
+```
+
+### Water Year Type
+We used the package `waterYearType` to assign water year types to the years in the dataset. We simplified water year types into `Wet` and `Dry` using the following logic: 
+
+- `Wet`, `Above Normal` = `Wet`
+- `Below Normal`, `Dry`, `Critical` = `Dry`
+
+Yuba River and Feather River are the only streams where the water year type appears to show a difference in proportion of catch that is spring run.
+
+```{r}
+standardized_run_wy <- standardized_run |> 
+  left_join(water_year_indices |> 
+              filter(location == "Sacramento Valley") |> 
+              mutate(Yr_type = ifelse(Yr_type %in% c("Wet", "Above Normal"), "Wet", "Dry")) |> 
+              select(year = WY, wy_type = Yr_type),
+            by = "year") |> 
+  mutate(wy_type = ifelse(year == 2022, "Dry", wy_type))
+
+standardized_run_wy |> 
+  group_by(wy_type, stream) |> 
+  count(run) |> 
+  mutate(freq = n / sum(n)) |> 
+  ggplot(aes(x = wy_type, y = freq, fill = run)) + 
+  geom_bar(stat = "identity") +
+  xlab("Year") +
+  ylab("Proportion of count by run") +
+  ggtitle("Proportions of spring run Chinook by water year type and stream") + 
+  theme_minimal() +
+  facet_wrap(~stream)
+```
+## Site
+
+Proportion spring run appeared to vary by site and year. For example, Clear Creek showed a distinct difference in proportion spring run by its two sampling sites.
+
+```{r}
+standardized_run |> 
+  group_by(stream, site, year) |> 
+  count(run) |> 
+  mutate(freq = n / sum(n)) |> 
+  filter(run == "spring") |> 
+  ggplot(aes(x = year, y = freq, color = site)) + 
+  geom_line() +
+  facet_wrap(~stream) +
+  xlab("Year") +
+  ylab("Proportion spring run") +
+  ggtitle("Proportions of spring run by site and stream") + 
+  theme_minimal()
+```
+Clear Creek:
+
+```{r}
+standardized_run |> 
+  group_by(stream, site, year) |> 
+  count(run) |> 
+  mutate(freq = n / sum(n)) |> 
+  filter(stream == "clear creek") |> 
+  ggplot(aes(x = year, y = freq, fill = run)) + 
+  geom_bar(stat = "identity") +
+  facet_wrap(~site) +
+  xlab("Year") +
+  ylab("Proportion of count") +
+  ggtitle("Run proportions in Clear Creek by site") + 
+  theme_minimal()
+```
+
+## Assigning Run Type Using Historical Averages
+
+
+### Methods
+
 Prior to initializing stock-recruit analysis, estimates of annual chinook outmigrant abundance needed to be converted to annual *spring run* chinook outmigrant abundance. One approach would be to multiply weekly abundance estimates by proportion of spring run fish by week. Ultimately, the PLAD model will be applied to historical data. In the interim, existing run type assignments were used to interpolate missing weeks to get proportion of spring run.
 
 Our methodology (performed for every tributary except Deer Creek and Mill Creek): 
