@@ -58,7 +58,7 @@ standardized_run |>
 
 ```
 
-### Stream
+### Stream {.tabset}
 
 By proportion of total count, Butte and Battle Creek show the most spring run Chinook salmon. Deer Creek and Mill Creek do not collect run data, and so all their run type assignments are `NA`. Feather River, Sacramento River, Yuba River, and Clear Creek show higher proportions of other runs. 
 
@@ -76,7 +76,7 @@ standardized_run |>
   theme_minimal()
 ```
 
-## Year
+## Year {.tabset}
 
 In earlier years, few records were assigned run type and so `NA` dominates. However, in later years the proportion of records assigned `NA` decrease and the ratio of `spring` to `not_spring` run records appears to stabilize.
 
@@ -93,7 +93,8 @@ standardized_run |>
   theme_minimal()
 ```
 
-### Water Year Type
+### Water Year Type {.tabset}
+
 We used the package `waterYearType` to assign water year types to the years in the dataset. We simplified water year types into `Wet` and `Dry` using the following logic: 
 
 - `Wet`, `Above Normal` = `Wet`
@@ -122,7 +123,8 @@ standardized_run_wy |>
   theme_minimal() +
   facet_wrap(~stream)
 ```
-## Site
+
+## Site {.tabset}
 
 Proportion spring run appeared to vary by site and year. For example, Clear Creek showed a distinct difference in proportion spring run by its two sampling sites.
 
