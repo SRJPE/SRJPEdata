@@ -113,3 +113,19 @@ gcs_get_object(object_name = "standard-format-data/standard_carcass_cjs_estimate
                saveToDisk = "data-raw/standard_carcass_cjs_estimate.csv",
                overwrite = TRUE)
 standard_carcass_estimates <- read_csv("data-raw/standard_carcass_cjs_estimate.csv")
+
+# Model rulesets
+# Yearling ruleset
+gcs_get_object(object_name = "standard-format-data/daily_yearling_ruleset.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data-raw/daily_yearling_ruleset.csv",
+               overwrite = TRUE)
+daily_yearling_ruleset <- read_csv("data-raw/daily_yearling_ruleset.csv")
+
+# years and weeks to include
+# this file was created in JPE-datasets/analysis/generate_sample_window.R
+gcs_get_object(object_name = "jpe-model-data/stream_week_year_include.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data-raw/stream_week_year_include.csv",
+               overwrite = TRUE)
+years_to_include <- read_csv("data-raw/stream_week_year_include.csv")
