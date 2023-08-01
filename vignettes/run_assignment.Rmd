@@ -10,13 +10,16 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width = 6, 
+  fig.height = 4,
+  fig.align = "center"
 )
 ```
 
-```{r setup}
+```{r setup, include = FALSE}
 library(SRJPEdata)
-source("data-raw/pull_tables_from_database.R")
+source("data-raw/build_model_datasets.R")
 ```
 
 The run variable in RST data is incomplete for several streams. Run assignment in the JPE will eventually be assigned using a Probability of Length-at-Date (PLAD) model, but for initial model development run was assigned using weekly averages within streams and sites.  
@@ -26,9 +29,9 @@ This file calculates proportion of spring run by week, stream, and site.
 Data were checked and cleaned in scripts available [here](https://github.com/FlowWest/JPE-datasets/tree/main/scripts/rst).
 Cleaned data were saved on the JPE cloud database and pulled using the `pull_tables_from_database.R` script. 
 
-## Method
+## Methods
 
-Initial inspection of RST data available showed that, for several tributaries, run data were incomplete. Deer and Mill Creek do not record run information, 28.9% of Yuba River's run records were `NA`, and Battle Creek and Sacramento River records were 14.9% and 13.7% `NA`, respectively. Butte Creek, Clear Creek, and Feather River had the most complete run data out of all tributaries:
+Initial inspection of RST data available showed that, for several tributaries, run data were incomplete. Deer and Mill Creek do not record run information, `28.9%` of Yuba River's run records were `NA`, and Battle Creek and Sacramento River records were `14.9%` and `13.7% NA`, respectively. Butte Creek, Clear Creek, and Feather River had the most complete run data out of all tributaries:
 
 ```{r}
 updated_standard_catch |> 
@@ -43,13 +46,13 @@ Our methodology (performed for every tributary except Deer Creek and Mill Creek)
 
 1) To get the correct weeks where data were missing, we assigned `NA` values to all run type assignments that provided no information (i.e. `not recorded` and `unknown` records)
 
-```{r, helpers}
+```{r}
 updated_standard_catch_na_run <- updated_standard_catch |> 
   mutate(run = ifelse(run %in% c("not recorded", "unknown", NA_character_), NA_character_, run)) |> glimpse()
 ```
 
 2) For each week where we had run type assignment data and counts above 0,  we calculated the `proportion_spring_run` and `proportion_not_spring_run` within years and sites.
-```{r, helpers}
+```{r}
 updated_standard_catch_na_run_no_deer_mill <- updated_standard_catch_na_run |> 
   filter(!stream %in% c("deer creek", "mill creek"))
 
@@ -67,7 +70,7 @@ weekly_run_bins |> arrange(stream, year, week) |> head()
 
 3) There were some years where there weren't weekly data to interpolate. For these weeks, we created proxy weekly bins (summarizing across years, but still within sites). We added these proxy bins to the weeks where data were missing
 
-```{r, helpers}
+```{r}
 # Use when no run data for a year 
 proxy_weekly_run <- updated_standard_catch_na_run_no_deer_mill |>
   mutate(year = year(date), week = week(date)) |>
@@ -92,14 +95,14 @@ proxy_run_bins_for_weeks_without_run |> arrange(stream, year, site) |> head()
 
 4) We added these two datasets together to get full coverage of weekly proportions of spring/not spring run Chinook.
 
-```{r, helpers}
+```{r}
 all_run_bins <- bind_rows(weekly_run_bins, proxy_run_bins_for_weeks_without_run) |>
   glimpse()
 ```
 
 5) We took the original dataset and filtered to those records where count was above 0 and run type was not assigned. For these records, we used the weekly proportions to fill in counts of spring run and not spring run Chinook:
 
-```{r, helpers}
+```{r}
 na_filled_run <- updated_standard_catch_na_run_no_deer_mill |> 
   filter(is.na(run) & count > 0) |> 
   left_join(all_run_bins, by = c("year", "week", "stream", "site")) |> 
@@ -122,7 +125,7 @@ na_filled_run <- updated_standard_catch_na_run_no_deer_mill |>
 * all original records where count was 0, and
 * all records for Deer Creek and Mill Creek, which did not have any run type assigned: 
 
-```{r, helpers}
+```{r}
 combined_rst_wo_na_run <- updated_standard_catch_na_run_no_deer_mill |> 
   filter(!is.na(run) & count > 0) |> 
   mutate(run_for_model = if_else(run == "spring", "spring_run", "not_spring_run")) |> 
@@ -206,7 +209,7 @@ updated_standard_catch_na_run |>
 
 - There were some weeks within years with no historical data with which to calculate averages, and for those we used the average for those weeks across all years within the dataset:
 
-```{r, helpers}
+```{r}
 updated_standard_catch_na_run_no_deer_mill |>
   filter(count > 0) |> 
   group_by(year, week, stream, site) |>
