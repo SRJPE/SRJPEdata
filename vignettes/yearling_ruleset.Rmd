@@ -8,12 +8,110 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width=8, fig.height=5)
 ```
 
 ```{r setup}
 library(SRJPEdata)
+library(tidyverse)
+library(lubridate)
+
+# Read in datasets 
+rulesets <- read.csv(here::here("data-raw", "weekly_yearling_cutoff.csv")) |> 
+  mutate(date_for_plot = as_date(date_for_plot))
+daily_ruleset_all <- read.csv(here::here("data-raw", "daily_yearling_ruleset.csv"))
+source("../data-raw/pull_tables_from_database.R")
 ```
+
+## Generate Yearling Rulesets 
+
+Raw catch from the trap does not consistently differentiate between yearling and YOY Chinook. FlowWest presented a proposed methodology at a LHD ruleset workshop and worked with watershed Experts to define methodology to systematically determine life history for each tributary (described below).
+
+### Approach: 
+
+1) Set weekly cutoff values: Use visual determination on fork length over time scatter plots to set weekly cutoff values of yearlings vs YOY. 
+2) Generate daily cutoff values: Use linear interpolation to extrapolate weekly cutoffs into daily values. 
+3) Review & Update: Share proposed cutoff values with watershed experts to review. Update as needed. 
+4) Apply cutoff to catch data: Use daily cutoff values to generate a yearling column in the catch data. 
+
+## Set Weekly Cutoff Values & Generate daily cutoff values
+
+FlowWest proposed weekly cutoff values and used these weekly cutoff values and generated daily values using a linear approximation function, `approxfun`. 
+
+`generate_cutoff <- approxfun(date, fork_length_cutoff, rule = 2)`
+
+The plot below shows the update cutoff values with linear interpolation betweek weekly cutoffs for Deer Creek. 
+
+```{r}
+stream_name <- "deer creek"
+rulesets <- read.csv(here::here("data-raw", "weekly_yearling_cutoff.csv")) |> 
+  mutate(date_for_plot = as_date(date_for_plot))
+
+rulesets_filtered <- rulesets |> 
+    filter(stream == stream_name) 
+  
+data <- catch |> 
+  filter(fork_length < 300) |> # for graph scaling, takes out a lot of butte creek
+  filter(stream != "sacramento river") |> 
+  mutate(week = week(date),
+         week = if_else(week == 53, 52, week), # all December 30th or 31st
+         month = month(date),
+         day = ifelse(day(date) < 10, paste0("0", day(date)), day(date)),
+         fake_year = ifelse(month %in% 10:12, 1971, 1972),
+         # create fake date for plotting all years on same x axis
+         fake_date = ymd(paste0(fake_year, "-",month, "-", day))) |> 
+  select(true_fl = fork_length, week, stream, fake_date) |> 
+  filter(stream == stream_name) 
+
+# interpolate daily cutoff line from weekly cutoff values
+generate_cutoff <- approxfun(rulesets_filtered$date_for_plot,
+                             rulesets_filtered$fl_cutoff, rule = 2)
+ruleset_lines <- tibble(
+    rulesets_dates = seq(as.Date("1971-10-01"), as.Date("1972-09-30"), by = "day"),
+    cutoff_line = generate_cutoff(rulesets_dates))
+
+# format daily rulesets
+daily_yearling_ruleset <- ruleset_lines |> 
+    mutate(month = month(rulesets_dates),
+           day = day(rulesets_dates),
+           cutoff = round(cutoff_line, 2),
+           stream = stream_name) |> 
+    select(stream, month, day, cutoff)
+  
+  # join interpolated line by date and then assign
+  # yearling cutoffs based on the interpolated line
+data <- data |> 
+    left_join(ruleset_lines, by = c("fake_date" = "rulesets_dates")) |> 
+    mutate(is_yearling = case_when(true_fl <= cutoff_line ~ "Subyearling",
+                                   true_fl > cutoff_line ~ "Yearling"))
+  
+  # plot
+ ggplot() + 
+    geom_point(data, mapping = aes(x = fake_date, y = true_fl, 
+                                   color = is_yearling), alpha = 0.6) +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b",
+                 limits = c(ymd("1971-10-01"), ymd("1972-09-30"))) +
+    labs(y = "fork length (mm)",
+         x = "") +
+    theme_minimal() +
+    geom_line(ruleset_lines, mapping = aes(x = rulesets_dates, y = cutoff_line)) +
+    ggtitle(paste0(str_to_title(stream_name))) + 
+    theme(plot.title = element_text(hjust = 0.5),
+          legend.position = "bottom") + 
+    labs(color = "Yearling designation") + 
+    geom_point(rulesets_filtered, mapping = aes(x = date_for_plot, y = fl_cutoff), shape = 15) + 
+    scale_color_manual(values = c("#440154FF", "#FDE725FF", "#21908CFF"),
+                       breaks = c("Subyearling", "Yearling", "Missing weekly cutoff value"))
+
+usethis::use_data(daily_yearling_ruleset)
+```
+
+## Review & Update
+
+FlowWest shared above plot for each watershed and asked stream experts to review. We incoperated in feedback on modifying rulesets to better seperate yearlings and YOY. 
+
+## Apply cutoff to catch data
+
+FlowWest then took daily cutoff line (shown in plot above) and used it as a threshold to classify Yearling vs YOY in historical catch data. We added an `is_yearling` column to the table and set `is_yearling = TRUE` for any fish whoes fork length exceeded the yearling cutoff on a given date. 
+
+Applied in the weekly_data_summaries script. 
