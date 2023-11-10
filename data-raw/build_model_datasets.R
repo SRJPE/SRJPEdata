@@ -56,7 +56,7 @@ weekly_model_data <- catch_reformatted |>
   # join flow data to dataset
   left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
   # select columns that josh uses 
-  select(year, week, stream, site, count, life_stage, is_yearling, mean_fork_length, 
+  select(year, week, stream, site, count, mean_fork_length, 
          number_released, number_recaptured, effort = hours_fished, 
          flow_cfs) |> 
   # TODO add efficiency flow to database - Standardize using code above 
@@ -67,6 +67,9 @@ weekly_model_data <- catch_reformatted |>
   mutate(run_year = ifelse(week >= 45, year + 1, year),
          catch_standardized_by_effort = ifelse(is.na(effort), count, round(count * average_stream_effort / effort, 0))) |> 
   glimpse()
+
+# TODO dig into yearling & lifestage splitting up data too much 
+# TODO create differnt weekly_model without lifestage and yearlings so liz can run that - bt_spas_x_input_data
 
 # TODO data checks 
 # Why does battle start in 2007 - did we intentionally leave early years out of database 

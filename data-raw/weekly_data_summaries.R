@@ -133,10 +133,11 @@ catch_with_inclusion_criteria <- updated_standard_catch |>
   glimpse()
 
 # summarize by week -----------------------------------------------------------
+# Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
 weekly_standard_catch_unmarked <- catch_with_inclusion_criteria %>% 
   mutate(week = week(date),
          year = year(date)) %>% 
-  group_by(week, year, stream, site, subsite, site_group, run, life_stage, adipose_clipped, include_in_model, is_yearling) %>% 
+  group_by(week, year, stream, site, subsite, site_group, run, adipose_clipped, include_in_model) %>% 
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count)) %>% 
