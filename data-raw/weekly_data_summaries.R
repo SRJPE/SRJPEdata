@@ -139,7 +139,8 @@ weekly_standard_catch_unmarked <- catch_with_inclusion_criteria %>%
   group_by(week, year, stream, site, subsite, site_group, run, life_stage, adipose_clipped, include_in_model, is_yearling) %>% 
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
-            count = sum(count)) %>% glimpse()
+            count = sum(count)) %>% 
+  ungroup() |> glimpse()
 
 # TADA - catch is matching up 
 # TODO Decide if we want to rename or save differently 
@@ -188,7 +189,7 @@ glimpse(efficiency_summary)
 
 # TODO add in flow and median fork length info (currently not in database)
 weekly_efficiency <- efficiency_summary |> 
-  group_by(stream, site, site_group, origin_released = origin, 
+  group_by(stream, site, site_group, 
            week_released = day(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
