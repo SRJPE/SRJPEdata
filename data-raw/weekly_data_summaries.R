@@ -110,7 +110,7 @@ weeks_wo_lifestage <- gap_weeks |>
 
 no_catch <- standard_catch_unmarked |> 
   mutate(week = week(date), year = year(date)) |>
-  filter(is.na(fork_length) & count == 0)
+  filter(is.na(fork_length) & count == 0) 
 
 # less rows now than in original, has to do with removing count != 0 in line 104, is there any reason not to do this?
 updated_standard_catch <- bind_rows(combined_rst_wo_na_fl, na_filled_lifestage, no_catch, weeks_wo_lifestage) |> glimpse()
@@ -129,28 +129,51 @@ catch_with_inclusion_criteria <- updated_standard_catch |>
   mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
          # if the year was not included in the list of years to include then should be FALSE
          include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
-  select(-c(monitoring_year, min_date, max_date, year, week)) |> 
+  filter(include_in_model) |> 
+  select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
   glimpse()
 
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
-weekly_standard_catch_unmarked <- catch_with_inclusion_criteria %>% 
+# TODO review logic with Ashley/Liz to confirm 
+weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
-         year = year(date)) %>% 
-  group_by(week, year, stream, site, subsite, site_group, run, adipose_clipped, include_in_model) %>% 
+         year = year(date)) |> 
+  group_by(week, year, stream, site, site_group, run, adipose_clipped) %>% 
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
-            count = sum(count)) %>% 
+            count = sum(count, na.rm = T))  |>  
+  filter(count > 0) |> 
+  mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
   ungroup() |> glimpse()
 
-# TADA - catch is matching up 
+catch_site_year_weeks <- unique(weekly_standard_catch_no_zeros$site_year_week)
+
+weekly_standard_catch_zeros <- catch_with_inclusion_criteria |> 
+  mutate(week = week(date),
+         year = year(date)) |> 
+  group_by(week, year, stream, site, site_group, run, adipose_clipped) %>% 
+  summarize(mean_fork_length = mean(fork_length, na.rm = T),
+            mean_weight = mean(weight, na.rm = T),
+            count = sum(count, na.rm = T))  |>  
+  filter(count == 0) |> 
+  mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
+  filter(!site_year_week %in% catch_site_year_weeks) |> 
+  glimpse()
+
+weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros, 
+                                   weekly_standard_catch_zeros) |> glimpse()
+  
+
 # TODO Decide if we want to rename or save differently 
 usethis::use_data(weekly_standard_catch_unmarked, overwrite = TRUE)
 
-
 # Trap Formatting ---------------------------------------------------------
 # Weekly effort from vignette/trap_effort.Rmd
-weekly_effort |> glimpse()
+weekly_effort_by_site <- weekly_effort |> 
+  group_by(week, year, stream, site, site_group) %>% 
+  summarize(hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
+  ungroup()
 
 # Catch & Effort ----------------------------------------------------------
 
