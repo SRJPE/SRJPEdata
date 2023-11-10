@@ -4,61 +4,46 @@
 source("data-raw/weekly_data_summaries.R")
 # Confirm data objects loaded from sourcing weekly data summaries 
 # TODO think through this process may want to save as CSVs and read in 
-weekly_catch_unmarked  |> glimpse()
+weekly_standard_catch_unmarked  |> glimpse()
 weekly_efficiency |> glimpse()
 standard_flow |> glimpse()
 
 # reformat flow data and summarize weekly
+# TODO josh has stream site column, we are keeping separate and will need to refactor his code
 flow_reformatted <- standard_flow |> 
-  mutate(stream_site = paste(stream, site),
-         year = year(date),
+  mutate(year = year(date),
          week = week(date)) |> 
-  group_by(year, week, site, stream, source, stream_site) |> 
+  group_by(year, week, site, stream, source) |> 
   summarise(flow_cfs = mean(flow_cfs, na.rm = T)) |> 
   glimpse()
 
-efficiency_reformatted <- weekly_efficiency |> 
-  ungroup() |> 
-  mutate(stream_site = paste(stream, site)) |> 
-  filter(!is.na(site), !is.na(year_released)) |> 
-  glimpse()
+weekly_efficiency |> glimpse()
 
 weekly_effort |> glimpse()
 
+# TODO do we want to do adipose clipped, josh had it but sounds like maybe we want to do all 
 #data frames for chinook of any kind and for spring run only (exclude hatchery in both cases)
-catch_reformatted <- weekly_catch_unmarked |> 
-  mutate(stream_site = paste(stream, site)) |> 
-  filter(adipose_clipped == FALSE,
-         run %in% c("spring", NA, "not recorded")) |> glimpse()
-# TODO update lifestage using logic below from flora 
+catch_reformatted <- weekly_standard_catch_unmarked |> 
+  filter(run %in% c("spring", NA, "not recorded")) |> glimpse()
 
 # Combine all 3 tables together 
-
 weekly_model_data <- catch_reformatted |> 
   left_join(weekly_effort, by = c("year", "week", "stream", "site", "subsite")) |> 
   # Join efficnecy data to catch data
   left_join(efficiency_reformatted, 
             by = c("week" = "week_released",
                    "year" = "year_released", "stream", 
-                   "site", "stream_site")) |> 
+                   "site")) |> 
   # join flow data to dataset
-  left_join(flow_reformatted, by = c("week", "year", "site", "stream", "stream_site")) |> 
+  left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
   # select columns that josh uses 
-  # TODO confirm we do not need night release
-  select(year, week, stream, site, count, lifestage, is_yearling, mean_fork_length, 
+  select(year, week, stream, site, count, life_stage, is_yearling, mean_fork_length, 
          origin_released, number_released, number_recaptured, effort = hours_fished, 
-         flow_cfs, efficiency_flow = flow_at_recapture_day1) |> 
-  # TODO add run year
+         flow_cfs) |> 
+  # TODO add efficiency flow to database 
+  # efficiency_flow = flow_at_recapture_day1) |>
+  mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
   glimpse()
 
-# TODO 
-# Potential lifestage update
-#  else if ((Jmon[Weeks[iwk]] >= 1 &
-# Jmon[Weeks[iwk]] < 3 & sz > 45 & sz <= 60) |
-#   (Jmon[Weeks[iwk]] >= 3 &
-#      Jmon[Weeks[iwk]] < 7 & sz > 45 & sz <= 100)) {
-#        Spr_Stage[k] = "Smolt"
-#      } else if ((Jmon[Weeks[iwk]] > 10 &
-#                  sz <= 45) | (Jmon[Weeks[iwk]] <= 6 & sz <= 45)) {
-#        Spr_Stage[k] = "Fry"
-#      }
+# 
+usethis::use_data(weekly_model_data)

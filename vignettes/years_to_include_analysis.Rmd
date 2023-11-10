@@ -58,5 +58,5 @@ chosen_site_years_to_model <- years_to_include |>
 
 
 
-usethis::use_data(chosen_site_years_to_model)
+usethis::use_data(chosen_site_years_to_model, overwrite = TRUE)
 ```

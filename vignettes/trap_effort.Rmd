@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, eval = FALSE}
 library(SRJPEdata)
 source("data-raw/pull_tables_from_database.R")
 ```
@@ -105,7 +105,7 @@ method_one_hours_fished <- filter(trap, stream %in%
                                 c("battle creek", "clear creek", 
                                   "feather river", "sacramento river")) %>% 
   select(trap_start_date, trap_start_time, trap_stop_date, trap_stop_time, 
-         stream, site, subsite, ) %>% 
+         stream, site, subsite, site_group) %>% 
   arrange(site, subsite, trap_stop_date, trap_stop_time) %>% 
   mutate(hours_fished_methodology = "using start time and stop time") %>% 
   hours_fished()
@@ -136,7 +136,7 @@ observation.
 ```{r, butte, yuba}
 ## Butte ####
 method_three_hours_fished <- filter(trap, stream %in% c("butte creek", "yuba river")) %>%
-  distinct(trap_stop_date, trap_stop_time, site, subsite, stream) %>%
+  distinct(trap_stop_date, trap_stop_time, site, subsite, site_group, stream) %>%
   mutate(start_datetime = ymd_hms(paste(trap_stop_date, trap_stop_time))) %>%
   mutate(hours_fished_methodology = "using only start time") %>% 
   hours_fished_one_date() %>% 
@@ -176,7 +176,7 @@ fished so assume 24 hours for every day with data.
 ```{r, deer & mill}
 ## Deer & mill #####
 deer_mill_hours_fished <- filter(trap, stream %in% c("deer creek", "mill creek")) %>% 
-  distinct(trap_stop_date, stream, site, subsite) %>% 
+  distinct(trap_stop_date, stream, site, subsite, site_group) %>% 
   mutate(hours_fished_methodology = "24 hour assumption") %>% 
   mutate(hours_fished = 24)
 
@@ -191,15 +191,15 @@ knitr::kable(head(deer_mill_hours_fished, 5))
 # do not sum by subsites. this can be done in further analysis
 
 method_one <- method_one_hours_fished %>% 
-  select(stream, site, subsite, trap_stop_date, trap_stop_time, hours_fished) %>% 
+  select(stream, site, subsite, site_group, trap_stop_date, trap_stop_time, hours_fished) %>% 
   mutate(hours_fished = as.numeric(hours_fished))
 
 method_three <- method_three_hours_fished %>% 
-  select(stream, site, subsite, trap_stop_date, trap_stop_time, hours_fished) %>% 
+  select(stream, site, subsite, site_group, trap_stop_date, trap_stop_time, hours_fished) %>% 
   mutate(hours_fished = as.numeric(hours_fished))
 
 mill_and_deer <- deer_mill_hours_fished %>% 
-  select(stream, site, subsite, trap_stop_date, hours_fished) %>% 
+  select(stream, site, subsite, site_group, trap_stop_date, hours_fished) %>% 
   mutate(hours_fished = as.numeric(hours_fished))
 
 hours_fished_combined <- bind_rows(method_one,
@@ -208,18 +208,20 @@ hours_fished_combined <- bind_rows(method_one,
   # if hours fished NA assumed 24 hours
   mutate(hours_fished = ifelse(is.na(hours_fished), 24, hours_fished)) %>% 
   rename(date = trap_stop_date) %>% 
-  group_by(stream, site, subsite, date) %>% 
+  group_by(stream, site, subsite, site_group, date) %>% 
   summarize(hours_fished = sum(hours_fished)) 
 ```
 
 ## Summarized by week
 
 ```{r}
-hours_fished_weekly <- hours_fished_combined %>% 
+weekly_effort <- hours_fished_combined %>% 
   mutate(week = week(date),
          year = year(date)) %>% 
-  group_by(stream, site, subsite, week, year) %>% 
+  group_by(stream, site, subsite, site_group, week, year) %>% 
   summarize(hours_fished = sum(hours_fished)) 
+
+usethis::use_data(weekly_effort, overwrite = TRUE)
 ```
 
 ### QC

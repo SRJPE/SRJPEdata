@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width=8, fig.height=5)
 ```
 
-```{r setup}
+```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
 library(SRJPEdata)
 library(tidyverse)
 library(lubridate)
@@ -20,7 +20,7 @@ library(lubridate)
 rulesets <- read.csv(here::here("data-raw", "weekly_yearling_cutoff.csv")) |> 
   mutate(date_for_plot = as_date(date_for_plot))
 daily_ruleset_all <- read.csv(here::here("data-raw", "daily_yearling_ruleset.csv"))
-source("../data-raw/pull_tables_from_database.R")
+source(here::here("data-raw", "pull_tables_from_database.R"))
 ```
 
 ## Generate Yearling Rulesets 
@@ -103,7 +103,7 @@ data <- data |>
     scale_color_manual(values = c("#440154FF", "#FDE725FF", "#21908CFF"),
                        breaks = c("Subyearling", "Yearling", "Missing weekly cutoff value"))
 
-usethis::use_data(daily_yearling_ruleset)
+usethis::use_data(daily_yearling_ruleset, overwrite = TRUE)
 ```
 
 ## Review & Update
