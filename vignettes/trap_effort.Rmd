@@ -17,9 +17,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, eval = FALSE}
+```{r setup, echo = FALSE}
 library(SRJPEdata)
-source("data-raw/pull_tables_from_database.R")
+source(here::here("data-raw", "pull_tables_from_database.R"))
+
+colors_small <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                            "#899DA4", "#C93312", "#DC863B" # royal 1 (- 3)
+)
 ```
 
 Hours fished is not included as a variable in the data and needs to be calculated.
@@ -119,12 +123,14 @@ knitr::kable(head(method_one_hours_fished, 5))
 method_one_hours_fished %>% 
   ggplot(aes(x = stop_datetime, y = hours_fished, color = stream)) +
   geom_point()+
-  theme_minimal()
+  theme_minimal() + 
+  scale_color_manual(values = colors_small)
 
 method_one_hours_fished %>% 
   ggplot(aes(x = hours_fished, fill = stream)) +
   geom_histogram(position = "dodge") +
-  theme_minimal()
+  theme_minimal() + 
+  scale_fill_manual(values = colors_small)
 ```
 
 
@@ -155,13 +161,16 @@ knitr::kable(head(method_three_hours_fished, 5))
 ```{r}
 method_three_hours_fished %>% 
   ggplot(aes(x = trap_stop_time, y = hours_fished, color = stream)) +
-  geom_point()
+  geom_point()+ 
+  scale_color_manual(values = colors_small)
 # trying to figure out where to set cut of for effort
 # decided to set as 5 days - 120 hours
 method_three_hours_fished %>% 
   filter(hours_fished < 200) %>% 
   ggplot(aes(x = hours_fished, fill = stream)) +
-  geom_histogram(position = "dodge") + theme_minimal()
+  geom_histogram(position = "dodge") + 
+  theme_minimal() + 
+  scale_fill_manual(values = colors_small)
 # these are typos and will be fixed by assuming 24 hours fished
 # butte_hours_fished %>% 
 #   filter(hours_fished > 5000) %>% tally()
@@ -227,14 +236,16 @@ usethis::use_data(weekly_effort, overwrite = TRUE)
 ### QC
 
 ```{r}
-hours_fished_weekly %>% 
+weekly_effort %>% 
   ggplot(aes(x = week, y = hours_fished, color = year)) +
   geom_point() + 
   facet_wrap(~stream)+ 
-  theme_minimal()
+  theme_minimal() + 
+  scale_fill_manual(values = colors_small)
 
-hours_fished_weekly %>% 
+weekly_effort %>% 
   ggplot(aes(x = hours_fished, fill = stream)) +
   geom_histogram(alpha = .75, position = 'dodge') +
-  theme_minimal()
+  theme_minimal() + 
+  scale_fill_manual(values = colors_small)
 ```

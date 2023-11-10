@@ -71,4 +71,4 @@ recaptured <- dbGetQuery(con, "SELECT rf.date, rf.count, rf.release_id, tl.strea
                            left join run r on rf.run_id = r.id
                            left join lifestage ls on rf.lifestage_id = ls.id") 
 
-glimpse(recaptured)
+# glimpse(recaptured)

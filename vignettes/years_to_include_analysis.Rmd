@@ -12,6 +12,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(googleCloudStorageR)
+library(tidyverse)
 ```
 
 ```{r setup}
@@ -25,9 +27,9 @@ gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
 gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET")) 
 gcs_get_object(object_name = "jpe-model-data/stream_week_year_include.csv",
                bucket = gcs_get_global_bucket(),
-               saveToDisk = "../data-raw/database-tables/stream_week_year_include.csv",
+               saveToDisk = "data-raw/database-tables/stream_week_year_include.csv",
                overwrite = TRUE)
-years_to_include <- read_csv("../data-raw/database-tables/stream_week_year_include.csv")
+years_to_include <- read_csv("data-raw/database-tables/stream_week_year_include.csv")
 
 lfc_subsites <- c("eye riffle_north", "eye riffle_side channel", "gateway main 400' up river", "gateway_main1", "gateway_rootball", "gateway_rootball_river_left", "#steep riffle_rst", "steep riffle_10' ext", "steep side channel")
 hfc_subsites <- c("herringer_east", "herringer_upper_west", "herringer_west", "live oak", "shawns_east", "shawns_west", "sunset east bank", "sunset west bank")

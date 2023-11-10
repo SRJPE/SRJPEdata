@@ -45,5 +45,6 @@ weekly_model_data <- catch_reformatted |>
   mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
   glimpse()
 
-# 
-usethis::use_data(weekly_model_data)
+# TODO data checks 
+# Why does battle start in 2007 - did we intentionally leave early years out of database 
+usethis::use_data(weekly_model_data, overwrite = TRUE)
