@@ -1,0 +1,36 @@
+title: SRJPEdata
+url: https://SRJPE.github.io/SRJPEdata/
+template:
+  params:
+    bootswatch: flatly
+    
+home:
+  links:
+  - text: ITP Website
+    href: https://water.ca.gov/Programs/State-Water-Project/Endangered-Species-Protection
+
+reference:
+- title: Model Data 
+  desc: Data used directly as model inputs 
+  
+- title: Helper Data 
+  desc: Data used as helper datasets to generate model data
+  
+navbar:
+  structure:
+    left:  [home, reference, articles]
+    right: [github]  
+  type: default
+  left:
+  - text: 'Reference'
+    href: reference/index.html
+  - text: 'Articles'
+    menu: 
+      - text: 'Yearling Analysis'
+        href: articles/yearling_ruleset.html
+      - text: 'Trap Effort'
+        href: articles/trap_effort.html
+repo:
+ url:
+  home: https://github.com/SRJPE/SRJPEdata
+  issue: https://github.com/SRJPE/SRJPEdata/issues/

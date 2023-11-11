@@ -1,9 +1,9 @@
 Package: SRJPEdata
 Title: Stores Monitoring Data to Be Used in the Spring Run Juvenile Production Estimate Model 
 Version: 0.0.0.9000
-Authors@R: c(person("Erin", "Cain", , "ecain@flowwest.com", role = c("aut")),
-             person("Liz", "Stebbins", , "lstebbins@flowwest.com", role = c("aut")),
-             person("Ashley", "Vizek", , "avizek@flowwest.com", role = c("aut", "cre")))
+Authors@R: c(person("Ashley", "Vizek", , "avizek@flowwest.com", role = c("aut", "cre")),
+             person("Erin", "Cain", , "ecain@flowwest.com", role = c("aut")),
+             person("Liz", "Stebbins", , "lstebbins@flowwest.com", role = c("aut")))
 Description: This data package pulls in data from the SR JPE database and formats data into model ready R data objects. 
 License: GPL-3
 Encoding: UTF-8

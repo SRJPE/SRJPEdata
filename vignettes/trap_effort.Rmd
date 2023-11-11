@@ -161,7 +161,8 @@ knitr::kable(head(method_three_hours_fished, 5))
 ```{r}
 method_three_hours_fished %>% 
   ggplot(aes(x = trap_stop_time, y = hours_fished, color = stream)) +
-  geom_point()+ 
+  geom_point() + 
+  theme_minimal() + 
   scale_color_manual(values = colors_small)
 # trying to figure out where to set cut of for effort
 # decided to set as 5 days - 120 hours
@@ -240,8 +241,9 @@ weekly_effort %>%
   ggplot(aes(x = week, y = hours_fished, color = year)) +
   geom_point() + 
   facet_wrap(~stream)+ 
-  theme_minimal() + 
-  scale_fill_manual(values = colors_small)
+  theme_minimal() 
+# + 
+#   scale_color_manual(values = colors_small)
 
 weekly_effort %>% 
   ggplot(aes(x = hours_fished, fill = stream)) +

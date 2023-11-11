@@ -1,5 +1,5 @@
 ---
-title: "Years to include analysis"
+title: "Data to Include In JPE"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{years_to_include_analysis}
@@ -16,20 +16,94 @@ library(googleCloudStorageR)
 library(tidyverse)
 ```
 
-```{r setup}
+The Spring Run Juvenile Production Estimate is trained on historical Rotary Screw Trap and Adult Surveys. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and Adult years to include. 
+
+## RST Data - Years To Include in Model 
+
+The modeling team hosted a modeling windows workshop where we discussed approaches to determining modeling windows. At the workshop we decided to use the full sampling season of data for each tributary and year but to exclude years where we were concerned about data completeness. We came up with the following approach to determine excluded years:
+
+1) First exclude years with lots of missing data from cumulative catch curves. See `data-raw/years_to_exclude.csv` (exclusion_type = “really low sampling”).
+2) Exclude yearlings from cumulative catch curves.
+3) Use updated cumulative catch curves to determine the critical window (average window over all historical years that captures 75 % percent of catch). See [heatmaps in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) to view critical window.
+4) Remove additional years where there is no sampling for 4 consecutive weeks within critical window. See `data-raw/years_to_exclude.csv` (exclusion_type = “missing four consecutive weeks in critical window”).
+
+See a section of years to exclude table below. 
+```{r, echo = FALSE}
 library(SRJPEdata)
-# TODO Build out with code from shiny - for now just pull in 
-# TODO clean up with here 
-# TODO cache as data object 
+library(tidyverse)
+library(lubridate)
+source(here::here("data-raw", "pull_tables_from_database.R"))
+# TODO Build out with code from shiny, add plots 
 # TODO document data object 
-# TODO add red bluff to file 
-gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
-gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET")) 
-gcs_get_object(object_name = "jpe-model-data/stream_week_year_include.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/database-tables/stream_week_year_include.csv",
-               overwrite = TRUE)
-years_to_include <- read_csv("data-raw/database-tables/stream_week_year_include.csv")
+# TODO add red bluff to database & file 
+
+years_exclude <- read_csv(here::here("data-raw","years_to_exclude.csv"))
+years_exclude_nice_names <- years_exclude |> select("Stream" = stream, 
+                                                    "Year" = year, 
+                                                    "Exclusion Type" = exclusion_type,
+                                                    "Notes" = reason_for_exclusion)
+knitr::kable(head(years_exclude_nice_names, 10))
+```
+
+```{r}
+# Following the sample window workshop Erin Cain emailed list of stream/years
+# to exclude. 
+# Read in years_to_exclude.csv
+# Read in catch data and find the min/max week for each stream/year
+# Exclude years
+
+# analysis for red bluff - bring back in after adding to database 
+rb <- filter(catch, site == "red bluff diversion dam")
+rb |> 
+  group_by(date) |> 
+  summarize(count = sum(count, na.rm = T)) |> 
+  mutate(wy = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
+         fake_date = ifelse(month(date) %in% 10:12, ymd(paste0("1999-",month(date), "-", day(date))), 
+                            ymd(paste0("2000-",month(date), "-", day(date))))) |> 
+  filter(wy == 2023) |> 
+  ggplot(aes(x = fake_date, y = count)) +
+    geom_point()
+
+# 1996, 1998, 2001, 2002, 2004, 2006, 2017, 2019, 2020
+# 1996 - most of february is missing
+# 1998 - all of february is missing
+# 2001 - no data collection
+# 2002 - data collection started in april
+# 2004 - missing second half of february
+# 2006 - missing first two weeks of march
+# 2017 - missing a lot of winter months
+# 2019 - missing first two weeks of march
+# 2020 - no data collection after march
+exclude <- tibble(stream = c(rep("battle creek",3), rep("butte creek", 5), rep("deer creek", 8),
+                             rep("feather river", 2), rep("mill creek", 5), "sacramento river"),
+                  monitoring_year = c(2003, 2007, 2015, 
+                                      2019, 2005, 1997, 2006, 1998, 
+                                      1993, 1994, 1997, 1998, 2008, 1999, 2004, 2006, 
+                                      2021, 2017, 
+                                      1997, 1998, 1999, 2004, 2009, 
+                                      2013),
+                  exclude = rep("yes", 24))
+
+min_max_week <- catch |> 
+  mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
+  group_by(monitoring_year, stream, site, subsite) |> 
+  summarize(min_date = min(date),
+            min_week = week(min_date),
+            max_date = max(date),
+            max_week = week(max_date))
+
+include <- min_max_week |> 
+  left_join(exclude) |> 
+  mutate(exclude = ifelse(site == "red bluff diversion dam" & monitoring_year %in% c(1996, 1998,
+                                                                                     2001, 2002,
+                                                                                     2004, 2006,
+                                                                                     2017, 2018,
+                                                                                     2020),
+                          "yes", exclude)) |> 
+  filter(is.na(exclude)) |> 
+  select(-exclude)
+
+knitr::kable(head(include, 10))
 
 lfc_subsites <- c("eye riffle_north", "eye riffle_side channel", "gateway main 400' up river", "gateway_main1", "gateway_rootball", "gateway_rootball_river_left", "#steep riffle_rst", "steep riffle_10' ext", "steep side channel")
 hfc_subsites <- c("herringer_east", "herringer_upper_west", "herringer_west", "live oak", "shawns_east", "shawns_west", "sunset east bank", "sunset west bank")
@@ -37,7 +111,7 @@ hfc_subsites <- c("herringer_east", "herringer_upper_west", "herringer_west", "l
 lfc_sites <- c("eye riffle", "gateway riffle", "steep riffle")
 hfc_sites <- c("herringer riffle", "live oak", "shawn's beach", "sunset pumps")
 
-chosen_site_years_to_model <- years_to_include |>
+chosen_site_years_to_model <- include |>
   group_by(monitoring_year, stream, site) |> 
   # decided to go inclusively 
   # if just take min week does not account for the monitoring year so need to find min date first
@@ -57,8 +131,6 @@ chosen_site_years_to_model <- years_to_include |>
                                 T ~ NA)) |> 
   filter(exclude == F) |> 
   select(monitoring_year, stream, site_group, site, min_date, min_week, max_date, max_week)
-
-
 
 usethis::use_data(chosen_site_years_to_model, overwrite = TRUE)
 ```
