@@ -23,7 +23,7 @@ weekly_efficiency |> glimpse()
 weekly_effort_by_site |> glimpse()
 
 # TODO do we want to do adipose clipped, josh had it but sounds like maybe we want to do all 
-#data frames for chinook of any kind and for spring run only (exclude hatchery in both cases)
+# data frames for chinook of any kind and for spring run only (exclude hatchery in both cases)
 catch_reformatted <- weekly_standard_catch_unmarked |>  glimpse()
 
 # Combine all 3 tables together 

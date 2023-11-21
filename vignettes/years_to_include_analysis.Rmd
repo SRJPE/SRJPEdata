@@ -10,15 +10,28 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
-)
+  warning = FALSE, 
+  message = FALSE,
+  comment = "#>", 
+  fig.width=8, fig.height=5)
 library(googleCloudStorageR)
 library(tidyverse)
+library(SRJPEdata)
+library(lubridate)
+
+colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                  "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
+                  "#F1BB7B", "#FD6467", "#5B1A18", # Grand Budapest 1 (-4)
+                  "#D8B70A", "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
+)
+source(here::here("data-raw", "pull_tables_from_database.R"))
 ```
 
 The Spring Run Juvenile Production Estimate is trained on historical Rotary Screw Trap and Adult Surveys. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and Adult years to include. 
 
-## RST Data - Years To Include in Model 
+# RST Data - Years To Include in Model 
 
 The modeling team hosted a modeling windows workshop where we discussed approaches to determining modeling windows. At the workshop we decided to use the full sampling season of data for each tributary and year but to exclude years where we were concerned about data completeness. We came up with the following approach to determine excluded years:
 
@@ -27,12 +40,135 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 3) Use updated cumulative catch curves to determine the critical window (average window over all historical years that captures 75 % percent of catch). See [heatmaps in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) to view critical window.
 4) Remove additional years where there is no sampling for 4 consecutive weeks within critical window. See `data-raw/years_to_exclude.csv` (exclusion_type = “missing four consecutive weeks in critical window”).
 
-See a section of years to exclude table below. 
+### Cumulative Catch Curves
+
+The cumulative catch curve below shows cumulative catch throughout time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used simmilar plots on each tributaries to exclude years where there is very limited sampling. See additional [cumulative catch curves in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) for each tributary. 
+
 ```{r, echo = FALSE}
-library(SRJPEdata)
-library(tidyverse)
-library(lubridate)
-source(here::here("data-raw", "pull_tables_from_database.R"))
+# PUll in origional catch here that hasn't been filtered to remove bad years 
+# gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
+# gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
+# gcs_get_object(object_name = "standard-format-data/standard_rst_catch.csv",
+#                bucket = gcs_get_global_bucket(),
+#                saveToDisk = "data-raw/database-tables/standard_catch.csv",
+#                overwrite = TRUE)
+standard_catch <- read_csv("data-raw/database-tables/standard_catch.csv")
+
+spring_run_catch <- filter(standard_catch, run == "spring" | stream %in% c("mill creek", "deer creek")) %>%
+  mutate(day = day(date),
+         month = month(date),
+         year = year(date),
+         water_year = ifelse(month %in% 10:12, year + 1, year),
+         fake_date = as_date(paste(ifelse(month %in% 10:12, 1999, 2000), month, day))) %>%
+  group_by(fake_date, water_year, stream, date) %>%
+  summarize(count = sum(count))
+# Yearly counts by stream/year
+spring_run_total_catch <- spring_run_catch %>%
+  group_by(water_year, stream) %>%
+  summarize(total = sum(count))
+
+
+spring_run_cumulative <- spring_run_catch %>% 
+  arrange(date) %>%
+  group_by(stream, water_year) %>%
+  mutate(count = ifelse(is.na(count), 0, count), 
+         total_count = sum(count, na.rm = T), 
+         cumulative_catch = cumsum(count),
+         prop_cuml_catch = cumulative_catch/total_count * 100)
+
+plotly::plot_ly(spring_run_cumulative |> filter(stream == "battle creek"), x = ~fake_date, y = ~prop_cuml_catch, 
+              text = ~water_year,
+              hovertemplate = paste(
+                "Water Year: %{text}"),
+              color = ~as_factor(water_year),
+              colors = colors_full,
+              type = 'scatter', mode = 'lines') %>%
+      plotly::layout(xaxis = list(title = "Months", tickformat = "%b"),
+               yaxis = list(title = "Percent Cumulative Catch"),
+               title = "Battle Creek Cumulative Catch Curve")
+```
+### Heat Map - All Streams
+The below heat map shows all streams. It shows that sampling is more complete across traps from 2004 - 2009 and from mid November to July. Some traps have continued sampling throughout the season. Some years there are gaps within season for specific traps or across multiple traps. 
+
+See [heatmaps in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) to view additional plots for each stream. 
+
+```{r, echo = FALSE}
+# Need to join catch_data_week to make sure all weeks get included in the 
+# sampling window heatmap
+catch_date_week <- standard_catch %>% 
+  mutate(day = day(date),
+         month = month(date),
+         fake_date = as_date(paste0("2000-", month, "-", day))) %>%
+  select(fake_date) %>%
+  distinct() %>%
+  mutate(week = week(fake_date))
+# This helper table provides a date range for each numeric week
+# This is used as hover text label in the heatmap
+date_range <- catch_date_week %>%
+  group_by(week) %>%
+  slice_min(fake_date) %>%
+  rename(min_date = fake_date) %>%
+  left_join(catch_date_week %>%
+              group_by(week) %>%
+              slice_max(fake_date) %>%
+              rename(max_date = fake_date)) %>%
+  mutate(min_date = format(min_date, "%b %d"),
+         max_date = format(max_date, "%b %d"),
+         date_range = paste(min_date,"-",max_date))
+
+catch_summary <- standard_catch %>%
+  select(date, stream) %>%
+  distinct() %>% 
+  mutate(week = week(date),
+         year = year(date)) %>%
+  group_by(stream, week, year) %>%
+  tally()
+
+catch_weekly <- catch_summary %>% 
+  # add catch_date_week to make sure all weeks are included in the data
+  right_join(select(catch_date_week, week) %>% 
+               distinct()) %>% 
+  pivot_wider(id_cols = c("stream", "year"), 
+              names_from = week, 
+              values_from = n, 
+              values_fill = 0) %>%
+  pivot_longer(cols = -c("stream","year"), names_to = "week", values_to = "number_days_sampled") %>%
+  mutate(week = as.numeric(week)) %>%
+  left_join(date_range) %>%
+  mutate(fake_date = case_when(week %in% c(40:53) ~ ymd("1999-01-01") + weeks(week - 1),
+                               T ~ ymd("2000-01-01") + weeks(week - 1)))
+
+plot_data <- catch_weekly %>%
+      filter(number_days_sampled > 0) %>%
+      mutate(wy = ifelse(week >= 37, year + 1, year)) %>%
+      group_by(week, wy, date_range, fake_date) %>%
+      summarize(streams = paste(unique(stream), collapse = ", "),
+                n_streams = length(unique(stream))) %>%
+      ungroup() %>%
+      mutate(week = factor(week, levels = c(37:53, 1:36)),
+             wy = factor(wy))
+year_labels <- c(1995, 2000, 2005, 2010, 2015, 2020)
+
+heat_map <- ggplot(plot_data, aes(x = fake_date, y = wy, fill = n_streams, text = paste0(date_range, "<br>", streams))) +
+  geom_tile() +
+  #scale_y_continuous(n.breaks = 5, breaks = waiver()) +
+  scale_y_discrete(breaks = year_labels) +
+  scale_x_date(date_labels = "%b", breaks = "2 months") +
+  theme_minimal() + 
+  ylab('water year') +
+  xlab("") + 
+  scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  labs(fill = "Number of streams")
+plotly::ggplotly(heat_map) 
+
+```
+
+
+### Years to Exclude 
+
+We utilized above cumulative catch curves and heatmaps come up with a list of years to exclude from modeling. See a section of this years to exclude table below. 
+
+```{r, echo = FALSE}
 # TODO Build out with code from shiny, add plots 
 # TODO document data object 
 # TODO add red bluff to database & file 
@@ -44,8 +180,15 @@ years_exclude_nice_names <- years_exclude |> select("Stream" = stream,
                                                     "Notes" = reason_for_exclusion)
 knitr::kable(head(years_exclude_nice_names, 10))
 ```
+*... with `r nrow(years_exclude) - 10` more rows* 
 
-```{r}
+## Applying to modeling datasets
+
+In order to apply the years to exclude information to the modeling datasets we did some additional analysis to create a table describing the Stream, Site, Year, Min Week, and Max Week that should be included in the SR JPE modeling. 
+
+The table below shows a section of this table: 
+
+```{r, echo = FALSE}
 # Following the sample window workshop Erin Cain emailed list of stream/years
 # to exclude. 
 # Read in years_to_exclude.csv
@@ -54,15 +197,15 @@ knitr::kable(head(years_exclude_nice_names, 10))
 
 # analysis for red bluff - bring back in after adding to database 
 rb <- filter(catch, site == "red bluff diversion dam")
-rb |> 
-  group_by(date) |> 
-  summarize(count = sum(count, na.rm = T)) |> 
-  mutate(wy = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
-         fake_date = ifelse(month(date) %in% 10:12, ymd(paste0("1999-",month(date), "-", day(date))), 
-                            ymd(paste0("2000-",month(date), "-", day(date))))) |> 
-  filter(wy == 2023) |> 
-  ggplot(aes(x = fake_date, y = count)) +
-    geom_point()
+# rb |> 
+#   group_by(date) |> 
+#   summarize(count = sum(count, na.rm = T)) |> 
+#   mutate(wy = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
+#          fake_date = ifelse(month(date) %in% 10:12, ymd(paste0("1999-",month(date), "-", day(date))), 
+#                             ymd(paste0("2000-",month(date), "-", day(date))))) |> 
+#   filter(wy == 2023) |> 
+#   ggplot(aes(x = fake_date, y = count)) +
+#     geom_point()
 
 # 1996, 1998, 2001, 2002, 2004, 2006, 2017, 2019, 2020
 # 1996 - most of february is missing
@@ -134,3 +277,31 @@ chosen_site_years_to_model <- include |>
 
 usethis::use_data(chosen_site_years_to_model, overwrite = TRUE)
 ```
+*... with `r nrow(include) - 10` more rows* 
+
+# Adult Data - Years To Include in Model 
+
+We treated Adult data a little differently to account for the two main types of adult data -  adult survey data (holding, redd, carcass) and adult passage data (video passage). 
+
+Below are the methods we used for excluding years by adult data type: 
+
+Survey data
+
+* Exclude year if survey does not cover all reaches in a year
+
+Video data
+
+* Exclude year if video out for more than 2 weeks in the sampling season
+* Exclude year if flows exceed X value on each trip (overpass weir etc..)
+
+Additionally we conducted outreach to stream teams to review our list and highlight any other years that should be excluded. 
+
+## Survey Data 
+TODO update with data from database once adult data is added in 
+
+
+## Video Data 
+TODO update with data from database once adult data is added in 
+
+
+

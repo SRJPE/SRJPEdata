@@ -1,0 +1,662 @@
+---
+title: "Combine Temperature Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Yearling Ruleset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+
+library(tidyverse)
+library(googleCloudStorageR)
+library(CDECRetrieve)
+library(lubridate)
+library(hms)
+library(weathermetrics) 
+library(forecast)
+
+root.dir <- rprojroot::find_rstudio_root_file()
+knitr::opts_knit$set(root.dir)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+FlowWest aggregated environmental data for temperature data from all 
+monitoring programs:
+
+-   Feather River (source: RST monitoring data)
+-   Battle Creek (source: FWS)
+-   Butte Creek (source: CDEC)
+-   Clear Creek (source: FWS)
+-   Deer Creek (source: CDEC)
+-   Mill Creek (source: CDEC)
+-   Sacramento River (source for Tisdale: USGS; source for Knights
+    Landing: RST monitoring data)
+-   Yuba River (source: RST monitoring data)
+
+### Rational for Data Sources:
+
+The following decision hierarchy was used to determine which datasets
+were used in the final temperature data aggregation:
+
+1.  Is there publicly available data available through USGS or CDEC?
+    This data can easily be built into a data pipeline because it's
+    available through a query and publicly available. The data is also
+    QC'd and available at precise temporal scales like hourly.
+2.  If no, is there data available through gages operated by Fish and Wildlife?
+3.  If no, is there RST temperature monitoring data available?
+4.  If no, perform linear regression on air temperature to get modeled
+    stream temperature for site
+
+## Standard format for Temperature Data
+
+Data dictionary for standard format:
+
+(B - Battle Creek, Bu - Butte Creek, C - Clear Creek, F - Feather River,
+D - Deer Creek, F - Feather River, M - Mill Creek, S- Sacramento River,
+Y - Yuba River)
+
+| column name       | stream collects   | definition                                          |
+|:-----------------|:-------------------|:---------------------------------|
+| date              | B, Bu, C, D, M, F | date that measurement occurs                        |
+| stream            | B, Bu, C, D, M, F | unique stream name associated with temperature data |
+| site              | B, Bu, C, D, M, F | unique site identifier where measurement occurs     |
+| source            | B, Bu, C, D, M, F | data source                                         |
+| location          | F                 | differentiates between `high flow` and `low flow`   |
+| mean_daily_temp_c | B, Bu, C, D, M, F | average daily temperature (degrees Celsius)         |
+| max_daily_temp_c  | B, C              | maximum daily temperature (degrees Celsius)         |
+
+# Pull in data and format {.tabset}
+
+Initial data exploration was done `r here::here("data-raw", "qc-markdowns", "temperature_data_prep.Rmd")`
+
+### All RST Environmental Data 
+
+```{r, include = F}
+# source file where gage data is pulled, need to run this file first
+source(knitr::purl(here::here("data-raw", "qc-markdowns", "temperature_data_prep.Rmd"), quiet=TRUE))
+
+# set up GCS
+gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
+gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
+
+gcs_get_object(object_name = "standard-format-data/standard_RST_environmental.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data/rst/standard_RST_environmental.csv",
+               overwrite = TRUE)
+
+rst_enviro <- read_csv('data/rst/standard_RST_environmental.csv') %>% glimpse()
+
+gcs_get_object(object_name = "standard-format-data/standard_rst_catch.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data/rst/standard_catch.csv",
+               overwrite = TRUE)
+catch <- read_csv("data/rst/standard_catch.csv")
+```
+
+## Battle Creek
+
+-   One site from the Fish and Wildlife Service provides data from
+    `2003-01-07` to `2021-02-2021`
+
+```{r}
+ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "standard-format-data-prep", "temp_data", "battle_clear_temp.xlsx"), sheet = 4)
+
+battle_format <- ubc_temp_raw %>% 
+  rename(date = DT,
+         temp_c = TEMP_C) %>%
+  mutate(stream = "battle creek", 
+         site = "ubc",
+         subsite = "ubc",
+         date = as.Date(date),
+         source = "FWS") %>%
+  group_by(date, stream, site, source, subsite) %>%
+  summarise(mean_temp_degC = mean(temp_c, na.rm = T),
+            max_temp_degC = max(temp_c, na.rm = T)) %>% 
+  filter(mean_temp_degC > 0) %>%
+  glimpse
+
+summary(battle_format)
+
+battle_format %>% ggplot() + 
+  geom_line(aes(x = date, y = mean_temp_degC, color = site)) + 
+  # geom_point(aes(x = date, y = mean_temp_degC), size = .001) +
+  theme_minimal()
+
+filter(catch, stream == "battle creek") |> distinct(site, subsite)
+```
+
+## Butte Creek
+
+-   The CDEC gage `BCK` was used to aggregate temperature for sites
+    `adams dam` and `okie dam` from `1998-09-16` to `2022-06-30`.
+
+```{r}
+# source CDEC
+butte <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "butte_temp.rds"))
+butte_format <- butte %>%
+  mutate(stream = "butte creek",
+         source = "CDEC BCK")
+
+butte_sites <- filter(catch, stream == "butte creek") |> 
+  select(stream, site, subsite) |> 
+  distinct()
+
+butte_format_all <- full_join(butte_format, butte_sites)
+
+summary(butte_format_all$date)
+
+butte_format_all %>% ggplot() + 
+  geom_line(aes(x = date, y = mean_temp_degC, color = site)) + 
+  # geom_point(aes(x = date, y = mean_temp_degC), size = .001) +
+  theme_minimal() 
+
+filter(catch, stream == "butte creek") |> distinct(site, subsite)
+```
+
+## Clear Creek
+
+-   Clear Creek data was aggregated from Fish Wildlife Service's site
+    `lcc` from `2001-02-16` to `2021-12-31`
+
+```{r}
+ucc_temp_raw <- readxl::read_excel(here::here("data-raw", "standard-format-data-prep", "temp_data", "battle_clear_temp.xlsx"), sheet = 2)
+
+ucc_temp <- ucc_temp_raw %>% 
+  rename(date = DT,
+         temp_c = TEMP_C) %>%
+  mutate(stream = "clear creek", 
+         site = "ucc",
+         subsite = "ucc",
+         date = as.Date(date)) %>%
+  glimpse
+
+lcc_temp_raw <- readxl::read_excel(here::here("data-raw", "standard-format-data-prep", "temp_data", "battle_clear_temp.xlsx"), sheet = 3)
+lcc_temp <- lcc_temp_raw %>% 
+  rename(date = DT,
+         temp_c = TEMP_C) %>% 
+  mutate(stream = "clear creek", 
+         site = "lcc",
+         subsite = "lcc",
+         date = as.Date(date)) %>%
+  glimpse
+
+clear_format <- bind_rows(lcc_temp, ucc_temp) %>% 
+  group_by(date, stream, site, subsite) %>%
+  summarise(mean_temp_degC = mean(temp_c, na.rm = T),
+            max_temp_degC = max(temp_c, na.rm = T)) %>% 
+  mutate(source = "FWS") %>% glimpse
+
+summary(clear_format$date)
+
+clear_format %>% ggplot() + 
+  geom_line(aes(x = date, y = mean_temp_degC, color = site)) + 
+  # geom_point(aes(x = date, y = mean_temp_degC), size = .001) +
+  theme_minimal()
+
+filter(catch, stream == "clear creek") |> distinct(site, subsite)
+```
+
+## Deer Creek
+
+-   Deer Creek data was aggregated from CDEC's site `DCV` from
+    `1998-10-01` to `2022-07-13`
+
+```{r}
+# source 
+deer <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "deer_temp.rds")) %>% glimpse
+deer_format <- deer %>%
+  mutate(stream = "deer creek",
+         site = stream,
+         subsite = site,
+         source = "CDEC DCV") %>%
+  filter(mean_temp_degC > 0 & mean_temp_degC < 35,
+         max_temp_degC > 0 & max_temp_degC < 35) %>% 
+  glimpse()
+
+summary(deer_format$date)
+
+deer_format %>% ggplot() + 
+  geom_line(aes(x = date, y = mean_temp_degC), color = "gray") + 
+  theme_minimal()
+
+deer_format %>% ggplot() + 
+  geom_line(aes(x = date, y = max_temp_degC), color = "gray") + 
+  theme_minimal()
+```
+
+## Feather River
+
+-   Chose to use RST environmental data instead of CDEC or USGS because
+    a significant data gap exists in publicly available data between
+    2006-09-05 and 2018-09-30. The two publicly available sites are also
+    spatially far apart.
+
+-   Feather River data can be aggregate by high and low flows using the
+    `location` column
+
+```{r}
+# Two gages according to RST shiny app:
+# - CDEC GRL
+# - CDEC FRA
+
+GRL_CDEC <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "1996-01-01")
+
+
+feather_river_temp_GRL <- GRL_CDEC %>%
+  mutate(date = as_date(datetime),
+         time = as_hms(datetime),
+         temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) %>%
+  select(date,time,temp_degC) %>%
+  group_by(date) %>%
+  summarise(mean_temp_degC = mean(temp_degC, na.rm = TRUE),
+            max_temp_degC = max(temp_degC, na.rm = TRUE)) %>% 
+  mutate(stream = "feather river", 
+         site = "GRL", 
+         source = "CDEC") %>%
+  filter(mean_temp_degC < 23 & mean_temp_degC > 2,
+         max_temp_degC < 35 & max_temp_degC > 2) # remove outlier
+
+# ggplot() + 
+#   geom_line(data = feather_river_temp_GRL, aes(x = date, y = mean_temp_degC)) +
+#   theme_minimal()
+# 
+# summary(feather_river_temp_GRL$date)
+
+# FRA
+
+
+FRA_CDEC <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1996-01-01")
+
+
+feather_river_temp_FRA <- FRA_CDEC %>%
+  mutate(date = as_date(datetime),
+         time = as_hms(datetime),
+         temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) %>%
+  select(date,time,temp_degC) %>%
+  group_by(date) %>%
+  summarise(mean_temp_degC = mean(temp_degC, na.rm = TRUE),
+            max_temp_degC = max(temp_degC, na.rm = TRUE)) %>% 
+  mutate(stream = "feather river", 
+         site = "FRA", 
+         source = "CDEC") 
+
+# ggplot() + 
+#   geom_line(data = feather_river_temp_FRA, aes(x = date, y = mean_temp_degC)) +
+#   theme_minimal()
+# 
+# summary(feather_river_temp_FRA$date)
+```
+
+### Combine Gage data for Feather River
+
+-   significant data gap exists
+
+```{r}
+
+feather_cdec_gages  <- bind_rows(feather_river_temp_FRA,
+                             feather_river_temp_GRL)
+
+ggplot() +
+  geom_line(data = feather_cdec_gages, aes(x = date, y = mean_temp_degC, color = site))
+
+```
+
+#### RST Environmental Data for Feather River 
+
+-   Chose to use this dataset since it is more complete
+
+-   Data can be aggregated up to high and low flows using `location`
+    column
+
+```{r}
+feather_rst <- rst_enviro %>% 
+  filter(stream == "feather river", parameter == "temperature") %>%
+  select(stream, site, subsite, date, value) %>%
+  rename(mean_temp_degC = value) %>%
+  mutate(source = "RST environmental") %>%
+  filter(mean_temp_degC > 0) %>%
+  glimpse
+
+ggplot() +
+  geom_line(data = feather_rst, aes(x = date, y = mean_temp_degC, color = subsite)) + 
+  facet_wrap(~site) +
+  theme_minimal()
+```
+
+## Mill Creek
+
+-   Mill Creek temperature data is sourced from CDEC's site `MLM` from
+    `1998-10-07` to `2022-07-13`
+
+```{r}
+# source USGS
+mill <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "mill_temp.rds"))
+mill_format <- mill %>%
+  mutate(stream = "mill creek",
+         site = stream, 
+         subsite = site,
+         source = "CDEC MLM") %>%
+   filter(mean_temp_degC > 0 & mean_temp_degC < 35,
+          max_temp_degC > 0 & max_temp_degC < 35) %>% 
+glimpse()
+
+summary(mill_format$date)
+
+mill_format %>% ggplot() + 
+  geom_line(aes(x = date, y = mean_temp_degC), color = "gray") + 
+  # geom_point(aes(x = date, y = mean_temp_degC), size = .001) +
+  theme_minimal()
+```
+
+## Sacramento
+
+-   combined dataset spans `1998-10-01` to `2022-07-25` and includes RST
+    environmental data from Knights Landing and USGS data from Tisdale
+
+#### Gage Data
+
+-   Data is from `USGS 11390500` and exists from `1998-10-01` to
+    `2022-07-25` with a significant data gap between `1998-09-30` and
+    `2016-10-01`
+  - use for both Knights Landing and Tisdale
+
+```{r}
+
+### USGS 11390500
+# Read created CSV
+WLK_USGS <- readNWISdv(11390500, "00010")
+
+# Format to make tidier
+sac_usgs_format <- WLK_USGS %>%
+  select(Date, temp_degC =  X_00010_00003) %>%
+  as_tibble() %>% 
+  rename(date = Date,
+         mean_temp_degC = temp_degC) %>% 
+  mutate(stream = "sacramento river", 
+         source = "USGS 11390500") %>%
+  #filter(year(date) > 2000) %>% # filter to greater than 2000
+  glimpse
+
+# Plot
+ggplot() +
+  geom_line(data = sac_usgs_format, aes(x = date, y = mean_temp_degC), color = "black") +
+  labs(x = "date",
+       y = "Temperature (deg C)", 
+       caption = "USGS 11390500")
+```
+
+#### Sacramento RST Environmental Data 
+
+-   One site: `knights landing`; apply to Tisdale
+
+-   Date range from `2002-10-04` to `2021-05-31` with a two year gap
+    between `2016-06-20` and `2018-08-28`
+
+```{r}
+
+sac_rst_format <- rst_enviro %>% 
+  filter(stream == "sacramento river", parameter == "temperature") %>% 
+  select(stream, date, value) %>%
+  rename(mean_temp_degC = value) %>%
+  mutate(source = "RST environmental") %>%
+  glimpse
+
+summary(sac_rst_format$date)
+
+ggplot() +
+  geom_line(data = sac_rst_format, aes(x = date, y = mean_temp_degC))
+
+```
+
+#### Combine Sacramento data
+
+-   combined dataset spans `1998-10-01` to `2022-07-25` and includes RST
+    environmental data from Knights Landing and USGS data from Tisdale
+
+```{r}
+
+sac_format <- bind_rows(sac_rst_format, # rst
+                        sac_usgs_format) %>% 
+  group_by(stream, date, mean_temp_degC, source) |> 
+  distinct()
+# need to apply values for all sacramento sites and subsites
+sac_sites <- filter(catch, stream == "sacramento river") |> 
+  select(stream, site, subsite) |> 
+  distinct()
+
+sac_format_all <- full_join(sac_format, sac_sites)
+
+summary(sac_format_all$date)
+
+ggplot() +
+  geom_line(data = sac_format_all, aes(x = date, y = mean_temp_degC, color = site)) 
+  #facet_wrap(~site)
+
+```
+
+## Yuba
+
+- There is limited USGS data and CDEC gage is far from the RST
+- Current approach is to use Yuba RST temperature data
+- Another possible option to model using air temperature
+
+```{r}
+#TODO need to do air temp modeling, check temperature_data_prep for potential gages (if not there use noaa data)
+
+yuba_rst_format <- rst_enviro %>% 
+  filter(stream == "yuba river", parameter == "temperature") %>% 
+  select(stream, site, subsite, date, value) %>%
+  rename(mean_temp_degC = value) %>%
+  mutate(source = "RST environmental") %>%
+  glimpse
+
+summary(yuba_rst_format$date)
+
+ggplot() +
+  geom_line(data = yuba_rst_format, aes(x = date, y = mean_temp_degC))
+```
+
+<!-- #### Other data available? -->
+
+<!-- * CDEC YRS - spatially far away from RST -->
+
+```{r, eval=FALSE, include=FALSE}
+# limited USGS gage data 
+# USGS 11417500 S YUBA R A JONES BAR NR GRASS VALLEY CA
+# site_no=11417500
+
+#cdec_datasets('YRS')
+cdec_yrs <- cdec_query(station = "YRS", dur_code = "H", sensor_num = "25", start_date = "1996-01-01") 
+
+## TODO: convert to C from F
+cdec_yrs_format <- cdec_yrs %>% 
+  rename(source = agency_cd,
+         site = location_id, 
+         temperature_c = parameter_value,
+         date = datetime) %>%
+  mutate(date = as_date(date),
+         temperature_c = (temperature_c-32 * 5/9)) %>%
+  group_by(date) %>%
+  mutate(mean_temp_degC = mean(temperature_c, na.rm = TRUE),
+         max_temp_degC = max(temperature_c, na.rm = TRUE)) %>%
+  filter(mean_temp_degC > 0) %>%
+  glimpse
+  
+summary(cdec_yrs_format)
+
+
+ggplot() +
+  geom_line(data = cdec_yrs_format, aes(x = date, y = mean_temp_degC))
+```
+
+<!-- #### Compare to Air Data Linear Regression -->
+
+```{r, eval=FALSE, include=FALSE}
+
+# yuba_monthly_agg <- yuba_rst_format %>% 
+#   mutate(year = year(date), month = month(date)) %>%
+#   group_by(year, month) %>%
+#   summarise(mean_temp_degC = mean(mean_temp_degC, na.rm = TRUE)) %>%
+#   ungroup() %>%
+#   mutate(date = ymd(paste(year, month, '01', sep = '-'))) %>%
+#   filter(!is.na(date)) %>%
+#   select(date, mean_temp_degC) %>% glimpse
+# 
+# yuba_air <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "yuba_temp_air.rds")) %>% 
+#   mutate(year = year(date), month = month(date)) %>%
+#   group_by(year, month) %>%
+#   summarise(air_tempC = mean(air_tempC, na.rm = TRUE)) %>%
+#   ungroup() %>%
+#   mutate(date = ymd(paste(year, month, '01', sep = '-'))) %>%
+#   filter(!is.na(date)) %>%
+#   select(date, air_tempC) %>%
+#   glimpse
+# 
+# ggplot(yuba_air, aes(x=date, y = air_tempC)) +
+#   geom_line(color = "darkred") +
+#   labs(y = "Air temperature (deg C)") +
+#   theme(axis.text = element_text(size = 12))
+# 
+# # combine water and air
+# 
+# yuba_air_water <- yuba_monthly_agg %>%
+#   left_join(yuba_air) %>%
+#   filter(!is.na(air_tempC)) %>% glimpse()
+# 
+# yuba_air_water %>%
+#   ggplot(aes(x = air_tempC, y = mean_temp_degC)) +
+#   geom_point() +
+#   geom_smooth(method = 'lm', se = FALSE)
+# 
+# yuba_temp_model <- lm(mean_temp_degC ~ air_tempC, data = yuba_air_water)
+# summary(yuba_temp_model)
+# 
+# yuba_temp_model$coefficients
+# 
+# # air temp thresholds
+# # MR: I don't really understand this section 
+# y <- c(13, 14)
+# air_temp_thresholds <- (y - yuba_temp_model$coefficients[[1]]) / yuba_temp_model$coefficients[[2]]
+# 
+# yuba_air_water %>%
+#   ggplot(aes(x = air_tempC, y = mean_temp_degC)) +
+#   geom_point() +
+#   geom_smooth(method = 'lm', se = FALSE) +
+#   geom_vline(xintercept = air_temp_thresholds[1], alpha = .2) +
+#   geom_vline(xintercept = air_temp_thresholds[2], alpha = .2) +
+#   geom_hline(yintercept = 13) +
+#   geom_hline(yintercept = 14)
+# 
+# pred <- broom::augment(yuba_temp_model) %>% pull(.fitted)
+# truth <- yuba_monthly_agg$mean_temp_degC
+# #xtab <- table(pred > 11, truth > 11)
+# #xtab <- table(pred > 12, truth > 12)
+# 
+# # new stuff
+# yuba_air_more_time <- yuba_air %>%
+#   bind_rows(
+#     tibble(date = seq.Date(ymd('2000-01-01'), ymd('2020-12-01'), by = 'month'),
+#            air_tempC = 0)
+#   ) %>%
+#   group_by(date) %>%
+#   summarise(air_tempC = max(air_tempC, na.rm = TRUE)) %>%
+#   ungroup() %>%
+#   mutate(air_tempC = ifelse(air_tempC == 0, NA, air_tempC)) %>% glimpse
+# 
+# 
+# ts_yuba <- ts(yuba_air_more_time$air_tempC, start = c(2000, 1), end = c(2020, 12), frequency = 12)
+# 
+# na.interp(ts_yuba) %>% autoplot(series = 'Interpolated') +
+#   forecast::autolayer(ts_yuba, series = 'Original')
+# 
+# yuba_air_temp_c <- tibble(
+#   date = seq.Date(ymd('2000-01-01'), ymd('2020-12-01'), by = 'month'),
+#   air_tempC = as.numeric(na.interp(ts_yuba)))
+# 
+# 
+# yuba_air_temp_c %>%
+#   ggplot(aes(x = date, y = air_tempC)) +
+#   geom_col(fill = 'darkgoldenrod2') +
+#   geom_col(data = yuba_air_temp_c, aes(x = date, y = air_tempC)) +
+#   theme_minimal() +
+#   labs(y = 'monthly mean air temperature (°C)')
+# 
+# yuba_pred_water_temp <- predict(yuba_temp_model, yuba_air_temp_c)
+# 
+# yuba_water_temp_c <- tibble(
+#   date = seq.Date(ymd('2000-01-01'), ymd('2020-12-01'), by = 'month'),
+#   stream = 'yuba river',
+#   mean_temp_degC = yuba_pred_water_temp) %>% 
+#   mutate(source = "predicted water temperature") %>%
+#   glimpse
+# 
+# yuba_water_temp_c %>%
+#   ggplot(aes(x = date)) +
+#   geom_line(aes(y = mean_temp_degC), color = 'red') +
+#   geom_line(data = yuba_air_temp_c, aes(y = air_tempC))
+# 
+# summary(yuba_water_temp_c)
+# 
+# yuba_format <-  yuba_water_temp_c
+
+```
+
+# Combine temperature data {.tabset}
+
+```{r}
+combined_temp <- bind_rows(battle_format,
+                           butte_format_all,
+                           clear_format,
+                           deer_format,
+                           feather_rst,
+                           mill_format,
+                           sac_format_all,
+                           #yuba_format,
+                           yuba_rst_format
+                           ) %>%
+  rename(mean_daily_temp_c  = mean_temp_degC,
+         max_daily_temp_c = max_temp_degC) %>%
+  glimpse()
+```
+
+## QA/QC
+
+```{r}
+summary(combined_temp)
+unique(combined_temp$stream)
+unique(combined_temp$site)
+unique(combined_temp$subsite)
+ggplot(combined_temp, aes(x = date, y = mean_daily_temp_c, color = site)) +
+  theme_minimal() +
+  geom_line() +
+  facet_wrap(~stream)
+filter(combined_temp, is.na(date)) 
+filter(combined_temp, mean_daily_temp_c == "NaN") 
+filter(combined_temp, max_daily_temp_c == "-Inf") 
+filter(combined_temp, is.na(max_daily_temp_c)) %>% pull(stream) %>% unique
+combined_temp_clean <- filter(combined_temp, !is.na(date)) %>% 
+  mutate(mean_daily_temp_c = ifelse(is.nan(mean_daily_temp_c), NA, mean_daily_temp_c),
+         max_daily_temp_c = ifelse(max_daily_temp_c == "-Inf", NA, max_daily_temp_c)) %>% glimpse
+
+summary(combined_temp_clean)
+
+filter(combined_temp_clean, mean_daily_temp_c == "NaN") 
+filter(combined_temp_clean, max_daily_temp_c == "-Inf") 
+unique(combined_temp_clean$stream)
+unique(combined_temp_clean$source)
+```
+
+```{r, include = FALSE}
+f <- function(input, output) write_csv(input, file = output)
+
+gcs_upload(combined_temp_clean,
+           object_function = f,
+           type = "csv",
+           name = "standard-format-data/standard_temperature.csv",
+           predefinedAcl = "bucketLevel")
+write_csv(combined_temp_clean, "data/standard-format-data/standard_temperature.csv")
+```
