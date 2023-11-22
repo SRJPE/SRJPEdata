@@ -139,7 +139,7 @@ catch_with_inclusion_criteria <- updated_standard_catch |>
 weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, run, adipose_clipped) %>% 
+  group_by(week, year, stream, site, site_group, run, adipose_clipped, life_stage) %>% 
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count, na.rm = T))  |>  
@@ -152,7 +152,7 @@ catch_site_year_weeks <- unique(weekly_standard_catch_no_zeros$site_year_week)
 weekly_standard_catch_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, run, adipose_clipped) %>% 
+  group_by(week, year, stream, site, site_group, run, adipose_clipped, life_stage) %>% 
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count, na.rm = T))  |>  
@@ -164,9 +164,21 @@ weekly_standard_catch_zeros <- catch_with_inclusion_criteria |>
 weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros, 
                                    weekly_standard_catch_zeros) |> glimpse()
   
+# TODO add hatchery column by expanding on adclip rate and adclip caught in the trap 
+weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |> 
+  filter(adipose_clipped == TRUE) |> 
+  group_by(week, year, stream, site, site_group, life_stage) |> 
+  summarise(weekly_hatchery_count_per_lifestage = sum(count, na.rm = TRUE),
+            expanded_weekly_hatch_count = weekly_hatchery_count_per_lifestage * 4) |> #ASSUMING 25% marking, add mark rates in here instead. 
+  glimpse()
 
 # TODO Decide if we want to rename or save differently 
-usethis::use_data(weekly_standard_catch_unmarked, overwrite = TRUE)
+usethis::use_data(weekly_standard_catch, overwrite = TRUE)
+
+# TODO Create PLAD table - Ashley going to check what she sent nobel 
+# FL bins for year, week, stream, site 
+# Bins need to match PLAD bins (or finer) so we can map
+# Think through how hatchery would play in here  
 
 # Trap Formatting ---------------------------------------------------------
 # Weekly effort from vignette/trap_effort.Rmd

@@ -9,7 +9,7 @@ weekly_efficiency |> glimpse()
 standard_flow |> glimpse()
 
 # reformat flow data and summarize weekly
-
+# TODO add size proportions here
 # TODO 32 NAs, fill in somehow  
 flow_reformatted <- standard_flow |> 
   mutate(year = year(date),
@@ -22,9 +22,7 @@ weekly_efficiency |> glimpse()
 
 weekly_effort_by_site |> glimpse()
 
-# TODO do we want to do adipose clipped, josh had it but sounds like maybe we want to do all 
-# data frames for chinook of any kind and for spring run only (exclude hatchery in both cases)
-catch_reformatted <- weekly_standard_catch_unmarked |>  glimpse()
+catch_reformatted <- weekly_standard_catch |>  glimpse()
 
 # Combine all 3 tables together 
 weekly_model_data <- catch_reformatted |> 
@@ -39,7 +37,7 @@ weekly_model_data <- catch_reformatted |>
   # select columns that josh uses 
   select(year, week, stream, site, count, mean_fork_length, 
          number_released, number_recaptured, effort = hours_fished, 
-         flow_cfs) |> 
+         flow_cfs, life_stage) |> 
   # TODO add efficiency flow to database - Standardize using code above 
   # efficiency_flow = flow_at_recapture_day1) |>
   group_by(stream) |> 
