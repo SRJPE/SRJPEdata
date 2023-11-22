@@ -136,10 +136,11 @@ catch_with_inclusion_criteria <- updated_standard_catch |>
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
 # TODO review logic with Ashley/Liz to confirm 
+# TODO confirm that okay to remove Run designation here! (causes many to many join problems with hatch fish), seems okay to remove since we are later using PLAD to designate 
 weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, run, adipose_clipped, life_stage) %>% 
+  group_by(week, year, stream, site, site_group, life_stage) %>% #removed run & adclip here 
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count, na.rm = T))  |>  
@@ -152,7 +153,7 @@ catch_site_year_weeks <- unique(weekly_standard_catch_no_zeros$site_year_week)
 weekly_standard_catch_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, run, adipose_clipped, life_stage) %>% 
+  group_by(week, year, stream, site, site_group, life_stage) %>% #removed run & adclip here  
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count, na.rm = T))  |>  
@@ -165,12 +166,31 @@ weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros,
                                    weekly_standard_catch_zeros) |> glimpse()
   
 # TODO add hatchery column by expanding on adclip rate and adclip caught in the trap 
-weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |> 
+# TODO need to figure out what happens with adipose_clipped = NA 
+hatch_per_week <- catch_with_inclusion_criteria |> 
   filter(adipose_clipped == TRUE) |> 
+  mutate(week = week(date),
+         year = year(date)) |> 
   group_by(week, year, stream, site, site_group, life_stage) |> 
-  summarise(weekly_hatchery_count_per_lifestage = sum(count, na.rm = TRUE),
-            expanded_weekly_hatch_count = weekly_hatchery_count_per_lifestage * 4) |> #ASSUMING 25% marking, add mark rates in here instead. 
+  summarize(count = sum(count, na.rm = TRUE)) |> 
+  ungroup() |> 
+  mutate(expanded_weekly_hatch_count = ifelse(stream == "feather river", 
+                                              count, 
+                                              count * 4)) |> #ASSUMING 25% marking, add mark rates in here instead.
+  select(-count) |> 
   glimpse()
+
+# subtract these values from weekly_standard_catch 
+weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |> 
+  left_join(hatch_per_week, 
+            by = c("week", "year", "stream", "site", "site_group", "life_stage")) |> 
+  mutate(expanded_weekly_hatch_count = ifelse(is.na(expanded_weekly_hatch_count), 0, expanded_weekly_hatch_count),
+         natural = ifelse(count - expanded_weekly_hatch_count < 0, 0, count - expanded_weekly_hatch_count), 
+         hatchery = ifelse(expanded_weekly_hatch_count > count, count, expanded_weekly_hatch_count)) |> 
+  select(-count) |>  
+  pivot_longer(natural:hatchery, names_to = "origin", values_to = "count") |> 
+  glimpse()
+# TODO discuss weeks where more hatchery adults than total catch given expansion...can turn natural catch 0 and hatch catch = total catch in traps, talk through 
 
 # TODO Decide if we want to rename or save differently 
 usethis::use_data(weekly_standard_catch, overwrite = TRUE)
