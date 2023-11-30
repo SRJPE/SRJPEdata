@@ -19,9 +19,9 @@ Sys.setenv("GCS_DEFAULT_BUCKET" = "jpe-dev-bucket")
 ```
 
 
-# Format environmental variables as standardized covariates {.tabset}
+## Format environmental variables as standardized covariates {.tabset}
 
-## Temperature 
+### Temperature 
 
 Several approaches were considered for summarizing temperature: 
 
@@ -29,7 +29,9 @@ Several approaches were considered for summarizing temperature:
 2. Growing degree days (GDD) with a base temperature of 0 degrees Celsius [(source)](https://www.researchgate.net/publication/279930331_Fish_growth_and_degree-days_I_Selecting_a_base_temperature_for_a_within-population_study and input from MAT team)  
 3. Degree Day 20 (DD20), where cumulative degree days are calculated against a threshold of 20 degrees Celsius [(source)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274) 
 
-For each metric approach, we calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. We tested both the individual effects of migratory and holding temperatures as well as a cumulative metric (summed migratory and holding temperatures).
+Following initial analyses (TODO - do we want these in the repo somewhere??), we focused on approach 3. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. 
+
+TODO - keep this analysis? Currently not included: (We tested both the individual effects of migratory and holding temperatures as well as a cumulative metric (summed migratory and holding temperatures)).
 
 ```{r,message = FALSE, warning = FALSE}
 # set thresholds and months
@@ -78,7 +80,7 @@ gdd |>
   facet_wrap(~stream, scales = "free_y")
 ```
 
-## Flow 
+### Flow 
 
 Mximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.
 
@@ -103,7 +105,7 @@ flow_metrics |>
 ```
 
 
-## Passage Timing
+### Passage Timing
 
 Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power.
 
@@ -132,7 +134,7 @@ upstream_passage_timing |>
   facet_wrap(~stream, scales = "free_y")
 ```
 
-## Water Year Type
+### Water Year Type
 
 To account for the influence of large scale interannual climate variability, we investigated water year type as a covariate as described by the [California Department of Water Resources](https://cdec.water.ca.gov/reportapp/javareports?name=WSIHIST) and available in the [waterYearType package in R](https://cloud.r-project.org/web/packages/waterYearType/index.html). 
 
@@ -150,7 +152,7 @@ knitr::kable(head(water_year_data, 10))
 ```
 
 
-## Total Passage as Index
+### Total Passage as Index
 
 We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality.
 
@@ -204,7 +206,8 @@ adult_model_covariates_standard |>
   facet_wrap(~stream, scales = "free_y") + 
   theme(legend.position = "bottom")
 ```
-Save data object:
+
+### Save data object:
 ```{r, evaluate = FALSE, message = FALSE, warning = FALSE}
 usethis::use_data(adult_model_covariates_standard, overwrite = TRUE)
 ```
