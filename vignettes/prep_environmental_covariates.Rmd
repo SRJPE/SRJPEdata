@@ -1,0 +1,175 @@
+---
+title: "Prep environmental covariates for adult modeling"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Prep environmental covariates for adult modeling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.width=15, fig.height=10)
+
+Sys.setenv("GCS_AUTH_FILE" = "config.json")
+Sys.setenv("GCS_DEFAULT_BUCKET" = "jpe-dev-bucket")
+
+library(tidyverse)
+library(googleCloudStorageR)
+library(waterYearType)
+```
+
+
+# Format environmental variables as standardized covariates {.tabset}
+
+## Temperature 
+
+Several approaches were considered for summarizing temperature: 
+
+1. Proportion of days where the temperature surpassed a threshold of 20 degrees Celsius [(source)](https://www.noaa.gov/sites/default/files/legacy/document/2020/Oct/07354626766.pdf) 
+2. Growing degree days (GDD) with a base temperature of 0 degrees Celsius [(source)](https://www.researchgate.net/publication/279930331_Fish_growth_and_degree-days_I_Selecting_a_base_temperature_for_a_within-population_study and input from MAT team)  
+3. Degree Day 20 (DD20), where cumulative degree days are calculated against a threshold of 20 degrees Celsius [(source)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274) 
+
+For each metric approach, we calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. We tested both the individual effects of migratory and holding temperatures as well as a cumulative metric (summed migratory and holding temperatures).
+
+```{r}
+# set thresholds and months
+# TODO full suite of temperatures tried are in the .Rmd on SRJPE model - should I include all those?
+# TODO future exploration to try different thresholds
+gdd_base_sac <- 20 # https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274
+gdd_base_trib <- 20
+migratory_months <- 3:5
+holding_months <- 5:8 # TODO should these be updated?
+
+# read in standard temperature
+# TODO replace with data object created by temperature_data_pull
+
+standard_temp <- read_csv(gcs_get_object(object_name = "standard-format-data/standard_temperature.csv",
+                                         bucket = gcs_get_global_bucket()))
+
+# calculate sum of days above the thresholds
+gdd_sac <- standard_temp |>
+  filter(month(date) %in% migratory_months, stream == "sacramento river") |>
+  mutate(gdd_sac = mean_daily_temp_c - gdd_base_sac,
+         gdd_sac = ifelse(gdd_sac < 0, 0, gdd_sac)) |>
+  group_by(year(date)) |>
+  summarise(gdd_sac = sum(gdd_sac, na.rm = T)) |>
+  rename(year = `year(date)`) |>
+  ungroup()
+
+gdd_trib <- standard_temp |>
+  filter(month(date) %in% holding_months & stream != "sacramento river") |>
+  mutate(gdd_trib = mean_daily_temp_c - gdd_base_trib,
+         gdd_trib = ifelse(gdd_trib < 0, 0, gdd_trib)) |>
+  group_by(year(date), stream) |>
+  summarise(gdd_trib = sum(gdd_trib, na.rm = T)) |>
+  rename(year = `year(date)`) |>
+  ungroup()
+
+gdd <- left_join(gdd_trib, gdd_sac,
+                 by = c("year")) |>
+  mutate(gdd_sac = ifelse(is.na(gdd_sac), 0, gdd_sac),
+         gdd_total = round(gdd_sac + gdd_trib, 2)) |>
+  glimpse()
+```
+
+## Flow 
+
+Mximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.
+
+```{r}
+# TODO update to use data object from flow data pull . Rmd
+migratory_and_holding_months <- 3:8
+
+standard_flow <- read_csv(gcs_get_object(object_name = "standard-format-data/standard_flow.csv",
+                                         bucket = gcs_get_global_bucket())) |>
+  filter(month(date) %in% migratory_and_holding_months) |>
+  mutate(year = year(date)) |>
+  group_by(stream, year) |>
+  summarise(mean_flow = mean(flow_cfs, na.rm = T),
+            max_flow = max(flow_cfs, na.rm = T)) |>
+  glimpse()
+```
+
+
+## Passage Timing
+
+Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power.
+
+```{r}
+# TODO update to pull from adult data object for upstream passage
+upstream_passage_timing <- read_csv(gcs_get_object(object_name = "standard-format-data/standard_adult_upstream_passage.csv",
+                                            bucket = gcs_get_global_bucket())) |>
+  filter(!is.na(date)) |>
+  mutate(stream = tolower(stream),
+         year = year(date),
+         week = week(date)) |>
+  filter(run %in% c("spring","not recorded")) |>
+  group_by(year, stream) |>
+  summarise(count = sum(count, na.rm = T),
+            median_passage_timing = median(week, na.rm = T),
+            mean_passage_timing = mean(week, na.rm = T),
+            min_passage_timing = min(week, na.rm = T)) |>
+  ungroup() |> # TODO look at up-down
+  select(-c(count)) |> 
+  glimpse()
+
+# TODO plot to show data gaps
+```
+
+## Water Year Type
+
+To account for the influence of large scale interannual climate variability, we investigated water year type as a covariate as described by the [California Department of Water Resources](https://cdec.water.ca.gov/reportapp/javareports?name=WSIHIST) and available in the [waterYearType package in R](https://cloud.r-project.org/web/packages/waterYearType/index.html). 
+
+We used the `waterYearType` package to pull water year assignments as a categorical covariate. Because for some streams we had very few data points (i.e. for Mill Creek, only seven years were considered dependable), we simplified all potential categories of water year type into either dry (`Dry`, `Below Normal`, `Critical`) or wet (`Wet`, `Above Normal`).
+
+```{r}
+water_year_data <- waterYearType::water_year_indices |>
+  mutate(water_year_type = case_when(Yr_type %in% c("Wet", "Above Normal") ~ "wet",
+                               Yr_type %in% c("Dry", "Below Normal", "Critical") ~ "dry",
+                               TRUE ~ Yr_type)) |>
+  filter(location == "Sacramento Valley") |>
+  dplyr::select(WY, water_year_type) |>
+  glimpse()
+```
+
+
+## Total Passage as Index
+
+We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality.
+
+```{r}
+upstream_passage_index <- upstream_passage_estimates |>
+  mutate(passage_index = passage_estimate) |>
+  select(year, stream, passage_index)
+```
+
+## Combine and standardize
+
+All continuous environmental variables (flow and temperature) were standardized and centered before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable for wet (wet, above normal) vs. dry (below normal, dry, critical).
+
+```{r}
+adult_model_covariates_standard <- full_join(standard_flow,
+                                             gdd,
+                                             by = c("year", "stream")) |>
+  full_join(upstream_passage_timing,
+            by = c("year", "stream")) |>
+  full_join(water_year_data,
+            by = c("year" = "WY")) |>
+  full_join(upstream_passage_index,
+            by = c("year", "stream")) |>
+  filter(!is.na(stream),
+         stream != "sacramento river") |>
+  select(-c(mean_flow, mean_passage_timing, min_passage_timing,
+            gdd_trib, gdd_sac)) |>
+  mutate(wy_type = ifelse(water_year_type == "dry", 0, 1),
+         max_flow_std = as.vector(scale(max_flow)),
+         gdd_std = as.vector(scale(gdd_total)),
+         passage_index = as.vector(scale(passage_index)),
+         median_passage_timing_std = as.vector(scale(median_passage_timing))) |>
+  select(year, stream, wy_type, max_flow_std, gdd_std, passage_index, median_passage_timing_std) |>
+  arrange(stream, year) |>
+  glimpse()
+
+usethis::use_data(adult_model_covariates_standard, overwrite = TRUE)
+```
+
