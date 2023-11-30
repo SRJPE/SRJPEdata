@@ -1,5 +1,6 @@
 ---
 title: "Prep environmental covariates for adult modeling"
+# output: html_document # to see tabset
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{prep_environmental_covariates}
@@ -8,7 +9,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.width=15, fig.height=10)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.width=10, fig.height=5)
 
 library(tidyverse)
 library(googleCloudStorageR)
@@ -18,8 +19,7 @@ gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
 Sys.setenv("GCS_DEFAULT_BUCKET" = "jpe-dev-bucket")
 ```
 
-
-## Format environmental variables as standardized covariates {.tabset}
+## Format environmental variables {.tabset}
 
 ### Temperature 
 
