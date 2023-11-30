@@ -2,7 +2,7 @@
 title: "Prep environmental covariates for adult modeling"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Prep environmental covariates for adult modeling}
+  %\VignetteIndexEntry{prep_environmental_covariates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -10,12 +10,12 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.width=15, fig.height=10)
 
-Sys.setenv("GCS_AUTH_FILE" = "config.json")
-Sys.setenv("GCS_DEFAULT_BUCKET" = "jpe-dev-bucket")
-
 library(tidyverse)
 library(googleCloudStorageR)
 library(waterYearType)
+
+gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
+Sys.setenv("GCS_DEFAULT_BUCKET" = "jpe-dev-bucket")
 ```
 
 
@@ -31,7 +31,7 @@ Several approaches were considered for summarizing temperature:
 
 For each metric approach, we calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. We tested both the individual effects of migratory and holding temperatures as well as a cumulative metric (summed migratory and holding temperatures).
 
-```{r}
+```{r,message = FALSE, warning = FALSE}
 # set thresholds and months
 # TODO full suite of temperatures tried are in the .Rmd on SRJPE model - should I include all those?
 # TODO future exploration to try different thresholds
@@ -68,26 +68,38 @@ gdd_trib <- standard_temp |>
 gdd <- left_join(gdd_trib, gdd_sac,
                  by = c("year")) |>
   mutate(gdd_sac = ifelse(is.na(gdd_sac), 0, gdd_sac),
-         gdd_total = round(gdd_sac + gdd_trib, 2)) |>
-  glimpse()
+         gdd_total = round(gdd_sac + gdd_trib, 2))
+
+knitr::kable(head(gdd, 10))
+
+gdd |> 
+  ggplot(aes(x = year, y = gdd_total)) + 
+  geom_line() +
+  facet_wrap(~stream, scales = "free_y")
 ```
 
 ## Flow 
 
 Mximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.
 
-```{r}
+```{r,message = FALSE, warning = FALSE}
 # TODO update to use data object from flow data pull . Rmd
 migratory_and_holding_months <- 3:8
 
-standard_flow <- read_csv(gcs_get_object(object_name = "standard-format-data/standard_flow.csv",
+flow_metrics <- read_csv(gcs_get_object(object_name = "standard-format-data/standard_flow.csv",
                                          bucket = gcs_get_global_bucket())) |>
   filter(month(date) %in% migratory_and_holding_months) |>
   mutate(year = year(date)) |>
   group_by(stream, year) |>
   summarise(mean_flow = mean(flow_cfs, na.rm = T),
-            max_flow = max(flow_cfs, na.rm = T)) |>
-  glimpse()
+            max_flow = max(flow_cfs, na.rm = T))
+
+knitr::kable(head(flow_metrics, 10))
+
+flow_metrics |> 
+  ggplot(aes(x = year, y = max_flow)) + 
+  geom_line() +
+  facet_wrap(~stream, scales = "free_y")
 ```
 
 
@@ -95,7 +107,7 @@ standard_flow <- read_csv(gcs_get_object(object_name = "standard-format-data/sta
 
 Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power.
 
-```{r}
+```{r,message = FALSE, warning = FALSE}
 # TODO update to pull from adult data object for upstream passage
 upstream_passage_timing <- read_csv(gcs_get_object(object_name = "standard-format-data/standard_adult_upstream_passage.csv",
                                             bucket = gcs_get_global_bucket())) |>
@@ -110,10 +122,14 @@ upstream_passage_timing <- read_csv(gcs_get_object(object_name = "standard-forma
             mean_passage_timing = mean(week, na.rm = T),
             min_passage_timing = min(week, na.rm = T)) |>
   ungroup() |> # TODO look at up-down
-  select(-c(count)) |> 
-  glimpse()
+  select(-c(count))
 
-# TODO plot to show data gaps
+knitr::kable(head(upstream_passage_timing, 10))
+
+upstream_passage_timing |> 
+  ggplot(aes(x = year, y = median_passage_timing)) + 
+  geom_line() +
+  facet_wrap(~stream, scales = "free_y")
 ```
 
 ## Water Year Type
@@ -122,14 +138,15 @@ To account for the influence of large scale interannual climate variability, we 
 
 We used the `waterYearType` package to pull water year assignments as a categorical covariate. Because for some streams we had very few data points (i.e. for Mill Creek, only seven years were considered dependable), we simplified all potential categories of water year type into either dry (`Dry`, `Below Normal`, `Critical`) or wet (`Wet`, `Above Normal`).
 
-```{r}
+```{r,message = FALSE, warning = FALSE}
 water_year_data <- waterYearType::water_year_indices |>
   mutate(water_year_type = case_when(Yr_type %in% c("Wet", "Above Normal") ~ "wet",
                                Yr_type %in% c("Dry", "Below Normal", "Critical") ~ "dry",
                                TRUE ~ Yr_type)) |>
   filter(location == "Sacramento Valley") |>
-  dplyr::select(WY, water_year_type) |>
-  glimpse()
+  dplyr::select(WY, water_year_type)
+
+knitr::kable(head(water_year_data, 10))
 ```
 
 
@@ -137,18 +154,27 @@ water_year_data <- waterYearType::water_year_indices |>
 
 We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality.
 
-```{r}
-upstream_passage_index <- upstream_passage_estimates |>
+```{r,message = FALSE, warning = FALSE}
+# pull in passage estimates and use these for upstream_count
+upstream_passage_index <- read_csv(gcs_get_object(object_name = "standard-format-data/standard_adult_passage_estimate.csv",
+                                                      bucket = gcs_get_global_bucket())) |>
   mutate(passage_index = passage_estimate) |>
   select(year, stream, passage_index)
+
+knitr::kable(head(upstream_passage_index, 10))
+
+upstream_passage_index |> 
+  ggplot(aes(x = year, y = passage_index)) + 
+  geom_line() +
+  facet_wrap(~stream, scales = "free_y")
 ```
 
 ## Combine and standardize
 
 All continuous environmental variables (flow and temperature) were standardized and centered before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable for wet (wet, above normal) vs. dry (below normal, dry, critical).
 
-```{r}
-adult_model_covariates_standard <- full_join(standard_flow,
+```{r,message = FALSE, warning = FALSE}
+adult_model_covariates_standard <- full_join(flow_metrics,
                                              gdd,
                                              by = c("year", "stream")) |>
   full_join(upstream_passage_timing,
@@ -167,9 +193,18 @@ adult_model_covariates_standard <- full_join(standard_flow,
          passage_index = as.vector(scale(passage_index)),
          median_passage_timing_std = as.vector(scale(median_passage_timing))) |>
   select(year, stream, wy_type, max_flow_std, gdd_std, passage_index, median_passage_timing_std) |>
-  arrange(stream, year) |>
-  glimpse()
+  arrange(stream, year)
 
+knitr::kable(head(adult_model_covariates_standard, 10))
+
+adult_model_covariates_standard |> 
+  pivot_longer(max_flow_std:median_passage_timing_std, names_to = "variable", values_to = "standardized_value") |> 
+  ggplot(aes(x = year, y = standardized_value, color = variable)) + 
+  geom_line() +
+  facet_wrap(~stream, scales = "free_y") + 
+  theme(legend.position = "bottom")
+```
+Save data object:
+```{r, evaluate = FALSE, message = FALSE, warning = FALSE}
 usethis::use_data(adult_model_covariates_standard, overwrite = TRUE)
 ```
-
