@@ -321,7 +321,7 @@ efficiency_standard_flows <- bind_rows(mainstem_standardized_efficiency_flows,
                                        tributary_standardized_efficiency_flows) |> 
   distinct()
 
-weekly_model_data <- weekly_model_data_wo_efficiency_flows |> 
+weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |> 
   left_join(efficiency_standard_flows, by = c("year", "week", "stream", "site"))
 
 # ADD special priors data in 
@@ -330,7 +330,12 @@ btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", 
   mutate(site = ifelse(Stream_Site == "battle creek_ubc", "ubc", NA)) |>
   select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max)
 
-usethis::use_data(btspasx_special_priors_data, overwrite = TRUE)
+# JOIN special priors with weekly model data
+# first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
+weekly_model_data <- weekly_model_data_with_eff_flows |>
+  left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
+  mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log((count / 1000) + 1) / 0.025)) |> # maximum possible value for log N across strata
+  select(-special_prior)
 
 
 # TODO data checks 
