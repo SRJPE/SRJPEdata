@@ -11,17 +11,17 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 
-library(tidyverse)
-library(googleCloudStorageR)
-library(CDECRetrieve)
-library(lubridate)
-library(hms)
-library(weathermetrics) 
-library(forecast)
+# library(tidyverse)
+# library(googleCloudStorageR)
+# library(CDECRetrieve)
+# library(lubridate)
+# library(hms)
+# library(weathermetrics) 
+# library(forecast)
 
-root.dir <- rprojroot::find_rstudio_root_file()
-knitr::opts_knit$set(root.dir)
-knitr::opts_chunk$set(echo = TRUE)
+# root.dir <- rprojroot::find_rstudio_root_file()
+# knitr::opts_knit$set(root.dir)
+# knitr::opts_chunk$set(echo = TRUE)
 ```
 
 FlowWest aggregated environmental data for temperature data from all 
@@ -75,7 +75,7 @@ Initial data exploration was done `r here::here("data-raw", "qc-markdowns", "tem
 
 ### All RST Environmental Data 
 
-```{r, include = F}
+```{r, include = F, eval = FALSE}
 # source file where gage data is pulled, need to run this file first
 source(knitr::purl(here::here("data-raw", "qc-markdowns", "temperature_data_prep.Rmd"), quiet=TRUE))
 
@@ -102,7 +102,7 @@ catch <- read_csv("data/rst/standard_catch.csv")
 -   One site from the Fish and Wildlife Service provides data from
     `2003-01-07` to `2021-02-2021`
 
-```{r}
+```{r, eval = FALSE}
 ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "standard-format-data-prep", "temp_data", "battle_clear_temp.xlsx"), sheet = 4)
 
 battle_format <- ubc_temp_raw %>% 
@@ -134,7 +134,7 @@ filter(catch, stream == "battle creek") |> distinct(site, subsite)
 -   The CDEC gage `BCK` was used to aggregate temperature for sites
     `adams dam` and `okie dam` from `1998-09-16` to `2022-06-30`.
 
-```{r}
+```{r, eval = FALSE}
 # source CDEC
 butte <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "butte_temp.rds"))
 butte_format <- butte %>%
@@ -162,7 +162,7 @@ filter(catch, stream == "butte creek") |> distinct(site, subsite)
 -   Clear Creek data was aggregated from Fish Wildlife Service's site
     `lcc` from `2001-02-16` to `2021-12-31`
 
-```{r}
+```{r, eval = FALSE}
 ucc_temp_raw <- readxl::read_excel(here::here("data-raw", "standard-format-data-prep", "temp_data", "battle_clear_temp.xlsx"), sheet = 2)
 
 ucc_temp <- ucc_temp_raw %>% 
@@ -205,7 +205,7 @@ filter(catch, stream == "clear creek") |> distinct(site, subsite)
 -   Deer Creek data was aggregated from CDEC's site `DCV` from
     `1998-10-01` to `2022-07-13`
 
-```{r}
+```{r, eval = FALSE}
 # source 
 deer <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "deer_temp.rds")) %>% glimpse
 deer_format <- deer %>%
@@ -238,7 +238,7 @@ deer_format %>% ggplot() +
 -   Feather River data can be aggregate by high and low flows using the
     `location` column
 
-```{r}
+```{r, eval = FALSE}
 # Two gages according to RST shiny app:
 # - CDEC GRL
 # - CDEC FRA
@@ -295,7 +295,7 @@ feather_river_temp_FRA <- FRA_CDEC %>%
 
 -   significant data gap exists
 
-```{r}
+```{r, eval = FALSE}
 
 feather_cdec_gages  <- bind_rows(feather_river_temp_FRA,
                              feather_river_temp_GRL)
@@ -312,7 +312,7 @@ ggplot() +
 -   Data can be aggregated up to high and low flows using `location`
     column
 
-```{r}
+```{r, eval = FALSE}
 feather_rst <- rst_enviro %>% 
   filter(stream == "feather river", parameter == "temperature") %>%
   select(stream, site, subsite, date, value) %>%
@@ -332,7 +332,7 @@ ggplot() +
 -   Mill Creek temperature data is sourced from CDEC's site `MLM` from
     `1998-10-07` to `2022-07-13`
 
-```{r}
+```{r, eval = FALSE}
 # source USGS
 mill <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "mill_temp.rds"))
 mill_format <- mill %>%
@@ -364,7 +364,7 @@ mill_format %>% ggplot() +
     `2016-10-01`
   - use for both Knights Landing and Tisdale
 
-```{r}
+```{r, eval = FALSE}
 
 ### USGS 11390500
 # Read created CSV
@@ -396,7 +396,7 @@ ggplot() +
 -   Date range from `2002-10-04` to `2021-05-31` with a two year gap
     between `2016-06-20` and `2018-08-28`
 
-```{r}
+```{r, eval = FALSE}
 
 sac_rst_format <- rst_enviro %>% 
   filter(stream == "sacramento river", parameter == "temperature") %>% 
@@ -417,7 +417,7 @@ ggplot() +
 -   combined dataset spans `1998-10-01` to `2022-07-25` and includes RST
     environmental data from Knights Landing and USGS data from Tisdale
 
-```{r}
+```{r, eval = FALSE}
 
 sac_format <- bind_rows(sac_rst_format, # rst
                         sac_usgs_format) %>% 
@@ -444,7 +444,7 @@ ggplot() +
 - Current approach is to use Yuba RST temperature data
 - Another possible option to model using air temperature
 
-```{r}
+```{r, eval = FALSE}
 #TODO need to do air temp modeling, check temperature_data_prep for potential gages (if not there use noaa data)
 
 yuba_rst_format <- rst_enviro %>% 
@@ -607,7 +607,7 @@ ggplot() +
 
 # Combine temperature data {.tabset}
 
-```{r}
+```{r, eval = FALSE}
 combined_temp <- bind_rows(battle_format,
                            butte_format_all,
                            clear_format,
@@ -625,7 +625,7 @@ combined_temp <- bind_rows(battle_format,
 
 ## QA/QC
 
-```{r}
+```{r, eval = FALSE}
 summary(combined_temp)
 unique(combined_temp$stream)
 unique(combined_temp$site)
@@ -650,7 +650,7 @@ unique(combined_temp_clean$stream)
 unique(combined_temp_clean$source)
 ```
 
-```{r, include = FALSE}
+```{r, include = FALSE, eval = FALSE}
 f <- function(input, output) write_csv(input, file = output)
 
 gcs_upload(combined_temp_clean,

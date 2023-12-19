@@ -30,6 +30,8 @@ navbar:
         href: articles/yearling_ruleset.html
       - text: 'Trap Effort'
         href: articles/trap_effort.html
+      - text: 'Years to Include'
+        href: articles/years_to_include_analysis.html
 repo:
  url:
   home: https://github.com/SRJPE/SRJPEdata

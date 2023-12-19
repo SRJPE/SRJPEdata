@@ -98,13 +98,13 @@ in nonsensical hours fished. In these cases, we assume 24 hour sampling periods.
 
 ## Hours fished {.tabset}
 
-## Method 1) Battle creek, Clear Creek, Feather, Kinghts, Tisdale
+## Method 1: Battle creek, Clear Creek, Feather, Kinghts, Tisdale
 
 The above creeks have data available to calculate the hours fished. There are a few
 cases when start date is NA. For these we fill in the start date assuming
 it is the sample date of the previous record.
 
-```{r, battle}
+```{r, battle, echo = FALSE}
 method_one_hours_fished <- filter(trap, stream %in% 
                                 c("battle creek", "clear creek", 
                                   "feather river", "sacramento river")) %>% 
@@ -118,19 +118,24 @@ knitr::kable(head(method_one_hours_fished, 5))
 ```
 
 ### QC
-
-```{r}
+TODO - deal with NA hours fished value
+```{r, echo = FALSE}
 method_one_hours_fished %>% 
   ggplot(aes(x = stop_datetime, y = hours_fished, color = stream)) +
   geom_point()+
   theme_minimal() + 
-  scale_color_manual(values = colors_small)
+  scale_color_manual(values = colors_small) +
+  labs(x = "Date", y = "Hours Fished", 
+       title = "Hours Fished Calculated Using Method One")
 
 method_one_hours_fished %>% 
   ggplot(aes(x = hours_fished, fill = stream)) +
   geom_histogram(position = "dodge") +
   theme_minimal() + 
-  scale_fill_manual(values = colors_small)
+  scale_fill_manual(values = colors_small) +
+  labs(x = "Hours Fished", 
+       y = "", 
+       title = "Hours Fished Calculated Using Method One")
 ```
 
 
@@ -139,7 +144,7 @@ method_one_hours_fished %>%
 Hours fished are calculated by taking the difference between the date/time at each 
 observation. 
 
-```{r, butte, yuba}
+```{r, butte, yuba, echo = FALSE}
 ## Butte ####
 method_three_hours_fished <- filter(trap, stream %in% c("butte creek", "yuba river")) %>%
   distinct(trap_stop_date, trap_stop_time, site, subsite, site_group, stream) %>%
@@ -158,12 +163,14 @@ knitr::kable(head(method_three_hours_fished, 5))
 
 ### QC
 
-```{r}
+```{r, echo = FALSE}
 method_three_hours_fished %>% 
   ggplot(aes(x = trap_stop_time, y = hours_fished, color = stream)) +
   geom_point() + 
   theme_minimal() + 
-  scale_color_manual(values = colors_small)
+  scale_color_manual(values = colors_small) +
+    labs(x = "Trap Stop Time", y = "Hours Fished", 
+       title = "Hours Fished Calculated Using Method Three")
 # trying to figure out where to set cut of for effort
 # decided to set as 5 days - 120 hours
 method_three_hours_fished %>% 
@@ -171,7 +178,10 @@ method_three_hours_fished %>%
   ggplot(aes(x = hours_fished, fill = stream)) +
   geom_histogram(position = "dodge") + 
   theme_minimal() + 
-  scale_fill_manual(values = colors_small)
+  scale_fill_manual(values = colors_small) +
+    labs(x = "Hours Fished", 
+       y = "", 
+       title = "Hours Fished Calculated Using Method Three")
 # these are typos and will be fixed by assuming 24 hours fished
 # butte_hours_fished %>% 
 #   filter(hours_fished > 5000) %>% tally()
@@ -183,7 +193,7 @@ Mill & Deer Creek do not have data available (no time variable) to calculate hou
 Mill & Deer Creek also does not have sample period revolutions so we cannot use trap revolutions 
 fished so assume 24 hours for every day with data. 
 
-```{r, deer & mill}
+```{r, deer & mill, echo = FALSE}
 ## Deer & mill #####
 deer_mill_hours_fished <- filter(trap, stream %in% c("deer creek", "mill creek")) %>% 
   distinct(trap_stop_date, stream, site, subsite, site_group) %>% 
@@ -196,7 +206,7 @@ knitr::kable(head(deer_mill_hours_fished, 5))
 
 # Combine data
 
-```{r}
+```{r, echo = FALSE}
 # all wee need is stop_date, hours_fished, stream, site
 # do not sum by subsites. this can be done in further analysis
 
@@ -224,7 +234,7 @@ hours_fished_combined <- bind_rows(method_one,
 
 ## Summarized by week
 
-```{r}
+```{r, echo = FALSE}
 weekly_effort <- hours_fished_combined %>% 
   mutate(week = week(date),
          year = year(date)) %>% 
@@ -236,12 +246,14 @@ usethis::use_data(weekly_effort, overwrite = TRUE)
 
 ### QC
 
-```{r}
+```{r, echo = FALSE}
 weekly_effort %>% 
   ggplot(aes(x = week, y = hours_fished, color = year)) +
   geom_point() + 
   facet_wrap(~stream)+ 
-  theme_minimal() 
+  theme_minimal() +
+      labs(x = "Week", y = "Hours Fished", 
+       title = "Hours Fished All Methods")
 # + 
 #   scale_color_manual(values = colors_small)
 
@@ -249,5 +261,8 @@ weekly_effort %>%
   ggplot(aes(x = hours_fished, fill = stream)) +
   geom_histogram(alpha = .75, position = 'dodge') +
   theme_minimal() + 
-  scale_fill_manual(values = colors_small)
+  scale_fill_manual(values = colors_small) +
+  labs(x = "Hours Fished", 
+   y = "", 
+   title = "Hours Fished All Methods")
 ```

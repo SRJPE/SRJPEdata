@@ -275,7 +275,7 @@ weekly_effort_by_site |> glimpse()
 catch_reformatted <- weekly_standard_catch |>  glimpse()
 
 # Combine all 3 tables together 
-weekly_model_data <- catch_reformatted |> 
+weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
   left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site")) |> 
   # Join efficnecy data to catch data
   left_join(weekly_efficiency, 
@@ -297,7 +297,7 @@ weekly_model_data <- catch_reformatted |>
   glimpse()
 
 # Add in standardized efficiency flows 
-mainstem_standardized_efficiency_flows <- weekly_model_data |>
+mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
   filter(site %in% c("knights landing", "tisdale", "red bluff diversion dam"),
          !is.na(flow_cfs), 
          !is.na(number_released),
@@ -307,7 +307,7 @@ mainstem_standardized_efficiency_flows <- weekly_model_data |>
            sd(flow_cfs, na.rm = T)) |> 
   select(year, week, stream, site, standardized_efficiency_flow)
 
-tributary_standardized_efficiency_flows <- weekly_model_data |>
+tributary_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
   filter(!site %in% c("knights landing", "tisdale", "red bluff diversion dam"),
          !is.na(flow_cfs),
          !is.na(number_released),
@@ -321,8 +321,14 @@ efficiency_standard_flows <- bind_rows(mainstem_standardized_efficiency_flows,
                                        tributary_standardized_efficiency_flows) |> 
   distinct()
 
-weekly_model_data <- weekly_model_data |> 
+weekly_model_data <- weekly_model_data_wo_efficiency_flows |> 
   left_join(efficiency_standard_flows, by = c("year", "week", "stream", "site"))
+
+# TODO add special priors somewhere in the data package 
+
+
+
+
 
 # TODO data checks 
 # Why does battle start in 2007 - did we intentionally leave early years out of database 

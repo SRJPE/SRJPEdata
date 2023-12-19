@@ -45,15 +45,7 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 The cumulative catch curve below shows cumulative catch throughout time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used simmilar plots on each tributaries to exclude years where there is very limited sampling. See additional [cumulative catch curves in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) for each tributary. 
 
 ```{r, echo = FALSE}
-# PUll in origional catch here that hasn't been filtered to remove bad years 
-# gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
-# gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
-# gcs_get_object(object_name = "standard-format-data/standard_rst_catch.csv",
-#                bucket = gcs_get_global_bucket(),
-#                saveToDisk = "data-raw/database-tables/standard_catch.csv",
-#                overwrite = TRUE)
-standard_catch <- read_csv("data-raw/database-tables/standard_catch.csv")
-
+standard_catch <- catch 
 spring_run_catch <- filter(standard_catch, run == "spring" | stream %in% c("mill creek", "deer creek")) %>%
   mutate(day = day(date),
          month = month(date),

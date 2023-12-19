@@ -22,7 +22,7 @@ library(googleCloudStorageR)
 
 ## Battle
 
-```{r}
+```{r, eval = FALSE}
 # Pull in flow data saved in flow_data_prep.Rmd
 # Format data as date, flow_cfs, stream, site, source
 
@@ -38,7 +38,7 @@ battle_format <- battle %>%
 
 ## Butte
 
-```{r}
+```{r, eval = FALSE}
 # source CDEC
 butte <- read_rds(here::here("data-raw", "standard-format-data-prep", "flow_data_prep_files", "flow_data", "butte_flow.rds"))
 
@@ -53,7 +53,7 @@ glimpse()
 
 ## Clear
 
-```{r}
+```{r, eval = FALSE}
 # source USGS
 clear <- read_rds(here::here("data-raw", "standard-format-data-prep", "flow_data_prep_files", "flow_data", "clear_flow.rds"))
 
@@ -68,7 +68,7 @@ glimpse()
 
 ## Deer
 
-```{r}
+```{r, eval = FALSE}
 # source USGS
 deer <- read_rds(here::here("data-raw", "standard-format-data-prep", "flow_data_prep_files", "flow_data", "deer_flow.rds"))
 
@@ -81,7 +81,7 @@ glimpse()
 
 ## Feather
 
-```{r}
+```{r, eval = FALSE}
 # source CDEC
 feather_hfc <- read_rds(here::here("data-raw", "standard-format-data-prep", "flow_data_prep_files", 
                                    "flow_data", "feather_hfc_flow.rds"))
@@ -151,7 +151,7 @@ lower_feather_format <- lower_feather |>
 
 ## Mill
 
-```{r}
+```{r, eval = FALSE}
 # source USGS
 mill <- read_rds(here::here("data-raw", "standard-format-data-prep", "flow_data_prep_files", "flow_data", "mill_flow.rds"))
 
@@ -164,7 +164,7 @@ glimpse()
 
 ## Yuba
 
-```{r}
+```{r, eval = FALSE}
 # source USGS
 yuba <- read_rds(here::here("data-raw", "standard-format-data-prep", "flow_data_prep_files", "flow_data", "yuba_flow.rds"))
 
@@ -179,7 +179,7 @@ glimpse()
 
 ## Sacramento
 
-```{r}
+```{r, eval = FALSE}
 # source USGS
 knights <- read_rds(here::here("data-raw", "standard-format-data-prep", "flow_data_prep_files", "flow_data", "knights_flow.rds"))
 
@@ -211,7 +211,7 @@ glimpse()
 
 # Combine flow data {.tabset}
 
-```{r}
+```{r, eval = FALSE}
 combined_flow <- bind_rows(battle_format,
                            butte_format,
                            clear_format,
@@ -228,7 +228,7 @@ combined_flow <- bind_rows(battle_format,
 ```
 ## QA/QC
 
-```{r}
+```{r, eval = FALSE}
 unique(combined_flow$stream)
 unique(combined_flow$site)
 
@@ -240,7 +240,7 @@ filter(combined_flow, is.na(date))
 combined_flow_clean <- filter(combined_flow, !is.na(date))
 ```
 
-```{r}
+```{r, eval = FALSE}
 f <- function(input, output) write_csv(input, file = output)
 
 gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
