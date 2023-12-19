@@ -11,27 +11,21 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 
-# library(tidyverse)
-# library(googleCloudStorageR)
-# library(CDECRetrieve)
-# library(lubridate)
-# library(hms)
-# library(weathermetrics) 
-# library(forecast)
-
-# root.dir <- rprojroot::find_rstudio_root_file()
-# knitr::opts_knit$set(root.dir)
-# knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(googleCloudStorageR)
+library(CDECRetrieve)
+library(lubridate)
+library(hms)
 ```
 
 FlowWest aggregated environmental data for temperature data from all 
 monitoring programs:
 
--   Feather River (source: RST monitoring data)
--   Battle Creek (source: FWS)
+-   Battle Creek (source: FWS gage data (xlsx version))
 -   Butte Creek (source: CDEC)
--   Clear Creek (source: FWS)
+-   Clear Creek (source: FWS gage data (xlsx version))
 -   Deer Creek (source: CDEC)
+-   Feather River (source: RST monitoring data)
 -   Mill Creek (source: CDEC)
 -   Sacramento River (source for Tisdale: USGS; source for Knights
     Landing: RST monitoring data)
@@ -71,39 +65,31 @@ Y - Yuba River)
 
 # Pull in data and format {.tabset}
 
-Initial data exploration was done `r here::here("data-raw", "qc-markdowns", "temperature_data_prep.Rmd")`
+Initial data exploration was done within [JPE datasets](https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/temperature_data_prep.Rmd)
 
 ### All RST Environmental Data 
 
 ```{r, include = F, eval = FALSE}
-# source file where gage data is pulled, need to run this file first
-source(knitr::purl(here::here("data-raw", "qc-markdowns", "temperature_data_prep.Rmd"), quiet=TRUE))
-
-# set up GCS
 gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
 gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
-
-gcs_get_object(object_name = "standard-format-data/standard_RST_environmental.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data/rst/standard_RST_environmental.csv",
-               overwrite = TRUE)
-
-rst_enviro <- read_csv('data/rst/standard_RST_environmental.csv') %>% glimpse()
-
-gcs_get_object(object_name = "standard-format-data/standard_rst_catch.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data/rst/standard_catch.csv",
-               overwrite = TRUE)
-catch <- read_csv("data/rst/standard_catch.csv")
 ```
 
 ## Battle Creek
 
 -   One site from the Fish and Wildlife Service provides data from
-    `2003-01-07` to `2021-02-2021`
+    `2003-01-07` to `2021-02-2021`. Pull from EXCEL. 
 
+***THINK ABOUT HOW WE WANT TO UPDATE THESE DATA? NEED TO GET NEW DATA FROM BATTLE CLEAR CREW*** 
 ```{r, eval = FALSE}
-ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "standard-format-data-prep", "temp_data", "battle_clear_temp.xlsx"), sheet = 4)
+# get data from google cloud
+gcs_get_object(object_name = "environmental/data-raw/battle_clear_RSTTEMPS_07052022.xlsx",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk =  here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"),
+               overwrite = TRUE)
+
+ubc_temp_raw <- readxl::read_excel(here::here("data-raw", 
+                                              "temperature-data", 
+                                              "battle_clear_temp.xlsx"), sheet = 4)
 
 battle_format <- ubc_temp_raw %>% 
   rename(date = DT,
@@ -136,8 +122,25 @@ filter(catch, stream == "battle creek") |> distinct(site, subsite)
 
 ```{r, eval = FALSE}
 # source CDEC
-butte <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "butte_temp.rds"))
-butte_format <- butte %>%
+# TODO add data checks for temp data pulls 
+BCK_CDEC <- cdec_query(station = "BCK", 
+                       dur_code = "H", 
+                       sensor_num = "25", 
+                       start_date = "1995-01-01")
+# make hourly 
+BCK_hourly_temps <- BCK_CDEC %>%
+  mutate(date = as_date(datetime),
+         time = as_hms(datetime),
+         temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) %>%
+  select(date, time, temp_degC)
+
+BCK_daily_temps <- BCK_hourly_temps %>% 
+  group_by(date) %>% 
+  summarize(mean_temp_degC = mean(temp_degC, na.rm = T),
+            max_temp_degC = max(temp_degC, na.rm = T)) 
+
+# FORMAT
+butte_format <- BCK_daily_temps %>%
   mutate(stream = "butte creek",
          source = "CDEC BCK")
 
@@ -163,7 +166,9 @@ filter(catch, stream == "butte creek") |> distinct(site, subsite)
     `lcc` from `2001-02-16` to `2021-12-31`
 
 ```{r, eval = FALSE}
-ucc_temp_raw <- readxl::read_excel(here::here("data-raw", "standard-format-data-prep", "temp_data", "battle_clear_temp.xlsx"), sheet = 2)
+ucc_temp_raw <- readxl::read_excel(here::here("data-raw",
+                                              "temperature_data", 
+                                              "battle_clear_temp.xlsx"), sheet = 2)
 
 ucc_temp <- ucc_temp_raw %>% 
   rename(date = DT,
@@ -207,8 +212,26 @@ filter(catch, stream == "clear creek") |> distinct(site, subsite)
 
 ```{r, eval = FALSE}
 # source 
-deer <- read_rds(here::here("data-raw", "standard-format-data-prep","temp_data", "deer_temp.rds")) %>% glimpse
-deer_format <- deer %>%
+# PUll data from CDEC - DCV (Deer Creek Near Vina)
+DCV_CDEC <- cdec_query(station = "DCV", 
+                       dur_code = "H", 
+                       sensor_num = "25", 
+                       start_date = "1995-01-01")
+
+DCV_hourly_temps <- DCV_CDEC %>%
+  mutate(date = as_date(datetime),
+         time = as_hms(datetime),
+         temp_degC = fahrenheit_to_celsius(parameter_value, round = 1)) %>%
+  select(date,time,temp_degC)
+
+# Daily summary 
+DCV_daily_temps <- DCV_hourly_temps %>% 
+  filter(!is.na(temp_degC)) %>%
+  group_by(date) %>% 
+  summarize(mean_temp_degC = mean(temp_degC, na.rm = T),
+            max_temp_degC = max(temp_degC, na.rm = T)) 
+
+deer_format <- DCV_daily_temps %>%
   mutate(stream = "deer creek",
          site = stream,
          subsite = site,

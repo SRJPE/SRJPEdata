@@ -17,9 +17,9 @@ library(tidyverse)
 library(lubridate)
 
 # Read in datasets 
-rulesets <- read.csv(here::here("data-raw", "weekly_yearling_cutoff.csv")) |> 
+rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
   mutate(date_for_plot = as_date(date_for_plot))
-daily_ruleset_all <- read.csv(here::here("data-raw", "daily_yearling_ruleset.csv"))
+daily_ruleset_all <- read.csv(here::here("data-raw", "helper-tables", "daily_yearling_ruleset.csv"))
 source(here::here("data-raw", "pull_tables_from_database.R"))
 ```
 
@@ -45,7 +45,7 @@ The plot below shows the update cutoff values with linear interpolation betweek 
 ```{r}
 # PLOT EXAMPLE FOR DEER 
 stream_name <- "deer creek"
-rulesets <- read.csv(here::here("data-raw", "weekly_yearling_cutoff.csv")) |> 
+rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
   mutate(date_for_plot = as_date(date_for_plot))
 
 rulesets_filtered <- rulesets |> 
@@ -109,7 +109,7 @@ data <- data |>
 ```{r, echo = FALSE}
 # Create for all tribs 
 generate_daily_cutoff <- function(stream_name) {
-  rulesets <- read.csv(here::here("data-raw", "weekly_yearling_cutoff.csv")) |> 
+  rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
     mutate(date_for_plot = as_date(date_for_plot))
   
   rulesets_filtered <- rulesets |> 

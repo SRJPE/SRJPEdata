@@ -1,6 +1,6 @@
 library(googleCloudStorageR)
 library(tidyverse)
-
+# TODO DELETE ONCE EVERYTHING IS IN DATABASE
 gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
 gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
 

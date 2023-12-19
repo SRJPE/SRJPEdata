@@ -165,7 +165,7 @@ We utilized above cumulative catch curves and heatmaps come up with a list of ye
 # TODO document data object 
 # TODO add red bluff to database & file 
 
-years_exclude <- read_csv(here::here("data-raw","years_to_exclude.csv"))
+years_exclude <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
 years_exclude_nice_names <- years_exclude |> select("Stream" = stream, 
                                                     "Year" = year, 
                                                     "Exclusion Type" = exclusion_type,
