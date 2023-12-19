@@ -324,10 +324,13 @@ efficiency_standard_flows <- bind_rows(mainstem_standardized_efficiency_flows,
 weekly_model_data <- weekly_model_data_wo_efficiency_flows |> 
   left_join(efficiency_standard_flows, by = c("year", "week", "stream", "site"))
 
-# TODO add special priors somewhere in the data package 
+# ADD special priors data in 
+# TODO ask Josh how he generates these / come up with update workflow
+btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", "Special_Priors.csv")) |>
+  mutate(site = ifelse(Stream_Site == "battle creek_ubc", "ubc", NA)) |>
+  select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max)
 
-
-
+usethis::use_data(btspasx_special_priors_data, overwrite = TRUE)
 
 
 # TODO data checks 
