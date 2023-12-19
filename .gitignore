@@ -17,4 +17,5 @@
 *.DS_Store
 .Rproj.user
 inst/doc
+*config.yml
 
