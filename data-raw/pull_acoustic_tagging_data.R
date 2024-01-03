@@ -71,8 +71,15 @@ spring_detections <- purrr::map(spring_ids[1:4], pull_detections_data) |>
   reduce(bind_rows) |> 
   glimpse()
 
+# TEST OUT ONE TO MATCH FLORAS TABLE -
+coleman_detections <- purrr::map("ColemanFall_2013", pull_detections_data) |> 
+  reduce(bind_rows) |> 
+  glimpse()
+
+c("Rel_")
+
 # Clean up 
-formatted_spring_detections <- spring_detections |> 
+formatted_spring_detections <- coleman_detections |> 
   mutate(first_time = as.POSIXct(first_time, 
                                  format = "%m/%d/%Y %H:%M:%S", 
                                  tz = "Etc/GMT+8"),
