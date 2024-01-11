@@ -18,4 +18,4 @@
 .Rproj.user
 inst/doc
 *config.yml
-
+*.Rproj.user

@@ -332,7 +332,7 @@ btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", 
 
 # JOIN special priors with weekly model data
 # first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
-weekly_model_data <- weekly_model_data_with_eff_flows |>
+weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log((count / 1000) + 1) / 0.025)) |> # maximum possible value for log N across strata
   select(-special_prior)
@@ -340,6 +340,6 @@ weekly_model_data <- weekly_model_data_with_eff_flows |>
 
 # TODO data checks 
 # Why does battle start in 2007 - did we intentionally leave early years out of database 
-usethis::use_data(weekly_model_data, overwrite = TRUE)
+usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)
 
 weekly_model_data |> filter(site == "ubc", year == 2009, week == 4) 

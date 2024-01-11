@@ -1,6 +1,9 @@
 ---
 title: "Combine Temperature Data"
-output: rmarkdown::html_vignette
+output:
+  html_document:
+     code_folding: hide
+     theme: flatly
 vignette: >
   %\VignetteIndexEntry{Yearling Ruleset}
   %\VignetteEngine{knitr::rmarkdown}
@@ -83,7 +86,7 @@ Initial data exploration was done within [JPE datasets](https://github.com/SRJPE
     `2003-01-07` to `2021-02-2021`. Pull from EXCEL. 
 
 ***THINK ABOUT HOW WE WANT TO UPDATE THESE DATA? NEED TO GET NEW DATA FROM BATTLE CLEAR CREW*** 
-```{r}
+```{r, eval = FALSE}
 # get data from google cloud
 # TODO update once battle and clear are in database
 # gcs_get_object(object_name = "environmental/data-raw/battle_clear_RSTTEMPS_07052022.xlsx",
@@ -124,7 +127,7 @@ battle_format %>% ggplot() +
 -   The CDEC gage `BCK` was used to aggregate temperature for sites
     `adams dam` and `okie dam` from `1998-09-16` to `2022-06-30`.
 
-```{r}
+```{r, eval = FALSE}
 # source CDEC
 # TODO add data checks for temp data pulls 
 BCK_CDEC <- cdec_query(station = "BCK", 
@@ -169,7 +172,7 @@ filter(catch, stream == "butte creek") |> distinct(site, subsite)
 -   Clear Creek data was aggregated from Fish Wildlife Service's site
     `lcc` from `2001-02-16` to `2021-12-31`
 
-```{r}
+```{r, eval = FALSE}
 ucc_temp_raw <- readxl::read_excel(here::here("data-raw",
                                               "temperature-data", 
                                               "battle_clear_temp.xlsx"), sheet = 2)
@@ -216,7 +219,7 @@ filter(catch, stream == "clear creek") |> distinct(site, subsite)
 -   Deer Creek data was aggregated from CDEC's site `DCV` from
     `1998-10-01` to `2022-07-13`
 
-```{r}
+```{r, eval = FALSE}
 # source 
 # PUll data from CDEC - DCV (Deer Creek Near Vina)
 DCV_CDEC <- cdec_query(station = "DCV", 
@@ -268,7 +271,7 @@ deer_format %>% ggplot() +
     `location` column
 
 
-```{r}
+```{r,  eval = FALSE}
 # TODO feather flow is not in the database, need to add! currently all NA 
 feather_rst <- trap %>% 
   filter(stream == "feather river") %>% 
@@ -289,7 +292,7 @@ ggplot() +
 -   Mill Creek temperature data is sourced from CDEC's site `MLM` from
     `1998-10-07` to `2022-07-13`
 
-```{r}
+```{r,  eval = FALSE}
 # cdec_datasets("MLM") 
 
 MLM_CDEC <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1996-01-01")
@@ -335,7 +338,7 @@ mill_format %>% ggplot() +
     `2016-10-01`
   - use for both Knights Landing and Tisdale
 
-```{r}
+```{r, eval = FALSE}
 
 ### USGS 11390500
 # Read created CSV
@@ -367,7 +370,7 @@ ggplot() +
 -   Date range from `2002-10-04` to `2021-05-31` with a two year gap
     between `2016-06-20` and `2018-08-28`
 
-```{r}
+```{r,  eval = FALSE}
 
 sac_rst_format <- trap %>% 
   filter(stream == "sacramento river") %>% 
@@ -388,7 +391,7 @@ ggplot() +
 -   combined dataset spans `1998-10-01` to `2022-07-25` and includes RST
     environmental data from Knights Landing and USGS data from Tisdale
 
-```{r}
+```{r,  eval = FALSE}
 
 sac_format <- bind_rows(sac_rst_format, # rst
                         sac_usgs_format) %>% 
@@ -415,7 +418,7 @@ ggplot() +
 - Current approach is to use Yuba RST temperature data
 - Another possible option to model using air temperature
 
-```{r}
+```{r,  eval = FALSE}
 #TODO need to do air temp modeling, check temperature_data_prep for potential gages (if not there use noaa data)
 
 yuba_rst_format <- trap %>% 
@@ -432,7 +435,7 @@ ggplot() +
 ```
 
 
-```{r}
+```{r,  eval = FALSE}
 # limited USGS gage data 
 # USGS 11417500 S YUBA R A JONES BAR NR GRASS VALLEY CA
 # site_no=11417500
@@ -465,7 +468,7 @@ ggplot() +
 
 # Combine temperature data {.tabset}
 
-```{r}
+```{r,  eval = FALSE}
 combined_temp <- bind_rows(battle_format,
                            butte_format_all,
                            clear_format,
@@ -483,7 +486,7 @@ combined_temp <- bind_rows(battle_format,
 
 ## QA/QC
 
-```{r}
+```{r,  eval = FALSE}
 summary(combined_temp)
 unique(combined_temp$stream)
 unique(combined_temp$site)

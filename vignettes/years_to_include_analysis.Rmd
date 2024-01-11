@@ -45,7 +45,7 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 The cumulative catch curve below shows cumulative catch throughout time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used simmilar plots on each tributaries to exclude years where there is very limited sampling. See additional [cumulative catch curves in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) for each tributary. 
 
 ```{r, echo = FALSE}
-standard_catch <- catch 
+standard_catch <- rst_catch 
 spring_run_catch <- filter(standard_catch, run == "spring" | stream %in% c("mill creek", "deer creek")) %>%
   mutate(day = day(date),
          month = month(date),
@@ -188,7 +188,7 @@ The table below shows a section of this table:
 # Exclude years
 
 # analysis for red bluff - bring back in after adding to database 
-rb <- filter(catch, site == "red bluff diversion dam")
+rb <- filter(rst_catch, site == "red bluff diversion dam")
 # rb |> 
 #   group_by(date) |> 
 #   summarize(count = sum(count, na.rm = T)) |> 
@@ -219,7 +219,7 @@ exclude <- tibble(stream = c(rep("battle creek",3), rep("butte creek", 5), rep("
                                       2013),
                   exclude = rep("yes", 24))
 
-min_max_week <- catch |> 
+min_max_week <- rst_catch |> 
   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
   group_by(monitoring_year, stream, site, subsite) |> 
   summarize(min_date = min(date),
@@ -288,12 +288,153 @@ Video data
 
 Additionally we conducted outreach to stream teams to review our list and highlight any other years that should be excluded. 
 
-## Survey Data 
-TODO update with data from database once adult data is added in 
-
-
 ## Video Data 
-TODO update with data from database once adult data is added in 
+```{r}
+standard_upstream <- read_csv(here::here("data-raw", "database-tables", "standard_adult_upstream.csv"))
+# TODO update with data from database once adult data is added in 
+# 
+upstream_date_week <- standard_upstream %>% 
+  mutate(day = day(date),
+         month = month(date),
+         fake_date = as_date(paste0("2000-", month, "-", day))) %>%
+  select(fake_date) %>%
+  distinct() %>%
+  mutate(week = week(fake_date))
+# This helper table provides a date range for each numeric week
+# This is used as hover text label in the heatmap
+upstream_date_range <- upstream_date_week %>%
+  group_by(week) %>%
+  slice_min(fake_date) %>%
+  rename(min_date = fake_date) %>%
+  left_join(catch_date_week %>%
+              group_by(week) %>%
+              slice_max(fake_date) %>%
+              rename(max_date = fake_date)) %>%
+  mutate(min_date = format(min_date, "%b %d"),
+         max_date = format(max_date, "%b %d"),
+         date_range = paste(min_date,"-",max_date))
+upstream_summary <- standard_upstream %>%
+  select(date, stream) %>%
+  distinct() %>% 
+  mutate(week = week(date),
+         year = year(date)) %>%
+  group_by(stream, week, year) %>%
+  tally()
 
+upstream_weekly <- upstream_summary %>% 
+  # add catch_date_week to make sure all weeks are included in the data
+  right_join(select(upstream_date_week, week) %>% 
+               distinct()) %>% 
+  pivot_wider(id_cols = c("stream", "year"), 
+              names_from = week, 
+              values_from = n, 
+              values_fill = 0) %>%
+  pivot_longer(cols = -c("stream","year"), names_to = "week", values_to = "number_days_sampled") %>%
+  mutate(week = as.numeric(week)) %>%
+  left_join(upstream_date_range) %>%
+  mutate(fake_date = case_when(week %in% c(40:53) ~ ymd("1999-01-01") + weeks(week - 1),
+                               T ~ ymd("2000-01-01") + weeks(week - 1)))
+
+updstream_plot_data <- upstream_weekly %>%
+      filter(number_days_sampled > 0) %>%
+      mutate(wy = ifelse(week >= 37, year + 1, year)) %>%
+      group_by(week, wy, date_range, fake_date) %>%
+      summarize(streams = paste(unique(stream), collapse = ", "),
+                n_streams = length(unique(stream))) %>%
+      ungroup() %>%
+      mutate(week = factor(week, levels = c(37:53, 1:36)),
+             wy = factor(wy))
+year_labels <- c(1995, 2000, 2005, 2010, 2015, 2020)
+
+upstream_heat_map <- ggplot(updstream_plot_data, 
+                   aes(x = fake_date, y = wy, fill = n_streams, text = paste0(date_range, "<br>", streams))) +
+  geom_tile() +
+  #scale_y_continuous(n.breaks = 5, breaks = waiver()) +
+  scale_y_discrete(breaks = year_labels) +
+  scale_x_date(date_labels = "%b", breaks = "2 months") +
+  theme_minimal() + 
+  ylab('water year') +
+  xlab("") + 
+  scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  labs(fill = "Number of streams")
+plotly::ggplotly(upstream_heat_map) 
+```
+
+
+
+
+## Survey Data 
+
+#TODO fix this section is in progress 
+
+```{r, eval = FALSE}
+# REDD 
+redd_date_week <- standard_daily_redd %>% 
+  mutate(day = day(date),
+         month = month(date),
+         fake_date = as_date(paste0("2000-", month, "-", day))) %>%
+  select(fake_date) %>%
+  distinct() %>%
+  mutate(week = week(fake_date))
+# This helper table provides a date range for each numeric week
+# This is used as hover text label in the heatmap
+redd_date_range <- redd_date_week %>%
+  group_by(week) %>%
+  slice_min(fake_date) %>%
+  rename(min_date = fake_date) %>%
+  left_join(catch_date_week %>%
+              group_by(week) %>%
+              slice_max(fake_date) %>%
+              rename(max_date = fake_date)) %>%
+  mutate(min_date = format(min_date, "%b %d"),
+         max_date = format(max_date, "%b %d"),
+         date_range = paste(min_date,"-",max_date))
+
+redd_summary <- standard_daily_redd %>%
+  select(date, stream, reach) %>%
+  distinct() %>% 
+  mutate(week = week(date),
+         year = year(date)) %>%
+  group_by(stream, week, reach, year) %>%
+  tally()
+
+redd_weekly <- redd_summary %>% 
+  # add catch_date_week to make sure all weeks are included in the data
+  right_join(select(upstream_date_week, week) %>% 
+               distinct()) %>% 
+  pivot_wider(id_cols = c("stream", "year"), 
+              names_from = week, 
+              values_from = n, 
+              values_fill = 0) %>%
+  pivot_longer(cols = -c("stream","year"), names_to = "week", values_to = "number_days_sampled") %>%
+  mutate(week = as.numeric(week)) %>%
+  left_join(upstream_date_range) %>%
+  mutate(fake_date = case_when(week %in% c(40:53) ~ ymd("1999-01-01") + weeks(week - 1),
+                               T ~ ymd("2000-01-01") + weeks(week - 1)))
+
+redd_plot_data <- redd_weekly %>%
+      filter(number_days_sampled > 0) %>%
+      mutate(wy = ifelse(week >= 37, year + 1, year)) %>%
+      group_by(week, wy, date_range, fake_date) %>%
+      summarize(streams = paste(unique(stream), collapse = ", "),
+                n_streams = length(unique(stream))) %>%
+      ungroup() %>%
+      mutate(week = factor(week, levels = c(37:53, 1:36)),
+             wy = factor(wy))
+year_labels <- c(1995, 2000, 2005, 2010, 2015, 2020)
+
+redd_heat_map <- ggplot(redd_plot_data, 
+                   aes(x = fake_date, y = wy, fill = n_streams, text = paste0(date_range, "<br>", streams))) +
+  geom_tile() +
+  #scale_y_continuous(n.breaks = 5, breaks = waiver()) +
+  scale_y_discrete(breaks = year_labels) +
+  scale_x_date(date_labels = "%b", breaks = "2 months") +
+  theme_minimal() + 
+  ylab('water year') +
+  xlab("") + 
+  scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  labs(fill = "Number of streams")
+plotly::ggplotly(redd_heat_map) 
+```
 
 

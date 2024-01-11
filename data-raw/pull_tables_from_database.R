@@ -14,7 +14,7 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
 
 
 # Catch table missing is yearling 
-catch <- dbGetQuery(con, 
+rst_catch <- dbGetQuery(con, 
                     "SELECT c.date, tl.stream, tl.site, tl.subsite, tl.site_group, c.count, r.definition as run, 
                     ls.definition as life_stage, c.adipose_clipped, c.dead, c.fork_length, c.weight, c.actual_count
                     FROM catch c 
@@ -24,9 +24,10 @@ catch <- dbGetQuery(con,
   mutate(species = "chinook")
 
 # glimpse(catch)
+usethis::use_data(rst_catch, overwrite = TRUE)
 
 # Trap table 
-trap <-  dbGetQuery(con, 
+rst_trap <-  dbGetQuery(con, 
                     "SELECT tv.trap_visit_time_start as trap_start_date, vt.definition as visit_type, tv.trap_visit_time_end as trap_stop_date, tl.stream, tl.site, tl.subsite, 
                     tl.site_group, tf.definition as trap_functioning, tv.in_half_cone_configuration, fp.definition as fish_processed, tv.rpm_start, tv.rpm_end, tv.total_revolutions,
                     tv.debris_volume, tv.discharge, tv.water_velocity, tv.water_temp, tv.turbidity, tv.include
@@ -41,8 +42,7 @@ trap <-  dbGetQuery(con,
          trap_stop_time = hms::as_hms(trap_stop_date),
          trap_stop_date = as_date(trap_stop_date)
   )
-# glimpse(trap)
-
+usethis::use_data(rst_trap, overwrite = TRUE)
 # Efficiency Summary 
 # Need med fork length released, med fork length at recapture, flow at release, ect. 
 efficiency_summary <- dbGetQuery(con, 
@@ -55,26 +55,30 @@ efficiency_summary <- dbGetQuery(con,
                     left join origin o on rs.origin_id = o.id") 
 
 # glimpse(efficiency_summary)
+usethis::use_data(efficiency_summary, overwrite = TRUE)
 
 # NO DATA IN RELEASE FISH - FIX
 release_fish <- dbGetQuery(con, "SELECT rf.release_id, tl.stream, tl.site, tl.subsite, tl.site_group, rf.fork_length
                     FROM released_fish rf 
                     left join trap_location tl on rf.trap_location_id = tl.id") 
+usethis::use_data(release_fish, overwrite = TRUE)
 
 # glimpse(release_fish)
 
 
-recaptured <- dbGetQuery(con, "SELECT rf.date, rf.count, rf.release_id, tl.stream, tl.site, tl.subsite, tl.site_group, rf.fork_length, rf.dead, 
+recaptures <- dbGetQuery(con, "SELECT rf.date, rf.count, rf.release_id, tl.stream, tl.site, tl.subsite, tl.site_group, rf.fork_length, rf.dead, 
                            rf.weight, r.definition as run, ls.definition as life_stage, rf.adipose_clipped
                            FROM recaptured_fish rf 
                            left join trap_location tl on rf.trap_location_id = tl.id 
                            left join run r on rf.run_id = r.id
                            left join lifestage ls on rf.lifestage_id = ls.id") 
+usethis::use_data(recaptures, overwrite = TRUE)
 
 # glimpse(recaptured)
 # 
 # 
 # ENV 
+# TODO figure out new way to pull in env data within this package 
 environmental_gage <- dbGetQuery(con, "SELECT e.date, tl.stream, tl.site, tl.subsite, tl.site_group, 
                                        e.gage_id, ep.definition as parameter, e.value
                                        FROM environmental_gage e

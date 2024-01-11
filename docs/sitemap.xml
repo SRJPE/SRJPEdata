@@ -31,6 +31,54 @@
     <loc>https://SRJPE.github.io/SRJPEdata/index.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/btspasx_special_priors_data.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/carcass_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/celsius_to_fahrenheit.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/chosen_site_years_to_model.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/daily_yearling_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/efficiency_summary.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/fahrenheit_to_celsius.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/holding.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/p2s_model_covariates_standard.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/recaptures.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/redd.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/release_fish.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/rst_catch.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/rst_trap.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/upstream_passage_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_model_data.html</loc>
   </url>
 </urlset>

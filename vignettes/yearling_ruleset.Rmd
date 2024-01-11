@@ -51,7 +51,7 @@ rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cu
 rulesets_filtered <- rulesets |> 
     filter(stream == stream_name) 
   
-data <- catch |> 
+data <- rst_catch |> 
   filter(fork_length < 300) |> # for graph scaling, takes out a lot of butte creek
   filter(stream != "sacramento river") |> 
   mutate(week = week(date),
@@ -115,7 +115,7 @@ generate_daily_cutoff <- function(stream_name) {
   rulesets_filtered <- rulesets |> 
     filter(stream == stream_name) 
     
-  catch_data <- catch |> 
+  catch_data <- rst_catch |> 
     filter(fork_length < 300) |> # for graph scaling, takes out a lot of butte creek
     filter(stream == stream_name) |> 
     mutate(week = week(date),
