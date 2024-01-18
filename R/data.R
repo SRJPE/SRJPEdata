@@ -3,6 +3,7 @@
 #' @name p2s_model_covariates_standard
 #' @description The passage to spawner model covariates standard table contains 
 #' standardized environmental covariates for use within the passage to spawner submodel. 
+#' See \code{vignette("prep_environmental_covariates.Rmd", package = "SRJPEdata")} for more details.
 #' @format A tibble with 192 rows and 7 columns 
 #' \itemize{
 #'   \item \code{year}: year 
@@ -27,7 +28,7 @@
 #'   \week \code{week} : week 
 #'   \item \code{stream}: rst stream 
 #'   \item \code{site}: rst site 
-#'   \item \code{count}: 
+#'   \item \code{count}: weekly count of number of 
 #'   \item \code{mean_fork_length}:
 #'   \item \code{number_released}: 
 #'   \item \code{number_recaptured}: 
@@ -161,7 +162,7 @@
 #' @title Years to Include in Modeling 
 #' @name chosen_site_years_to_model
 #' @description Datasets containing the chosen sites and years of monitoring data to include in model. 
-#' See  \code{vignette("years_to_include_analysis", package = "SRJPEdata")} for more details
+#' See \code{vignette("years_to_include_analysis", package = "SRJPEdata")} for more details
 #' @format Dataframe with 186 rows and 8 columns 
 #' \itemize{
 #'   \item \code{monitoring_year} : year 

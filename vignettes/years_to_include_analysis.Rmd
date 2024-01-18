@@ -366,6 +366,7 @@ plotly::ggplotly(upstream_heat_map)
 ## Survey Data 
 
 #TODO fix this section is in progress 
+#Heat map plot for survey reaches 
 
 ```{r, eval = FALSE}
 # REDD 

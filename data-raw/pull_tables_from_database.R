@@ -85,4 +85,3 @@ environmental_gage <- dbGetQuery(con, "SELECT e.date, tl.stream, tl.site, tl.sub
                                        left join trap_location tl on e.trap_location_id = tl.id
                                        left join environmental_parameter ep on e.parameter_id = ep.id")
 # TODO add in gage source - left join gage_source gs on e.gage_id = gs.id 
-glimpse(environmental_gage)

@@ -69,6 +69,7 @@ navbar:
         href: articles/years_to_include_analysis.html
       - text: 'Passage to Spawner Model Covariate Prep'
         href: articles/prep_environmental_covariates.html
+        
 repo:
  url:
   home: https://github.com/SRJPE/SRJPEdata

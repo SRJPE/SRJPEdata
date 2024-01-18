@@ -95,16 +95,6 @@
 
     
     
-<pre><code><span><span class="co">## Rows: 442,085</span></span>
-<span><span class="co">## Columns: 8</span></span>
-<span><span class="co">## $ date       <span style="color: #949494; font-style: italic;">&lt;dttm&gt;</span> 2003-01-01, 2003-01-02, 2003-01-03, 2003-01-04, 2003-01-05…</span></span>
-<span><span class="co">## $ stream     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "battle creek", "battle creek", "battle creek", "battle cre…</span></span>
-<span><span class="co">## $ site       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "ubc", "ubc", "ubc", "ubc", "ubc", "ubc", "ubc", "ubc", "ub…</span></span>
-<span><span class="co">## $ subsite    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "ubc", "ubc", "ubc", "ubc", "ubc", "ubc", "ubc", "ubc", "ub…</span></span>
-<span><span class="co">## $ site_group <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "battle creek", "battle creek", "battle creek", "battle cre…</span></span>
-<span><span class="co">## $ gage_id    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "6", "6", "6", "6", "6", "6", "6", "6", "6", "6", "6", "6",…</span></span>
-<span><span class="co">## $ parameter  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "discharge", "discharge", "discharge", "discharge", "discha…</span></span>
-<span><span class="co">## $ value      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 872, 647, 556, 502, 476, 454, 437, 420, 405, 1400, 1810, 15…</span></span></code></pre>
 <p>Hours fished is not included as a variable in the data and needs to
 be calculated. This file calculates hours fished by date, stream and
 site.</p>
@@ -138,7 +128,7 @@ used for any traps.)</li>
 <li>If the start and stop date/time of the sampling period are
 available, simply subtract the difference in time.</li>
 </ol>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculating hours fished when have start and stop datetime</span></span>
 <span><span class="va">hours_fished</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">dat</span> <span class="op">%&gt;%</span></span>
@@ -153,7 +143,7 @@ take the average cone RPMs and divide
 <code>total_revolutions</code>/average RMP/60 to get total hours
 fished.</li>
 </ol>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculating hours fished when have start and stop datetime</span></span>
 <span><span class="va">revolution_calculated_hours_fished</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="va">dat</span> <span class="op">%&gt;%</span></span>
@@ -169,7 +159,7 @@ fished.</li>
 <li>If only one date is available, assume that the end date is the date
 sampled on the following day.</li>
 </ol>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculating hours fished when have only date and time</span></span>
 <span><span class="va">hours_fished_one_date</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">dat</span> <span class="op">%&gt;%</span></span>
