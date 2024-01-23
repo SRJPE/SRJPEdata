@@ -61,12 +61,11 @@ butte_creek_existing_flow  <- SRJPEdata::environmental_data |>
   filter(gage_agency == "CDEC" & 
            gage_number == "BCK" & 
            parameter == "flow") |> 
-  select(-site)  #TODO create lookup table to join at end 
-
+  select(-site)  
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("butte_creek_data_query")) 
-  butte_creek_daily_flows <- buttee_creek_existing_flow 
+  butte_creek_daily_flows <- butte_creek_existing_flow 
   else(butte_creek_daily_flows <- butte_creek_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
          group_by(date = as.Date(datetime)) |> 
@@ -80,11 +79,45 @@ try(if(!exists("butte_creek_data_query"))
                 parameter = "flow"
          )))
 
+
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(butte_creek_daily_flows) < nrow(butte_creek_existing_flow)) 
   butte_creek_daily_flows <- butte_creek_existing_flow)
 
+## Clear Creek
+### Flow Data Pull 
+#### Gage Agency (CDEC, IGO)
+### Flow Data Pull Tests 
+try(clear_creek_data_query <- CDECRetrieve::cdec_query(station = "IGO", dur_code = "H", sensor_num = "20", start_date = "2003-01-01"))
+# Filter existing data to use as a back up 
+clear_creek_existing_flow  <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" & 
+           gage_number == "IGO" & 
+           parameter == "flow") |> 
+  select(-site)  
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("clear_creek_data_query")) 
+  clear_creek_daily_flows <- clear_creek_existing_flow 
+  else(clear_creek_daily_flows <- clear_creek_data_query |> 
+         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+         group_by(date = as.Date(datetime)) |> 
+         summarise(mean = mean(parameter_value, na.rm = TRUE),
+                   max = max(parameter_value, na.rm = TRUE),
+                   min = min(parameter_value, na.rm = TRUE)) |> 
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+         mutate(stream = "clear creek",
+                gage_agency = "CDEC",
+                gage_number = "IGO",
+                parameter = "flow"
+         )))
+
+
+# Do a few additional flow data pull tests to confirm that new data pull has 
+# more data
+try(if(nrow(clear_creek_daily_flows) < nrow(clear_creek_existing_flow)) 
+  clear_creek_daily_flows <- clear_creek_existing_flow)
 
 
 ### Temp Data Pull 
@@ -130,9 +163,9 @@ try(if(nrow(deer_creek_daily_flows) < nrow(deer_creek_existing_flow))
 #### Gage Agency (CDEC, GRL)
 ### Flow Data Pull Tests 
 
-try(feather_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1996-01-01"))
+try(feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1996-01-01"))
 # Filter existing data to use as a back up 
-fether_river_existing_flow  <- SRJPEdata::environmental_data |> 
+feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
            gage_number == "GRL" & 
            parameter == "flow") |> 
@@ -140,9 +173,9 @@ fether_river_existing_flow  <- SRJPEdata::environmental_data |>
 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
-try(if(!exists("feather_river_data_query")) 
-  feather_river_daily_flows <- feather_river_existing_flow 
-  else(feather_river_daily_flows <- feather_river_data_query |> 
+try(if(!exists("feather_hfc_river_data_query")) 
+  feather_hfc_river_daily_flows <- feather_hfc_river_existing_flow 
+  else(feather_hfc_river_daily_flows <- feather_hfc_river_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
          group_by(date = as.Date(datetime)) |> 
          summarise(mean = mean(parameter_value, na.rm = TRUE),
@@ -156,8 +189,67 @@ try(if(!exists("feather_river_data_query"))
          )))
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
-try(if(nrow(feather_river_daily_flows) < nrow(feather_river_existing_flow)) 
-  feather_river_daily_flows <- feather_river_existing_flow)
+try(if(nrow(feather_hfc_river_daily_flows) < nrow(feather_hfc_river_existing_flow)) 
+  feather_hfc_river_daily_flows <- feather_hfc_river_existing_flow)
+
+#Pull Lower Flow Channel Feather
+try(feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060"), silent = TRUE)
+# Filter existing data to use as a back up 
+feather_lfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "USGS" & 
+           gage_number == "11407000" & 
+           parameter == "flow") |> 
+  select(-site)  
+
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("feather_lfc_river_data_query")) 
+  feather_lfc_river_daily_flows <- feather_lfc_river_existing_flow 
+  else(feather_lfc_river_daily_flows <- feather_lfc_river_data_query|> 
+         select(Date, value =  X_00060_00003) |> 
+         as_tibble() %>%
+         rename(date = Date) |> 
+         mutate(stream = "feather river", 
+                gage_agency = "USGS",
+                gage_number = "11407000",
+                parameter = "flow",
+                statistic = "mean" 
+         )))
+
+# Do a few additional flow data pull tests to confirm that new data pull has 
+# more data
+try(if(nrow(feather_lfc_river_daily_flows) < nrow(feather_lfc_river_existing_flow)) 
+  feather_lfc_river_daily_flows <- feather_lfc_river_existing_flow)
+
+#Pull Lower Feather data
+try(lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "H", sensor_num = "20", start_date = "2010-01-01"))
+# Filter existing data to use as a back up 
+lower_feather_river_existing_flow  <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" & 
+           gage_number == "FSB" & 
+           parameter == "flow") |> 
+  select(-site)  
+
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("lower_feather_river_data_query")) 
+  lower_feather_river_daily_flows <- lower_feather_river_existing_flow 
+  else(lower_feather_river_daily_flows <- lower_feather_river_data_query |> 
+         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+         group_by(date = as.Date(datetime)) |> 
+         summarise(mean = mean(parameter_value, na.rm = TRUE),
+                   max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
+                   min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+         mutate(stream = "feather river",  
+                gage_agency = "CDEC",
+                gage_number = "FBL",
+                parameter = "flow"
+         )))
+# Do a few additional flow data pull tests to confirm that new data pull has 
+# more data
+try(if(nrow(lower_feather_river_daily_flows) < nrow(lower_feather_river_existing_flow)) 
+  lower_feather_river_daily_flows <- lower_feather_river_existing_flow)
 
 ### Temp Data Pull 
 ### Temp Data Pull Tests 
@@ -265,4 +357,23 @@ try(if(nrow(yuba_daily_flows) < nrow(yuba_existing_flow))
 
 ### Temp Data Pull 
 ### Temp Data Pull Tests 
+
+#Combine all flow data from different streams
+all_flow <- bind_rows(battle_creek_daily_flows,
+                      butte_creek_daily_flows, 
+                      clear_creek_daily_flows,
+                      deer_creek_daily_flows,
+                      feather_hfc_river_daily_flows,
+                      lower_feather_river_daily_flows,
+                      feather_lfc_river_daily_flows,
+                      mill_creek_daily_flows,
+                      sac_river_daily_flows,
+                      yuba_river_daily_flows) |> 
+  glimpse()
+
+ggplot(all_flow |> 
+         filter(statistic == "mean"),
+         aes(x= date, y = value, color=stream)) +
+  geom_line() +
+  facet_wrap(~stream)
 
