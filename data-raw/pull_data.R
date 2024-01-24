@@ -94,12 +94,6 @@ holding <- read_csv("data-raw/database-tables/standard_holding.csv")
 # TODO update to pull from database 
 usethis::use_data(holding, overwrite = TRUE)
 # Adult Redd Data
-gcs_get_object(object_name = "standard-format-data/standard_annual_redd.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/database-tables/standard_annual_redd.csv",
-               overwrite = TRUE)
-standard_annual_redd <- read_csv("data-raw/database-tables/standard_annual_redd.csv")
-
 gcs_get_object(object_name = "standard-format-data/standard_daily_redd.csv",
                bucket = gcs_get_global_bucket(),
                saveToDisk = "data-raw/database-tables/standard_daily_redd.csv",
