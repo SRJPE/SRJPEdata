@@ -45,9 +45,23 @@ try(if(nrow(battle_creek_daily_flows) < nrow(battle_creek_existing_flow))
 #### Gage # 
 
 ### Temp Data Pull Tests 
+ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "battle_clear_temp.xlsx"), sheet = 4)
 
-
-
+ubc_temp <- ubc_temp_raw |> 
+  rename(date = DT,
+         temp_degC = TEMP_C) |> 
+  mutate(date = as_date(date, tz = "UTC")) |> 
+  group_by(date) |> 
+  summarise(mean = mean(temp_degC, na.rm = TRUE),
+             max = max(temp_degC, na.rm = TRUE),
+             min = min(temp_degC, na.rm = TRUE)) |> 
+  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+  mutate(stream = "battle creek",  
+         gage_agency = "USFWS",
+         gage_number = "UBC",
+         parameter = "temperature") |> 
+  glimpse()
+  
 
 ## Butte Creek 
 ### Flow Data Pull 
