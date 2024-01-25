@@ -12,7 +12,7 @@
 #'   \item \code{max_flow_std}: standardized maximum flow data for adult migration period (March - August) 
 #'   \item \code{gdd_std}: standardized cumulative degree days above 20 degrees Celsius 
 #'   for adult migration (Sacramento March - May) and holding (Tributaries May - August)
-#'   \item \code{passage_inxed}: standardized total adult returns (not currently utilized by model)
+#'   \item \code{passage_index}: standardized total adult returns (not currently utilized by model)
 #'   \item \code{median_passage_timing_std}: standardized median return week (not currently utilized by model)
 #'   }
 'p2s_model_covariates_standard'
@@ -126,27 +126,63 @@
 #'  this / explain different status for different sites
 #' @format 
 #' \itemize{
-#'   \item \code{year}: year 
+#'   \item \code{year}: year data were collected
+#'   \item \code{stream}: stream data were collected on 
+#'   \item \code{passage_estimate}: yearly aggregated interpolated upstream passage estimate
+#'   \item \code{run}: run of fish (if assigned)
+#'   \item \code{adipose_clipped}: whether or not the adipose fin was clipped
 #'   }
 'upstream_passage_estimates'
 
 
 #' @title Carcass Survey CJS Estimates
 #' @name carcass_estimates
-#' @description Carcass Estimates, Cormack-Jolly-Seber model used to generate 
-#' carcass estimates from raw carcass data - TODO add source to show / explain specific sites we have this for 
+#' @description Carcass Estimates produced by analyzing mark-recapture carcass surveys
+#' with a Cormack-Jolly-Seber (CJS) model. Performed on the Yuba River, Feather River, and 
+#' Butte Creek. Butte Creek uses the `escapeMR` package applied to raw count data.
+#' TODO add source to show / explain specific sites we have this for 
 #' @format 
 #' \itemize{
-#'   \item \code{col 1}:col 1  
+#'   \item \code{year}: year data were collected
+#'   \item \code{spawner_abundance_estimate}: estimated annual spawner abundance
+#'   \item \code{stream}: stream data were collected on
+#'   \item \code{lower}: lower confidence interval of abundance estimate
+#'   \item \code{upper}: upper confidence interval of abundance estimate
+#'   \item \code{confidence_interval}: confidence interval associated with lower and upper values
 #'   }
 'carcass_estimates'
 
 #' @title Redd Survey Data 
 #' @name redd
 #' @description Raw redd survey monitoring data 
+#' TODO link to vignette on age_index when available 
 #' @format 
 #' \itemize{
-#'   \item \code{col 1}:col 1  
+#'   \item \code{date}: year data were collected
+#'   \item \code{latitude}: latitude of redd location
+#'   \item \code{longitude}: longitude of redd location
+#'   \item \code{reach}: survey reach where data were collected
+#'   \item \code{river_mile}: river mile of redd location
+#'   \item \code{redd_id}: unique identifier of redd
+#'   \item \code{fish_guarding}: whether or not fish were observed guarding the redd
+#'   \item \code{redd_measured}: whether or not the redd was measured
+#'   \item \code{redd_width}: widdth of redd (m)
+#'   \item \code{redd_length}: length of redd (m)
+#'   \item \code{velocity}: measured stream velocity (ft/s)
+#'   \item \code{age}: age of redd
+#'   \item \code{age_index}: number of times a unique redd was aged If 0, the redd was surveyed but not aged.
+#'   \item \code{redd_count}: number of redds surveyed
+#'   \item \code{stream}: stream data were collected on
+#'   \item \code{year}: year data were collected
+#'   \item \code{survey_method}: surveying method
+#'   \item \code{run}: run of fish associated with redd
+#'   \item \code{species}: species of fish associated with redd
+#'   \item \code{depth_m}: depth of water (m)
+#'   \item \code{starting_elevation_ft}: starting elevation (ft)
+#'   \item \code{num_of_fish_on_redd}: number of fish observed on redd
+#'   \item \code{redd_substrate_class}: size class of substrate determined by millimeter size
+#'   \item \code{tail_substrate_class}: size class of tail substrate determined by millimeter size
+#'   \item \code{pre_redd_substrate_class}: size class of substrate pre-redd determined by millimeter size
 #'   }
 'redd'
 
@@ -155,9 +191,36 @@
 #' @description Raw holding survey monitoring data 
 #' @format 
 #' \itemize{
-#'   \item \code{col 1}:col 1  
+#'   \item \code{date}: date data were collected
+#'   \item \code{reach}: survey reach where data were collected
+#'   \item \code{river_mile}: river mile where holding fish were observed
+#'   \item \code{count}: count of fish observed
+#'   \item \code{jacks}: number of jacks observed
+#'   \item \code{latitude}: latitude where fish were observed
+#'   \item \code{longitude}: latitude where fish were observed
+#'   \item \code{stream}: stream where data were collected
+#'   \item \code{year}: year data were collected
+#'   \item \code{survey_intent}: purpose of the survey conducted
+#'   \item \code{picket_weir_location_rm}: location of the picket weir in river miles
+#'   \item \code{picket_weir_relate}: where the fish were observed relative to the picket weir
 #'   }
 'holding'
+
+#' @title Combined Adult Survey and Passage Counts
+#' @name observed_adult_input
+#' @description Contains all adult holding and redd survey counts, CJS estimates,
+#' and interpolated upstream passage estimates aggregated by year. Includes all 
+#' available years for all streams for each data type. This can be used as input for 
+#' the Passage to Spawner model.
+#' @format 
+#' \itemize{
+#'   \item \code{year}: year data were collected
+#'   \item \code{stream}: stream data were collected on
+#'   \item \code{data_type}: type of adult data (either `upstream_estimate`, 
+#'   `redd_count`, `holding_count`, or `carcass_estimate`)
+#'   \item \code{count}: aggregated yearly count of fish
+#'   }
+'observed_adult_input'
 
 #' @title Years to Include in Modeling 
 #' @name chosen_site_years_to_model
