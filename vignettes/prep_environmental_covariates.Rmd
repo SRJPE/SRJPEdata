@@ -1,5 +1,5 @@
 ---
-title: "Prep environmental covariates for adult modeling"
+title: "Prepare environmental covariates for adult modeling"
 # output: html_document # to see tabset
 output:
   html_document:
@@ -13,7 +13,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, fig.width=10, fig.height=5)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 
 library(tidyverse)
 library(googleCloudStorageR)
@@ -39,16 +39,16 @@ Several approaches were considered for summarizing temperature:
 
 Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. 
 
-```{r,message = FALSE, warning = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # set thresholds and months
 gdd_base_sac <- 20 # https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274
 gdd_base_trib <- 20
 migratory_months <- 3:5
 holding_months <- 5:8
 
-# read in standard temperature
-# TODO replace with data object created by temperature_data_pull
-standard_temp <- read_csv(here::here("data-raw", "database-tables", "standard_temperature.csv"))
+# read in standard temperature (database-tables does not have the mean column)
+# TODO when temperature_data_pull.Rmd creates a data object, use that
+standard_temp <- read_csv(here::here("data", "standard-format-data", "standard_temperature.csv"))
 
 # calculate sum of days above the thresholds
 gdd_sac <- standard_temp |>
@@ -86,7 +86,7 @@ gdd |>
 
 Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.
 
-```{r,message = FALSE, warning = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # TODO update to use data object from flow data pull . Rmd
 migratory_and_holding_months <- 3:8
 
@@ -111,8 +111,8 @@ flow_metrics |>
 
 Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power.
 
-```{r,message = FALSE, warning = FALSE}
-# TODO update to pull from adult data object for upstream passage
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# pull raw upstream counts because they still contain date
 upstream_passage_timing <- read_csv(here::here("data-raw", "database-tables", "standard_adult_upstream.csv"))  |> 
   filter(!is.na(date),
          run %in% c("spring","not recorded"),
@@ -142,13 +142,15 @@ To account for the influence of large scale interannual climate variability, we 
 
 We used the `waterYearType` package to pull water year assignments as a categorical covariate. Because for some streams we had very few data points (i.e. for Mill Creek, only seven years were considered dependable), we simplified all potential categories of water year type into either dry (`Dry`, `Below Normal`, `Critical`) or wet (`Wet`, `Above Normal`).
 
-```{r,message = FALSE, warning = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 water_year_data <- waterYearType::water_year_indices |>
   mutate(water_year_type = case_when(Yr_type %in% c("Wet", "Above Normal") ~ "wet",
                                Yr_type %in% c("Dry", "Below Normal", "Critical") ~ "dry",
                                TRUE ~ Yr_type)) |>
   filter(location == "Sacramento Valley") |>
   dplyr::select(WY, water_year_type)
+
+knitr::kable(water_year_data |> group_by(water_year_type) |> tally())
 
 knitr::kable(head(water_year_data, 10))
 ```
@@ -158,7 +160,7 @@ knitr::kable(head(water_year_data, 10))
 
 We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality.
 
-```{r,message = FALSE, warning = FALSE}
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # pull in passage estimates and use these for upstream_count
 upstream_passage_index <- read_csv(here::here("data-raw", "database-tables", "standard_adult_passage_estimate.csv")) |> 
   mutate(passage_index = passage_estimate) |>
@@ -176,7 +178,7 @@ upstream_passage_index |>
 
 All continuous environmental variables (flow and temperature) were standardized and centered before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical).
 
-```{r,message = FALSE, warning = FALSE, }
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
 p2s_model_covariates_standard <- full_join(flow_metrics,
                                              gdd,
                                              by = c("year", "stream")) |>
@@ -211,6 +213,6 @@ p2s_model_covariates_standard |>
 #### Save data object
 Data object saved in `SRJPEdata` as `p2s_model_covariates_standard.rds`. To access documentation search `?SRJPEdata::p2s_model_covariates_standard.rds`.
 
-```{r}
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
 usethis::use_data(p2s_model_covariates_standard, overwrite = TRUE)
 ```
