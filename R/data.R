@@ -134,6 +134,30 @@
 #'   }
 'upstream_passage_estimates'
 
+#' @title Adult Upstream passage monitoring raw counts
+#' @name standard_upstream
+#' @description Raw adult upstream passage counts
+#' @format 
+#' \itemize{
+#'   \item \code{year}: year data were collected
+#'   \item \code{date}: date fish passage was observed
+#'   \item \code{time}: time fish passage was observed
+#'   \item \code{count}: count of fish observed passing the video system
+#'   \item \code{run}: run of fish observed
+#'   \item \code{adipose_clipped}: whether or not adipose fin was clipped
+#'   \item \code{sex}: sex of fish
+#'   \item \code{passage_direction}: direction of fish pasage (up or down)
+#'   \item \code{viewing_condition}: viewing condition
+#'   \item \code{spawning_condition}: description of spawning status based on coloration
+#'   \item \code{jack_size}: Whether or not the fish is jack sized
+#'   \item \code{ladder}: the ladder the fish was observed at
+#'   \item \code{flow}: flow in cfs at the weir
+#'   \item \code{temperature}: temperature in C at the weir
+#'   \item \code{hours}: hours the camera was in operation #TODO confirm
+#'   \item \code{comments}: comments
+#'   }
+'standard_upstream'
+
 
 #' @title Carcass Survey CJS Estimates
 #' @name carcass_estimates

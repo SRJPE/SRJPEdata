@@ -83,6 +83,7 @@ upstream_passage_estimates <- read_csv("data-raw/database-tables/standard_adult_
 
 # TODO update to pull from database 
 usethis::use_data(upstream_passage_estimates, overwrite = TRUE)
+usethis::use_data(standard_upstream, overwrite = TRUE)
 
 # Adult Holding Data
 gcs_get_object(object_name = "standard-format-data/standard_holding.csv",
