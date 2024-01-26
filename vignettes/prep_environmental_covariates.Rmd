@@ -23,6 +23,10 @@ library(waterYearType)
 # Sys.setenv("GCS_DEFAULT_BUCKET" = "jpe-dev-bucket")
 ```
 
+The Passage to Spawner (P2S) model relates spawner counts (from redd or holding surveys) to upstream passage counts obtained by video systems. This model is restricted to streams with reliable redd or holding surveys and reliable upstream passage counts. It is also restricted to years where the redd/holding and upstream passage datasets overlap. This vignette describes the process of pulling and processing environmental covariates for use in the P2S model.
+
+Potential environmental covariates hypothesized to influence prespawn mortality were proposed in meetings with the SRJPE Modeling Advisory Team (MAT). Five initial categories were identified: temperature, flow, passage timing, water year type, and total passage. There are many ways to summarize each of these categories and initial analyses helped identify collinearity and performance of each potential method by regressing prespawn mortality (calculated as `upstream_count / spawner_count`) against the environmental variable. When we were using redd counts as `spawner_count`, our model assumed a 50/50 sex ratio and modified that equation to be `upstream_count / (spawner_count * 0.5)`. Generally, one redd per female is a reasonable assumption although our model left the possibility open for more than one redd per female [(source)](https://www.researchgate.net/publication/233231658_The_Number_of_Redds_Constructed_per_Female_Spring_Chinook_Salmon_in_the_Wenatchee_River_Basin).
+
 ## Format environmental variables {.tabset}
 
 ### Temperature 
@@ -33,22 +37,17 @@ Several approaches were considered for summarizing temperature:
 2. Growing degree days (GDD) with a base temperature of 0 degrees Celsius [(source)](https://www.researchgate.net/publication/279930331_Fish_growth_and_degree-days_I_Selecting_a_base_temperature_for_a_within-population_study and input from MAT team)  
 3. Degree Day 20 (DD20), where cumulative degree days are calculated against a threshold of 20 degrees Celsius [(source)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274) 
 
-Following initial analyses (TODO - do we want these in the repo somewhere??), we focused on approach 3. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. 
-
-TODO - keep this analysis? Currently not included: (We tested both the individual effects of migratory and holding temperatures as well as a cumulative metric (summed migratory and holding temperatures)).
+Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. 
 
 ```{r,message = FALSE, warning = FALSE}
 # set thresholds and months
-# TODO full suite of temperatures tried are in the .Rmd on SRJPE model - should I include all those?
-# TODO future exploration to try different thresholds
 gdd_base_sac <- 20 # https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274
 gdd_base_trib <- 20
 migratory_months <- 3:5
-holding_months <- 5:8 # TODO should these be updated?
+holding_months <- 5:8
 
 # read in standard temperature
 # TODO replace with data object created by temperature_data_pull
-
 standard_temp <- read_csv(here::here("data-raw", "database-tables", "standard_temperature.csv"))
 
 # calculate sum of days above the thresholds
@@ -85,7 +84,7 @@ gdd |>
 
 ### Flow 
 
-Mximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.
+Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.
 
 ```{r,message = FALSE, warning = FALSE}
 # TODO update to use data object from flow data pull . Rmd
@@ -96,7 +95,8 @@ flow_metrics <- read_csv(here::here("data-raw", "database-tables", "standard_flo
   mutate(year = year(date)) |>
   group_by(stream, year) |>
   summarise(mean_flow = mean(flow_cfs, na.rm = T),
-            max_flow = max(flow_cfs, na.rm = T))
+            max_flow = max(flow_cfs, na.rm = T)) |> 
+  ungroup()
 
 knitr::kable(head(flow_metrics, 10))
 
@@ -113,18 +113,19 @@ Passage timing was considered; however, limited data reduced the sample size of 
 
 ```{r,message = FALSE, warning = FALSE}
 # TODO update to pull from adult data object for upstream passage
-upstream_passage_timing <- read_csv(here::here("data-raw", "database-tables", "standard_adult_upstream.csv")) |> 
-  filter(!is.na(date)) |>
+upstream_passage_timing <- read_csv(here::here("data-raw", "database-tables", "standard_adult_upstream.csv"))  |> 
+  filter(!is.na(date),
+         run %in% c("spring","not recorded"),
+         passage_direction %in% c(NA, "up")) |>
   mutate(stream = tolower(stream),
          year = year(date),
          week = week(date)) |>
-  filter(run %in% c("spring","not recorded")) |>
   group_by(year, stream) |>
   summarise(count = sum(count, na.rm = T),
             median_passage_timing = median(week, na.rm = T),
             mean_passage_timing = mean(week, na.rm = T),
             min_passage_timing = min(week, na.rm = T)) |>
-  ungroup() |> # TODO look at up-down
+  ungroup() |> 
   select(-c(count))
 
 knitr::kable(head(upstream_passage_timing, 10))
@@ -159,7 +160,7 @@ We hypothesized that total annual passage might be an indicator of density becau
 
 ```{r,message = FALSE, warning = FALSE}
 # pull in passage estimates and use these for upstream_count
-upstream_passage_index <-  read_csv(here::here("data-raw", "database-tables", "standard_adult_passage_estimate.csv")) |> 
+upstream_passage_index <- read_csv(here::here("data-raw", "database-tables", "standard_adult_passage_estimate.csv")) |> 
   mutate(passage_index = passage_estimate) |>
   select(year, stream, passage_index)
 
@@ -173,7 +174,7 @@ upstream_passage_index |>
 
 ## Combine and standardize
 
-All continuous environmental variables (flow and temperature) were standardized and centered before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable for wet (wet, above normal) vs. dry (below normal, dry, critical).
+All continuous environmental variables (flow and temperature) were standardized and centered before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical).
 
 ```{r,message = FALSE, warning = FALSE, }
 p2s_model_covariates_standard <- full_join(flow_metrics,
