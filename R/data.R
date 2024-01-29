@@ -1,9 +1,10 @@
 # TODO descide if we also want to export weekly summaries...probably not necessary, leaving in for now so I don't break something 
 #' @title Passage to Spawner Model Covariates Standard
 #' @name p2s_model_covariates_standard
-#' @description The passage to spawner model covariates standard table contains 
-#' standardized environmental covariates for use within the passage to spawner submodel. 
-#' See \code{vignette("prep_environmental_covariates.Rmd", package = "SRJPEdata")} for more details.
+#' @description The passage to spawner model covariates standard table contains environmental
+#' covariates for use in the Passage to Spawner (P2S) model. The environmental variables are 
+#' standardized within a column to center around 0. Selection and preparation of the 
+#' covariates are detailed in \code{vignette("prep_environmental_covariates.Rmd", package = "SRJPEdata")}.
 #' @format A tibble with 192 rows and 7 columns 
 #' \itemize{
 #'   \item \code{year}: year 

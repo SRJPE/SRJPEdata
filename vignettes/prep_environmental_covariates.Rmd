@@ -192,11 +192,13 @@ p2s_model_covariates_standard <- full_join(flow_metrics,
          stream != "sacramento river") |>
   select(-c(mean_flow, mean_passage_timing, min_passage_timing,
             gdd_trib, gdd_sac)) |>
+  group_by(stream) |> 
   mutate(wy_type = ifelse(water_year_type == "dry", 0, 1),
          max_flow_std = as.vector(scale(max_flow)),
          gdd_std = as.vector(scale(gdd_total)),
          passage_index = as.vector(scale(passage_index)),
          median_passage_timing_std = as.vector(scale(median_passage_timing))) |>
+  ungroup() |> 
   select(year, stream, wy_type, max_flow_std, gdd_std, passage_index, median_passage_timing_std) |>
   arrange(stream, year)
 
