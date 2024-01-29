@@ -14,7 +14,7 @@ upstream_passage_estimate_table <- read_csv("data-raw/database-tables/standard_a
 holding_table <- read_csv("data-raw/database-tables/standard_holding.csv")
 redd_table <- read_csv("data-raw/database-tables/standard_daily_redd.csv")
 carcass_estimates_table <- read_csv("data-raw/database-tables/standard_carcass_cjs_estimate.csv")
-carcass_table <- read_csv("data-raw/database-tables/standard_carcass.csv")
+#carcass_table <- read_csv("data-raw/database-tables/standard_carcass.csv")
 
 # upstream passage and estimates -----------------------------------------------
 # upstream passage - use these data for passage timing calculations
@@ -74,7 +74,7 @@ redd_non_battle_clear <- redd_table |>
 # for streams with redd id, just sum redd count (each redd id is only counted once)
 battle_clear_redd <- redd_table |>
   filter(run %in% c("spring", "not recorded"),
-         species != "steelhead",
+         species %in% c("not recorded", NA, "chinook", "unknown"),
          stream %in% c("battle creek", "clear creek"),
          !reach %in% c("R6", "R6A", "R6B", "R7")) |> #TODO remove once reaches are standardized
   group_by(year = year(date), stream) |> 
