@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prep environmental covariates for adult modeling • SRJPEdata</title>
+<title>Prepare environmental covariates for adult modeling • SRJPEdata</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
-<meta property="og:title" content="Prep environmental covariates for adult modeling">
+<meta property="og:title" content="Prepare environmental covariates for adult modeling">
 <meta property="og:description" content="SRJPEdata">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -85,7 +85,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Prep environmental covariates for adult
+      <h1 data-toc-skip>Prepare environmental covariates for adult
 modeling</h1>
             
       
@@ -96,6 +96,26 @@ modeling</h1>
 
     
     
+<p>The Passage to Spawner (P2S) model relates spawner counts (from redd
+or holding surveys) to upstream passage counts obtained by video
+systems. This model is restricted to streams with reliable redd or
+holding surveys and reliable upstream passage counts. It is also
+restricted to years where the redd/holding and upstream passage datasets
+overlap. This vignette describes the process of pulling and processing
+environmental covariates for use in the P2S model.</p>
+<p>Potential environmental covariates hypothesized to influence prespawn
+mortality were proposed in meetings with the SRJPE Modeling Advisory
+Team (MAT). Five initial categories were identified: temperature, flow,
+passage timing, water year type, and total passage. There are many ways
+to summarize each of these categories and initial analyses helped
+identify collinearity and performance of each potential method by
+regressing prespawn mortality (calculated as
+<code>upstream_count / spawner_count</code>) against the environmental
+variable. When we were using redd counts as <code>spawner_count</code>,
+our model assumed a 50/50 sex ratio and modified that equation to be
+<code>upstream_count / (spawner_count * 0.5)</code>. Generally, one redd
+per female is a reasonable assumption although our model left the
+possibility open for more than one redd per female <a href="https://www.researchgate.net/publication/233231658_The_Number_of_Redds_Constructed_per_Female_Spring_Chinook_Salmon_in_the_Wenatchee_River_Basin" class="external-link">(source)</a>.</p>
 <div class="section level2 tabset">
 <h2 class="tabset" id="format-environmental-variables">Format environmental variables<a class="anchor" aria-label="anchor" href="#format-environmental-variables"></a>
 </h2>
@@ -114,52 +134,12 @@ Celsius <a href="https://www.researchgate.net/publication/279930331_Fish_growth_
 against a threshold of 20 degrees Celsius <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274" class="external-link">(source)</a>
 </li>
 </ol>
-<p>Following initial analyses (TODO - do we want these in the repo
-somewhere??), we focused on approach 3. We calculated the metric for
-migration months (March - May) in the Sacramento River and holding
-months (May - August) in each tributary.</p>
-<p>TODO - keep this analysis? Currently not included: (We tested both
-the individual effects of migratory and holding temperatures as well as
-a cumulative metric (summed migratory and holding temperatures)).</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># set thresholds and months</span></span>
-<span><span class="co"># TODO full suite of temperatures tried are in the .Rmd on SRJPE model - should I include all those?</span></span>
-<span><span class="co"># TODO future exploration to try different thresholds</span></span>
-<span><span class="va">gdd_base_sac</span> <span class="op">&lt;-</span> <span class="fl">20</span> <span class="co"># https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274</span></span>
-<span><span class="va">gdd_base_trib</span> <span class="op">&lt;-</span> <span class="fl">20</span></span>
-<span><span class="va">migratory_months</span> <span class="op">&lt;-</span> <span class="fl">3</span><span class="op">:</span><span class="fl">5</span></span>
-<span><span class="va">holding_months</span> <span class="op">&lt;-</span> <span class="fl">5</span><span class="op">:</span><span class="fl">8</span> <span class="co"># TODO should these be updated?</span></span>
-<span></span>
-<span><span class="co"># read in standard temperature</span></span>
-<span><span class="co"># TODO replace with data object created by temperature_data_pull</span></span>
-<span></span>
-<span><span class="va">standard_temp</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"data-raw"</span>, <span class="st">"database-tables"</span>, <span class="st">"standard_temperature.csv"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># calculate sum of days above the thresholds</span></span>
-<span><span class="va">gdd_sac</span> <span class="op">&lt;-</span> <span class="va">standard_temp</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">month</span><span class="op">(</span><span class="va">date</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">migratory_months</span>, <span class="va">stream</span> <span class="op">==</span> <span class="st">"sacramento river"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>gdd_sac <span class="op">=</span> <span class="va">mean_daily_temp_c</span> <span class="op">-</span> <span class="va">gdd_base_sac</span>,</span>
-<span>         gdd_sac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">gdd_sac</span> <span class="op">&lt;</span> <span class="fl">0</span>, <span class="fl">0</span>, <span class="va">gdd_sac</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="fu">year</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span>gdd_sac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">gdd_sac</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">rename</span><span class="op">(</span>year <span class="op">=</span> <span class="va">`year(date)`</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">gdd_trib</span> <span class="op">&lt;-</span> <span class="va">standard_temp</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">month</span><span class="op">(</span><span class="va">date</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">holding_months</span> <span class="op">&amp;</span> <span class="va">stream</span> <span class="op">!=</span> <span class="st">"sacramento river"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>gdd_trib <span class="op">=</span> <span class="va">mean_daily_temp_c</span> <span class="op">-</span> <span class="va">gdd_base_trib</span>,</span>
-<span>         gdd_trib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">gdd_trib</span> <span class="op">&lt;</span> <span class="fl">0</span>, <span class="fl">0</span>, <span class="va">gdd_trib</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="fu">year</span><span class="op">(</span><span class="va">date</span><span class="op">)</span>, <span class="va">stream</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span>gdd_trib <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">gdd_trib</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">rename</span><span class="op">(</span>year <span class="op">=</span> <span class="va">`year(date)`</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">gdd</span> <span class="op">&lt;-</span> <span class="fu">left_join</span><span class="op">(</span><span class="va">gdd_trib</span>, <span class="va">gdd_sac</span>,</span>
-<span>                 by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>gdd_sac <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">gdd_sac</span><span class="op">)</span>, <span class="fl">0</span>, <span class="va">gdd_sac</span><span class="op">)</span>,</span>
-<span>         gdd_total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">gdd_sac</span> <span class="op">+</span> <span class="va">gdd_trib</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">gdd</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Following initial analyses and discussions, we focused on approach 3
+because it showed the most consistent relationship with prespawn
+mortality across streams and accounts for cumulative stress. We
+calculated the metric for migration months (March - May) in the
+Sacramento River and holding months (May - August) in each
+tributary.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="right">year</th>
@@ -170,105 +150,88 @@ a cumulative metric (summed migratory and holding temperatures)).</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">1998</td>
-<td align="left">feather river</td>
-<td align="right">0.000000</td>
-<td align="right">0</td>
-<td align="right">0.00</td>
-</tr>
-<tr class="even">
 <td align="right">1999</td>
 <td align="left">butte creek</td>
-<td align="right">49.583333</td>
+<td align="right">49.50231</td>
 <td align="right">0</td>
-<td align="right">49.58</td>
-</tr>
-<tr class="odd">
-<td align="right">1999</td>
-<td align="left">deer creek</td>
-<td align="right">79.333333</td>
-<td align="right">0</td>
-<td align="right">79.33</td>
+<td align="right">49.50</td>
 </tr>
 <tr class="even">
 <td align="right">1999</td>
-<td align="left">feather river</td>
-<td align="right">9.722222</td>
+<td align="left">deer creek</td>
+<td align="right">79.30787</td>
 <td align="right">0</td>
-<td align="right">9.72</td>
+<td align="right">79.31</td>
 </tr>
 <tr class="odd">
 <td align="right">1999</td>
 <td align="left">mill creek</td>
-<td align="right">23.825000</td>
+<td align="right">23.82870</td>
 <td align="right">0</td>
-<td align="right">23.82</td>
+<td align="right">23.83</td>
 </tr>
 <tr class="even">
 <td align="right">2000</td>
 <td align="left">butte creek</td>
-<td align="right">194.625000</td>
+<td align="right">194.46759</td>
 <td align="right">0</td>
-<td align="right">194.62</td>
+<td align="right">194.47</td>
 </tr>
 <tr class="odd">
 <td align="right">2000</td>
 <td align="left">deer creek</td>
-<td align="right">183.550000</td>
+<td align="right">183.55556</td>
 <td align="right">0</td>
-<td align="right">183.55</td>
+<td align="right">183.56</td>
 </tr>
 <tr class="even">
 <td align="right">2000</td>
-<td align="left">feather river</td>
-<td align="right">2.222220</td>
-<td align="right">0</td>
-<td align="right">2.22</td>
-</tr>
-<tr class="odd">
-<td align="right">2000</td>
 <td align="left">mill creek</td>
-<td align="right">97.262500</td>
+<td align="right">97.26157</td>
 <td align="right">0</td>
 <td align="right">97.26</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">2000</td>
 <td align="left">yuba river</td>
-<td align="right">0.000000</td>
+<td align="right">0.00000</td>
 <td align="right">0</td>
 <td align="right">0.00</td>
 </tr>
+<tr class="even">
+<td align="right">2001</td>
+<td align="left">butte creek</td>
+<td align="right">351.51620</td>
+<td align="right">0</td>
+<td align="right">351.52</td>
+</tr>
+<tr class="odd">
+<td align="right">2001</td>
+<td align="left">clear creek</td>
+<td align="right">17.07813</td>
+<td align="right">0</td>
+<td align="right">17.08</td>
+</tr>
+<tr class="even">
+<td align="right">2001</td>
+<td align="left">deer creek</td>
+<td align="right">280.74306</td>
+<td align="right">0</td>
+<td align="right">280.74</td>
+</tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gdd</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">gdd_total</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">stream</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-2-1.png" width="960"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="flow">Flow<a class="anchor" aria-label="anchor" href="#flow"></a>
 </h3>
-<p>Mximum flow more effectively captures the high flow events that
+<p>Maximum flow more effectively captures the high flow events that
 support migration speed and passage to upstream holding areas.
 Additionally, upon inspection of the data source across multiple years
 average maximum flow over the migratory and holding months (March-May
 and May-August, respectively) was more representative of the
 fluctuations in flow over the entire year.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># TODO update to use data object from flow data pull . Rmd</span></span>
-<span><span class="va">migratory_and_holding_months</span> <span class="op">&lt;-</span> <span class="fl">3</span><span class="op">:</span><span class="fl">8</span></span>
-<span></span>
-<span><span class="va">flow_metrics</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"data-raw"</span>, <span class="st">"database-tables"</span>, <span class="st">"standard_flow.csv"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">month</span><span class="op">(</span><span class="va">date</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">migratory_and_holding_months</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>year <span class="op">=</span> <span class="fu">year</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">stream</span>, <span class="va">year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span>mean_flow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">flow_cfs</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>,</span>
-<span>            max_flow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">flow_cfs</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">flow_metrics</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">stream</th>
@@ -339,12 +302,7 @@ fluctuations in flow over the entire year.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">flow_metrics</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">max_flow</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">stream</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-3-1.png" width="960"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="passage-timing">Passage Timing<a class="anchor" aria-label="anchor" href="#passage-timing"></a>
@@ -352,23 +310,6 @@ fluctuations in flow over the entire year.</p>
 <p>Passage timing was considered; however, limited data reduced the
 sample size of the datasets for some tributaries so much as to remove
 them from candidacy for the model due to lack of statistical power.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># TODO update to pull from adult data object for upstream passage</span></span>
-<span><span class="va">upstream_passage_timing</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"data-raw"</span>, <span class="st">"database-tables"</span>, <span class="st">"standard_adult_upstream.csv"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>stream <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">tolower</a></span><span class="op">(</span><span class="va">stream</span><span class="op">)</span>,</span>
-<span>         year <span class="op">=</span> <span class="fu">year</span><span class="op">(</span><span class="va">date</span><span class="op">)</span>,</span>
-<span>         week <span class="op">=</span> <span class="fu">week</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">run</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"spring"</span>,<span class="st">"not recorded"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">year</span>, <span class="va">stream</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span>count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">count</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>,</span>
-<span>            median_passage_timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">week</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>,</span>
-<span>            mean_passage_timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">week</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>,</span>
-<span>            min_passage_timing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">week</span>, na.rm <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># TODO look at up-down</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">upstream_passage_timing</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
 <col width="6%">
@@ -457,12 +398,7 @@ them from candidacy for the model due to lack of statistical power.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">upstream_passage_timing</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">median_passage_timing</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">stream</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-4-1.png" width="960"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="water-year-type">Water Year Type<a class="anchor" aria-label="anchor" href="#water-year-type"></a>
@@ -479,15 +415,22 @@ considered dependable), we simplified all potential categories of water
 year type into either dry (<code>Dry</code>, <code>Below Normal</code>,
 <code>Critical</code>) or wet (<code>Wet</code>,
 <code>Above Normal</code>).</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">water_year_data</span> <span class="op">&lt;-</span> <span class="fu">waterYearType</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/waterYearType/man/water_year_indices.html" class="external-link">water_year_indices</a></span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>water_year_type <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="va">Yr_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Wet"</span>, <span class="st">"Above Normal"</span><span class="op">)</span> <span class="op">~</span> <span class="st">"wet"</span>,</span>
-<span>                               <span class="va">Yr_type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Dry"</span>, <span class="st">"Below Normal"</span>, <span class="st">"Critical"</span><span class="op">)</span> <span class="op">~</span> <span class="st">"dry"</span>,</span>
-<span>                               <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">Yr_type</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">location</span> <span class="op">==</span> <span class="st">"Sacramento Valley"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">WY</span>, <span class="va">water_year_type</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">water_year_data</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">water_year_type</th>
+<th align="right">n</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">dry</td>
+<td align="right">63</td>
+</tr>
+<tr class="even">
+<td align="left">wet</td>
+<td align="right">53</td>
+</tr>
+</tbody>
+</table>
 <table class="table">
 <thead><tr class="header">
 <th align="right">WY</th>
@@ -495,43 +438,43 @@ year type into either dry (<code>Dry</code>, <code>Below Normal</code>,
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">1901</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="right">1902</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="right">1903</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
-<td align="right">1904</td>
-<td align="left">NA</td>
-</tr>
-<tr class="odd">
-<td align="right">1905</td>
-<td align="left">NA</td>
-</tr>
-<tr class="even">
 <td align="right">1906</td>
 <td align="left">wet</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1907</td>
 <td align="left">wet</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1908</td>
 <td align="left">dry</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1909</td>
 <td align="left">wet</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1910</td>
+<td align="left">wet</td>
+</tr>
+<tr class="even">
+<td align="right">1911</td>
+<td align="left">wet</td>
+</tr>
+<tr class="odd">
+<td align="right">1912</td>
+<td align="left">dry</td>
+</tr>
+<tr class="even">
+<td align="right">1913</td>
+<td align="left">dry</td>
+</tr>
+<tr class="odd">
+<td align="right">1914</td>
+<td align="left">wet</td>
+</tr>
+<tr class="even">
+<td align="right">1915</td>
 <td align="left">wet</td>
 </tr>
 </tbody>
@@ -543,13 +486,6 @@ year type into either dry (<code>Dry</code>, <code>Below Normal</code>,
 <p>We hypothesized that total annual passage might be an indicator of
 density because more adults in holding/spawning habitat could result in
 less available habitat and thus influence prespawn mortality.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># pull in passage estimates and use these for upstream_count</span></span>
-<span><span class="va">upstream_passage_index</span> <span class="op">&lt;-</span>  <span class="fu">read_csv</span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html" class="external-link">here</a></span><span class="op">(</span><span class="st">"data-raw"</span>, <span class="st">"database-tables"</span>, <span class="st">"standard_adult_passage_estimate.csv"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>passage_index <span class="op">=</span> <span class="va">passage_estimate</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">year</span>, <span class="va">stream</span>, <span class="va">passage_index</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">upstream_passage_index</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">year</th>
@@ -609,12 +545,7 @@ less available habitat and thus influence prespawn mortality.</p>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">upstream_passage_index</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">passage_index</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">stream</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-6-1.png" width="960"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
 </div>
 </div>
 <div class="section level2">
@@ -623,40 +554,17 @@ less available habitat and thus influence prespawn mortality.</p>
 <p>All continuous environmental variables (flow and temperature) were
 standardized and centered before performing any analyses so that the
 scale of the data did not affect results. Water year type was coded as a
-binary variable for wet (wet, above normal) vs. dry (below normal, dry,
-critical).</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p2s_model_covariates_standard</span> <span class="op">&lt;-</span> <span class="fu">full_join</span><span class="op">(</span><span class="va">flow_metrics</span>,</span>
-<span>                                             <span class="va">gdd</span>,</span>
-<span>                                             by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"stream"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">full_join</span><span class="op">(</span><span class="va">upstream_passage_timing</span>,</span>
-<span>            by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"stream"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">full_join</span><span class="op">(</span><span class="va">water_year_data</span>,</span>
-<span>            by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span> <span class="op">=</span> <span class="st">"WY"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">full_join</span><span class="op">(</span><span class="va">upstream_passage_index</span>,</span>
-<span>            by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"stream"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stream</span><span class="op">)</span>,</span>
-<span>         <span class="va">stream</span> <span class="op">!=</span> <span class="st">"sacramento river"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_flow</span>, <span class="va">mean_passage_timing</span>, <span class="va">min_passage_timing</span>,</span>
-<span>            <span class="va">gdd_trib</span>, <span class="va">gdd_sac</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>wy_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">water_year_type</span> <span class="op">==</span> <span class="st">"dry"</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>         max_flow_std <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">max_flow</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>         gdd_std <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">gdd_total</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>         passage_index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">passage_index</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>         median_passage_timing_std <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/scale.html" class="external-link">scale</a></span><span class="op">(</span><span class="va">median_passage_timing</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">year</span>, <span class="va">stream</span>, <span class="va">wy_type</span>, <span class="va">max_flow_std</span>, <span class="va">gdd_std</span>, <span class="va">passage_index</span>, <span class="va">median_passage_timing_std</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">arrange</span><span class="op">(</span><span class="va">stream</span>, <span class="va">year</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">p2s_model_covariates_standard</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+binary variable as <code>1</code> for wet (wet, above normal) and
+<code>0</code> for dry (below normal, dry, critical).</p>
+<table style="width:100%;" class="table">
 <colgroup>
 <col width="5%">
 <col width="14%">
 <col width="8%">
 <col width="14%">
-<col width="11%">
+<col width="12%">
 <col width="15%">
-<col width="29%">
+<col width="28%">
 </colgroup>
 <thead><tr class="header">
 <th align="right">year</th>
@@ -674,7 +582,7 @@ critical).</p>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.6837483</td>
+<td align="right">-0.5054967</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
@@ -683,7 +591,7 @@ critical).</p>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.8597315</td>
+<td align="right">-0.5261514</td>
 <td align="right">NA</td>
 </tr>
 <tr class="odd">
@@ -692,7 +600,7 @@ critical).</p>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.4509963</td>
+<td align="right">-0.4781792</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
@@ -701,8 +609,8 @@ critical).</p>
 <td align="right">1</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.0479381</td>
-<td align="right">-0.1189741</td>
+<td align="right">-0.4308733</td>
+<td align="right">0.6422969</td>
 </tr>
 <tr class="odd">
 <td align="right">1999</td>
@@ -710,8 +618,8 @@ critical).</p>
 <td align="right">1</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.6440101</td>
-<td align="right">0.3429254</td>
+<td align="right">-0.5008327</td>
+<td align="right">1.0470320</td>
 </tr>
 <tr class="even">
 <td align="right">2000</td>
@@ -719,8 +627,8 @@ critical).</p>
 <td align="right">1</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.6156258</td>
-<td align="right">1.2667243</td>
+<td align="right">-0.4975013</td>
+<td align="right">1.8565021</td>
 </tr>
 <tr class="odd">
 <td align="right">2001</td>
@@ -728,8 +636,8 @@ critical).</p>
 <td align="right">0</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.4282888</td>
-<td align="right">-0.7348401</td>
+<td align="right">-0.4755141</td>
+<td align="right">0.1026502</td>
 </tr>
 <tr class="even">
 <td align="right">2002</td>
@@ -737,48 +645,36 @@ critical).</p>
 <td align="right">0</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">0.2018445</td>
-<td align="right">0.9587913</td>
+<td align="right">-0.4015569</td>
+<td align="right">1.5866787</td>
 </tr>
 <tr class="odd">
 <td align="right">2003</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.6738405</td>
-<td align="right">-0.695810</td>
-<td align="right">0.1961676</td>
-<td align="right">2.8063892</td>
+<td align="right">-0.3136885</td>
+<td align="right">-0.4373424</td>
+<td align="right">-0.4022232</td>
+<td align="right">3.2056189</td>
 </tr>
 <tr class="even">
 <td align="right">2004</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.3871427</td>
-<td align="right">-0.703062</td>
-<td align="right">-0.5475032</td>
-<td align="right">0.0349924</td>
+<td align="right">-0.4400463</td>
+<td align="right">-0.4386879</td>
+<td align="right">-0.4895060</td>
+<td align="right">0.7772086</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p2s_model_covariates_standard</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">pivot_longer</span><span class="op">(</span><span class="va">max_flow_std</span><span class="op">:</span><span class="va">median_passage_timing_std</span>, names_to <span class="op">=</span> <span class="st">"variable"</span>, values_to <span class="op">=</span> <span class="st">"standardized_value"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">standardized_value</span>, color <span class="op">=</span> <span class="va">variable</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">stream</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <div class="section level4">
 <h4 id="save-data-object">Save data object<a class="anchor" aria-label="anchor" href="#save-data-object"></a>
 </h4>
 <p>Data object saved in <code>SRJPEdata</code> as
 <code>p2s_model_covariates_standard.rds</code>. To access documentation
 search <code>?SRJPEdata::p2s_model_covariates_standard.rds</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_data.html" class="external-link">use_data</a></span><span class="op">(</span><span class="va">p2s_model_covariates_standard</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #00BB00;">✔</span> Setting active project to <span style="color: #0000BB;">'/Users/erincain/Documents/Git/JPE/SRJPEdata'</span></span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> Saving <span style="color: #0000BB;">'p2s_model_covariates_standard'</span> to <span style="color: #0000BB;">'data/p2s_model_covariates_standard.rda'</span></span></span>
-<span><span class="co">## <span style="color: #BB0000;">•</span> Document your data (see <span style="color: #0000BB;">'https://r-pkgs.org/data.html'</span>)</span></span></code></pre>
 </div>
 </div>
   </div>
