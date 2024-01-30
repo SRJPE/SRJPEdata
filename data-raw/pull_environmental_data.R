@@ -24,9 +24,9 @@ battle_creek_existing_flow  <- SRJPEdata::environmental_data |>
 # if exists - reformat new data pull
 try(if(!exists("battle_creek_data_query")) 
     battle_creek_daily_flows <- battle_creek_existing_flow 
-    else(battle_creek_daily_flows <- battle_creek_data_query %>% # rename to match new naming structure
-            select(Date, value =  X_00060_00003) %>% # rename to value
-            as_tibble() %>%
+    else(battle_creek_daily_flows <- battle_creek_data_query |>  # rename to match new naming structure
+            select(Date, value =  X_00060_00003) |>  # rename to value
+            as_tibble() |> 
             rename(date = Date) |> 
             mutate(stream = "battle creek", # add additional columns for stream, gage info, and parameter 
                    gage_agency = "USGS",
@@ -43,7 +43,7 @@ try(if(nrow(battle_creek_daily_flows) < nrow(battle_creek_existing_flow))
 
 
 ### Temp Data Pull 
-#### Gage # 
+#### Gage #UBC
 
 ### Temp Data Pull Tests 
 ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "battle_clear_temp.xlsx"), sheet = 4)
@@ -102,22 +102,30 @@ try(if(nrow(butte_creek_daily_flows) < nrow(butte_creek_existing_flow))
 
 
 ### Temp Data Pull 
-bck_temp_raw <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "2000-01-01")
+try(butte_creek_temp_query <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "2000-01-01"))
 
-BCK_temps <- bck_temp_raw |> 
-  mutate(date = as_date(datetime),
-         temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-  filter(temp_degC < 40, temp_degC > 0) |>
-  group_by(date) |> 
-  summarise(mean = mean(temp_degC, na.rm = TRUE),
-            max = max(temp_degC, na.rm = TRUE),
-            min = min(temp_degC, na.rm = TRUE)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "battle creek",
-         gage_agency = "CDEC",
-         gage_number = "BCK",
-         parameter = "temperature") |> 
-    glimpse()
+butte_creek_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" &
+           gage_number == "BCK" &
+           parameter == "temperature") |> 
+  select(-site)
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("butte_creek_temp_query")) 
+  butte_creek_daily_temps <- butte_creek_existing_temp 
+  else(butte_creek_daily_temps <- butte_creek_temp_query |> 
+    mutate(date = as_date(datetime),
+           temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+    filter(temp_degC < 40, temp_degC > 0) |>
+    group_by(date) |> 
+    summarise(mean = mean(temp_degC, na.rm = TRUE),
+              max = max(temp_degC, na.rm = TRUE),
+              min = min(temp_degC, na.rm = TRUE)) |> 
+    pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+    mutate(stream = "butte creek",
+           gage_agency = "CDEC",
+           gage_number = "BCK",
+           parameter = "temperature")))
 
 ### Temp Data Pull Tests  
 
@@ -214,7 +222,7 @@ try(if(!exists("deer_creek_data_query"))
   deer_creek_daily_flows <- deer_creek_existing_flow 
   else(deer_creek_daily_flows <- deer_creek_data_query|> 
          select(Date, value =  X_00060_00003) |> 
-         as_tibble() %>%
+         as_tibble() |> 
          rename(date = Date) |> 
          mutate(stream = "deer creek", 
                 gage_agency = "USGS",
@@ -230,12 +238,35 @@ try(if(nrow(deer_creek_daily_flows) < nrow(deer_creek_existing_flow))
 
 
 ### Temp Data Pull 
+try(deer_creek_temp_query <- cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1995-01-01"))
 
+deer_creek_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" &
+           gage_number == "DCV" &
+           parameter == "temperature") |> 
+  select(-site)
 
-
-
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("deer_creek_temp_query")) 
+  butte_creek_daily_temps <- deer_creek_existing_temp 
+  else(deer_creek_daily_temps <- deer_creek_temp_query |> 
+         mutate(date = as_date(datetime),
+                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+         filter(temp_degC < 40, temp_degC > 0) |> 
+         group_by(date) |> 
+         summarise(mean = mean(temp_degC, na.rm = TRUE),
+                   max = max(temp_degC, na.rm = TRUE),
+                   min = min(temp_degC, na.rm = TRUE)) |>
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         mutate(stream = "deer creek",
+                gage_agency = "CDEC",
+                gage_number = "DCV",
+                parameter = "temperature")))
 
 ### Temp Data Pull Tests 
+
+
 ## Feather River 
 ### Flow Data Pull 
 #### Gage Agency (CDEC, GRL)
@@ -285,7 +316,7 @@ try(if(!exists("feather_lfc_river_data_query"))
   feather_lfc_river_daily_flows <- feather_lfc_river_existing_flow 
   else(feather_lfc_river_daily_flows <- feather_lfc_river_data_query|> 
          select(Date, value =  X_00060_00003) |> 
-         as_tibble() %>%
+         as_tibble() |> 
          rename(date = Date) |> 
          mutate(stream = "feather river", 
                 gage_agency = "USGS",
@@ -333,43 +364,60 @@ try(if(nrow(lower_feather_river_daily_flows) < nrow(lower_feather_river_existing
 
 #GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC).
 
-grl_temp_raw <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05", end_date = "2007-06-01")
+#Pulling temp data GRL
+try(feather_lfc_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05", end_date = "2007-06-01"))
 
-GRL_temps <- grl_temp_raw |> 
-  mutate(date = as_date(datetime),
-         temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-  filter(temp_degC < 40, temp_degC > 0) |> 
-  group_by(date) |> 
-  summarise(mean = mean(temp_degC, na.rm = TRUE),
-            max = max(temp_degC, na.rm = TRUE),
-            min = min(temp_degC, na.rm = TRUE)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "HFC Feather",
-         gage_agency = "CDEC",
-         gage_number = "GRL",
-         parameter = "temperature") |> 
-  glimpse()
+feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" &
+           gage_number == "GRL" &
+           parameter == "temperature") |> 
+  select(-site)
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("feather_lfc_temp_query")) 
+feather_lfc_daily_temps <- feather_lfc_existing_temp 
+  else(feather_lfc_daily_temps <- feather_lfc_temp_query |> 
+         mutate(date = as_date(datetime),
+                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+         filter(temp_degC < 40, temp_degC > 0) |>
+         group_by(date) |> 
+         summarise(mean = mean(temp_degC, na.rm = TRUE),
+                   max = max(temp_degC, na.rm = TRUE),
+                   min = min(temp_degC, na.rm = TRUE)) |> 
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         mutate(stream = "Feather River -low flow channel",
+                gage_agency = "CDEC",
+                gage_number = "GRL",
+                parameter = "temperature")))
+#pulling temp data FRA
+try(feather_hfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1996-01-01"))
 
-fra_temp_raw <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1996-01-01")
-
-FRA_temps <- fra_temp_raw |> 
-  mutate(date = as_date(datetime),
-         temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-  filter(temp_degC < 40, temp_degC > 0) |> 
-  group_by(date) |> 
-  summarise(mean = mean(temp_degC, na.rm = TRUE),
-            max = max(temp_degC, na.rm = TRUE),
-            min = min(temp_degC, na.rm = TRUE)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "LFC Feather",
-         gage_agency = "CDEC",
-         gage_number = "FRA",
-         parameter = "temperature") |> 
-  glimpse()
-
+feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" &
+           gage_number == "FRA" &
+           parameter == "temperature") |> 
+  select(-site)
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("feather_hfc_temp_query")) 
+  feather_hfc_daily_temps <- feather_lfc_existing_temp 
+  else(feather_hfc_daily_temps <- feather_hfc_temp_query |> 
+         mutate(date = as_date(datetime),
+                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+         filter(temp_degC < 40, temp_degC > 0) |>
+         group_by(date) |> 
+         summarise(mean = mean(temp_degC, na.rm = TRUE),
+                   max = max(temp_degC, na.rm = TRUE),
+                   min = min(temp_degC, na.rm = TRUE)) |> 
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         mutate(stream = "Feather River -high flow channel",
+                gage_agency = "CDEC",
+                gage_number = "FRA",
+                parameter = "temperature")))
 
 
 ### Temp Data Pull Tests 
+
 ## Mill Creek 
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11381500)
@@ -407,25 +455,36 @@ try(if(nrow(mill_creek_daily_flows) < nrow(mill_creek_existing_flow))
 
 ### Temp Data Pull 
 
-mill_temp_raw <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1996-01-01")
+try(mill_creek_temp_query <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1996-01-01"))
 
-MLM_temps <- mill_temp_raw |> 
-  mutate(date = as_date(datetime),
-         temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-  filter(temp_degC < 40, temp_degC > 0) |> 
-  group_by(date) |> 
-  summarise(mean = mean(temp_degC, na.rm = TRUE),
-            max = max(temp_degC, na.rm = TRUE),
-            min = min(temp_degC, na.rm = TRUE)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "Mill Creek",
-         gage_agency = "CDEC",
-         gage_number = "MLM",
-         parameter = "temperature") |> 
-  glimpse()
-#TODO double check that this is the only Mill Creek staion we are using, if so clarify on temp data prep since there is another CDEC station listed (MCH) in addition to MLM
+mill_creek_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" &
+           gage_number == "MLM" &
+           parameter == "temperature") |> 
+  select(-site)
+
+
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("mill_creek_temp_query")) 
+  mill_creek_daily_temps <- mill_creek_existing_temp 
+  else(mill_creek_daily_temps <- mill_creek_temp_query |> 
+         mutate(date = as_date(datetime),
+                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+         filter(temp_degC < 40, temp_degC > 0) |>
+         group_by(date) |> 
+         summarise(mean = mean(temp_degC, na.rm = TRUE),
+                   max = max(temp_degC, na.rm = TRUE),
+                   min = min(temp_degC, na.rm = TRUE)) |> 
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         mutate(stream = "Mill creek",
+                gage_agency = "CDEC",
+                gage_number = "MLM",
+                parameter = "temperature")))
+
 
 ### Temp Data Pull Tests 
+
 ## Sacramento River 
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11381500)
@@ -456,7 +515,31 @@ try(if(!exists("sac_river_data_query"))
 
 
 ### Temp Data Pull 
+try(sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010"), silent = TRUE)
+
+sac_river_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "USGS" &
+           gage_number == "11390500" &
+           parameter == "temperature") |> 
+  select(-site)
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("sac_river_temp_query")) 
+  sac_river_daily_temps <- sac_river_existing_temp 
+  else(sac_river_daily_temps <- sac_river_temp_query |> 
+         select(Date, temp_degC =  X_00010_00003) %>%
+         as_tibble() %>% 
+         rename(date = Date,
+                mean_temp_degC = temp_degC) %>% 
+         mutate(stream = "Sacramento River",
+                       gage_agency = "USGS",
+                       gage_number = "11390500",
+                       parameter = "temperature")))
+
+
+
 ### Temp Data Pull Tests 
+
 ## Yuba River 
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11421000)
@@ -484,6 +567,7 @@ try(if(!exists("yuba_river_data_query"))
                 parameter = "flow",
                 statistic = "mean"
          )))
+#TODO fix RTS data to add - USGS daily data only pulled
 
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
@@ -491,14 +575,25 @@ try(if(nrow(yuba_daily_flows) < nrow(yuba_existing_flow))
   yuba_daily_flows <- yuba_existing_flow)
 
 
-### Temp Data Pull 
-yuba_temp_raw <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "1995-01-01")
+### Temp Data Pull - 
+#Process historical data
+yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2019-01-01")
 
-YR7_temps <- yuba_temp_raw |> 
-  mutate(date = as_date(datetime),
-         temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-  filter(temp_degC < 40, temp_degC > 0) |> 
-  group_by(date) #TODO continue to clean up
+
+yuba_river_daily_temps <- yuba_river_temp_query |> 
+  mutate(date = as_date(datetime)) |>
+  filter(parameter_value < 40, parameter_value > 0) |> 
+  group_by(date) |> 
+  summarise(mean = mean(parameter_value, , na.rm = TRUE),
+            max = max(parameter_value, na.rm = TRUE),
+            min = min(parameter_value, na.rm = TRUE)) |> 
+  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+  mutate(stream = "Yuba River",
+         gage_agency = "CDEC",
+         gage_number = "YR7",
+         parameter = "temperature") |> 
+  glimpse()
+
 
 ### Temp Data Pull Tests 
 
