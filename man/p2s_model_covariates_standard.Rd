@@ -13,7 +13,7 @@ A tibble with 192 rows and 7 columns
 \item \code{max_flow_std}: standardized maximum flow data for adult migration period (March - August)
 \item \code{gdd_std}: standardized cumulative degree days above 20 degrees Celsius
 for adult migration (Sacramento March - May) and holding (Tributaries May - August)
-\item \code{passage_inxed}: standardized total adult returns (not currently utilized by model)
+\item \code{passage_index}: standardized total adult returns (not currently utilized by model)
 \item \code{median_passage_timing_std}: standardized median return week (not currently utilized by model)
 }
 }
@@ -21,7 +21,9 @@ for adult migration (Sacramento March - May) and holding (Tributaries May - Augu
 p2s_model_covariates_standard
 }
 \description{
-The passage to spawner model covariates standard table contains
-standardized environmental covariates for use within the passage to spawner submodel.
+The passage to spawner model covariates standard table contains environmental
+covariates for use in the Passage to Spawner (P2S) model. The environmental variables are
+standardized within a column to center around 0. Selection and preparation of the
+covariates are detailed in \code{vignette("prep_environmental_covariates.Rmd", package = "SRJPEdata")}.
 }
 \keyword{datasets}

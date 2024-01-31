@@ -296,8 +296,7 @@ Survey data
 
 Video data
 
--   Exclude year if video out for more than 2 weeks in the sampling season
-
+-   Exclude year if video out for more than 4 weeks in the sampling season
 -   Exclude year if flows exceed X value on each tributary (overpass weir etc..)
 
     | Stream         | Threshold |

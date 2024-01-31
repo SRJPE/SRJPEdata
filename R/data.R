@@ -30,19 +30,22 @@
 #'   \item \code{stream}: rst stream 
 #'   \item \code{site}: rst site 
 #'   \item \code{count}: weekly count of number of 
-#'   \item \code{mean_fork_length}:
-#'   \item \code{number_released}: 
-#'   \item \code{number_recaptured}: 
-#'   \item \code{effort}: 
-#'   \item \code{flow_cfs}: 
-#'   \item \code{life_stage}: 
-#'   \item \code{average_stream_effort}: 
-#'   \item \code{standardized_flow}: 
-#'   \item \code{run_year}: 
-#'   \item \code{catch_standardized_by_effort}: 
-#'   \item \code{standardized_efficiency}: 
-#'   \item \code{lgN_prior}: 
+#'   \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish 
+#'   \item \code{number_released}: Number of efficiency trial fish released
+#'   \item \code{number_recaptured}: Number of efficency trial fish recaptured
+#'   \item \code{effort}: Hours fished on a stream (TODO: rename to hours fished)
+#'   \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
+#'   \item \code{life_stage}: Life stage of juvenile fish 
+#'   \item \code{average_stream_effort}: Average hours fished on a given stream, used to standize 
+#'   \item \code{standardized_flow}: Flow standardized across years and sites 
+#'   \item \code{run_year}: Run year 
+#'   \item \code{catch_standardized_by_effort}: Catch standardized by hours fished in a given week 
+#'   \item \code{standardized_efficiency}: Efficiency standardized across years 
+#'   \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search `?SRJPEdata::btspasx_special_priors_data`
 #'   }
+#'   @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
+#'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
 'weekly_juvenile_abundance_model_data'
 
 #' @title Special Priors for BT-SPAS-X Abundance Model 
@@ -55,11 +58,12 @@
 #'   \item \code{week}: week 
 #'   \item \code{special_prior}: log normalized special prior abundance cap
 #'   }
+#'   @source Special priors were developed by the lead SR JPE modeler, Josh Korman.
 'btspasx_special_priors_data'
 
 #' @title RST Catch Data 
 #' @name rst_catch
-#' @description Dataset containing rst catch monitoring data for all SR JPE tribuatary and mainstem monitoring programs 
+#' @description Dataset containing rst catch monitoring data for all SR JPE tribuatary and mainstem monitoring programs. 
 #' @format A dataframe with 511,961 rows and 14 columns 
 #' \itemize{
 #'   \item \code{date}: date 
@@ -77,6 +81,22 @@
 #'   \item \code{actual_count}: Boolean Value describing if count is actual value or interpolated  
 #'   \item \code{species}: Species of catch  
 #'   }
+#'@source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below.
+#'  \itemize{
+#'   \item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_rst_catch_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte-creek-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Clear Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_rst_catch.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Deer Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/deer-creek/deer_creek_rst_data_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Feather River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather-rst.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Mill Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/mill-creek/mill_creek_rst_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Sacramento River}:
+#'      \itemize{
+#'          \item{Knights Landing}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Tisdale}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Delta Entry}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1}{Data on EDI}.
+#'          }
+#'   \item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   }
 'rst_catch'
 
 #' @title RST Trap Data 
@@ -84,7 +104,43 @@
 #' @description Dataset containing rst trap operations monitoring data for all SR JPE tribuatary and mainstem monitoring programs
 #' @format 
 #' \itemize{
-#'   \item \code{year}: year 
+#'   \item \code{trap_start_date}: Date that trap was visited. This field is included because in some cases a visit will not have a start/stop time (e.g. if trap was cleaned/serviced or just checked)                
+#'   \item \code{visit_type}:
+#'   \item \code{trap_stop_date}: Date that trap was started prior to being sampled. trap_start_date and trap_stop_date are meant to describe the sampling period.
+#'   \item \code{trap_start_time}: Time that trap was visited.
+#'   \item \code{trap_stop_time}:  Time that trap was sampled.
+#'   \item \code{stream}: Which stream the RST is located on                 
+#'   \item \code{site}: Site name  
+#'   \item \code{subsite}: Name of trap       
+#'   \item \code{site_group}: Site group, used to seperate traps within the same stream that have unique environmental conditions.
+#'   \item \code{trap_functioning}: Describes how well trap is functioning. Categories: trap functioning normally, trap stopped functioning, trap not in service, trap functioning but not normally. If trap_functioning not used, "not recorded" is entered. 
+#'   \item \code{in_half_cone_configuration}: Boolean to describe if trap fished in half cone configuration. If not recorded, then assumed to be FALSE.
+#'   \item \code{fish_processed}: Describes if fish were processed. Categories: processed fish; no fish caught; no catch data, fish released; no catch data, fish left in live box. If fish_processed not used, "not recorded" is entered.
+#'   \item \code{rpm_start}: Revolutions per minute at the start of the trap visit before trap is cleaned. If not recorded, then NA.
+#'   \item \code{rpm_end}:  Revolutions per minute at the end of the trap visit after trap is cleaned. If not recorded, then NA.
+#'   \item \code{total_revolutions}: Total revolutions during sample period. If not recorded, then NA. 
+#'   \item \code{debris_volume}: Volume of debris emptied from trap (gallons). If not recorded, then NA. 
+#'   \item \code{discharge}: Flow at trap in cfs
+#'   \item \code{water_velocity}: Velocity at trap in feet per second 
+#'   \item \code{water_temp}: Temperature at trap in degrees C
+#'   \item \code{include}: Boolean to describe if sample should be included in data for analysis. If false then data or visit is determined to be of poor quality by data steward and should not be included in analysis. If not recorded, then assumed to be TRUE.
+#'   \item \code{turbidity}: Turbidity at trap in NTUs
+#'   }
+#' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. 
+#'  \itemize{
+#'   \item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_rst_environmental_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte-creek-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Clear Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_rst_environmental.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Deer Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/deer-creek/deer_creek_rst_data_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Feather River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather-rst-effort.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Mill Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/mill-creek/mill_creek_rst_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Sacramento River}:
+#'      \itemize{
+#'          \item{Knights Landing}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing/}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Tisdale}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Delta Entry}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1}{Data on EDI}.
+#'          }
+#'   \item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
 #'   }
 'rst_trap'
 
@@ -93,7 +149,32 @@
 #' @description Dataset containing summarized efficiency monitoring data for all SR JPE tribuatary and mainstem monitoring programs
 #' @format 
 #' \itemize{
-#'   \item \code{year}: year 
+#'   \item \code{date_released}: Date that efficiency trial release occurs (format - %Y-%m-%d)
+#'   \item \code{release_id}: The unique identifier for each release trial 
+#'   \item \code{stream}: Which stream the RST is located on                 
+#'   \item \code{site}: Site name  
+#'   \item \code{subsite}: Name of trap       
+#'   \item \code{site_group}: Site group, used to seperate traps within the same stream that have unique environmental conditions.
+#'   \item \code{number_released}: Count of fish released       
+#'   \item \code{number_recaptured}: Count of fish recaptured in RST on a specific recapture date, when NA trap is not fished
+#'   \item \code{run}: Run of fish released
+#'   \item \code{life_stage}: Lifestage of fish released
+#'   \item \code{origin}: Fish origin (natural, hatchery, mixed, unknown, not recorded, or NA)   
+#'   }
+#' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. Data is combined \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/mark_recapture_standard_format.Rmd}{here}
+#'  \itemize{
+#'   \item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_mark_recapture_data.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte_mark_recapture.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Clear Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_mark_recapture.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Deer Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+#'   \item \strong{Feather River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather_mark_recapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Mill Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+#'      \itemize{
+#'          \item{Knights Landing}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing_mark_reacapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Tisdale}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale_efficiency.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Delta Entry}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1}{Data on EDI}.
+#'          }
+#'   \item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
 #'   }
 'efficiency_summary'
 
@@ -116,15 +197,42 @@
 #' @description Dataset containing recapture for efficiency monitoring  
 #' @format 
 #' \itemize{
-#'   \item \code{year}: year 
+#'   \item \code{date}: date 
+#'   \item \code{stream}: Stream RST is located on  
+#'   \item \code{site}: Site RST is located on   
+#'   \item \code{subsite}: Specific trap site   
+#'   \item \code{site_group}: Site group    
+#'   \item \code{count}: Number of fish caught 
+#'   \item \code{release_id}: The unique identifier for each release trial  
+#'   \item \code{fork_length}: Fork length measure of catch in mm   
+#'   \item \code{dead}: Mortality status of catch   
+#'   \item \code{weight}: Weight of catch in grams   
+#'   \item \code{run}: Run of catch   
+#'   \item \code{life_stage}: Life Stage of catch   
+#'   \item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch 
+#'   }
+#' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. Data is combined \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/mark_recapture_standard_format.Rmd}{here}
+#'  \itemize{
+#'   \item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_mark_recapture_data.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte_mark_recapture.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Clear Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_mark_recapture.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Deer Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+#'   \item \strong{Feather River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather_mark_recapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Mill Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+#'      \itemize{
+#'          \item{Knights Landing}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing_mark_reacapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Tisdale}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale_efficiency.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Delta Entry}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1}{Data on EDI}.
+#'          }
+#'   \item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
 #'   }
 'recaptures'
 
 #' @title Adult Upstream passage monitoring estimates 
 #' @name upstream_passage_estimates
 #' @description Adult upstream passage estimates, Generalized Additive Model (GAM) 
-#' used to generate passage estimates from raw passage data - TODO add source to show
-#'  this / explain different status for different sites
+#' used to generate passage estimates from raw passage data. Upstream passage estimates 
+#' are available for: battle creek, clear creek, deer creek, mill creek, yuba river, butte creek. 
 #' @format 
 #' \itemize{
 #'   \item \code{year}: year data were collected
@@ -133,10 +241,14 @@
 #'   \item \code{run}: run of fish (if assigned)
 #'   \item \code{adipose_clipped}: whether or not the adipose fin was clipped
 #'   }
+#' @source Adult upstream passage estimates were provided by monitoring programs. 
+#' These data are currently being uploaded to EDI. In the meantime you can find data exploration scripts 
+#' for each tributary \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/adult-upstream-passage-monitoring}{here} and 
+#' combined passage estimates \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/adult_passage_estimate_standard_format.Rmd}{here}.
 'upstream_passage_estimates'
 
 #' @title Adult Upstream passage monitoring raw counts
-#' @name standard_upstream
+#' @name upstream
 #' @description Raw adult upstream passage counts
 #' @format 
 #' \itemize{
@@ -157,8 +269,7 @@
 #'   \item \code{hours}: hours the camera was in operation #TODO confirm
 #'   \item \code{comments}: comments
 #'   }
-'standard_upstream'
-
+'upstream_passage'
 
 #' @title Carcass Survey CJS Estimates
 #' @name carcass_estimates
@@ -175,11 +286,16 @@
 #'   \item \code{upper}: upper confidence interval of abundance estimate
 #'   \item \code{confidence_interval}: confidence interval associated with lower and upper values
 #'   }
+#' @source Carcass survey CJS estimates were provided by monitoring programs. 
+#' These data are currently being uploaded to EDI. In the meantime you can find data exploration scripts 
+#' for each tributary \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/adult-holding-redd-and-carcass-surveys}{here} and 
+#' combined carcass estimates \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/carcass_cjs_estimates_standard_format.Rmd}{here}.
 'carcass_estimates'
 
 #' @title Redd Survey Data 
 #' @name redd
-#' @description Raw redd survey monitoring data 
+#' @description Raw redd survey monitoring data. Redd survey data is available 
+#' for Battle Creek, Clear Creek, Feather River, Mill Creek, Yuba River. 
 #' TODO link to vignette on age_index when available 
 #' @format 
 #' \itemize{
@@ -209,11 +325,16 @@
 #'   \item \code{tail_substrate_class}: size class of tail substrate determined by millimeter size
 #'   \item \code{pre_redd_substrate_class}: size class of substrate pre-redd determined by millimeter size
 #'   }
+#' @source Redd data were provided by monitoring programs. 
+#' These data are currently being uploaded to EDI. In the meantime you can find data exploration scripts 
+#' for each tributary \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/adult-holding-redd-and-carcass-surveys}{here} and 
+#' combined redd data \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/standard_adult_redd_data.Rmd}{here}.
 'redd'
 
 #' @title Holding Survey Data 
 #' @name holding
-#' @description Raw holding survey monitoring data 
+#' @description Raw holding survey monitoring data. Holding survey data is available 
+#' for Battle Creek, Butte Creek, Clear Creek, Deer Creek. 
 #' @format 
 #' \itemize{
 #'   \item \code{date}: date data were collected
@@ -229,6 +350,10 @@
 #'   \item \code{picket_weir_location_rm}: location of the picket weir in river miles
 #'   \item \code{picket_weir_relate}: where the fish were observed relative to the picket weir
 #'   }
+#' @source Holding data were provided by monitoring programs. 
+#' These data are currently being uploaded to EDI. In the meantime you can find data exploration scripts 
+#' for each tributary \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/adult-holding-redd-and-carcass-surveys}{here} and 
+#' combined holding data \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/holding_standard_format.Rmd}{here}.
 'holding'
 
 #' @title Combined Adult Survey and Passage Counts
@@ -245,6 +370,10 @@
 #'   `redd_count`, `holding_count`, or `carcass_estimate`)
 #'   \item \code{count}: aggregated yearly count of fish
 #'   }
+#' @source Adult data packages are currently being added to EDI. 
+#' Data in this table was pulled from holding, redd, carcass, and passage datasets.
+#' See `?SRJPEdata::holding`, `?SRJPEdata::redd`, `?SRJPEdata::carcass_estimates`, 
+#' and `?SRJPEdata::passage_estimates` for more details.
 'observed_adult_input'
 
 #' @title Years to Include in Modeling 
@@ -262,17 +391,37 @@
 #'   \item \code{max_date} : Maximum date of sampling season to include  
 #'   \item \code{max_week} : Maximum week of sampling season to include  
 #'   }
+#' @source Expert opinion. See \code{vignette("years_to_include_analysis", package = "SRJPEdata")} for more details.
 'chosen_site_years_to_model'
 
 #' @title Daily Yearling Rulesets 
 #' @name daily_yearling_ruleset
 #' @description Datasets containing the daily yearling rulesets. 
 #' See \code{vignette("yearling_ruleset", package = "SRJPEdata")} for more details.
-#' @format Dataframe...
+#' @format Dataframe with 2,565 rows and 4 columns (stream, month, day, cutoff)
 #' \itemize{
-#'   \item \code{monitoring_year} : year 
+#'   \item \code{stream}: Stream RST is located on   
+#'   \item \code{month}: Month to apply yearling ruleset to 
+#'   \item \code{day}: Day to apply yearling ruleset to  
+#'   \item \code{cutoff}: Fork length cutoff value in mm 
 #'   }
+#' @source Expert opinion. See \code{vignette("yearling_ruleset", package = "SRJPEdata")} for more details.
 'daily_yearling_ruleset'
+
+#' @title Weekly Hours Fished
+#' @name weekly_hours_fished
+#' @description Datasets containing the hours fished for each stream, site, and week. 
+#' See \code{vignette("trap_effort", package = "SRJPEdata")} for more details.
+#' @format Dataframe containing 7 columns (stream, site, subsite, site_group, week, year, hours_fished)
+#' \itemize{
+#'  \item \code{year}: year 
+#'   \item \code{stream}: Stream RST is located on  
+#'   \item \code{site}: Site RST is located on   
+#'   \item \code{site_group}: Site group   
+#'   \item \code{week}: Week 
+#'   \item \code{hours_fished}: Number of hours that a trap was operated in a given week. Capped at 168. 
+#'   }
+'weekly_hours_fished'
 
 # TODO - get env data figured out 
 # #' @title Environmental Gage Data

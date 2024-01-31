@@ -6,13 +6,31 @@
 \title{Holding Survey Data}
 \format{
 \itemize{
-\item \code{col 1}:col 1
+\item \code{date}: date data were collected
+\item \code{reach}: survey reach where data were collected
+\item \code{river_mile}: river mile where holding fish were observed
+\item \code{count}: count of fish observed
+\item \code{jacks}: number of jacks observed
+\item \code{latitude}: latitude where fish were observed
+\item \code{longitude}: latitude where fish were observed
+\item \code{stream}: stream where data were collected
+\item \code{year}: year data were collected
+\item \code{survey_intent}: purpose of the survey conducted
+\item \code{picket_weir_location_rm}: location of the picket weir in river miles
+\item \code{picket_weir_relate}: where the fish were observed relative to the picket weir
 }
+}
+\source{
+Holding data were provided by monitoring programs.
+These data are currently being uploaded to EDI. In the meantime you can find data exploration scripts
+for each tributary \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/adult-holding-redd-and-carcass-surveys}{here} and
+combined holding data \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/holding_standard_format.Rmd}{here}.
 }
 \usage{
 holding
 }
 \description{
-Raw holding survey monitoring data
+Raw holding survey monitoring data. Holding survey data is available
+for Battle Creek, Butte Creek, Clear Creek, Deer Creek.
 }
 \keyword{datasets}

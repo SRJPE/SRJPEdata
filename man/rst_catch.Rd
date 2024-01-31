@@ -23,10 +23,28 @@ A dataframe with 511,961 rows and 14 columns
 \item \code{species}: Species of catch
 }
 }
+\source{
+Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below.
+\itemize{
+\item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_rst_catch_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte-creek-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Clear Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_rst_catch.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Deer Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/deer-creek/deer_creek_rst_data_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Feather River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather-rst.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Mill Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/mill-creek/mill_creek_rst_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Sacramento River}:
+\itemize{
+\item{Knights Landing}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item{Tisdale}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item{Delta Entry}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1}{Data on EDI}.
+}
+\item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+}
+}
 \usage{
 rst_catch
 }
 \description{
-Dataset containing rst catch monitoring data for all SR JPE tribuatary and mainstem monitoring programs
+Dataset containing rst catch monitoring data for all SR JPE tribuatary and mainstem monitoring programs.
 }
 \keyword{datasets}

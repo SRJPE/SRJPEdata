@@ -36,10 +36,10 @@ See vignette("yearling_ruleset", package = "SRJPEdata") for more details.'><!-- 
       <a href="../articles/yearling_ruleset.html">Yearling Analysis</a>
     </li>
     <li>
-      <a href="../articles/trap_effort.html">Trap Effort</a>
+      <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
     </li>
     <li>
       <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
@@ -76,8 +76,15 @@ See <code><a href="../articles/yearling_ruleset.html">vignette("yearling_ruleset
 
     <div id="format">
     <h2>Format</h2>
-    <p>Dataframe...</p><ul><li><p><code>monitoring_year</code> : year</p></li>
+    <p>Dataframe with 2,565 rows and 4 columns (stream, month, day, cutoff)</p><ul><li><p><code>stream</code>: Stream RST is located on</p></li>
+<li><p><code>month</code>: Month to apply yearling ruleset to</p></li>
+<li><p><code>day</code>: Day to apply yearling ruleset to</p></li>
+<li><p><code>cutoff</code>: Fork length cutoff value in mm</p></li>
 </ul></div>
+    <div id="source">
+    <h2>Source</h2>
+    <p>Expert opinion. See <code><a href="../articles/yearling_ruleset.html">vignette("yearling_ruleset", package = "SRJPEdata")</a></code> for more details.</p>
+    </div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

@@ -11,20 +11,23 @@ A tibble with 9,457 rows and 17 columns
 \week \code{week} : week
 \item \code{stream}: rst stream
 \item \code{site}: rst site
-\item \code{count}:
-\item \code{mean_fork_length}:
-\item \code{number_released}:
-\item \code{number_recaptured}:
-\item \code{effort}:
-\item \code{flow_cfs}:
-\item \code{life_stage}:
-\item \code{average_stream_effort}:
-\item \code{standardized_flow}:
-\item \code{run_year}:
-\item \code{catch_standardized_by_effort}:
-\item \code{standardized_efficiency}:
-\item \code{lgN_prior}:
+\item \code{count}: weekly count of number of
+\item \code{mean_fork_length}: Mean fork length of released efficiency trial fish
+\item \code{number_released}: Number of efficiency trial fish released
+\item \code{number_recaptured}: Number of efficency trial fish recaptured
+\item \code{effort}: Hours fished on a stream (TODO: rename to hours fished)
+\item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
+\item \code{life_stage}: Life stage of juvenile fish
+\item \code{average_stream_effort}: Average hours fished on a given stream, used to standize
+\item \code{standardized_flow}: Flow standardized across years and sites
+\item \code{run_year}: Run year
+\item \code{catch_standardized_by_effort}: Catch standardized by hours fished in a given week
+\item \code{standardized_efficiency}: Efficiency standardized across years
+\item \code{lgN_prior}: log normalized special prior abundance cap, for more info search \code{?SRJPEdata::btspasx_special_priors_data}
 }
+@source Prepared using rotary screw trap catch data (see \code{?SRJPEdata::rst_catch} for more information on raw data sources),
+environmental_data (see \code{?SRJPEdata::environmental_data}), hours fished information
+(see \verb{?SRJPEdata::weekly_hours_fished for more information}), and btspasx special priors (see \code{?SRJPEdata::btspasx_special_priors_data} for more information).
 }
 \usage{
 weekly_juvenile_abundance_model_data
