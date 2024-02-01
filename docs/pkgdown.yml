@@ -4,11 +4,10 @@ pkgdown_sha: ~
 articles:
   flow_data_pull: flow_data_pull.html
   prep_environmental_covariates: prep_environmental_covariates.html
-  temperature_data_pull: temperature_data_pull.html
   trap_effort: trap_effort.html
   yearling_ruleset: yearling_ruleset.html
   years_to_include_analysis: years_to_include_analysis.html
-last_built: 2024-01-31T23:51Z
+last_built: 2024-02-01T00:07Z
 urls:
   reference: https://SRJPE.github.io/SRJPEdata/reference
   article: https://SRJPE.github.io/SRJPEdata/articles

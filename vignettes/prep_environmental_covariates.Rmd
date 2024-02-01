@@ -18,9 +18,6 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
 library(tidyverse)
 library(googleCloudStorageR)
 library(waterYearType)
-
-# gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
-# Sys.setenv("GCS_DEFAULT_BUCKET" = "jpe-dev-bucket")
 ```
 
 The Passage to Spawner (P2S) model relates spawner counts (from redd or holding surveys) to upstream passage counts obtained by video systems. This model is restricted to streams with reliable redd or holding surveys and reliable upstream passage counts. It is also restricted to years where the redd/holding and upstream passage datasets overlap. This vignette describes the process of pulling and processing environmental covariates for use in the P2S model.
@@ -48,10 +45,10 @@ holding_months <- 5:8
 
 # read in standard temperature (database-tables does not have the mean column)
 # TODO when temperature_data_pull.Rmd creates a data object, use that
-standard_temp <- read_csv(here::here("data", "standard-format-data", "standard_temperature.csv"))
+standard_temp <- read_csv(here::here("data-raw", "database-tables", "standard_temperature.csv"))
 
 # calculate sum of days above the thresholds
-gdd_sac <- standard_temp |>
+gdd_sac <- standard_temp |> glimpse()
   filter(month(date) %in% migratory_months, stream == "sacramento river") |>
   mutate(gdd_sac = mean_daily_temp_c - gdd_base_sac,
          gdd_sac = ifelse(gdd_sac < 0, 0, gdd_sac)) |>
@@ -113,7 +110,7 @@ Passage timing was considered; however, limited data reduced the sample size of 
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 # pull raw upstream counts because they still contain date
-upstream_passage_timing <- read_csv(here::here("data-raw", "database-tables", "standard_adult_upstream.csv"))  |> 
+upstream_passage_timing <- SRJPEdata::upstream_passage  |> 
   filter(!is.na(date),
          run %in% c("spring","not recorded"),
          passage_direction %in% c(NA, "up")) |>

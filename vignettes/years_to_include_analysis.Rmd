@@ -45,7 +45,7 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 The cumulative catch curve below shows cumulative catch throughout time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used simmilar plots on each tributaries to exclude years where there is very limited sampling. See additional [cumulative catch curves in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) for each tributary.
 
 ```{r, echo = FALSE}
-standard_catch <- rst_catch 
+standard_catch <- SRJPEdata::rst_catch 
 spring_run_catch <- filter(standard_catch, run == "spring" | stream %in% c("mill creek", "deer creek")) %>%
   mutate(day = day(date),
          month = month(date),
@@ -162,8 +162,6 @@ plotly::ggplotly(heat_map)
 We utilized above cumulative catch curves and heatmaps come up with a list of years to exclude from modeling. See a section of this years to exclude table below.
 
 ```{r, echo = FALSE}
-# TODO Build out with code from shiny, add plots 
-# TODO document data object 
 # TODO add red bluff to database & file 
 
 years_exclude <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
@@ -190,7 +188,7 @@ The table below shows a section of this table:
 # Exclude years
 
 # analysis for red bluff - bring back in after adding to database 
-rb <- filter(rst_catch, site == "red bluff diversion dam")
+rb <- filter(SRJPEdata::rst_catch, site == "red bluff diversion dam")
 # rb |> 
 #   group_by(date) |> 
 #   summarize(count = sum(count, na.rm = T)) |> 
@@ -221,7 +219,7 @@ exclude <- tibble(stream = c(rep("battle creek",3), rep("butte creek", 5), rep("
                                       2013),
                   exclude = rep("yes", 24))
 
-min_max_week <- rst_catch |> 
+min_max_week <- SRJPEdata::rst_catch |> 
   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
   group_by(monitoring_year, stream, site, subsite) |> 
   summarize(min_date = min(date),

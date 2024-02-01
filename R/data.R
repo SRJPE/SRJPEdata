@@ -248,7 +248,7 @@
 'upstream_passage_estimates'
 
 #' @title Adult Upstream passage monitoring raw counts
-#' @name upstream
+#' @name upstream_passage
 #' @description Raw adult upstream passage counts
 #' @format 
 #' \itemize{

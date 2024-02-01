@@ -35,6 +35,7 @@ reference:
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
 - contents: 
+  - upstream_passage
   - upstream_passage_estimates 
   - carcass_estimates 
   - redd

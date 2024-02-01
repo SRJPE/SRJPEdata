@@ -114,7 +114,7 @@ cases when start date is NA. For these we fill in the start date assuming
 it is the sample date of the previous record.
 
 ```{r, battle, echo = FALSE}
-method_one_hours_fished <- filter(rst_trap, stream %in% 
+method_one_hours_fished <- filter(SRJPEdata::rst_trap, stream %in% 
                                 c("battle creek", "clear creek", 
                                   "feather river", "sacramento river")) %>% 
   select(trap_start_date, trap_start_time, trap_stop_date, trap_stop_time, 
@@ -161,7 +161,7 @@ observation.
 
 ```{r, butte, yuba, echo = FALSE}
 ## Butte ####
-method_three_hours_fished <- filter(rst_trap, stream %in% c("butte creek", "yuba river")) %>%
+method_three_hours_fished <- filter(SRJPEdata::rst_trap, stream %in% c("butte creek", "yuba river")) %>%
   distinct(trap_stop_date, trap_stop_time, site, subsite, site_group, stream) %>%
   mutate(start_datetime = ymd_hms(paste(trap_stop_date, trap_stop_time))) %>%
   mutate(hours_fished_methodology = "using only start time") %>% 
@@ -216,7 +216,7 @@ fished so assume 24 hours for every day with data.
 
 ```{r, deer & mill, echo = FALSE}
 ## Deer & mill #####
-deer_mill_hours_fished <- filter(rst_trap, stream %in% c("deer creek", "mill creek")) %>% 
+deer_mill_hours_fished <- filter(SRJPEdata::rst_trap, stream %in% c("deer creek", "mill creek")) %>% 
   distinct(trap_stop_date, stream, site, subsite, site_group) %>% 
   mutate(hours_fished_methodology = "24 hour assumption") %>% 
   mutate(hours_fished = 24)
@@ -273,6 +273,8 @@ weekly_hours_fished <- hours_fished_combined %>%
   summarize(hours_fished = sum(hours_fished),
             hours_fished = ifelse(hours_fished > 168, 168, hours_fished)) |>  #only 168 hours in a year 
   ungroup()
+
+# Save to package
 usethis::use_data(weekly_hours_fished, overwrite = TRUE)
 ```
 
