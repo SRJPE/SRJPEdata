@@ -1,24 +1,12 @@
 # Create data file for passage-to-spawner (P2S) model
 library(tidyverse)
-library(googleCloudStorageR)
 
-# pull tables from google cloud (to be replaced with db) ------------------
-# TODO source pull_tables_from_database
-# TODO add adult tables to pull_tables_from_database
 # Pull tables using pull data script 
-source('data-raw/pull_data.R')
-
-# read in tables 
-upstream_passage_table <- read_csv("data-raw/database-tables/standard_adult_upstream.csv")
-upstream_passage_estimate_table <- read_csv("data-raw/database-tables/standard_adult_passage_estimate.csv")
-holding_table <- read_csv("data-raw/database-tables/standard_holding.csv")
-redd_table <- read_csv("data-raw/database-tables/standard_daily_redd.csv")
-carcass_estimates_table <- read_csv("data-raw/database-tables/standard_carcass_cjs_estimate.csv")
-#carcass_table <- read_csv("data-raw/database-tables/standard_carcass.csv")
+source('data-raw/pull_tables_from_database.R')
 
 # upstream passage and estimates -----------------------------------------------
 # upstream passage - use these data for passage timing calculations
-upstream_passage <- upstream_passage_table |> 
+upstream_passage <- SRJPEdata::upstream_passage |> 
   filter(!is.na(date)) |>
   mutate(stream = tolower(stream),
          year = year(date)) |>
@@ -41,12 +29,12 @@ upstream_passage <- upstream_passage_table |>
 # TODO think if we want to retain the adipose_clip and run info 
 
 # pull in passage estimates and use these for upstream_count
-upstream_passage_estimates <- upstream_passage_estimate_table |>
+upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates |>
   mutate(passage_estimate = round(passage_estimate, 0)) |>
   glimpse()
 
 # holding -----------------------------------------------------------------
-holding <- holding_table |>
+holding <- SRJPEdata::holding |>
   group_by(year, stream) |>
   summarise(count = sum(count, na.rm = T)) |>
   ungroup() |>
@@ -56,7 +44,7 @@ holding <- holding_table |>
 # have a method for each stream 
 # Use max daily reach count summed across year to get max annual count for streams
 # that do not have redd id 
-redd_non_battle_clear <- redd_table |>
+redd_non_battle_clear <- SRJPEdata::redd |>
   filter(run %in% c("spring", "not recorded"),
          species != "steelhead",
          !stream %in% c("battle creek", "clear creek")) |> 
@@ -72,7 +60,7 @@ redd_non_battle_clear <- redd_table |>
   glimpse()
   
 # for streams with redd id, just sum redd count (each redd id is only counted once)
-battle_clear_redd <- redd_table |>
+battle_clear_redd <- SRJPEdata::redd |>
   filter(run %in% c("spring", "not recorded"),
          species %in% c("not recorded", NA, "chinook", "unknown"),
          stream %in% c("battle creek", "clear creek"),
@@ -84,18 +72,10 @@ battle_clear_redd <- redd_table |>
 redd_data <- bind_rows(redd_non_battle_clear, battle_clear_redd) |> glimpse()
 
 
-# carcass and CJS estimates -----------------------------------------------------------------
-# raw carcass
-carcass <- carcass_table |>
-  filter(run %in% c("spring", NA, "unknown")) |>
-  group_by(year(date), stream) |>
-  summarise(count = sum(count, na.rm = T)) |>
-  ungroup() |>
-  select(year = `year(date)`, stream, count) |>
-  glimpse()
+# carcass CJS estimates -----------------------------------------------------------------
 
 # estimates from CJS model (carcass survey)
-carcass_estimates <- carcass_estimates_table |> 
+carcass_estimates <- SRJPEdata::carcass_estimates |> 
   rename(carcass_spawner_estimate = spawner_abundance_estimate) |>
   glimpse()
 
