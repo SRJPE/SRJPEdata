@@ -25,7 +25,9 @@ A tibble with 9,457 rows and 17 columns
 \item \code{standardized_efficiency}: Efficiency standardized across years
 \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search \code{?SRJPEdata::btspasx_special_priors_data}
 }
-@source Prepared using rotary screw trap catch data (see \code{?SRJPEdata::rst_catch} for more information on raw data sources),
+}
+\source{
+Prepared using rotary screw trap catch data (see \code{?SRJPEdata::rst_catch} for more information on raw data sources),
 environmental_data (see \code{?SRJPEdata::environmental_data}), hours fished information
 (see \verb{?SRJPEdata::weekly_hours_fished for more information}), and btspasx special priors (see \code{?SRJPEdata::btspasx_special_priors_data} for more information).
 }

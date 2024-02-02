@@ -54,10 +54,10 @@
       <a href="../articles/yearling_ruleset.html">Yearling Analysis</a>
     </li>
     <li>
-      <a href="../articles/trap_effort.html">Trap Effort</a>
+      <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
     </li>
     <li>
       <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
@@ -105,11 +105,17 @@ overlap. This vignette describes the process of pulling and processing
 environmental covariates for use in the P2S model.</p>
 <p>Potential environmental covariates hypothesized to influence prespawn
 mortality were proposed in meetings with the SRJPE Modeling Advisory
-Team (MAT). Five initial categories were identified: temperature, flow,
-passage timing, water year type, and total passage. There are many ways
-to summarize each of these categories and initial analyses helped
-identify collinearity and performance of each potential method by
-regressing prespawn mortality (calculated as
+Team (MAT). Five initial categories were identified:</p>
+<ul>
+<li>temperature,</li>
+<li>flow,</li>
+<li>passage timing,</li>
+<li>water year type,</li>
+<li>and total passage.</li>
+</ul>
+<p>There are many ways to summarize each of these categories and initial
+analyses helped identify collinearity and performance of each potential
+method by regressing prespawn mortality (calculated as
 <code>upstream_count / spawner_count</code>) against the environmental
 variable. When we were using redd counts as <code>spawner_count</code>,
 our model assumed a 50/50 sex ratio and modified that equation to be
@@ -150,44 +156,58 @@ tributary.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">1999</td>
-<td align="left">butte creek</td>
-<td align="right">49.50231</td>
+<td align="right">1998</td>
+<td align="left">feather river</td>
+<td align="right">0.00000</td>
 <td align="right">0</td>
-<td align="right">49.50</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
 <td align="right">1999</td>
 <td align="left">deer creek</td>
-<td align="right">79.30787</td>
+<td align="right">79.33333</td>
 <td align="right">0</td>
-<td align="right">79.31</td>
+<td align="right">79.33</td>
 </tr>
 <tr class="odd">
 <td align="right">1999</td>
-<td align="left">mill creek</td>
-<td align="right">23.82870</td>
+<td align="left">feather river</td>
+<td align="right">0.00000</td>
 <td align="right">0</td>
-<td align="right">23.83</td>
+<td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="right">2000</td>
-<td align="left">butte creek</td>
-<td align="right">194.46759</td>
+<td align="right">1999</td>
+<td align="left">mill creek</td>
+<td align="right">24.30417</td>
 <td align="right">0</td>
-<td align="right">194.47</td>
+<td align="right">24.30</td>
 </tr>
 <tr class="odd">
 <td align="right">2000</td>
-<td align="left">deer creek</td>
-<td align="right">183.55556</td>
+<td align="left">butte creek</td>
+<td align="right">194.62500</td>
 <td align="right">0</td>
-<td align="right">183.56</td>
+<td align="right">194.62</td>
+</tr>
+<tr class="even">
+<td align="right">2000</td>
+<td align="left">deer creek</td>
+<td align="right">191.69792</td>
+<td align="right">0</td>
+<td align="right">191.70</td>
+</tr>
+<tr class="odd">
+<td align="right">2000</td>
+<td align="left">feather river</td>
+<td align="right">78.59004</td>
+<td align="right">0</td>
+<td align="right">78.59</td>
 </tr>
 <tr class="even">
 <td align="right">2000</td>
 <td align="left">mill creek</td>
-<td align="right">97.26157</td>
+<td align="right">97.26250</td>
 <td align="right">0</td>
 <td align="right">97.26</td>
 </tr>
@@ -201,27 +221,13 @@ tributary.</p>
 <tr class="even">
 <td align="right">2001</td>
 <td align="left">butte creek</td>
-<td align="right">351.51620</td>
+<td align="right">351.29167</td>
 <td align="right">0</td>
-<td align="right">351.52</td>
-</tr>
-<tr class="odd">
-<td align="right">2001</td>
-<td align="left">clear creek</td>
-<td align="right">17.07813</td>
-<td align="right">0</td>
-<td align="right">17.08</td>
-</tr>
-<tr class="even">
-<td align="right">2001</td>
-<td align="left">deer creek</td>
-<td align="right">280.74306</td>
-<td align="right">0</td>
-<td align="right">280.74</td>
+<td align="right">351.29</td>
 </tr>
 </tbody>
 </table>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="flow">Flow<a class="anchor" aria-label="anchor" href="#flow"></a>
@@ -302,7 +308,7 @@ fluctuations in flow over the entire year.</p>
 </tr>
 </tbody>
 </table>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="passage-timing">Passage Timing<a class="anchor" aria-label="anchor" href="#passage-timing"></a>
@@ -398,7 +404,7 @@ them from candidacy for the model due to lack of statistical power.</p>
 </tr>
 </tbody>
 </table>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="water-year-type">Water Year Type<a class="anchor" aria-label="anchor" href="#water-year-type"></a>
@@ -417,65 +423,17 @@ year type into either dry (<code>Dry</code>, <code>Below Normal</code>,
 <code>Above Normal</code>).</p>
 <table class="table">
 <thead><tr class="header">
-<th align="left">water_year_type</th>
-<th align="right">n</th>
+<th align="left">Water Year Type</th>
+<th align="right">Count</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">dry</td>
-<td align="right">63</td>
+<td align="right">60</td>
 </tr>
 <tr class="even">
 <td align="left">wet</td>
-<td align="right">53</td>
-</tr>
-</tbody>
-</table>
-<table class="table">
-<thead><tr class="header">
-<th align="right">WY</th>
-<th align="left">water_year_type</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="right">1906</td>
-<td align="left">wet</td>
-</tr>
-<tr class="even">
-<td align="right">1907</td>
-<td align="left">wet</td>
-</tr>
-<tr class="odd">
-<td align="right">1908</td>
-<td align="left">dry</td>
-</tr>
-<tr class="even">
-<td align="right">1909</td>
-<td align="left">wet</td>
-</tr>
-<tr class="odd">
-<td align="right">1910</td>
-<td align="left">wet</td>
-</tr>
-<tr class="even">
-<td align="right">1911</td>
-<td align="left">wet</td>
-</tr>
-<tr class="odd">
-<td align="right">1912</td>
-<td align="left">dry</td>
-</tr>
-<tr class="even">
-<td align="right">1913</td>
-<td align="left">dry</td>
-</tr>
-<tr class="odd">
-<td align="right">1914</td>
-<td align="left">wet</td>
-</tr>
-<tr class="even">
-<td align="right">1915</td>
-<td align="left">wet</td>
+<td align="right">52</td>
 </tr>
 </tbody>
 </table>
@@ -509,19 +467,9 @@ less available habitat and thus influence prespawn mortality.</p>
 <td align="right">35</td>
 </tr>
 <tr class="even">
-<td align="right">1996</td>
-<td align="left">clear creek</td>
-<td align="right">NA</td>
-</tr>
-<tr class="odd">
 <td align="right">1997</td>
 <td align="left">battle creek</td>
 <td align="right">107</td>
-</tr>
-<tr class="even">
-<td align="right">1997</td>
-<td align="left">clear creek</td>
-<td align="right">NA</td>
 </tr>
 <tr class="odd">
 <td align="right">1998</td>
@@ -543,19 +491,29 @@ less available habitat and thus influence prespawn mortality.</p>
 <td align="left">clear creek</td>
 <td align="right">35</td>
 </tr>
+<tr class="odd">
+<td align="right">2000</td>
+<td align="left">battle creek</td>
+<td align="right">78</td>
+</tr>
+<tr class="even">
+<td align="right">2000</td>
+<td align="left">clear creek</td>
+<td align="right">9</td>
+</tr>
 </tbody>
 </table>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-6-1.png" width="768"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="combine-and-standardize">Combine and standardize<a class="anchor" aria-label="anchor" href="#combine-and-standardize"></a>
 </h2>
-<p>All continuous environmental variables (flow and temperature) were
-standardized and centered before performing any analyses so that the
-scale of the data did not affect results. Water year type was coded as a
-binary variable as <code>1</code> for wet (wet, above normal) and
-<code>0</code> for dry (below normal, dry, critical).</p>
+<p>Both continuous environmental variables (flow and temperature) were
+standardized and centered within streams before performing any analyses
+so that the scale of the data did not affect results. Water year type
+was coded as a binary variable as <code>1</code> for wet (wet, above
+normal) and <code>0</code> for dry (below normal, dry, critical).</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="5%">
@@ -582,7 +540,7 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.5054967</td>
+<td align="right">-0.6837483</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
@@ -591,7 +549,7 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.5261514</td>
+<td align="right">-0.8597315</td>
 <td align="right">NA</td>
 </tr>
 <tr class="odd">
@@ -600,7 +558,7 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.4781792</td>
+<td align="right">-0.4509963</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
@@ -609,8 +567,8 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">1</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.4308733</td>
-<td align="right">0.6422969</td>
+<td align="right">-0.0479381</td>
+<td align="right">-0.1057615</td>
 </tr>
 <tr class="odd">
 <td align="right">1999</td>
@@ -618,8 +576,8 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">1</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.5008327</td>
-<td align="right">1.0470320</td>
+<td align="right">-0.6440101</td>
+<td align="right">0.3595891</td>
 </tr>
 <tr class="even">
 <td align="right">2000</td>
@@ -627,8 +585,8 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">1</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.4975013</td>
-<td align="right">1.8565021</td>
+<td align="right">-0.6156258</td>
+<td align="right">1.2902904</td>
 </tr>
 <tr class="odd">
 <td align="right">2001</td>
@@ -636,8 +594,8 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">0</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.4755141</td>
-<td align="right">0.1026502</td>
+<td align="right">-0.4282888</td>
+<td align="right">-0.7262290</td>
 </tr>
 <tr class="even">
 <td align="right">2002</td>
@@ -645,30 +603,30 @@ binary variable as <code>1</code> for wet (wet, above normal) and
 <td align="right">0</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-<td align="right">-0.4015569</td>
-<td align="right">1.5866787</td>
+<td align="right">0.2018445</td>
+<td align="right">0.9800567</td>
 </tr>
 <tr class="odd">
 <td align="right">2003</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.3136885</td>
-<td align="right">-0.4373424</td>
-<td align="right">-0.4022232</td>
-<td align="right">3.2056189</td>
+<td align="right">0.6738405</td>
+<td align="right">-0.7074578</td>
+<td align="right">0.1961676</td>
+<td align="right">2.8414592</td>
 </tr>
 <tr class="even">
 <td align="right">2004</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.4400463</td>
-<td align="right">-0.4386879</td>
-<td align="right">-0.4895060</td>
-<td align="right">0.7772086</td>
+<td align="right">-0.3871427</td>
+<td align="right">-0.7145862</td>
+<td align="right">-0.5475032</td>
+<td align="right">0.0493554</td>
 </tr>
 </tbody>
 </table>
-<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="prep_environmental_covariates_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
 <div class="section level4">
 <h4 id="save-data-object">Save data object<a class="anchor" aria-label="anchor" href="#save-data-object"></a>
 </h4>

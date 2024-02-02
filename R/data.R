@@ -43,7 +43,7 @@
 #'   \item \code{standardized_efficiency}: Efficiency standardized across years 
 #'   \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search `?SRJPEdata::btspasx_special_priors_data`
 #'   }
-#'   @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
+#' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
 #'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
 #'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
 'weekly_juvenile_abundance_model_data'
@@ -58,7 +58,7 @@
 #'   \item \code{week}: week 
 #'   \item \code{special_prior}: log normalized special prior abundance cap
 #'   }
-#'   @source Special priors were developed by the lead SR JPE modeler, Josh Korman.
+#' @source Special priors were developed by the lead SR JPE modeler, Josh Korman.
 'btspasx_special_priors_data'
 
 #' @title RST Catch Data 
@@ -81,7 +81,7 @@
 #'   \item \code{actual_count}: Boolean Value describing if count is actual value or interpolated  
 #'   \item \code{species}: Species of catch  
 #'   }
-#'@source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below.
+#' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below.
 #'  \itemize{
 #'   \item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_rst_catch_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
 #'   \item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte-creek-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
