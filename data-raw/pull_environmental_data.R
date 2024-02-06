@@ -48,7 +48,7 @@ try(if(nrow(battle_creek_daily_flows) < nrow(battle_creek_existing_flow))
 ### Temp Data Pull Tests 
 ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "battle_clear_temp.xlsx"), sheet = 4)
 
-ubc_temp <- ubc_temp_raw |> 
+battle_creek_daily_temp <- ubc_temp_raw |> 
   rename(date = DT,
          temp_degC = TEMP_C) |> 
   mutate(date = as_date(date, tz = "UTC")) |> 
@@ -112,8 +112,8 @@ butte_creek_existing_temp <- SRJPEdata::environmental_data |>
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("butte_creek_temp_query")) 
-  butte_creek_daily_temps <- butte_creek_existing_temp 
-  else(butte_creek_daily_temps <- butte_creek_temp_query |> 
+  butte_creek_daily_temp <- butte_creek_existing_temp 
+  else(butte_creek_daily_temp <- butte_creek_temp_query |> 
     mutate(date = as_date(datetime),
            temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
     filter(temp_degC < 40, temp_degC > 0) |>
@@ -169,7 +169,7 @@ try(if(nrow(clear_creek_daily_flows) < nrow(clear_creek_existing_flow))
 
 upperclear_temp_raw <- readxl::read_excel(here::here("data-raw", "battle_clear_temp.xlsx"), sheet = 2)
 
-upperclear_temp <- upperclear_temp_raw |> 
+upperclear_creek_daily_temp <- upperclear_temp_raw |> 
   rename(date = DT,
          temp_degC = TEMP_C) |> 
   mutate(date = as_date(date, tz = "UTC")) |>
@@ -187,7 +187,7 @@ upperclear_temp <- upperclear_temp_raw |>
 
 lowerclear_temp_raw <- readxl::read_excel(here::here("data-raw", "battle_clear_temp.xlsx"), sheet = 3)
 
-lowerclear_temp <- lowerclear_temp_raw |> 
+lowerclear_creek_daily_temp <- lowerclear_temp_raw |> 
   rename(date = DT,
          temp_degC = TEMP_C) |> 
   mutate(date = as_date(date, tz = "UTC")) |>
@@ -249,8 +249,8 @@ deer_creek_existing_temp <- SRJPEdata::environmental_data |>
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("deer_creek_temp_query")) 
-  butte_creek_daily_temps <- deer_creek_existing_temp 
-  else(deer_creek_daily_temps <- deer_creek_temp_query |> 
+  deer_creek_daily_temp <- deer_creek_existing_temp 
+  else(deer_creek_daily_temp <- deer_creek_temp_query |> 
          mutate(date = as_date(datetime),
                 temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
          filter(temp_degC < 40, temp_degC > 0) |> 
@@ -365,43 +365,18 @@ try(if(nrow(lower_feather_river_daily_flows) < nrow(lower_feather_river_existing
 #GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC).
 
 #Pulling temp data GRL
-try(feather_lfc_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05", end_date = "2007-06-01"))
+try(feather_hfc_river_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05", end_date = "2007-06-01"))
 
-feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
+feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
            gage_number == "GRL" &
            parameter == "temperature") |> 
   select(-site)
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
-try(if(!exists("feather_lfc_temp_query")) 
-feather_lfc_daily_temps <- feather_lfc_existing_temp 
-  else(feather_lfc_daily_temps <- feather_lfc_temp_query |> 
-         mutate(date = as_date(datetime),
-                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-         filter(temp_degC < 40, temp_degC > 0) |>
-         group_by(date) |> 
-         summarise(mean = mean(temp_degC, na.rm = TRUE),
-                   max = max(temp_degC, na.rm = TRUE),
-                   min = min(temp_degC, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "Feather River -low flow channel",
-                gage_agency = "CDEC",
-                gage_number = "GRL",
-                parameter = "temperature")))
-#pulling temp data FRA
-try(feather_hfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1996-01-01"))
-
-feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "FRA" &
-           parameter == "temperature") |> 
-  select(-site)
-# Confirm data pull did not error out, if does not exist - use existing flow, 
-# if exists - reformat new data pull
 try(if(!exists("feather_hfc_temp_query")) 
-  feather_hfc_daily_temps <- feather_lfc_existing_temp 
-  else(feather_hfc_daily_temps <- feather_hfc_temp_query |> 
+  feather_hfc_river_daily_temp <- feather_hfc_existing_temp 
+  else(feather_hfc_river_daily_temp <- feather_hfc_river_temp_query |> 
          mutate(date = as_date(datetime),
                 temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
          filter(temp_degC < 40, temp_degC > 0) |>
@@ -411,6 +386,31 @@ try(if(!exists("feather_hfc_temp_query"))
                    min = min(temp_degC, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
          mutate(stream = "Feather River -high flow channel",
+                gage_agency = "CDEC",
+                gage_number = "GRL",
+                parameter = "temperature")))
+#pulling temp data FRA
+try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1996-01-01"))
+
+feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" &
+           gage_number == "FRA" &
+           parameter == "temperature") |> 
+  select(-site)
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull
+try(if(!exists("feather_lfc_temp_query")) 
+  feather_lfc_river_daily_temp <- feather_lfc_existing_temp 
+  else(feather_lfc_river_daily_temp <- feather_lfc_temp_query |> 
+         mutate(date = as_date(datetime),
+                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+         filter(temp_degC < 40, temp_degC > 0) |>
+         group_by(date) |> 
+         summarise(mean = mean(temp_degC, na.rm = TRUE),
+                   max = max(temp_degC, na.rm = TRUE),
+                   min = min(temp_degC, na.rm = TRUE)) |> 
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         mutate(stream = "Feather River -low flow channel",
                 gage_agency = "CDEC",
                 gage_number = "FRA",
                 parameter = "temperature")))
@@ -467,8 +467,8 @@ mill_creek_existing_temp <- SRJPEdata::environmental_data |>
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("mill_creek_temp_query")) 
-  mill_creek_daily_temps <- mill_creek_existing_temp 
-  else(mill_creek_daily_temps <- mill_creek_temp_query |> 
+  mill_creek_daily_temp <- mill_creek_existing_temp 
+  else(mill_creek_daily_temp <- mill_creek_temp_query |> 
          mutate(date = as_date(datetime),
                 temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
          filter(temp_degC < 40, temp_degC > 0) |>
@@ -525,8 +525,8 @@ sac_river_existing_temp <- SRJPEdata::environmental_data |>
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("sac_river_temp_query")) 
-  sac_river_daily_temps <- sac_river_existing_temp 
-  else(sac_river_daily_temps <- sac_river_temp_query |> 
+  sac_river_daily_temp <- sac_river_existing_temp 
+  else(sac_river_daily_temp <- sac_river_temp_query |> 
          select(Date, temp_degC =  X_00010_00003) %>%
          as_tibble() %>% 
          rename(date = Date,
@@ -580,7 +580,7 @@ try(if(nrow(yuba_daily_flows) < nrow(yuba_existing_flow))
 yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2019-01-01")
 
 
-yuba_river_daily_temps <- yuba_river_temp_query |> 
+yuba_river_daily_temp <- yuba_river_temp_query |> 
   mutate(date = as_date(datetime)) |>
   filter(parameter_value < 40, parameter_value > 0) |> 
   group_by(date) |> 
@@ -603,6 +603,7 @@ all_flow <- bind_rows(battle_creek_daily_flows,
                       clear_creek_daily_flows,
                       deer_creek_daily_flows,
                       feather_hfc_river_daily_flows,
+                      feather_lfc_river_daily_flows,
                       lower_feather_river_daily_flows,
                       feather_lfc_river_daily_flows,
                       mill_creek_daily_flows,
@@ -613,6 +614,25 @@ all_flow <- bind_rows(battle_creek_daily_flows,
 ggplot(all_flow |> 
          filter(statistic == "mean"),
          aes(x= date, y = value, color=stream)) +
+  geom_line() +
+  facet_wrap(~stream)
+
+#Combine all temperature data from different streams
+all_temps <- bind_rows(battle_creek_daily_temp,
+                      butte_creek_daily_temp, 
+                      lowerclear_creek_daily_temp,
+                      upperclear_creek_daily_temp,
+                      deer_creek_daily_temp,
+                      feather_hfc_river_daily_temp,
+                      feather_lfc_river_daily_temp,
+                      feather_lfc_river_daily_temp,
+                      mill_creek_daily_temp,
+                      sac_river_daily_temp) |> 
+  glimpse()
+
+ggplot(all_temps |> 
+         filter(statistic == "mean"),
+       aes(x= date, y = value, color=stream)) +
   geom_line() +
   facet_wrap(~stream)
 
