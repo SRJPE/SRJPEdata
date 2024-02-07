@@ -6,7 +6,36 @@
 \title{RST efficiency trial recaptures}
 \format{
 \itemize{
-\item \code{year}: year
+\item \code{date}: date
+\item \code{stream}: Stream RST is located on
+\item \code{site}: Site RST is located on
+\item \code{subsite}: Specific trap site
+\item \code{site_group}: Site group
+\item \code{count}: Number of fish caught
+\item \code{release_id}: The unique identifier for each release trial
+\item \code{fork_length}: Fork length measure of catch in mm
+\item \code{dead}: Mortality status of catch
+\item \code{weight}: Weight of catch in grams
+\item \code{run}: Run of catch
+\item \code{life_stage}: Life Stage of catch
+\item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch
+}
+}
+\source{
+Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. Data is combined \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/mark_recapture_standard_format.Rmd}{here}
+\itemize{
+\item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_mark_recapture_data.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte_mark_recapture.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Clear Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_mark_recapture.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Deer Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+\item \strong{Feather River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather_mark_recapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item \strong{Mill Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+\itemize{
+\item{Knights Landing}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing_mark_reacapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item{Tisdale}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale_efficiency.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+\item{Delta Entry}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1}{Data on EDI}.
+}
+\item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
 }
 }
 \usage{

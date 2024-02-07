@@ -16,6 +16,7 @@ reference:
   desc: Data used as model inputs to passage to spawner (p2s) model or directly input to stock recruit 
 - contents: 
   - p2s_model_covariates_standard
+  - observed_adult_input
 - subtitle: Juvenile Datasets
   desc: Data used as inputs to juvenile bt-spas-x abundance model 
 - contents: 
@@ -34,6 +35,7 @@ reference:
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
 - contents: 
+  - upstream_passage
   - upstream_passage_estimates 
   - carcass_estimates 
   - redd
@@ -44,6 +46,7 @@ reference:
   - daily_yearling_ruleset
   - chosen_site_years_to_model
   - btspasx_special_priors_data
+  - weekly_hours_fished
   
 - title: Helper Functions 
   desc: Functions used to generate model data
@@ -63,9 +66,9 @@ navbar:
     menu: 
       - text: 'Yearling Analysis'
         href: articles/yearling_ruleset.html
-      - text: 'Trap Effort'
+      - text: 'Hours Fished Analysis'
         href: articles/trap_effort.html
-      - text: 'Years to Include'
+      - text: 'Monitoring Years to Include'
         href: articles/years_to_include_analysis.html
       - text: 'Passage to Spawner Model Covariate Prep'
         href: articles/prep_environmental_covariates.html

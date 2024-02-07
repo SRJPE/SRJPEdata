@@ -17,11 +17,14 @@ Dataframe with 186 rows and 8 columns
 \item \code{max_week} : Maximum week of sampling season to include
 }
 }
+\source{
+Expert opinion. See \code{vignette("years_to_include_analysis", package = "SRJPEdata")} for more details.
+}
 \usage{
 chosen_site_years_to_model
 }
 \description{
 Datasets containing the chosen sites and years of monitoring data to include in model.
-See  \code{vignette("years_to_include_analysis", package = "SRJPEdata")} for more details
+See \code{vignette("years_to_include_analysis", package = "SRJPEdata")} for more details
 }
 \keyword{datasets}

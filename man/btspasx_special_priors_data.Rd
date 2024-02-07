@@ -13,6 +13,9 @@ A dataframe with 71 rows and 4 columns
 \item \code{special_prior}: log normalized special prior abundance cap
 }
 }
+\source{
+Special priors were developed by the lead SR JPE modeler, Josh Korman.
+}
 \usage{
 btspasx_special_priors_data
 }

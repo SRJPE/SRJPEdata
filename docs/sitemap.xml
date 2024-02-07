@@ -58,6 +58,9 @@
     <loc>https://SRJPE.github.io/SRJPEdata/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/observed_adult_input.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/p2s_model_covariates_standard.html</loc>
   </url>
   <url>
@@ -76,7 +79,13 @@
     <loc>https://SRJPE.github.io/SRJPEdata/reference/rst_trap.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/upstream_passage.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/upstream_passage_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_hours_fished.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_model_data.html</loc>

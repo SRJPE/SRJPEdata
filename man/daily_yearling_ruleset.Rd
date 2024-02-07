@@ -5,10 +5,16 @@
 \alias{daily_yearling_ruleset}
 \title{Daily Yearling Rulesets}
 \format{
-Dataframe...
+Dataframe with 2,565 rows and 4 columns (stream, month, day, cutoff)
 \itemize{
-\item \code{monitoring_year} : year
+\item \code{stream}: Stream RST is located on
+\item \code{month}: Month to apply yearling ruleset to
+\item \code{day}: Day to apply yearling ruleset to
+\item \code{cutoff}: Fork length cutoff value in mm
 }
+}
+\source{
+Expert opinion. See \code{vignette("yearling_ruleset", package = "SRJPEdata")} for more details.
 }
 \usage{
 daily_yearling_ruleset

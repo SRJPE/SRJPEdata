@@ -35,10 +35,10 @@
       <a href="../articles/yearling_ruleset.html">Yearling Analysis</a>
     </li>
     <li>
-      <a href="../articles/trap_effort.html">Trap Effort</a>
+      <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
     </li>
     <li>
       <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
@@ -75,7 +75,41 @@
     <div id="format">
     <h2>Format</h2>
     
-<ul><li><p><code>year</code>: year</p></li>
+<ul><li><p><code>trap_start_date</code>: Date that trap was visited. This field is included because in some cases a visit will not have a start/stop time (e.g. if trap was cleaned/serviced or just checked)</p></li>
+<li><p><code>visit_type</code>:</p></li>
+<li><p><code>trap_stop_date</code>: Date that trap was started prior to being sampled. trap_start_date and trap_stop_date are meant to describe the sampling period.</p></li>
+<li><p><code>trap_start_time</code>: Time that trap was visited.</p></li>
+<li><p><code>trap_stop_time</code>:  Time that trap was sampled.</p></li>
+<li><p><code>stream</code>: Which stream the RST is located on</p></li>
+<li><p><code>site</code>: Site name</p></li>
+<li><p><code>subsite</code>: Name of trap</p></li>
+<li><p><code>site_group</code>: Site group, used to seperate traps within the same stream that have unique environmental conditions.</p></li>
+<li><p><code>trap_functioning</code>: Describes how well trap is functioning. Categories: trap functioning normally, trap stopped functioning, trap not in service, trap functioning but not normally. If trap_functioning not used, "not recorded" is entered.</p></li>
+<li><p><code>in_half_cone_configuration</code>: Boolean to describe if trap fished in half cone configuration. If not recorded, then assumed to be FALSE.</p></li>
+<li><p><code>fish_processed</code>: Describes if fish were processed. Categories: processed fish; no fish caught; no catch data, fish released; no catch data, fish left in live box. If fish_processed not used, "not recorded" is entered.</p></li>
+<li><p><code>rpm_start</code>: Revolutions per minute at the start of the trap visit before trap is cleaned. If not recorded, then NA.</p></li>
+<li><p><code>rpm_end</code>:  Revolutions per minute at the end of the trap visit after trap is cleaned. If not recorded, then NA.</p></li>
+<li><p><code>total_revolutions</code>: Total revolutions during sample period. If not recorded, then NA.</p></li>
+<li><p><code>debris_volume</code>: Volume of debris emptied from trap (gallons). If not recorded, then NA.</p></li>
+<li><p><code>discharge</code>: Flow at trap in cfs</p></li>
+<li><p><code>water_velocity</code>: Velocity at trap in feet per second</p></li>
+<li><p><code>water_temp</code>: Temperature at trap in degrees C</p></li>
+<li><p><code>include</code>: Boolean to describe if sample should be included in data for analysis. If false then data or visit is determined to be of poor quality by data steward and should not be included in analysis. If not recorded, then assumed to be TRUE.</p></li>
+<li><p><code>turbidity</code>: Turbidity at trap in NTUs</p></li>
+</ul></div>
+    <div id="source">
+    <h2>Source</h2>
+    <p>Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below.</p><ul><li><p><strong>Battle Creek</strong>: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_rst_environmental_qc.md" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p><strong>Butte Creek</strong>: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte-creek-rst-qc-checklist.md" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p><strong>Clear Creek</strong>: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_rst_environmental.md" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p><strong>Deer Creek</strong>: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/deer-creek/deer_creek_rst_data_qc.md" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p><strong>Feather River</strong>: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather-rst-effort.md" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p><strong>Mill Creek</strong>: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/mill-creek/mill_creek_rst_qc.md" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p><strong>Sacramento River</strong>:</p><ul><li><p>Knights Landing: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing/" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p>Tisdale: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
+<li><p>Delta Entry: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1" class="external-link">Data on EDI</a>.</p></li>
+</ul></li>
+<li><p><strong>Yuba River</strong>: <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2" class="external-link">Data on EDI</a>, <a href="https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md" class="external-link">Original Data Exploration Script</a>. Additional data exploration scripts are located in GitHub.</p></li>
 </ul></div>
 
   </div>

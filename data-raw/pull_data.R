@@ -73,7 +73,7 @@ gcs_get_object(object_name = "standard-format-data/standard_adult_upstream_passa
                bucket = gcs_get_global_bucket(),
                saveToDisk = "data-raw/database-tables/standard_adult_upstream.csv",
                overwrite = TRUE)
-standard_upstream <- read_csv("data-raw/database-tables/standard_adult_upstream.csv")
+upstream_passage <- read_csv("data-raw/database-tables/standard_adult_upstream.csv")
 
 gcs_get_object(object_name = "standard-format-data/standard_adult_passage_estimate.csv",
                bucket = gcs_get_global_bucket(),
@@ -83,6 +83,7 @@ upstream_passage_estimates <- read_csv("data-raw/database-tables/standard_adult_
 
 # TODO update to pull from database 
 usethis::use_data(upstream_passage_estimates, overwrite = TRUE)
+usethis::use_data(upstream_passage, overwrite = TRUE)
 
 # Adult Holding Data
 gcs_get_object(object_name = "standard-format-data/standard_holding.csv",
@@ -94,12 +95,6 @@ holding <- read_csv("data-raw/database-tables/standard_holding.csv")
 # TODO update to pull from database 
 usethis::use_data(holding, overwrite = TRUE)
 # Adult Redd Data
-gcs_get_object(object_name = "standard-format-data/standard_annual_redd.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/database-tables/standard_annual_redd.csv",
-               overwrite = TRUE)
-standard_annual_redd <- read_csv("data-raw/database-tables/standard_annual_redd.csv")
-
 gcs_get_object(object_name = "standard-format-data/standard_daily_redd.csv",
                bucket = gcs_get_global_bucket(),
                saveToDisk = "data-raw/database-tables/standard_daily_redd.csv",

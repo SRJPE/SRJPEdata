@@ -272,6 +272,7 @@ try(if(!exists("deer_creek_temp_query"))
 #### Gage Agency (CDEC, GRL)
 ### Flow Data Pull Tests 
 
+
 try(feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1996-01-01"))
 # Filter existing data to use as a back up 
 feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -361,12 +362,13 @@ try(if(nrow(lower_feather_river_daily_flows) < nrow(lower_feather_river_existing
   lower_feather_river_daily_flows <- lower_feather_river_existing_flow)
 
 ### Temp Data Pull 
+#Interpolation feather hfc
+feather_hfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", "feather_hfc_temp_interpolation.csv"))
 
 #GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC).
-
 #Pulling temp data GRL
-try(feather_hfc_river_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05", end_date = "2007-06-01"))
-
+try(feather_hfc_river_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05"))
+#TODO look for other gage in HFC
 feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
            gage_number == "GRL" &
@@ -379,7 +381,7 @@ try(if(!exists("feather_hfc_temp_query"))
   else(feather_hfc_river_daily_temp <- feather_hfc_river_temp_query |> 
          mutate(date = as_date(datetime),
                 temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-         filter(temp_degC < 40, temp_degC > 0) |>
+         filter(temp_degC < 40, temp_degC > 0) |> #Was not able to filter >2024 because the latest record of this gage is 2007
          group_by(date) |> 
          summarise(mean = mean(temp_degC, na.rm = TRUE),
                    max = max(temp_degC, na.rm = TRUE),
@@ -389,8 +391,12 @@ try(if(!exists("feather_hfc_temp_query"))
                 gage_agency = "CDEC",
                 gage_number = "GRL",
                 parameter = "temperature")))
+
+#Interpolation feather lfc
+feather_lfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv"))
+
 #pulling temp data FRA
-try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1996-01-01"))
+try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "2024-02-07"))
 
 feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
@@ -576,13 +582,28 @@ try(if(nrow(yuba_daily_flows) < nrow(yuba_existing_flow))
 
 
 ### Temp Data Pull - 
+#Interpolation pull for Yuba
+yuba_river_interpolated <- read.csv(here::here("data-raw", "temperature-data", "yuba_temp_interpolation.csv"))
+
+
 #Process historical data
-yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2019-01-01")
+try(yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2019-01-01"))
 
+yuba_river_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" &
+           gage_number == "YR7" &
+           parameter == "temperature") |> 
+  select(-site)
 
-yuba_river_daily_temp <- yuba_river_temp_query |> 
+# Confirm data pull did not error out, if does not exist - use existing flow, 
+# if exists - reformat new data pull           
+
+try(if(!exist("yuba_river_temp_query"))
+  yuba_river_daily_temp <- yuba_river_existing_temp 
+  else(yuba_river_daily_temp <- yuba_river_temp_query |> 
   mutate(date = as_date(datetime)) |>
-  filter(parameter_value < 40, parameter_value > 0) |> 
+  mutate(year = year(datetime)) |> 
+  filter(year(date) > 2023) |> 
   group_by(date) |> 
   summarise(mean = mean(parameter_value, , na.rm = TRUE),
             max = max(parameter_value, na.rm = TRUE),
@@ -591,8 +612,7 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
   mutate(stream = "Yuba River",
          gage_agency = "CDEC",
          gage_number = "YR7",
-         parameter = "temperature") |> 
-  glimpse()
+         parameter = "temperature")))
 
 
 ### Temp Data Pull Tests 
