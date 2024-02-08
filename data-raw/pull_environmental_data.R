@@ -28,7 +28,7 @@ try(if(!exists("battle_creek_data_query"))
             select(Date, value =  X_00060_00003) |>  # rename to value
             as_tibble() |> 
             rename(date = Date) |> 
-            mutate(stream = "battle creek", # add additional columns for stream, gage info, and parameter 
+            mutate(stream = "Battle Creek", # add additional columns for stream, gage info, and parameter 
                    gage_agency = "USGS",
                    gage_number = "11376550",
                    parameter = "flow",
@@ -57,7 +57,7 @@ battle_creek_daily_temp <- ubc_temp_raw |>
              max = max(temp_degC, na.rm = TRUE),
              min = min(temp_degC, na.rm = TRUE)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "battle creek",  
+  mutate(stream = "Battle Creek",  
          gage_agency = "USFWS",
          gage_number = "UBC",
          parameter = "temperature") |> 
@@ -88,7 +88,7 @@ try(if(!exists("butte_creek_data_query"))
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "butte creek",
+         mutate(stream = "Butte Creek",
                 gage_agency = "CDEC",
                 gage_number = "BCK",
                 parameter = "flow"
@@ -122,7 +122,7 @@ try(if(!exists("butte_creek_temp_query"))
               max = max(temp_degC, na.rm = TRUE),
               min = min(temp_degC, na.rm = TRUE)) |> 
     pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-    mutate(stream = "butte creek",
+    mutate(stream = "Butte Creek",
            gage_agency = "CDEC",
            gage_number = "BCK",
            parameter = "temperature")))
@@ -152,7 +152,7 @@ try(if(!exists("clear_creek_data_query"))
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "clear creek",
+         mutate(stream = "Clear Creek",
                 gage_agency = "CDEC",
                 gage_number = "IGO",
                 parameter = "flow"
@@ -178,7 +178,7 @@ upperclear_creek_daily_temp <- upperclear_temp_raw |>
             max = max(temp_degC),
             min = min(temp_degC)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "upper clear creek",  
+  mutate(stream = "Upper Clear Creek",  
          gage_agency = "USFWS",
          gage_number = "UCC",
          parameter = "temperature") |> 
@@ -196,7 +196,7 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
             max = max(temp_degC),
             min = min(temp_degC)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "lower clear creek",  
+  mutate(stream = "Lower Clear Creek",  
          gage_agency = "USFWS",
          gage_number = "LCC",
          parameter = "temperature") |> 
@@ -224,7 +224,7 @@ try(if(!exists("deer_creek_data_query"))
          select(Date, value =  X_00060_00003) |> 
          as_tibble() |> 
          rename(date = Date) |> 
-         mutate(stream = "deer creek", 
+         mutate(stream = "Deer Creek", 
                 gage_agency = "USGS",
                 gage_number = "11383500",
                 parameter = "flow",
@@ -259,7 +259,7 @@ try(if(!exists("deer_creek_temp_query"))
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |>
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "deer creek",
+         mutate(stream = "Deer Creek",
                 gage_agency = "CDEC",
                 gage_number = "DCV",
                 parameter = "temperature")))
@@ -292,7 +292,7 @@ try(if(!exists("feather_hfc_river_data_query"))
                    max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
                    min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "feather river",  
+         mutate(stream = "Feather River",  
                 gage_agency = "CDEC",
                 gage_number = "GRL",
                 parameter = "flow"
@@ -319,7 +319,7 @@ try(if(!exists("feather_lfc_river_data_query"))
          select(Date, value =  X_00060_00003) |> 
          as_tibble() |> 
          rename(date = Date) |> 
-         mutate(stream = "feather river", 
+         mutate(stream = "Feather River", 
                 gage_agency = "USGS",
                 gage_number = "11407000",
                 parameter = "flow",
@@ -351,7 +351,7 @@ try(if(!exists("lower_feather_river_data_query"))
                    max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
                    min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "feather river",  
+         mutate(stream = "Feather River",  
                 gage_agency = "CDEC",
                 gage_number = "FBL",
                 parameter = "flow"
@@ -394,7 +394,7 @@ try(if(!exists("feather_hfc_temp_query"))
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "Feather River -high flow channel",
+         mutate(stream = "Feather River - High Flow Channel",
                 gage_agency = "CDEC",
                 gage_number = "GRL",
                 parameter = "temperature") |> 
@@ -460,7 +460,7 @@ try(if(!exists("mill_creek_data_query"))
          select(Date, value =  X_00060_00003) |>  
          as_tibble() |> 
          rename(date = Date) |> 
-         mutate(stream = "mill creek", 
+         mutate(stream = "Mill Creek", 
                 gage_agency = "USGS",
                 gage_number = "11381500",
                 parameter = "flow",
@@ -527,7 +527,7 @@ try(if(!exists("sac_river_data_query"))
          select(Date, value =  X_00060_00003) |>  
          as_tibble() |> 
          rename(date = Date) |> 
-         mutate(stream = "sacramento river", 
+         mutate(stream = "Sacramento River", 
                 gage_agency = "USGS",
                 gage_number = "11390500",
                 parameter = "flow",
@@ -582,7 +582,7 @@ try(if(!exists("yuba_river_data_query"))
          select(Date, value =  X_00060_00003)  |>  
          as_tibble() |> 
          rename(date = Date) |> 
-         mutate(stream = "yuba river",  
+         mutate(stream = "Yuba River",  
                 gage_agency = "USGS",
                 gage_number = "11421000",
                 parameter = "flow",
