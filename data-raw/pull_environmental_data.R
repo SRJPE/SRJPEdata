@@ -394,6 +394,7 @@ try(if(!exists("feather_hfc_temp_query"))
 
 #Interpolation feather lfc
 feather_lfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv")) |> 
+  mutate(date = as_date(date)) |> 
   select(-subsite, -site_group, -site) |> 
   mutate(parameter = "temperature") |> 
   glimpse()
@@ -409,24 +410,22 @@ feather_lfc_existing_temp <- SRJPEdata::environmental_data |>
   select(-site)
 # Confirm data pull did not error out, if does not exist - use existing temp, 
 # if exists - reformat new data pull
-try(if(!exists("feather_lfc_existing_temp")) 
-  feather_lfc_river_daily_temp <- feather_lfc_existing_temp 
-  else({feather_lfc_river_daily_temp <- feather_lfc_temp_query |> 
-         mutate(date = as_date(datetime),
-                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-         filter(temp_degC < 40, temp_degC > 0) |>
-         group_by(date) |> 
-         summarise(mean = mean(temp_degC, na.rm = TRUE),
-                   max = max(temp_degC, na.rm = TRUE),
-                   min = min(temp_degC, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "Feather River -low flow channel",
-                gage_agency = "CDEC",
-                gage_number = "FRA",
-                parameter = "temperature") |> 
-    bind_rows(feather_lfc_interpolated)}
-    ))
-#TODO test to see if this works
+try(if(!exists("feather_lfc_temp_query"))
+  feather_lfc_river_daily_temp <- feather_lfc_existing_temp
+  else(feather_lfc_river_daily_temp <- feather_lfc_temp_query |> 
+    mutate(date = as_date(datetime)) |> 
+    mutate(year = year(datetime)) |> 
+    group_by(date) |> 
+    summarise(mean= mean(parameter_value, na.rm = TRUE),
+              max = max(parameter_value, na.rm = TRUE),
+              min = min(parameter_value, na.rm = TRUE)) |> 
+    pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+    mutate(stream = "Feather River",
+           gage_agency = "CDEC",
+           gage_number = "FRA",
+           parameter = "temperature") |> 
+    bind_rows(feather_lfc_interpolated)
+   ))
 
 ### Temp Data Pull Tests 
 
