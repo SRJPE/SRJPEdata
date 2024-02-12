@@ -113,7 +113,7 @@ try(if(!exists("butte_creek_temp_query"))
   butte_creek_daily_temp <- butte_creek_existing_temp 
   else(butte_creek_daily_temp <- butte_creek_temp_query |> 
     mutate(date = as_date(datetime),
-           temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+           temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
     filter(temp_degC < 40, temp_degC > 0) |>
     group_by(date) |> 
     summarise(mean = mean(temp_degC, na.rm = TRUE),
@@ -243,7 +243,7 @@ try(if(nrow(deer_creek_daily_flows) < nrow(deer_creek_existing_flow))
 #### Gage #DVC
 ### Temp Data Pull Tests 
 try(deer_creek_temp_query <- cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1995-01-01"))
-
+# Filter existing data to use as a back up 
 deer_creek_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
            gage_number == "DCV" &
@@ -255,7 +255,7 @@ try(if(!exists("deer_creek_temp_query"))
   deer_creek_daily_temp <- deer_creek_existing_temp 
   else(deer_creek_daily_temp <- deer_creek_temp_query |> 
          mutate(date = as_date(datetime),
-                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+                temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
          filter(temp_degC < 40, temp_degC > 0) |> 
          group_by(date) |> 
          summarise(mean = mean(temp_degC, na.rm = TRUE),
@@ -408,7 +408,7 @@ try(if(!exists("feather_lfc_temp_query"))
   else(feather_lfc_river_daily_temp <- feather_lfc_temp_query |> 
     mutate(date = as_date(datetime),
            year = year(datetime),
-           parameter_value = fahrenheit.to.celsius(parameter_value, round = 1)) |> 
+           parameter_value = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |> 
     group_by(date) |> 
     summarise(mean= mean(parameter_value, na.rm = TRUE),
               max = max(parameter_value, na.rm = TRUE),
@@ -473,7 +473,7 @@ try(if(!exists("mill_creek_temp_query"))
   mill_creek_daily_temp <- mill_creek_existing_temp 
   else(mill_creek_daily_temp <- mill_creek_temp_query |> 
          mutate(date = as_date(datetime),
-                temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
+                temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
          filter(temp_degC < 40, temp_degC > 0) |>
          group_by(date) |> 
          summarise(mean = mean(temp_degC, na.rm = TRUE),
