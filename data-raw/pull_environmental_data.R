@@ -427,8 +427,10 @@ try(if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp))
 ## Mill Creek ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11381500)
-### Flow Data Pull Tests 
 
+#Pull data
+
+### Flow Data Pull Tests 
 try(mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060"), silent = TRUE)
 # Filter existing data to use as a back up 
 mill_creek_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -436,7 +438,6 @@ mill_creek_existing_flow  <- SRJPEdata::environmental_data |>
            gage_number == "11381500" & 
            parameter == "flow") |> 
   select(-site)  #TODO finish data cleaning
-
 # Confirm data pull did not error out, if does not exist - use existing temp, 
 # if exists - reformat new data pull
 try(if(!exists("mill_creek_data_query")) 
@@ -451,26 +452,22 @@ try(if(!exists("mill_creek_data_query"))
                 parameter = "flow",
                 statistic = "mean" 
          )))
-
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(mill_creek_daily_flows) < nrow(mill_creek_existing_flow)) 
   mill_creek_daily_flows <- mill_creek_existing_flow)
 
-
-
 ### Temp Data Pull 
-
+#### Gage #MLM
+### Temp Data Pull Tests 
 try(mill_creek_temp_query <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1996-01-01"))
-
+# Filter existing data to use as a back up 
 mill_creek_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
            gage_number == "MLM" &
            parameter == "temperature") |> 
   select(-site)
-
-
-# Confirm data pull did not error out, if does not exist - use existing flow, 
+# Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull
 try(if(!exists("mill_creek_temp_query")) 
   mill_creek_daily_temp <- mill_creek_existing_temp 
@@ -487,15 +484,17 @@ try(if(!exists("mill_creek_temp_query"))
                 gage_agency = "CDEC",
                 gage_number = "MLM",
                 parameter = "temperature")))
-
-
 ### Temp Data Pull Tests 
+try(if(nrow(mill_creek_daily_temp) < nrow(mill_creek_existing_temp)) 
+  mill_creek_daily_temp <- mill_creek_existing_temp)
 
-## Sacramento River 
+## Sacramento River ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11381500)
-### Flow Data Pull Tests 
 
+#Pull data
+
+### Flow Data Pull Tests 
 try(sac_river_data_query <- dataRetrieval::readNWISdv(11390500, "00060"), silent = TRUE)
 # Filter existing data to use as a back up 
 sac_river_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -503,7 +502,6 @@ sac_river_existing_flow  <- SRJPEdata::environmental_data |>
            gage_number == "11390500" & 
            parameter == "flow") |> 
   select(-site)  
-
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("sac_river_data_query")) 
@@ -518,17 +516,21 @@ try(if(!exists("sac_river_data_query"))
                 parameter = "flow",
                 statistic = "mean" 
          )))
-
+### Temp Data Pull Tests 
+try(if(nrow(sac_river_daily_flows) < nrow(sac_river_existing_flow)) 
+  sac_river_daily_flows <- sac_river_existing_flow)
 
 ### Temp Data Pull 
+#### Gage #11390500
+### Temp Data Pull Tests
 try(sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010"), silent = TRUE)
-
+# Filter existing data to use as a back up 
 sac_river_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" &
            gage_number == "11390500" &
            parameter == "temperature") |> 
   select(-site)
-# Confirm data pull did not error out, if does not exist - use existing flow, 
+# Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull
 try(if(!exists("sac_river_temp_query")) 
   sac_river_daily_temp <- sac_river_existing_temp 
@@ -542,23 +544,24 @@ try(if(!exists("sac_river_temp_query"))
                        gage_number = "11390500",
                        parameter = "temperature")))
 
-
-
 ### Temp Data Pull Tests 
+try(if(nrow(sac_river_daily_temp) < nrow(sac_river_existing_temp)) 
+  sac_river_daily_temp <- sac_river_existing_temp)
 
-## Yuba River 
+## Yuba River ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11421000)
-### Flow Data Pull Tests
 
+#Pull data
+
+### Flow Data Pull Tests
 try(yuba_river_data_query <- dataRetrieval::readNWISdv(11421000, "00060"), silent = TRUE)
 # Filter existing data to use as a back up 
 yuba_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11421000" & 
            parameter == "flow") |> 
-  select(-site)  #TODO create lookup table to join at end 
-
+  select(-site)  
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("yuba_river_data_query")) 
@@ -573,40 +576,31 @@ try(if(!exists("yuba_river_data_query"))
                 parameter = "flow",
                 statistic = "mean"
          )))
-
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(yuba_daily_flows) < nrow(yuba_existing_flow)) 
   yuba_daily_flows <- yuba_existing_flow)
 
-yuba_river_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "YR7" &
-           parameter == "temperature") |> 
-  select(-site)
+### Temp Data Pull 
+#### Interpolation pull for Yuba
 
-### Temp Data Pull - 
-#Interpolation pull for Yuba
 yuba_river_interpolated <- read_csv(here::here("data-raw", "temperature-data", "yuba_temp_interpolation.csv")) |> 
   select(-subsite, -site_group, -site) |> 
   mutate(parameter = "temperature") |> 
   glimpse()
 
-
-
+### Temp Data Pull 
+#### Gage #YR7
+### Temp Data Pull Tests 
+try(yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2019-01-01"))
+# Filter existing data to use as a back up 
 yuba_river_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
            gage_number == "YR7" &
            parameter == "temperature") |> 
   select(-site)
-
-
-#pull temp data from CDEC YR7
-try(yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2019-01-01"))
-
-# Confirm data pull did not error out, if does not exist - use existing flow, 
+# Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull           
-
 try(if(!exists("yuba_river_temp_query"))
   yuba_river_daily_temp <- yuba_river_existing_temp
   else({yuba_river_daily_temp <- yuba_river_temp_query |> 
@@ -623,9 +617,9 @@ try(if(!exists("yuba_river_temp_query"))
                 parameter = "temperature") |> 
   bind_rows(yuba_river_interpolated)
   } ))
-
-
 ### Temp Data Pull Tests 
+try(if(nrow(yuba_river_daily_temp) < nrow(yuba_river_existing_temp)) 
+  yuba_river_daily_temp <- yuba_river_existing_temp)
 
 #Combine all flow data from different streams
 all_flow <- bind_rows(battle_creek_daily_flows,
