@@ -136,11 +136,11 @@ try(if(nrow(butte_creek_daily_temp) < nrow(butte_creek_existing_temp))
 #Pull data
 
 ### Flow Data Pull Tests 
-try(clear_creek_data_query <- CDECRetrieve::cdec_query(station = "IGO", dur_code = "H", sensor_num = "20", start_date = "2003-01-01"))
+try(clear_creek_data_query <- dataRetrieval::readNWISdv(11372000, "00060"))
 # Filter existing data to use as a back up 
 clear_creek_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" & 
-           gage_number == "IGO" & 
+  filter(gage_agency == "USGS" & 
+           gage_number == "11372000" & 
            parameter == "flow") |> 
   select(-site)  
 # Confirm data pull did not error out, if does not exist - use existing flow, 
@@ -148,15 +148,12 @@ clear_creek_existing_flow  <- SRJPEdata::environmental_data |>
 try(if(!exists("clear_creek_data_query")) 
   clear_creek_daily_flows <- clear_creek_existing_flow 
   else(clear_creek_daily_flows <- clear_creek_data_query |> 
-         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
-         group_by(date = as.Date(datetime)) |> 
-         summarise(mean = mean(parameter_value, na.rm = TRUE),
-                   max = max(parameter_value, na.rm = TRUE),
-                   min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+         select(Date, value =  X_00060_00003) |> 
+         as_tibble() |> 
+         rename(date = Date) |>
          mutate(stream = "clear creek",
-                gage_agency = "CDEC",
-                gage_number = "IGO",
+                gage_agency = "USGS",
+                gage_number = "11372000",
                 parameter = "flow"
          )))
 # Do a few additional flow data pull tests to confirm that new data pull has 
