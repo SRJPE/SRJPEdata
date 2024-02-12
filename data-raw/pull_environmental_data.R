@@ -225,7 +225,7 @@ try(if(!exists("deer_creek_data_query"))
          select(Date, value =  X_00060_00003) |> 
          as_tibble() |> 
          rename(date = Date) |> 
-         mutate(stream = "Deer Creek", 
+         mutate(stream = "deer creek", 
                 gage_agency = "USGS",
                 gage_number = "11383500",
                 parameter = "flow",
@@ -532,7 +532,7 @@ try(if(!exists("sac_river_temp_query"))
          select(Date, temp_degC =  X_00010_00003) %>%
          as_tibble() %>% 
          rename(date = Date,
-                parameter = temp_degC) %>% 
+                value = temp_degC) %>% 
          mutate(stream = "sacramento river",
                        gage_agency = "USGS",
                        gage_number = "11390500",
@@ -638,7 +638,6 @@ all_temps <- bind_rows(battle_creek_daily_temp,
                        upperclear_creek_daily_temp,
                        lowerclear_creek_daily_temp,
                        deer_creek_daily_temp,
-                       feather_hfc_river_daily_temp,
                        feather_lfc_river_daily_temp,
                        mill_creek_daily_temp,
                        sac_river_daily_temp,
@@ -651,3 +650,8 @@ ggplot(all_temps |>
   geom_line() +
   facet_wrap(~stream)
 
+environmental_data <- bind_rows(all_temps,
+                                all_flow)
+  
+#Save package
+usethis::use_data(environmental_data)
