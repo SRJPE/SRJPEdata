@@ -8,18 +8,21 @@ library(weathermetrics)
 # save as data object 
 
 ### Pull Flow and Temperature Data for each JPE tributary ----------------------
-## Battle Creek 
+
+## Battle Creek ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, # 11376550)
+
 # Pull data 
+
+### Flow Data Pull Tests
 try(battle_creek_data_query <- dataRetrieval::readNWISdv(11376550, "00060"), silent = TRUE)
 # Filter existing data to use as a back up 
 battle_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
          gage_number == "11376550" & 
          parameter == "flow") |> 
-  select(-site)  #TODO create lookup table to join at end 
-
+  select(-site)  
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("battle_creek_data_query")) 
@@ -34,17 +37,13 @@ try(if(!exists("battle_creek_data_query"))
                    parameter = "flow",
                    statistic = "mean" # if query returns instantaneous data then report a min, mean, and max
                    )))
-
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(battle_creek_daily_flows) < nrow(battle_creek_existing_flow)) 
   battle_creek_daily_flows <- battle_creek_existing_flow)
 
-
-
 ### Temp Data Pull 
 #### Gage #UBC
-
 ### Temp Data Pull Tests 
 ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"), sheet = 4)
 
@@ -62,14 +61,14 @@ battle_creek_daily_temp <- ubc_temp_raw |>
          gage_number = "UBC",
          parameter = "temperature") |> 
   glimpse()
-  
 
-## Butte Creek 
+## Butte Creek ----
 ### Flow Data Pull 
 #### Gage Agency (CDEC, BCK)
-# Pull data 
-### Flow Data Pull Tests
 
+# Pull data 
+
+### Flow Data Pull Tests
 try(butte_creek_data_query <- CDECRetrieve::cdec_query(station = "BCK", dur_code = "H", sensor_num = "20", start_date = "1995-01-01"))
 # Filter existing data to use as a back up 
 butte_creek_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -93,15 +92,14 @@ try(if(!exists("butte_creek_data_query"))
                 gage_number = "BCK",
                 parameter = "flow"
          )))
-
-
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(butte_creek_daily_flows) < nrow(butte_creek_existing_flow)) 
   butte_creek_daily_flows <- butte_creek_existing_flow)
 
-
 ### Temp Data Pull 
+#### Gage #BCK
+### Temp Data Pull Tests 
 try(butte_creek_temp_query <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "2000-01-01"))
 
 butte_creek_existing_temp <- SRJPEdata::environmental_data |> 
@@ -109,7 +107,7 @@ butte_creek_existing_temp <- SRJPEdata::environmental_data |>
            gage_number == "BCK" &
            parameter == "temperature") |> 
   select(-site)
-# Confirm data pull did not error out, if does not exist - use existing flow, 
+# Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull
 try(if(!exists("butte_creek_temp_query")) 
   butte_creek_daily_temp <- butte_creek_existing_temp 
@@ -126,13 +124,17 @@ try(if(!exists("butte_creek_temp_query"))
            gage_agency = "CDEC",
            gage_number = "BCK",
            parameter = "temperature")))
+# Do a few additional temperature data pull tests to confirm that new data pull has 
+# more data 
+try(if(nrow(butte_creek_daily_temp) < nrow(butte_creek_existing_temp)) 
+  butte_creek_daily_temp <- butte_creek_existing_temp)
 
-### Temp Data Pull Tests  
-
-
-## Clear Creek
+## Clear Creek ----
 ### Flow Data Pull 
 #### Gage Agency (CDEC, IGO)
+
+#Pull data
+
 ### Flow Data Pull Tests 
 try(clear_creek_data_query <- CDECRetrieve::cdec_query(station = "IGO", dur_code = "H", sensor_num = "20", start_date = "2003-01-01"))
 # Filter existing data to use as a back up 
@@ -157,16 +159,15 @@ try(if(!exists("clear_creek_data_query"))
                 gage_number = "IGO",
                 parameter = "flow"
          )))
-
-
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(clear_creek_daily_flows) < nrow(clear_creek_existing_flow)) 
   clear_creek_daily_flows <- clear_creek_existing_flow)
 
-
 ### Temp Data Pull 
-
+#### Existing temp data
+### Temp Data Pull Tests 
+#Upper Clear Lake
 upperclear_temp_raw <- readxl::read_excel(here::here("data-raw","temperature-data", "battle_clear_temp.xlsx"), sheet = 2)
 
 upperclear_creek_daily_temp <- upperclear_temp_raw |> 
@@ -184,7 +185,7 @@ upperclear_creek_daily_temp <- upperclear_temp_raw |>
          parameter = "temperature") |> 
   glimpse()
          
-
+#Lower Clear Lake
 lowerclear_temp_raw <- readxl::read_excel(here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"), sheet = 3)
 
 lowerclear_creek_daily_temp <- lowerclear_temp_raw |> 
@@ -203,10 +204,14 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
   glimpse()
 
 ### Temp Data Pull Tests  
+#TODO, do we add tests for these data pulls? 
 
-## Deer Creek 
+## Deer Creek ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11383500)
+
+#Pull data
+
 ### Flow Data Pull Tests 
 try(deer_creek_data_query <- dataRetrieval::readNWISdv(11383500, "00060"), silent = TRUE)
 # Filter existing data to use as a back up 
@@ -215,7 +220,6 @@ deer_creek_existing_flow  <- SRJPEdata::environmental_data |>
            gage_number == "11383500" & 
            parameter == "flow") |> 
   select(-site)  
-
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("deer_creek_data_query")) 
@@ -230,14 +234,14 @@ try(if(!exists("deer_creek_data_query"))
                 parameter = "flow",
                 statistic = "mean" 
          )))
-
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(deer_creek_daily_flows) < nrow(deer_creek_existing_flow)) 
   deer_creek_daily_flows <- deer_creek_existing_flow)
 
-
 ### Temp Data Pull 
+#### Gage #DVC
+### Temp Data Pull Tests 
 try(deer_creek_temp_query <- cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1995-01-01"))
 
 deer_creek_existing_temp <- SRJPEdata::environmental_data |> 
@@ -245,8 +249,7 @@ deer_creek_existing_temp <- SRJPEdata::environmental_data |>
            gage_number == "DCV" &
            parameter == "temperature") |> 
   select(-site)
-
-# Confirm data pull did not error out, if does not exist - use existing flow, 
+# Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull
 try(if(!exists("deer_creek_temp_query")) 
   deer_creek_daily_temp <- deer_creek_existing_temp 
@@ -263,16 +266,18 @@ try(if(!exists("deer_creek_temp_query"))
                 gage_agency = "CDEC",
                 gage_number = "DCV",
                 parameter = "temperature")))
-
 ### Temp Data Pull Tests 
+try(if(nrow(deer_creek_daily_temp) < nrow(deer_creek_existing_temp)) 
+  deer_creek_daily_temp <- deer_creek_existing_temp)
 
-
-## Feather River 
+## Feather River ----
 ### Flow Data Pull 
 #### Gage Agency (CDEC, GRL)
+
+#Pull data
+
 ### Flow Data Pull Tests 
-
-
+#Feather High Flow Channel 
 try(feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1996-01-01"))
 # Filter existing data to use as a back up 
 feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -280,7 +285,6 @@ feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |>
            gage_number == "GRL" & 
            parameter == "flow") |> 
   select(-site)  
-
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("feather_hfc_river_data_query")) 
@@ -302,7 +306,8 @@ try(if(!exists("feather_hfc_river_data_query"))
 try(if(nrow(feather_hfc_river_daily_flows) < nrow(feather_hfc_river_existing_flow)) 
   feather_hfc_river_daily_flows <- feather_hfc_river_existing_flow)
 
-#Pull Lower Flow Channel Feather
+### Flow Data Pull Tests 
+#Feather Low Flow Channel 
 try(feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060"), silent = TRUE)
 # Filter existing data to use as a back up 
 feather_lfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -310,7 +315,6 @@ feather_lfc_river_existing_flow  <- SRJPEdata::environmental_data |>
            gage_number == "11407000" & 
            parameter == "flow") |> 
   select(-site)  
-
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("feather_lfc_river_data_query")) 
@@ -325,13 +329,13 @@ try(if(!exists("feather_lfc_river_data_query"))
                 parameter = "flow",
                 statistic = "mean" 
          )))
-
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
 try(if(nrow(feather_lfc_river_daily_flows) < nrow(feather_lfc_river_existing_flow)) 
   feather_lfc_river_daily_flows <- feather_lfc_river_existing_flow)
 
-#Pull Lower Feather data
+### Flow Data Pull Tests 
+#Lower Feather data 
 try(lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "H", sensor_num = "20", start_date = "2010-01-01"))
 # Filter existing data to use as a back up 
 lower_feather_river_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -339,7 +343,6 @@ lower_feather_river_existing_flow  <- SRJPEdata::environmental_data |>
            gage_number == "FSB" & 
            parameter == "flow") |> 
   select(-site)  
-
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("lower_feather_river_data_query")) 
@@ -362,6 +365,7 @@ try(if(nrow(lower_feather_river_daily_flows) < nrow(lower_feather_river_existing
   lower_feather_river_daily_flows <- lower_feather_river_existing_flow)
 
 ### Temp Data Pull 
+#### Interpolation Data
 #GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC).
 
 #Interpolation feather hfc
@@ -370,36 +374,13 @@ feather_hfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", 
   select(-subsite, -site_group, -site) |> 
   mutate(parameter = "temperature") |> 
   glimpse()
+### Temp Data Pull Tests
+#### Gage #GRL
+### Temp Data Pull Tests
 
-
-#Pulling temp data GRL
-try(feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05"))
-
-#TODO look for other gage in HFC that has data later than 2007 as the latest
-feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "GRL" &
-           parameter == "temperature") |> 
-  select(-site)
-# Confirm data pull did not error out, if does not exist - use existing flow, 
-# if exists - reformat new data pull
-try(if(!exists("feather_hfc_temp_query"))
-  feather_hfc_river_daily_temp <- feather_hfc_existing_temp 
-  else(feather_hfc_river_daily_temp <- feather_hfc_temp_query |> 
-         mutate(date = as_date(datetime),
-                parameter_value = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-         filter(parameter_value < 40, parameter_value > 0) |> #Was not able to filter >2024 because the latest record of this gage is 2007
-         group_by(date) |> 
-         summarise(mean = mean(parameter_value, na.rm = TRUE),
-                   max = max(parameter_value, na.rm = TRUE),
-                   min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "Feather River - High Flow Channel",
-                gage_agency = "CDEC",
-                gage_number = "GRL",
-                parameter = "temperature") |> 
-         bind_rows(feather_hfc_interpolated)
-  ))
+#Note: There is no current updated gage for Feather High Flow Channel, we initially
+#explored GRL gage from CDEC but most recent data is from 2007. Overall data coverage
+#is out of range of our interest (2003-2017)
 
 #Interpolation feather lfc
 feather_lfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv")) |> 
@@ -408,8 +389,11 @@ feather_lfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", 
   mutate(parameter = "temperature") |> 
   glimpse()
 
+### Temp Data Pull 
+#### Gage #FRA
+### Temp Data Pull Tests 
 
-#pulling temp data FRA
+#pulling temp data for Feather River Low Flow Channel - FRA
 try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "2024-02-07"))
 
 feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
@@ -417,7 +401,7 @@ feather_lfc_existing_temp <- SRJPEdata::environmental_data |>
            gage_number == "FRA" &
            parameter == "temperature") |> 
   select(-site)
-# Confirm data pull did not error out, if does not exist - use existing temp, 
+# Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull
 try(if(!exists("feather_lfc_temp_query"))
   feather_lfc_river_daily_temp <- feather_lfc_existing_temp
@@ -436,10 +420,11 @@ try(if(!exists("feather_lfc_temp_query"))
            parameter = "temperature") |> 
     bind_rows(feather_lfc_interpolated)
    ))
-
 ### Temp Data Pull Tests 
+try(if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp)) 
+  feather_lfc_river_daily_temp <- feather_lfc_existing_temp)
 
-## Mill Creek 
+## Mill Creek ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11381500)
 ### Flow Data Pull Tests 
