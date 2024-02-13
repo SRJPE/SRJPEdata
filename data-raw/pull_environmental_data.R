@@ -1,7 +1,6 @@
 library(tidyverse)
 library(CDECRetrieve)
 library(dataRetrieval)
-library(weathermetrics)
 
 ### Read in lookup table for environmental data --------------------------------
 
@@ -199,9 +198,6 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
          gage_number = "LCC",
          parameter = "temperature") |> 
   glimpse()
-
-### Temp Data Pull Tests  
-#TODO, do we add tests for these data pulls? 
 
 ## Deer Creek ----
 ### Flow Data Pull 
@@ -431,7 +427,7 @@ mill_creek_existing_flow  <- SRJPEdata::environmental_data |>
   filter(gage_agency == "USGS" & 
            gage_number == "11381500" & 
            parameter == "flow") |> 
-  select(-site)  #TODO finish data cleaning
+  select(-site) 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("mill_creek_data_query")) 
@@ -654,4 +650,4 @@ environmental_data <- bind_rows(all_temps,
                                 all_flow)
   
 #Save package
-usethis::use_data(environmental_data)
+usethis::use_data(environmental_data, overwrite = TRUE)
