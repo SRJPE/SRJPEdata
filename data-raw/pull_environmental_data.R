@@ -259,7 +259,8 @@ try(if(!exists("deer_creek_temp_query"))
                 gage_agency = "CDEC",
                 gage_number = "DCV",
                 parameter = "temperature")))
-### Temp Data Pull Tests 
+# Do a few additional temperature data pull tests to confirm that new data pull has 
+# more data 
 try(if(nrow(deer_creek_daily_temp) < nrow(deer_creek_existing_temp)) 
   deer_creek_daily_temp <- deer_creek_existing_temp)
 
@@ -410,7 +411,8 @@ try(if(!exists("feather_lfc_temp_query"))
            parameter = "temperature") |> 
     bind_rows(feather_lfc_interpolated)
    ))
-### Temp Data Pull Tests 
+# Do a few additional temperature data pull tests to confirm that new data pull has 
+# more data 
 try(if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp)) 
   feather_lfc_river_daily_temp <- feather_lfc_existing_temp)
 
@@ -474,7 +476,8 @@ try(if(!exists("mill_creek_temp_query"))
                 gage_agency = "CDEC",
                 gage_number = "MLM",
                 parameter = "temperature")))
-### Temp Data Pull Tests 
+# Do a few additional temperature data pull tests to confirm that new data pull has 
+# more data  
 try(if(nrow(mill_creek_daily_temp) < nrow(mill_creek_existing_temp)) 
   mill_creek_daily_temp <- mill_creek_existing_temp)
 
@@ -506,7 +509,8 @@ try(if(!exists("sac_river_data_query"))
                 parameter = "flow",
                 statistic = "mean" 
          )))
-### Temp Data Pull Tests 
+# Do a few additional flow data pull tests to confirm that new data pull has 
+# more data
 try(if(nrow(sac_river_daily_flows) < nrow(sac_river_existing_flow)) 
   sac_river_daily_flows <- sac_river_existing_flow)
 
@@ -533,7 +537,8 @@ try(if(!exists("sac_river_temp_query"))
                        gage_agency = "USGS",
                        gage_number = "11390500",
                        parameter = "temperature")))
-### Temp Data Pull Tests 
+# Do a few additional temperature data pull tests to confirm that new data pull has 
+# more data  
 try(if(nrow(sac_river_daily_temp) < nrow(sac_river_existing_temp)) 
   sac_river_daily_temp <- sac_river_existing_temp)
 
@@ -605,7 +610,8 @@ try(if(!exists("yuba_river_temp_query"))
                 parameter = "temperature") |> 
   bind_rows(yuba_river_interpolated)
   } ))
-### Temp Data Pull Tests 
+# Do a few additional temperature data pull tests to confirm that new data pull has 
+# more data  
 try(if(nrow(yuba_river_daily_temp) < nrow(yuba_river_existing_temp)) 
   yuba_river_daily_temp <- yuba_river_existing_temp)
 
