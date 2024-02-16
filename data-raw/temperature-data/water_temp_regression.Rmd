@@ -74,10 +74,10 @@ feather_hfc_format <- hfc_feather |>
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "Feather River -high flow channel",
+         mutate(stream = "feather river",
                 gage_agency = "CDEC",
                 gage_number = "GRL",
-                site_group = "feather river hfc",
+                site_group = "upper feather hfc",
                 parameter = "temperature") |> 
   glimpse()
 
@@ -91,20 +91,11 @@ feather_lfc_format <- lfc_feather |>
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "Feather River -low flow channel",
+         mutate(stream = "feather river",
                 gage_agency = "CDEC",
                 gage_number = "FRA",
-                site_group = "feather river lfc",
+                site_group = "upper feather lfc",
                 parameter = "temperature")
-
-feather_sites <- SRJPEdata::rst_catch |> 
-  filter(stream == "feather river") |> 
-  distinct(stream, site, site_group, subsite) |> 
-  glimpse()
-
-feather_hfc_sites <- filter(feather_sites, site_group == "feather river hfc")
-feather_lfc_sites <- filter(feather_sites, site_group == "feather river lfc")
-
 ```
 
 ### LFC {.tabset}
@@ -273,21 +264,21 @@ feather_gap_lfc <- bind_rows(feather_lfc_max_predicted,
                              feather_lfc_mean_predicted,
                              feather_lfc_min_predicted) |> 
   mutate(stream = "feather river",
-         site_group = "feather river lfc") %>% 
+         site_group = "upper feather lfc") %>% 
   pivot_wider(id_cols = c(date, stream, site_group), values_from = "value", names_from = "statistic") |>
   rename(mean_i = mean,
          max_i = max,
          min_i = min) |> 
   full_join(feather_lfc_format |> 
               pivot_wider(id_cols = c(stream, date, gage_agency, gage_number, site_group), values_from = "value", names_from = "statistic")) |> 
-  mutate(mean = ifelse(is.na(mean), mean_i, mean),
+  mutate(gage_agency = ifelse(is.na(mean), "interpolated", gage_agency),
+         gage_number = ifelse(is.na(mean), "interpolated", gage_number),
+         mean = ifelse(is.na(mean), mean_i, mean),
          min = ifelse(is.na(min), min_i, min),
-         max = ifelse(is.na(max), max_i, max)) |> 
+         max = ifelse(is.na(max), max_i, max)) |>
   select(-c(min_i, mean_i, max_i)) |> 
   pivot_longer(cols = mean:min, values_to = "value", names_to = "statistic") |> 
-  group_by(stream, date, statistic, gage_agency, gage_number, site_group) |> 
-  full_join(feather_lfc_sites) |> 
-  glimpse()
+  group_by(stream, date, statistic, gage_agency, gage_number, site_group) |> glimpse()
 
 ggplot() +
   geom_line(data = feather_gap_lfc, aes(x = date, y = value, color = statistic)) +
@@ -457,22 +448,21 @@ feather_gap_hfc <- bind_rows(feather_hfc_max_predicted,
                              feather_hfc_mean_predicted,
                              feather_hfc_min_predicted) |> 
   mutate(stream = "feather river",
-         site_group = "feather river hfc") %>% 
+         site_group = "upper feather hfc") %>% 
   pivot_wider(id_cols = c(date, stream, site_group), values_from = "value", names_from = "statistic") |>
   rename(mean_i = mean,
          max_i = max,
          min_i = min) |> 
   full_join(feather_hfc_format |> 
               pivot_wider(id_cols = c(stream, date, gage_agency, gage_number, site_group), values_from = "value", names_from = "statistic")) |> 
-  mutate(mean = ifelse(is.na(mean), mean_i, mean),
+  mutate(gage_agency = ifelse(is.na(mean), "interpolated", gage_agency),
+         gage_number = ifelse(is.na(mean), "interpolated", gage_number),
+         mean = ifelse(is.na(mean), mean_i, mean),
          min = ifelse(is.na(min), min_i, min),
          max = ifelse(is.na(max), max_i, max)) |> 
   select(-c(min_i, mean_i, max_i)) |> 
   pivot_longer(cols = mean:min, values_to = "value", names_to = "statistic") |> 
-  group_by(stream, date, statistic, gage_agency, gage_number, site_group) |> 
-  distinct() |> 
-  full_join(feather_hfc_sites) |> 
-  glimpse()
+  group_by(stream, date, statistic, gage_agency, gage_number, site_group) |> glimpse()
 
 ggplot() +
   geom_line(data = feather_gap_hfc, aes(x = date, y = value, color = statistic)) +
@@ -510,11 +500,6 @@ yuba_format <- YR7_daily_temps |>
          gage_agency = "CDEC",
          gage_number = "YR7",
          parameter = "temperature") |> 
-  glimpse()
-
-yuba_sites <- SRJPEdata::rst_catch |> 
-  filter(stream == "yuba river") |> 
-  distinct(stream, site, site_group, subsite) |> 
   glimpse()
 ```
 
@@ -676,14 +661,14 @@ yuba_gap <- bind_rows(yuba_max_predicted,
   pivot_wider(id_cols = c(date, stream), values_from = "value", names_from = "statistic") |> 
   full_join(yuba_format |> 
               pivot_wider(id_cols = c(stream, date, gage_agency, gage_number), values_from = "value", names_from = "statistic")) |> 
-  mutate(mean = ifelse(is.na(mean), mean_predicted, mean),
+  mutate(gage_agency = ifelse(is.na(mean), "interpolated", gage_agency),
+         gage_number = ifelse(is.na(mean), "interpolated", gage_number),
+         mean = ifelse(is.na(mean), mean_predicted, mean),
          min = ifelse(is.na(min), min_predicted, min),
          max = ifelse(is.na(max), max_predicted, max)) |> 
   select(-c(mean_predicted, max_predicted, min_predicted)) |> 
     pivot_longer(cols = mean:min, values_to = "value", names_to = "statistic") |>
-  group_by(stream, date, statistic, gage_agency, gage_number) |> 
-  full_join(yuba_sites) |> 
-  glimpse()
+  group_by(stream, date, statistic, gage_agency, gage_number) |> glimpse()
   
 
 ggplot() +
