@@ -59,11 +59,7 @@ butte_format <- butte |>
 * GRL (2003-03-05 to 2007-06-01 H; 2020-01-04 to present E): located after Thermalito Afterbay
 * FRA (2002-01-01 to present): located between Lake Oroville and Thermalito Afterbay
 
-2. Pull in data collected by the monitoring program (logger data)
-
-3. Combine the datasets ensuring there is no overlap
-
-4. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
+2. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
  
 
 ```{r, include = F}
@@ -81,6 +77,7 @@ feather_hfc_format <- hfc_feather |>
          mutate(stream = "Feather River -high flow channel",
                 gage_agency = "CDEC",
                 gage_number = "GRL",
+                site_group = "feather river hfc",
                 parameter = "temperature") |> 
   glimpse()
 
@@ -97,48 +94,8 @@ feather_lfc_format <- lfc_feather |>
          mutate(stream = "Feather River -low flow channel",
                 gage_agency = "CDEC",
                 gage_number = "FRA",
+                site_group = "feather river lfc",
                 parameter = "temperature")
-
-# Pull in data collected at monitoring stations
-feather_rst_hfc <- SRJPEdata::rst_trap %>%
-  filter(stream == "feather river", site == "herringer riffle") %>%
-  select(stream, date = trap_stop_date, value = water_temp) %>%
-  group_by(stream, date) |> 
-  summarize(value = mean(value, na.rm = T)) |> 
-  mutate(gage_agency = "DWR",
-         gage_number = "logger",
-         site_group = "feather river hfc",
-         statistic = "mean",
-         value = case_when(value < 0.5 ~ NA_real_,
-                               T ~ value),
-         value = as.numeric(value),
-         value = na.approx(value, na.rm = F)) |> glimpse()
-
-feather_rst_lfc <- SRJPEdata::rst_trap %>%
-  filter(stream == "feather river", site == "eye riffle") %>%
-  select(stream, date = trap_stop_date, value = water_temp) %>%
-  group_by(stream, date) |> 
-  summarize(value = mean(value, na.rm = T)) |> 
-  mutate(gage_agency = "DWR",
-         gage_number = "logger",
-         site_group = "feather river lfc",
-         statistic = "mean",
-         value = case_when(value < 0.5 ~ NA_real_,
-                               T ~ value),
-         value = as.numeric(value),
-         value = na.approx(value, na.rm = F)) |> glimpse()
-
-# Combine gage and RST logger data
-feather_lfc_format_combined <- bind_rows(filter(feather_rst_lfc, year(date) < 2017), # rst, filter so it does not overlap with gage data
-                        feather_lfc_format) %>% 
-  group_by(stream, date, statistic, gage_agency, gage_number, site_group) |> 
-  glimpse()
-
-
-feather_hfc_format_combined <- bind_rows(filter(feather_rst_hfc, date > "2007-06-01"), # rst filter so does not overlap with gage data
-                        feather_hfc_format) %>% 
-  mutate(value = ifelse(is.nan(value) | is.infinite(value), NA, value)) |> 
-  group_by(stream, date, statistic, gage_agency, gage_number, site_group) |> glimpse()
 
 feather_sites <- SRJPEdata::rst_catch |> 
   filter(stream == "feather river") |> 
@@ -154,7 +111,7 @@ feather_lfc_sites <- filter(feather_sites, site_group == "feather river lfc")
 
 ```{r, include = F}
 # Prepare data for regression
-feather_lfc_format_wide <- feather_lfc_format_combined |> 
+feather_lfc_format_wide <- feather_lfc_format |> 
   ungroup() |> 
   select(-gage_agency, -gage_number) |> 
   pivot_wider(id_cols = c(stream, date, site_group), names_from = "statistic", values_from = "value", values_fill = NA)
@@ -321,7 +278,7 @@ feather_gap_lfc <- bind_rows(feather_lfc_max_predicted,
   rename(mean_i = mean,
          max_i = max,
          min_i = min) |> 
-  full_join(feather_lfc_format_combined |> 
+  full_join(feather_lfc_format |> 
               pivot_wider(id_cols = c(stream, date, gage_agency, gage_number, site_group), values_from = "value", names_from = "statistic")) |> 
   mutate(mean = ifelse(is.na(mean), mean_i, mean),
          min = ifelse(is.na(min), min_i, min),
@@ -346,7 +303,7 @@ write_csv(feather_gap_lfc, "feather_lfc_temp_interpolation.csv")
 
 ```{r, include = F}
 # need reformat the dataset so can find the dates when min/max are NA (e.g. otherwise just won't ahve data)
-feather_hfc_format_wide <- feather_hfc_format_combined |> 
+feather_hfc_format_wide <- feather_hfc_format |> 
   ungroup() |> 
   select(-gage_agency, -gage_number) |> 
 pivot_wider(id_cols = c(stream, date, site_group), names_from = "statistic", values_from = "value", values_fill = NA)
@@ -505,7 +462,7 @@ feather_gap_hfc <- bind_rows(feather_hfc_max_predicted,
   rename(mean_i = mean,
          max_i = max,
          min_i = min) |> 
-  full_join(feather_hfc_format_combined |> 
+  full_join(feather_hfc_format |> 
               pivot_wider(id_cols = c(stream, date, gage_agency, gage_number, site_group), values_from = "value", names_from = "statistic")) |> 
   mutate(mean = ifelse(is.na(mean), mean_i, mean),
          min = ifelse(is.na(min), min_i, min),
@@ -532,61 +489,38 @@ write_csv(feather_gap_hfc, "feather_hfc_temp_interpolation.csv")
 
 ### Data Prepartion {.tabset}
 
-1. Pull in gage data from YR7 CDEC gage, however, this only contains data from 2020 onwards. Temperature data collected along with RST data is used to fill the gap prior to 2020. 
+1. Pull in gage data from YR7 CDEC gage, however, this only contains data from 2020 onwards. Temperature data collected along with RST data was originally used to fill the gap prior to 2020; however, due to inconsistencies in these data sources the resulting predicted mean values were lower than the min values as the RST data only has mean data. 
 
-2. Pull in data collected by the monitoring program (logger data)
-
-3. Combine the datasets ensuring there is no overlap
-
-4. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
+2. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
 
 ```{r, include = F}
 # Gage Data
 YR7_daily_temps <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2019-01-01")
 
 yuba_format <- YR7_daily_temps |> 
-   mutate(date = as_date(datetime)) |>
-    mutate(year = year(datetime)) |> 
-    filter(parameter_value < 40, parameter_value > 0) |> 
+    mutate(date = as_date(datetime),
+           year = year(datetime)) |> 
+    filter(parameter_value < 40, parameter_value > 0, !is.na(date)) |> 
     group_by(date) |> 
-   summarise(mean = mean(parameter_value, na.rm = TRUE),
+    summarise(mean = mean(parameter_value, na.rm = TRUE),
              max = max(parameter_value, na.rm = TRUE),
              min = min(parameter_value, na.rm = TRUE)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "Yuba River",
+  mutate(stream = "yuba river",
          gage_agency = "CDEC",
          gage_number = "YR7",
          parameter = "temperature") |> 
   glimpse()
 
-
-# Monitoring data
-yuba_rst_format <- SRJPEdata::rst_trap %>% 
-  filter(stream == "yuba river", site == "yuba river") %>%
-  select(stream, date = trap_stop_date, value = water_temp) %>%
-  group_by(stream, date) |> 
-  summarize(value = mean(value, na.rm = T)) |> 
-  mutate(gage_agency = "DWR",
-         gage_number = "logger",
-         statistic = "mean",
-         value = case_when(value < 0.5 ~ NA_real_,
-                               T ~ value),
-         value = as.numeric(value),
-         value = na.approx(value, na.rm = F)) |> glimpse()
-
 yuba_sites <- SRJPEdata::rst_catch |> 
   filter(stream == "yuba river") |> 
   distinct(stream, site, site_group, subsite) |> 
   glimpse()
-
-# Combined data
-yuba_combined <- bind_rows(yuba_format, yuba_rst_format)
-glimpse(yuba_combined)
 ```
 
 ```{r, include = F}
 # combine butte and yuba together for regression modeling
-yuba_format_wide <- yuba_combined |> 
+yuba_format_wide <- yuba_format |> 
   ungroup() |> 
   select(-gage_agency, -gage_number) |> 
   pivot_wider(id_cols = c(stream, date), names_from = "statistic", values_from = "value", values_fill = NA)
@@ -735,18 +669,13 @@ ggplot(yuba_max_predicted, aes(x = date, y = value)) +
 
 #### Full dataset
 ```{r}
-yuba_combined_wide <- yuba_combined |> 
-  pivot_wider(id_cols = c(date, stream, gage_agency, gage_number), values_from = "value", names_from = "statistic") |> 
-  glimpse()
-
-
-
 yuba_gap <- bind_rows(yuba_max_predicted,
                       yuba_mean_predicted,
                       yuba_min_predicted) |> 
   mutate(stream = "yuba river") |> 
   pivot_wider(id_cols = c(date, stream), values_from = "value", names_from = "statistic") |> 
-  full_join(yuba_combined_wide) |> 
+  full_join(yuba_format |> 
+              pivot_wider(id_cols = c(stream, date, gage_agency, gage_number), values_from = "value", names_from = "statistic")) |> 
   mutate(mean = ifelse(is.na(mean), mean_predicted, mean),
          min = ifelse(is.na(min), min_predicted, min),
          max = ifelse(is.na(max), max_predicted, max)) |> 
