@@ -3,8 +3,11 @@ library(CDECRetrieve)
 library(dataRetrieval)
 
 ### Read in lookup table for environmental data --------------------------------
-
+site_lookup <- read_csv(here::here("data-raw", "database-tables", "trap_location.csv")) |> 
+  select(stream, site, subsite, site_group) |> 
+  distinct()
 # save as data object 
+usethis::use_data(site_lookup, overwrite = TRUE)
 
 ### Pull Flow and Temperature Data for each JPE tributary ----------------------
 
@@ -175,7 +178,8 @@ upperclear_creek_daily_temp <- upperclear_temp_raw |>
             max = max(temp_degC),
             min = min(temp_degC)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "upper clear creek",  
+  mutate(stream = "clear creek",  
+         site = "ucc",
          gage_agency = "USFWS",
          gage_number = "UCC",
          parameter = "temperature") |> 
@@ -193,7 +197,8 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
             max = max(temp_degC),
             min = min(temp_degC)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "lower clear creek",  
+  mutate(stream = "clear creek",  
+         site = "lcc",
          gage_agency = "USFWS",
          gage_number = "LCC",
          parameter = "temperature") |> 
@@ -271,7 +276,7 @@ try(if(nrow(deer_creek_daily_temp) < nrow(deer_creek_existing_temp))
 #Pull data
 
 ### Flow Data Pull Tests 
-#Feather High Flow Channel 
+# Feather High Flow Channel 
 try(feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1996-01-01"))
 # Filter existing data to use as a back up 
 feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
@@ -286,11 +291,12 @@ try(if(!exists("feather_hfc_river_data_query"))
   else(feather_hfc_river_daily_flows <- feather_hfc_river_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
          group_by(date = as.Date(datetime)) |> 
-         summarise(mean = mean(parameter_value, na.rm = TRUE),
+         summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
                    max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
                    min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "feather river",  
+         mutate(stream = "feather river", 
+                site_group = "upper feather hfc",
                 gage_agency = "CDEC",
                 gage_number = "GRL",
                 parameter = "flow"
@@ -318,6 +324,7 @@ try(if(!exists("feather_lfc_river_data_query"))
          as_tibble() |> 
          rename(date = Date) |> 
          mutate(stream = "feather river", 
+                site_group = "upper feather lfc",
                 gage_agency = "USGS",
                 gage_number = "11407000",
                 parameter = "flow",
@@ -344,11 +351,12 @@ try(if(!exists("lower_feather_river_data_query"))
   else(lower_feather_river_daily_flows <- lower_feather_river_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
          group_by(date = as.Date(datetime)) |> 
-         summarise(mean = mean(parameter_value, na.rm = TRUE),
+         summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
                    max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
                    min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
          mutate(stream = "feather river",  
+                site_group = "lower feather river", 
                 gage_agency = "CDEC",
                 gage_number = "FSB",
                 parameter = "flow"
@@ -363,9 +371,8 @@ try(if(nrow(lower_feather_river_daily_flows) < nrow(lower_feather_river_existing
 #GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC).
 
 #Interpolation feather hfc
-feather_hfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", "feather_hfc_temp_interpolation.csv")) |> 
+feather_hfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", "feather_hfc_temp_interpolation.csv")) |> 
   mutate(date = as_date(date)) |> 
-  select(-subsite, -site_group, -site) |> 
   mutate(parameter = "temperature") |> 
   glimpse()
 
@@ -374,9 +381,8 @@ feather_hfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", 
 #is out of range of our interest (2003-2017)
 
 #Interpolation feather lfc
-feather_lfc_interpolated <- read.csv(here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv")) |> 
+feather_lfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv")) |> 
   mutate(date = as_date(date)) |> 
-  select(-subsite, -site_group, -site) |> 
   mutate(parameter = "temperature") |> 
   glimpse()
 
@@ -406,6 +412,7 @@ try(if(!exists("feather_lfc_temp_query"))
               min = min(parameter_value, na.rm = TRUE)) |> 
     pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
     mutate(stream = "feather river",
+           site_group = "upper feather lfc",
            gage_agency = "CDEC",
            gage_number = "FRA",
            parameter = "temperature") |> 
@@ -415,6 +422,38 @@ try(if(!exists("feather_lfc_temp_query"))
 # more data 
 try(if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp)) 
   feather_lfc_river_daily_temp <- feather_lfc_existing_temp)
+
+# Temperature data for HFC Feather River
+# pulling temp data for Feather River Low Flow Channel - FRA
+try(feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor_num = "25", start_date = "2024-02-07"))
+# Filter existing data to use as a back up 
+feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
+  filter(gage_agency == "CDEC" & gage_number == "GRL" & parameter == "temperature") |> 
+  select(-site)
+# Confirm data pull did not error out, if does not exist - use existing temperature, 
+# if exists - reformat new data pull
+try(if(!exists("feather_hfc_temp_query"))
+  feather_hfc_river_daily_temp <- feather_hfc_existing_temp
+  else(feather_hfc_river_daily_temp <- feather_hfc_temp_query |> 
+         mutate(date = as_date(datetime),
+                year = year(datetime),
+                parameter_value = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |> 
+         group_by(date) |> 
+         summarise(mean= mean(parameter_value, na.rm = TRUE),
+                   max = max(parameter_value, na.rm = TRUE),
+                   min = min(parameter_value, na.rm = TRUE)) |> 
+         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         mutate(stream = "feather river",
+                site_group = "upper feather hfc",
+                gage_agency = "CDEC",
+                gage_number = "GRL",
+                parameter = "temperature") |> 
+         bind_rows(feather_hfc_interpolated)
+  ))
+# Do a few additional temperature data pull tests to confirm that new data pull has 
+# more data 
+try(if(nrow(feather_hfc_river_daily_temp) < nrow(feather_hfc_existing_temp)) 
+  feather_hfc_river_daily_temp <- feather_hfc_existing_temp)
 
 ## Mill Creek ----
 ### Flow Data Pull 
@@ -578,7 +617,6 @@ try(if(nrow(yuba_daily_flows) < nrow(yuba_existing_flow))
 ### Temp Data Pull 
 #### Interpolation pull for Yuba
 yuba_river_interpolated <- read_csv(here::here("data-raw", "temperature-data", "yuba_temp_interpolation.csv")) |> 
-  select(-subsite, -site_group, -site) |> 
   mutate(parameter = "temperature") |> 
   glimpse()
 
@@ -615,44 +653,58 @@ try(if(!exists("yuba_river_temp_query"))
 try(if(nrow(yuba_river_daily_temp) < nrow(yuba_river_existing_temp)) 
   yuba_river_daily_temp <- yuba_river_existing_temp)
 
-#Combine all flow data from different streams
-all_flow <- bind_rows(battle_creek_daily_flows,
+# Combine all flow data from different streams
+# Created a site group variable so that the hfc and lfc will bind with the correct sites
+# so need to bind feather to the site lookup separately
+flow <- bind_rows(battle_creek_daily_flows,
                       butte_creek_daily_flows, 
                       clear_creek_daily_flows,
                       deer_creek_daily_flows,
-                      feather_hfc_river_daily_flows,
-                      feather_lfc_river_daily_flows,
-                      lower_feather_river_daily_flows,
                       mill_creek_daily_flows,
                       sac_river_daily_flows,
                       yuba_river_daily_flows) |> 
-  glimpse()
+  left_join(site_lookup) |> glimpse()
+feather_flow <- bind_rows(feather_hfc_river_daily_flows,
+                          feather_lfc_river_daily_flows,
+                          lower_feather_river_daily_flows) |> 
+  left_join(site_lookup) |> glimpse()
+all_flow <- bind_rows(flow, 
+                      feather_flow)
 
 ggplot(all_flow |> 
          filter(statistic == "mean"),
          aes(x= date, y = value, color=stream)) +
   geom_line() +
-  facet_wrap(~stream)
+  facet_wrap(~site)
 
 #Combine all temperature data from different streams
-all_temps <- bind_rows(battle_creek_daily_temp,
-                       butte_creek_daily_temp,
-                       upperclear_creek_daily_temp,
-                       lowerclear_creek_daily_temp,
-                       deer_creek_daily_temp,
-                       feather_lfc_river_daily_temp,
-                       mill_creek_daily_temp,
-                       sac_river_daily_temp,
-                       yuba_river_daily_temp) |> 
-  glimpse()
+temp <- bind_rows(battle_creek_daily_temp,
+                  butte_creek_daily_temp,
+                  deer_creek_daily_temp,
+                  mill_creek_daily_temp,
+                  sac_river_daily_temp,
+                  yuba_river_daily_temp) |> 
+  left_join(site_lookup, by = c("stream")) |> glimpse()
+  
+feather_temp <- bind_rows(feather_lfc_river_daily_temp,
+                          feather_hfc_river_daily_temp) |> 
+  left_join(site_lookup, by = c("stream", "site_group")) |> glimpse()
 
-ggplot(all_temps |> 
+clear_temp <- bind_rows(upperclear_creek_daily_temp,
+                        lowerclear_creek_daily_temp) |> 
+  left_join(site_lookup, by = c("stream", "site")) |> glimpse()
+
+all_temp <- bind_rows(temp,
+                      feather_temp,
+                      clear_temp)
+
+ggplot(all_temp |> 
          filter(statistic == "mean"),
        aes(x= date, y = value, color=stream)) +
   geom_line() +
-  facet_wrap(~stream)
+  facet_wrap(~site)
 
-environmental_data <- bind_rows(all_temps,
+environmental_data <- bind_rows(all_temp,
                                 all_flow)
   
 #Save package

@@ -1,0 +1,72 @@
+stream,site,subsite,site_group,description,id
+battle creek,ubc,ubc,battle creek,upper battle creek rst site location,1
+battle creek,ubc,NA,battle creek,"upper battle creek rst site location and subsite is
+                                 not associated with release location",2
+butte creek,okie dam,okie dam 1,butte creek,rst 1 at okie dam (aka parrott-phalean),3
+butte creek,okie dam,okie dam 2,butte creek,rst 2 at okie dam (aka parrott-phalean),4
+butte creek,okie dam,okie dam fyke trap,butte creek,fyke trap at okie dam located in diversion canal,5
+butte creek,okie dam,NA,butte creek,trap unknown or okie dam site and subsite is not associated with release location,6
+butte creek,adams dam,adams dam,butte creek,rst at adams dam only used historically,7
+clear creek,lcc,lcc,clear creek,lower clear creek rst site,8
+clear creek,ucc,ucc,clear creek,upper clear creek rst site,9
+clear creek,not recorded,NA,clear creek,site not recorded during release trial,10
+clear creek,lcc,NA,clear creek,lower clear creek rst site and subsite is not associated with release location,11
+clear creek,ucc,NA,clear creek,upper clear creek rst site and subsite is not associated with release location,12
+deer creek,deer creek,deer creek,deer creek,deer creek rst site location,13
+deer creek,deer creek,NA,deer creek,deer creek rst site location and subsite is not associated with release location,14
+feather river,eye riffle,eye riffle_north,upper feather lfc,low flow channel rst sites,15
+feather river,eye riffle,eye riffle_side channel,upper feather lfc,low flow channel rst sites,16
+feather river,eye riffle,NA,upper feather lfc,low flow channel rst sites and subsite is not associated with release location,17
+feather river,live oak,live oak,upper feather hfc,high flow channel rst sites,18
+feather river,live oak,NA,upper feather hfc,high flow channel rst sites and subsite is not associated with release location,19
+feather river,herringer riffle,herringer_west,upper feather hfc,high flow channel rst sites,20
+feather river,herringer riffle,herringer_east,upper feather hfc,high flow channel rst sites,21
+feather river,herringer riffle,herringer_upper_west,upper feather hfc,high flow channel rst sites,22
+feather river,herringer riffle,NA,upper feather hfc,high flow channel rst sites and subsite is not associated with release location,23
+feather river,steep riffle,#steep riffle_rst,upper feather lfc,low flow channel rst sites,24
+feather river,steep riffle,steep riffle_10' ext,upper feather lfc,low flow channel rst sites,25
+feather river,steep riffle,steep side channel,upper feather lfc,low flow channel rst sites,26
+feather river,steep riffle,NA,upper feather lfc,low flow channel rst sites and subsite is not associated with release location,27
+feather river,sunset pumps,sunset west bank,upper feather hfc,high flow channel rst sites,28
+feather river,sunset pumps,sunset east bank,upper feather hfc,high flow channel rst sites,29
+feather river,sunset pumps,NA,upper feather hfc,high flow channel rst sites and subsite is not associated with release location,30
+feather river,shawn's beach,shawns_west,upper feather hfc,high flow channel rst sites,31
+feather river,shawn's beach,shawns_east,upper feather hfc,high flow channel rst sites,32
+feather river,gateway riffle,gateway_main1,upper feather lfc,low flow channel rst sites,33
+feather river,gateway riffle,gateway main 400' up river,upper feather lfc,low flow channel rst sites,34
+feather river,gateway riffle,gateway_rootball,upper feather lfc,low flow channel rst sites,35
+feather river,gateway riffle,gateway_rootball_river_left,upper feather lfc,low flow channel rst sites,36
+feather river,gateway riffle,NA,upper feather lfc,low flow channel rst sites and subsite is not associated with release location,37
+feather river,lower feather river,rr,lower feather river,rst at river right,38
+feather river,lower feather river,rl,lower feather river,rst at river left,39
+feather river,lower feather river,NA,lower feather river,lower feather and subsite is not associated with release location,40
+mill creek,mill creek,mill creek,mill creek,mill creek rst site location,41
+mill creek,mill creek,NA,mill creek,mill creek rst site location and subsite is not associated with release location,42
+yuba river,yuba river,yub,yuba river,"rst at yuba river, only used historically",43
+yuba river,hallwood,hal,yuba river,rst 1 at hallwood,44
+yuba river,hallwood,hal2,yuba river,rst 2 at hallwood,45
+yuba river,hallwood,hal3,yuba river,rst 3 at hallwood,46
+yuba river,hallwood,NA,yuba river,hallwood rst site location and subsite is not associated with release location,47
+sacramento river,knights landing,8.3,knights landing,rst at knights landing,48
+sacramento river,knights landing,8.4,knights landing,rst at knights landing,49
+sacramento river,knights landing,knights landing,knights landing,rst location unknown,50
+sacramento river,knights landing,NA,knights landing,knights landing rst site location and subsite is not associated with release location,51
+sacramento river,tisdale,rr,tisdale,rst at river right,52
+sacramento river,tisdale,rl,tisdale,rst at river left,53
+sacramento river,tisdale,NA,tisdale,tisdale rst site location and subsite is not associated with release location,54
+sacramento river,red bluff diversion dam,gate 6,red bluff diversion dam,rst at red bluff diversion dam,55
+sacramento river,red bluff diversion dam,gate 3,red bluff diversion dam,rst at red bluff diversion dam,56
+sacramento river,red bluff diversion dam,gate 7,red bluff diversion dam,rst at red bluff diversion dam,57
+sacramento river,red bluff diversion dam,gate 8,red bluff diversion dam,rst at red bluff diversion dam,58
+sacramento river,red bluff diversion dam,gate 4,red bluff diversion dam,rst at red bluff diversion dam,59
+sacramento river,red bluff diversion dam,gate 9,red bluff diversion dam,rst at red bluff diversion dam,60
+sacramento river,red bluff diversion dam,gate 5,red bluff diversion dam,rst at red bluff diversion dam,61
+sacramento river,red bluff diversion dam,gate 2,red bluff diversion dam,rst at red bluff diversion dam,62
+sacramento river,red bluff diversion dam,gate 1,red bluff diversion dam,rst at red bluff diversion dam,63
+sacramento river,red bluff diversion dam,gate 11,red bluff diversion dam,rst at red bluff diversion dam,64
+sacramento river,red bluff diversion dam,gate 10,red bluff diversion dam,rst at red bluff diversion dam,65
+sacramento river,red bluff diversion dam,gate 6 e,red bluff diversion dam,rst at red bluff diversion dam,66
+sacramento river,red bluff diversion dam,gate 6 w,red bluff diversion dam,rst at red bluff diversion dam,67
+sacramento river,red bluff diversion dam,gate 5 w,red bluff diversion dam,rst at red bluff diversion dam,68
+sacramento river,red bluff diversion dam,gate 7 e,red bluff diversion dam,rst at red bluff diversion dam,69
+sacramento river,red bluff diversion dam,NA,red bluff diversion dam,red bluff rst site location and subsite is not associated with release location,70
