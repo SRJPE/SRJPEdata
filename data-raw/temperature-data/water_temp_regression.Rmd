@@ -295,7 +295,7 @@ ggplot() +
 ```
 ```{r, include = F}
 #write csv
-write_csv(feather_gap_lfc, "feather_lfc_temp_interpolation.csv")
+write_csv(feather_gap_lfc, here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv"))
 ```
 
 
@@ -481,7 +481,7 @@ ggplot() +
 
 ```{r, include = F}
 # write csv
-write_csv(feather_gap_hfc, "feather_hfc_temp_interpolation.csv")
+write_csv(feather_gap_hfc, here::here("data-raw", "temperature-data", "feather_hfc_temp_interpolation.csv"))
 
 ```
 
@@ -689,11 +689,10 @@ yuba_gap <- bind_rows(yuba_max_predicted,
 ggplot() +
   geom_line(data = yuba_gap, aes(x = date, y = value, color = statistic)) +
   theme_minimal()
-#TODO check on mean being lower than min
 
 ```
 
 ```{r, include = F}
 # write csv
-write_csv(yuba_gap, "yuba_temp_interpolation.csv")
+write_csv(yuba_gap, here::here("data-raw", "temperature-data", "yuba_temp_interpolation.csv"))
 ```
