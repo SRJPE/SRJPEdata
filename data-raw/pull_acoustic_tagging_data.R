@@ -66,11 +66,12 @@ pull_detections_data <- function(study_id_list){
 # Test on one 
 # study_id_list <- "SJ_Scarf_2019"
 # pull_detections_data(study_id_list)
-# Map through all spring ids 
+# Get through all spring ids 
 spring_detections <- purrr::map(spring_ids[1:4], pull_detections_data) |> 
   reduce(bind_rows) |> 
   glimpse()
 
+# Change "ColemanFall_2013" to spring_detections to map through all spring detections
 # TEST OUT ONE TO MATCH FLORAS TABLE -
 coleman_detections <- purrr::map("ColemanFall_2013", pull_detections_data) |> 
   reduce(bind_rows) |> 
@@ -103,13 +104,13 @@ joined_detections <- fish |>
   glimpse()
 
 # Visualize Detections associated with one study 
-BC_2018_detections <- joined_detections |> 
-filter(study_id == "BC-Spring-2018")
+COL_2013_detections <- joined_detections |> 
+  filter(study_id == "ColemanFall_2013")
 
-detect_summary <- aggregate(list(fish_count = BC_2018_detections$fish_id), 
-                            by = list(receiver_general_location = BC_2018_detections$receiver_general_location.x, 
-                                      latitude = BC_2018_detections$receiver_general_latitude, 
-                                      longitude = BC_2018_detections$receiver_general_longitude), function(x){length(unique(x))}) |> 
+detect_summary <- aggregate(list(fish_count = COL_2013_detections$fish_id), 
+                            by = list(receiver_general_location = COL_2013_detections$receiver_general_location.x, 
+                                      latitude = COL_2013_detections$receiver_general_latitude, 
+                                      longitude = COL_2013_detections$receiver_general_longitude), function(x){length(unique(x))}) |> 
   mutate(latitude = as.numeric(latitude), 
         longitude = as.numeric(longitude)) |> glimpse()
 
