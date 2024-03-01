@@ -285,11 +285,11 @@ Survey data
     | Stream         | Core Reaches |
     |----------------|-----------|
     | Battle Creek   | R1, R2, R3, R4 (R5, R6) |
-    | Butte Creek    |           |
-    | Clear Creek    | R1, R2, R3, R4, R5 (R5A, R5B, R5C)|
-    | Deer Creek     |           |
-    | Feather River  |           |
-    | Mill Creek     |           |
+    | Butte Creek    | A1, B1, C1, D1, E3          |
+    | Clear Creek    | R1, R2, R3, R4, R5 (R5A, R5B, R5C) |
+    | Deer Creek     | Lower Falls to A line, A line to Wilson Cove, Polk Springs to Murphy Trail, Murphy Trail to Ponderosa Way, Ponderosa Way to Trail 2E17, Trail 2E17 to Dillon Cove, Uper Falls to Potato Patch Camp, Potato Patch Camp to Highway 32 (Red Bridge)         |
+    | Feather River  | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38  |
+    | Mill Creek     | Mccarthy Place To Savercool Place, Savercool Place To Black Rock, Black Rock To Below Ranch House, Below Ranch House To Above Avery, Above Avery To Pape Place, Pape Place to Buckhorn Gulch, Buckhorn Gulch To Upper Dam, Above Hwy 36,Hwy 36 To Little Hole In Ground, Hole In Ground To Ishi Trail Head, Ishi Trail Head To Big Bend, Big Bend to Canyon Camp, Canyon Camp To Sooner Place  |
     | Yuba River     |           |
 
 Video data

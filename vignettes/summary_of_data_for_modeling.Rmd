@@ -1,0 +1,140 @@
+---
+title: "Summary of Data Used in JPE "
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{trap_effort}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.width=8, fig.height=6
+)
+```
+
+```{r setup, echo = FALSE}
+library(SRJPEdata)
+# source(here::here("data-raw", "pull_tables_from_database.R"))
+
+colors_small <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                            "#899DA4", "#C93312", "#DC863B" # royal 1 (- 3)
+)
+colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                  "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
+                  "#F1BB7B", "#FD6467", "#5B1A18", # Grand Budapest 1 (-4)
+                  "#D8B70A", "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87", # Isle of dogs 2 altered slightly
+                  "#AC9765", "#b67c3b", "#175149", "#AF4E24", "#CEB175",
+                  "#E54E21", "#6C8645", "#C18748", "#FBA72A", "#D3D4D8", "#CB7A5C", "#5785C1")
+
+```
+
+```{r}
+# Create plot with Stream on the y axis, year on x axis and 
+rst_plot_data <- rst_catch |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream, site, subsite, site_group) |> 
+  summarize(monthly_catch_exists = ifelse(sum(count, na.rm = TRUE) > 0, TRUE, FALSE),
+            sampling_type = "rst",
+            sampling_exists = length(unique(date))/30 * 100) |> 
+  ungroup() |> 
+  select(year, month, stream, site, subsite, site_group, monthly_catch_exists, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
+  glimpse()
+
+
+
+adult_carcass_plot_data <- carcass_estimates |> 
+  mutate(sampling_type = "carcass estimate",
+         sampling_exists = 100) |> 
+  select(year, stream, sampling_type, sampling_exists) |> 
+  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) |>
+  glimpse()
+
+upstream_passage_plot_data <- upstream_passage_estimates |> 
+  mutate(sampling_type = "upstream passage estimate",
+         sampling_exists = 100) |> 
+  select(year, stream, sampling_type, sampling_exists) |> 
+  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) |>
+  glimpse()
+
+redd_plot_data <- redd |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream) |> 
+  summarize(sampling_type = "redd",
+            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
+  ungroup() |> 
+  select(year, month, stream, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
+  glimpse()
+
+holding_plot_data <- holding |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream) |> 
+  summarize(sampling_type = "holding",
+            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
+    ungroup() |> 
+  select(year, month, stream, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
+  glimpse()
+
+
+plot_data <- bind_rows(rst_plot_data, 
+                       adult_carcass_plot_data, 
+                       redd_plot_data,
+                       holding_plot_data,
+                       upstream_passage_plot_data) |> 
+  filter(stream != "sacramento river") |> 
+  distinct() |> glimpse()
+
+potential_jpe_window <- plot_data |> 
+  pivot_wider(id_cols = c("date", "year", "month", "stream", "site", "subsite"),
+              names_from = sampling_type,
+              values_from = sampling_exists) |>
+  group_by(year, month, stream) |> 
+  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass estimate`)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(holding)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(`upstream passage estimate`)) ~ TRUE,
+                                            T ~ FALSE)) |> 
+  ungroup() |> 
+  # mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
+  # filter(potential_SR_window == TRUE) |> 
+  glimpse()
+
+plot_data |> ggplot2::ggplot(aes(x = date, 
+                                 y = sampling_type, 
+                                 alpha = sampling_exists, 
+                                 color = sampling_type)) + 
+  geom_point() +
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+  labs(y = "",
+       x = "") +
+  facet_grid(rows=vars(stream), switch = "x") +
+  theme(text = element_text(family = "Arial"),
+        strip.text.y.right = element_text(angle = 0, family = "Arial"), 
+        axis.text.y.right = element_text(size = 6),
+        legend.position="top",
+        panel.spacing = unit(0, "lines"))
+
+
+avaliable_years_plot <- potential_jpe_window |> 
+  ggplot(aes(x = year, y = stream, color = potential_SR_window)) +
+  geom_line()
+
+avaliable_years_plot
+```
+

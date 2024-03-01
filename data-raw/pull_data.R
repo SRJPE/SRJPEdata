@@ -81,9 +81,6 @@ gcs_get_object(object_name = "standard-format-data/standard_adult_passage_estima
                overwrite = TRUE)
 upstream_passage_estimates <- read_csv("data-raw/database-tables/standard_adult_passage_estimate.csv")
 
-# TODO update to pull from database 
-usethis::use_data(upstream_passage_estimates, overwrite = TRUE)
-usethis::use_data(upstream_passage, overwrite = TRUE)
 
 # Adult Holding Data
 gcs_get_object(object_name = "standard-format-data/standard_holding.csv",
@@ -92,22 +89,18 @@ gcs_get_object(object_name = "standard-format-data/standard_holding.csv",
                overwrite = TRUE)
 holding <- read_csv("data-raw/database-tables/standard_holding.csv")
 
-# TODO update to pull from database 
-usethis::use_data(holding, overwrite = TRUE)
 # Adult Redd Data
 gcs_get_object(object_name = "standard-format-data/standard_daily_redd.csv",
                bucket = gcs_get_global_bucket(),
                saveToDisk = "data-raw/database-tables/standard_daily_redd.csv",
                overwrite = TRUE)
 redd <- read_csv("data-raw/database-tables/standard_daily_redd.csv")
-# TODO update to pull from database 
-usethis::use_data(redd, overwrite = TRUE)
+
 
 gcs_get_object(object_name = "standard-format-data/standard_carcass_cjs_estimate.csv",
                bucket = gcs_get_global_bucket(),
                saveToDisk = "data-raw/database-tables/standard_carcass_cjs_estimate.csv",
                overwrite = TRUE)
 carcass_estimates <- read_csv("data-raw/database-tables/standard_carcass_cjs_estimate.csv")
-# TODO update to pull from database 
-usethis::use_data(carcass_estimates, overwrite = TRUE)
+
 

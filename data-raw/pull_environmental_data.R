@@ -662,20 +662,17 @@ flow <- bind_rows(battle_creek_daily_flows,
                   deer_creek_daily_flows,
                   mill_creek_daily_flows,
                   sac_river_daily_flows,
-                  yuba_river_daily_flows) |>
-  left_join(site_lookup) |> glimpse()
-feather_flow <- bind_rows(feather_hfc_river_daily_flows,
-                          feather_lfc_river_daily_flows,
-                          lower_feather_river_daily_flows) |> 
-  left_join(site_lookup) |> glimpse()
-all_flow <- bind_rows(flow, 
-                      feather_flow)
+                  yuba_river_daily_flows,
+                  feather_hfc_river_daily_flows,
+                  feather_lfc_river_daily_flows,
+                  lower_feather_river_daily_flows) |> 
+  select(-site_group) |> glimpse()
 
-ggplot(all_flow |> 
+ggplot(flow |> 
          filter(statistic == "mean"),
        aes(x= date, y = value, color=stream)) +
   geom_line() +
-  facet_wrap(~site)
+  facet_wrap(~stream)
 
 #Combine all temperature data from different streams
 temp <- bind_rows(battle_creek_daily_temp,
@@ -683,29 +680,21 @@ temp <- bind_rows(battle_creek_daily_temp,
                   deer_creek_daily_temp,
                   mill_creek_daily_temp,
                   sac_river_daily_temp,
-                  yuba_river_daily_temp) |> 
-  left_join(site_lookup, by = c("stream")) |> glimpse()
+                  yuba_river_daily_temp,
+                  feather_lfc_river_daily_temp,
+                  feather_hfc_river_daily_temp,
+                  upperclear_creek_daily_temp,
+                  lowerclear_creek_daily_temp) |> 
+  select(-site_group, -site) |> glimpse()
 
-feather_temp <- bind_rows(feather_lfc_river_daily_temp,
-                          feather_hfc_river_daily_temp) |> 
-  left_join(site_lookup, by = c("stream", "site_group")) |> glimpse()
-
-clear_temp <- bind_rows(upperclear_creek_daily_temp,
-                        lowerclear_creek_daily_temp) |> 
-  left_join(site_lookup, by = c("stream", "site")) |> glimpse()
-
-all_temp <- bind_rows(temp,
-                      feather_temp,
-                      clear_temp)
-
-ggplot(all_temp |> 
+ggplot(temp |> 
          filter(statistic == "mean"),
        aes(x= date, y = value, color=stream)) +
   geom_line() +
-  facet_wrap(~site)
+  facet_wrap(~gage_number)
 
-environmental_data <- bind_rows(all_temp,
-                                all_flow)
+environmental_data <- bind_rows(temp,
+                                flow)
 
 #Save package
 usethis::use_data(environmental_data, overwrite = TRUE)

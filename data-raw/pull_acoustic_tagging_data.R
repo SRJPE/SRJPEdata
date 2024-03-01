@@ -7,80 +7,32 @@ library(tidyverse) # Data manipulations
 library(rerddap) # To retrieve NOAA ERDDAP data
 library(lubridate) # Date time manipulations
 library(leaflet) # To visualize receiver locations quickly on a map
-library(vroom) # Read CSV's quickly
+library(SRJPEdata)
 
 ### Clear Cache
 # First clear cache or it will repull old data 
 cache_delete_all()
 
 ### Load TaggedFish and ReceiverDeployments tables through ERDDAP --------------
-# tagging_metadata tablel is used to get all FishIDs for a study, and release information
-# reciever_deployment is used to get Region
-
-# Set erddap url to use in pull data functions 
-erddap_url <- "https://oceanview.pfeg.noaa.gov/erddap/"
+# tagging_metadata table is used to get all FishIDs for a study, and release information
+# receiver_deployment is used to get Region
 
 # TAGGED FISH TABLE
-# metadata for JSATS tagged fish table
-fish_metadata <- info('FED_JSATS_taggedfish', url = erddap_url)
-# load in table
-fish <- tabledap(fish_metadata, url = erddap_url)  
-updated_fish <- fish |> 
-  mutate(fish_release_date = as.POSIXct(fish_release_date, 
-                                        format = "%m/%d/%Y %H:%M:%S", 
-                                        tz = "Etc/GMT+8"),
-         fish_date_tagged = as.POSIXct(fish_date_tagged, 
-                                        format = "%m/%d/%Y %H:%M:%S", 
-                                        tz = "Etc/GMT+8"),
-         fish_id_prefix = substr(fish_id, start = 1, stop = (nchar(fish_id)-4))) |> 
-  glimpse()
-
+fish_data <- pull_fish_data_from_ERDDAP()
 
 # RECEIVER TABLE
-# metadata for JSATS recievers table
-reciever_metadata <- info('FED_JSATS_receivers', url = erddap_url)
-reciever_data <- tabledap(reciever_metadata, url = erddap_url)
+reciever_data <- pull_reciever_data_from_ERDDAP()
 
-# Establish ERDDAP url and database name
-detections_metadata <- info('FED_JSATS_detects', url = erddap_url)
-# detections columns 
-detections_metadata$variables
 # Retrieve list of all studyIDs on FED_JSATS
-study_ids <- tabledap(detections_metadata,
-                       fields = "study_id",
-                       url = erddap_url) |> 
-  pull(study_id) |> 
-  unique()
+study_ids <- pull_study_ids_from_ERDDAP()
 
 ids_with_spring <- which(str_detect(study_ids, "Spring"))
 spring_ids <- study_ids[ids_with_spring]
+# Cannot download all at once so just pull jpe ids for now
+jpe_ids <- c("SacRiverSpringJPE_2022", "SacRiverSpringJPE_2023")
 
-# Cannot download all at once so just pull spring ids for now
- 
-pull_detections_data <- function(study_id_list){
-  data <- tabledap('FED_JSATS_detects',
-                  url = erddap_url, 
-                  str2lang(noquote(paste0("'study_id=\"", study_id_list,"\"'"))))
-  return(data)
-}
-# Test on one 
-# study_id_list <- "SJ_Scarf_2019"
-# pull_detections_data(study_id_list)
-# Get through all spring ids 
-spring_detections <- purrr::map(spring_ids[1:4], pull_detections_data) |> 
+jpe_detections <- purrr::map(jpe_ids, pull_detections_data_from_ERDDAP) |> 
   reduce(bind_rows) |> 
-  glimpse()
-
-# Change "ColemanFall_2013" to spring_detections to map through all spring detections
-# TEST OUT ONE TO MATCH FLORAS TABLE -
-coleman_detections <- purrr::map("ColemanFall_2013", pull_detections_data) |> 
-  reduce(bind_rows) |> 
-  glimpse()
-
-c("Rel_")
-
-# Clean up 
-formatted_spring_detections <- coleman_detections |> 
   mutate(first_time = as.POSIXct(first_time, 
                                  format = "%m/%d/%Y %H:%M:%S", 
                                  tz = "Etc/GMT+8"),
@@ -93,24 +45,20 @@ formatted_spring_detections <- coleman_detections |>
   glimpse()
 
 # Join all tables together to get detections associated with fish releases 
-joined_detections <- fish |> 
-  inner_join(formatted_spring_detections, 
+joined_detections <- fish_data |> 
+  inner_join(jpe_detections, 
              by = c("study_id" = "study_id", 
                     "fish_id" = "fish_id")) |> # Used inner join because that is what the example ERDAPP script was doing, think through this more
-  left_join(reciever_data, 
-            by = c("dep_id" = "dep_id")) |> 
+  left_join(reciever_data) |> 
   mutate(latitude = as.numeric(latitude), 
          longitude = as.numeric(longitude)) |> 
   glimpse()
 
-# Visualize Detections associated with one study 
-COL_2013_detections <- joined_detections |> 
-  filter(study_id == "ColemanFall_2013")
-
-detect_summary <- aggregate(list(fish_count = COL_2013_detections$fish_id), 
-                            by = list(receiver_general_location = COL_2013_detections$receiver_general_location.x, 
-                                      latitude = COL_2013_detections$receiver_general_latitude, 
-                                      longitude = COL_2013_detections$receiver_general_longitude), function(x){length(unique(x))}) |> 
+# MAP 
+detect_summary <- aggregate(list(fish_count = joined_detections$fish_id), 
+                            by = list(receiver_general_location = joined_detections$receiver_general_location, 
+                                      latitude = joined_detections$receiver_general_latitude, 
+                                      longitude = joined_detections$receiver_general_longitude), function(x){length(unique(x))}) |> 
   mutate(latitude = as.numeric(latitude), 
         longitude = as.numeric(longitude)) |> glimpse()
 
@@ -132,3 +80,86 @@ ggplot() +
   theme_bw() + ylab("latitude") + xlab("longitude") +
   coord_fixed(1.3, xlim = xlim, ylim = ylim) +
   ggtitle("Location of study detections w/ count of unique fish visits")
+
+## USE FLORA LOGIC TO FORMAT CH ---- she groups fish into 4 detection sites,
+# use floras functions to generate table with CH 
+
+# Select columns that we want
+all_detections <- joined_detections |> 
+  select(study_id, fish_id, receiver_general_location, time,
+         receiver_general_river_km, receiver_region, 
+         receiver_general_latitude, receiver_general_longitude,
+         fish_release_date, release_river_km, release_latitude,
+         release_longitude, release_location)
+
+# Get list of all receiver GEN
+# reach.meta <- get_receiver_GEN(all_detections)
+reach_metadata <- get_receiver_sites_metadata(all_detections)
+# Manually select receiver locations to use and combine for Sac River study
+# Will need to go back in and remap if we want new 
+region_mapped_reach_metadata <- reach_metadata %>%
+  filter(receiver_general_location %in% c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec","Altube Island","MillCk_RST_Rel",
+                    "MillCk2_Rel","DeerCk_RST_Rel","Mill_Ck_Conf",
+                    "Abv_WoodsonBr","Blw_Woodson",
+                    "I80-50_Br","TowerBridge",
+                    "ToeDrainBase","Hwy84Ferry",
+                    "BeniciaE","BeniciaW","ChippsE","ChippsW"))%>%
+  mutate(receiver_region = case_when(receiver_region == 'Battle Ck' ~ 'Release',
+                            receiver_region == 'DeerCk' ~ 'Release',
+                            receiver_region == 'Mill Ck' ~ 'Release',
+                            receiver_general_location == 'RBDD_Rel'& receiver_region == 'Upper Sac R' ~ 'Release',
+                            receiver_general_location == 'RBDD_Rel_Rec'& receiver_region == 'Upper Sac R' ~ 'Release',
+                            receiver_region == 'Yolo Bypass' ~ 'Lower Sac R',
+                            receiver_region == 'North Delta' ~ 'Lower Sac R',
+                            receiver_region == 'West Delta' ~ 'End',
+                            receiver_region == 'Carquinez Strait' ~ 'End',
+                            TRUE ~ receiver_region))
+
+# Aggregate receiver locations and detections
+# TODO - THIS LOGIC WILL VARY BASED ON SITE... WE ALSO HAVE ONE FOR BUTTE BUT CAN WE MAKE A MORE GENERALIZED ONE
+aggregate <- aggregate_detections_sacramento(detections = all_detections, 
+                                             receiever_metadata = region_mapped_reach_metadata)
+all_aggregated <- aggregate$detections
+# View study reaches in map
+map_reaches <- aggregate$reach_meta_aggregate %>%
+  filter(receiver_general_location != "Releasepoint") %>%
+  rbind(c("Battle Creek",517.344,40.39816,-122.1456,"Release"),
+        c("RBDD",461.579, 40.15444, -122.2025,'Release'),
+        c("Mill Creek",450.703,40.05479, -122.0321,'Release'),
+        c('Deer Creek',441.728,39.99740,-121.9677,'Release')) %>%
+  mutate(receiver_general_latitude = as.numeric(receiver_general_latitude),
+         receiver_general_longitude = as.numeric(receiver_general_longitude))
+
+(map_receiv_agg <- leaflet(data = aggregate$reach_meta_aggregate) %>% 
+    addTiles() %>%
+    addMarkers(~receiver_general_longitude, 
+               ~receiver_general_latitude, 
+               popup = ~as.character(receiver_general_location),
+               label = ~as.character(receiver_general_location),
+               labelOptions = labelOptions(noHide = T, textOnly = TRUE)) %>%
+    addProviderTiles("Esri.WorldTopoMap")
+)
+
+
+# Create Encounter History list and inp file for Sac River model------------------------------------------------------------------
+all_encounter_history <- make_fish_encounter_history(detections = all_aggregated, 
+                                                     aggregated_reciever_metadata = aggregate$reach_meta_aggregate,
+                                                     released_fish_table = fish_data)
+
+# Add in fish information to inp file
+# First add in fish info
+surv_model_inputs_with_fish_information <- all_encounter_history %>%
+  left_join(updated_fish %>% select(fish_id, study_id, fish_length, fish_weight, fish_type,fish_release_date,
+                                   release_location), by = c("fish_id" = "fish_id")) |> 
+  mutate(year = year(as.Date(fish_release_date, format="%m/%d/%Y"))) |> glimpse()
+
+# Summarize fish info
+fish_summary <- surv_model_inputs_with_fish_information %>%
+  group_by(year, study_id) %>%
+  summarise(minFL = min(as.numeric(fish_length),na.rm=TRUE),
+            maxFL = max(as.numeric(fish_length),na.rm=TRUE),
+            minweight = min(as.numeric(fish_weight),na.rm=TRUE),
+            maxweight = max(as.numeric(fish_weight),na.rm=TRUE),
+            N=n()) |> glimpse()
+
+
