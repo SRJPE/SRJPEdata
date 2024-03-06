@@ -13,6 +13,9 @@
     <loc>https://SRJPE.github.io/SRJPEdata/articles/prep_environmental_covariates.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/summary_of_data_for_modeling.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/articles/temperature_data_pull.html</loc>
   </url>
   <url>
@@ -29,6 +32,12 @@
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/index.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/aggregate_detections_butte.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/aggregate_detections_sacramento.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/btspasx_special_priors_data.html</loc>
@@ -52,16 +61,34 @@
     <loc>https://SRJPE.github.io/SRJPEdata/reference/fahrenheit_to_celsius.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/get_receiver_sites_metadata.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/holding.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/index.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/make_fish_encounter_history.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/observed_adult_input.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/p2s_model_covariates_standard.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_detections_data_from_ERDDAP.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_fish_data_from_ERDDAP.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_reciever_data_from_ERDDAP.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_study_ids_from_ERDDAP.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/recaptures.html</loc>

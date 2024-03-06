@@ -53,6 +53,14 @@ reference:
 - contents: 
   - fahrenheit_to_celsius
   - celsius_to_fahrenheit
+  - pull_detections_data_from_ERDDAP
+  - pull_fish_data_from_ERDDAP
+  - pull_reciever_data_from_ERDDAP
+  - pull_study_ids_from_ERDDAP
+  - aggregate_detections_butte
+  - aggregate_detections_sacramento
+  - get_receiver_sites_metadata
+  - make_fish_encounter_history
   
 navbar:
   structure:
@@ -72,6 +80,8 @@ navbar:
         href: articles/years_to_include_analysis.html
       - text: 'Passage to Spawner Model Covariate Prep'
         href: articles/prep_environmental_covariates.html
+      - text: 'Summary of Data for Modeling '
+        href: articles/summary_of_data_for_modeling.html
         
 repo:
  url:

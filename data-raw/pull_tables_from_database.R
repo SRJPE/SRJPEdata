@@ -54,7 +54,7 @@ try(rst_trap_query <-  dbGetQuery(con,
 
 try(if(!exists("rst_trap_query"))
   rst_trap <- SRJPEdata::rst_trap
-  else(rst_catch <- rst_trap_query))
+  else(rst_trap <- rst_trap_query))
 
 try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
   rst_trap <- SRJPEdata::rst_trap
@@ -186,7 +186,7 @@ try(if(!exists("redd_query"))
   else(redd <- redd_query))
 
 try(if(nrow(redd_query) <= nrow(SRJPEdata::redd)) {
-  holding <- SRJPEdata::redd
+  redd <- SRJPEdata::redd
   warning(paste("No new redd datasets detected in the database. Redd data not updated on", Sys.Date()))
 })
 
@@ -205,7 +205,7 @@ try(if(!exists("carcass_estimates_query"))
   else(carcass_estimates <- carcass_estimates_query))
 
 try(if(nrow(carcass_estimates_query) <= nrow(SRJPEdata::carcass_estimates)) {
-  holding <- SRJPEdata::carcass_estimates
+  carcass_estimates <- SRJPEdata::carcass_estimates
   warning(paste("No new carcass estimates datasets detected in the database. Carcass estimate data not updated on", Sys.Date()))
 })
 
