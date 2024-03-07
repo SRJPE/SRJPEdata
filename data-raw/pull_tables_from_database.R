@@ -122,6 +122,7 @@ usethis::use_data(recaptures, overwrite = TRUE)
 # Pull in passage raw counts 
 # TODO decide if we want more site information 
 # TODO 14 records with NA stream and NA reach...figure out what is going on there (looks like it is probably battle creek)
+# TODO filter out butte creek 
 try(upstream_passage_query <- dbGetQuery(con, "SELECT p.date, sl.stream, sl.reach, p.count, p.adipose_clipped,  
                                               r.definition as run, s.definition as sex, d.definition as direction,
                                               p.hours_sampled
@@ -146,7 +147,8 @@ try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.strea
                                                          p.confidence_level
                                                          FROM passage_estimates p
                                                          left join survey_location sl on p.survey_location_id = sl.id
-                                                         left join run r on p.run_id = r.id"))
+                                                         left join run r on p.run_id = r.id") |> 
+      filter(stream != "butte creek"))
 
 try(if(!exists("upstream_passage_estimates_query"))
   upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
