@@ -388,7 +388,7 @@ make_fish_encounter_history <- function(detections,
 
   # Get list of all tagged fish for the studyID
   fish <- released_fish_table %>%
-    filter(study_id == detections$study_id[1]) %>%
+    # filter(study_id == detections$study_id[1]) %>%
     arrange(fish_id) %>%
     pull(fish_id)
   
