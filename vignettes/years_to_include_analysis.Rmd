@@ -164,15 +164,16 @@ We utilized above cumulative catch curves and heatmaps come up with a list of ye
 ```{r, echo = FALSE}
 # TODO add red bluff to database & file 
 
-years_exclude <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
-years_exclude_nice_names <- years_exclude |> select("Stream" = stream, 
+years_to_exclude_rst_data <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
+usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
+years_exclude_nice_names <- years_to_exclude_rst_data |> select("Stream" = stream, 
                                                     "Year" = year, 
                                                     "Exclusion Type" = exclusion_type,
                                                     "Notes" = reason_for_exclusion)
 knitr::kable(head(years_exclude_nice_names, 10))
 ```
 
-*... with `r nrow(years_exclude) - 10` more rows*
+*... with `r nrow(years_to_exclude_rst_data) - 10` more rows*
 
 ## Applying to modeling datasets
 
@@ -475,8 +476,9 @@ We utilized above cumulative catch curves and heatmaps to come up with a list of
 ```{r, echo = FALSE}
 # TODO add red bluff to database & file 
 
-years_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv"))
-years_exclude_nice_names_adult <- years_exclude_adult |> select("Stream" = stream, 
+years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv"))
+usethis::use_data(years_to_exclude_adult, overwrite = TRUE)
+years_exclude_nice_names_adult <- years_to_exclude_adult |> select("Stream" = stream, 
                                                     "Year" = year, 
                                                     "Data Type" = data_type,
                                                     "Exclusion Type" = reason_for_exclusion)

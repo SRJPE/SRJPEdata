@@ -149,7 +149,7 @@ all_encounter_history <- make_fish_encounter_history(detections = all_aggregated
 # Add in fish information to inp file
 # First add in fish info
 surv_model_inputs_with_fish_information <- all_encounter_history %>%
-  left_join(updated_fish %>% select(fish_id, study_id, fish_length, fish_weight, fish_type,fish_release_date,
+  left_join(fish_data %>% select(fish_id, study_id, fish_length, fish_weight, fish_type,fish_release_date,
                                    release_location), by = c("fish_id" = "fish_id")) |> 
   mutate(year = year(as.Date(fish_release_date, format="%m/%d/%Y"))) |> glimpse()
 
