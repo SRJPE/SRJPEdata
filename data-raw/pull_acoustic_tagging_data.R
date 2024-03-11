@@ -153,6 +153,9 @@ surv_model_inputs_with_fish_information <- all_encounter_history %>%
                                    release_location), by = c("fish_id" = "fish_id")) |> 
   mutate(year = year(as.Date(fish_release_date, format="%m/%d/%Y"))) |> glimpse()
 
+survival_model_inputs <- surv_model_inputs_with_fish_information
+usethis::use_data(survival_model_inputs, overwrite = TRUE)
+
 # Summarize fish info
 fish_summary <- surv_model_inputs_with_fish_information %>%
   group_by(year, study_id) %>%
@@ -160,6 +163,9 @@ fish_summary <- surv_model_inputs_with_fish_information %>%
             maxFL = max(as.numeric(fish_length),na.rm=TRUE),
             minweight = min(as.numeric(fish_weight),na.rm=TRUE),
             maxweight = max(as.numeric(fish_weight),na.rm=TRUE),
-            N=n()) |> glimpse()
+            N=n(),
+            recaptured_site_1 = sum(str_split(ch, "")[[1]][2] == "1"),
+            recaptured_site_2 = sum(str_split(ch, "")[[1]][3] == "1"),
+            recaptured_site_3 = sum(str_split(ch, "")[[1]][3] == "1")) |> glimpse()
 
 
