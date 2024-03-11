@@ -5,7 +5,7 @@ library(grunID)
 
 con <- gr_db_connect()
 
-complete_genetic_samples <- DBI::dbGetQuery(con, 
+completed_genetic_samples <- DBI::dbGetQuery(con, 
                                             "SELECT s.id AS sample_id, s.datetime_collected, se.first_sample_date, s.fork_length_mm, 
                                             rt.run_name AS sherlock_run_assignment, rt2.run_name AS field_run_assignment,
                                             sl.stream_name
@@ -19,4 +19,4 @@ complete_genetic_samples <- DBI::dbGetQuery(con,
                                             LEFT JOIN sample_location AS sl ON se.sample_location_id = sl.id
                                             WHERE ss.status_code_id = 11;")
 
-usethis::use_data(complete_genetic_samples, overwrite = TRUE)
+usethis::use_data(completed_genetic_samples, overwrite = TRUE)
