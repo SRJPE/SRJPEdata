@@ -39,11 +39,12 @@ The spring run juvenile production estimate (SR JPE) contains many submodels tha
 
 Additional sections will be added to highlight survival, genetics, and covariate data. 
 
-# Stock Recurit Modeling Data Selection
+# Stock Recruit Modeling Data Selection
 
 Collecting and selecting spring run chinook monitoring data to use in the spring run juvenile production estimate (SR JPE) was a multistep and iterative process. We acquired datasets, hosted a workshop to define a ruleset for evaluating years to exclude based on missing data ([see years to include vignette for an in depth overview of this process](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html)), selected data where there was both adult and juvenile data overlap, and finally selected a single adult dataset to use for each year and stream. The diagram below visualizes this process and shows how many total datasets we retained along the way.
 
-![](images/jpe-data-summary-diagram-02.png){width=105%}
+![](images/data_selection_diagram.png){width=108%}
+
 *Distinct annual datasets are identified by looking at distinct year, stream, and monitoring types*
 
 ## Monitoring Data Overview
@@ -122,7 +123,7 @@ plot_data |>
        title = "Monitoring Data Overview",
        subtitle = "Historical Monitoring Coverage Accross SR JPE Tributaries"
        ) +
-  facet_grid(rows=vars(stream), switch = "y") +
+  facet_grid(rows=vars(factor(stream)), switch = "y") +
   # facet_wrap(~stream)
   theme(text = element_text(family = "Arial"),
         strip.text.y.left = element_text(angle = 0, family = "Arial"), 
@@ -135,6 +136,7 @@ plot_data |>
         ) +
   guides(alpha = FALSE)
 ```
+
 *Plot does not include Sacramento River mainstem monitoring. This data may also be utilized by the JPE but will not be included in the Stock Recruit models*
 
 ### Filtering data to years that contain both juvinile and adult monitoring
@@ -166,11 +168,12 @@ avaliable_years_plot <- potential_jpe_window |>
        ) +
   scale_color_manual(values = colors_small) +
   theme(legend.position = "none",
-        plot.title = element_text(hjust = 0))
-  
+        plot.title = element_text(hjust = 0)) + 
+   scale_y_discrete(limits=rev)
 
 avaliable_years_plot
 ```
+
 *Gray boxes indicate that monitoring occurred but that data is not being utalized for the stock recruit since a year does not have both adult and juvenile data* 
 
 ## Excluding Incomplete Years 
@@ -320,10 +323,13 @@ avaliable_years_plot <- updated_potential_jpe_window |>
        ) +
   scale_color_manual(values = colors_small) +
   theme(legend.position = "none",
-        plot.title = element_text(hjust = 0))
+        plot.title = element_text(hjust = 0)) + 
+  scale_y_discrete(limits=rev)
+
 
 avaliable_years_plot
 ```
+
 
 *Gray boxes indicate that monitoring occurred but that data is not being utalized for the stock recruit. Data may be excluded because there is not adult and juvenile annual overlap or because the data was considered incomplete for a given monitoring type and year.* 
 
@@ -383,12 +389,13 @@ multiple_adult_data_options <- updated_plot_data |>
          Stream = stream, 
          "Sampling Type" = sampling_types) |> 
   select(-num_sampling_types) |> 
-  mutate("Selected Sampling Site" = case_when(Stream == "butte creek" ~ "carcass estimate", 
+  mutate("Selected Adult Data Type" = case_when(Stream == "butte creek" ~ "carcass estimate", 
                                               Stream == "feather river" ~ "carcass estimate", 
                                               T ~ "TBD"))
 
 knitr::kable(head(multiple_adult_data_options, 10))
 ```
+
 
 *... with `r nrow(multiple_adult_data_options) - 10` more rows*
 
