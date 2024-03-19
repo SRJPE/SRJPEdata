@@ -281,7 +281,7 @@ Below are the methods we used for excluding years by adult data type:
 
 **Survey data**
 
--   Exclude year if survey does not cover core reaches in a year/if less than 50% of reaches are sampled. 
+-   Exclude year if survey does not cover core reaches in a year or if less than 50% of reaches are sampled. 
 
     | Stream         | Core Reaches |
     |----------------|-------------------------------------------------------------------------------------------|
