@@ -25,7 +25,7 @@ source(here::here("data-raw", "pull_tables_from_database.R"))
 
 ## Generate Yearling Rulesets 
 
-Raw catch from the trap does not consistently differentiate between yearling and YOY Chinook. FlowWest presented a proposed methodology at a LHD ruleset workshop (see [lhd shiny](https://flowwest.shinyapps.io/lhd-workshop-shiny/) for workshop materials) and worked with watershed Experts to define methodology to systematically determine life history for each tributary (described below).
+Raw catch from the trap does not consistently differentiate between yearling and YOY Chinook. FlowWest presented a proposed methodology at a LHD ruleset workshop (see [lhd shiny](https://flowwest.shinyapps.io/lhd-workshop-shiny/) for workshop materials) and worked with watershed experts to define methodology to systematically determine life history for each tributary (described below).
 
 ### Approach: 
 

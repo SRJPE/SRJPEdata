@@ -92,7 +92,7 @@
 </h1></div>
 <p>This data package contains Juvenile, Adult and environmental data for each of the watersheds within the Spring Run Juvenile Production Estimate (SRJPE) Forecast model. Historical data are used to train the model and seasonal updates are used to Forecast the JPE of a given season.</p>
 <p>This data has been compiled from monitoring programs and gages and is stored in the SRJPE model database on Microsoft Azure. Biweekly, automated scripts update the database, pulling new datasets from CDEC &amp; USGS gages and from EDI monitoring data packages. RST data is updated biweekly throughout the trapping season and Adult data is updated annual at the end of the adult monitoring season.</p>
-<p>This data package will be updated in __ and then biweekly through the RST motioning season (Nov - June).</p>
+<p>This data package will be updated in annually after adult datasets are finalized and then biweekly through the RST motioning season (Nov - June).</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -110,8 +110,23 @@
 <span><span class="op">?</span><span class="va">SRJPEdata</span></span></code></pre>
 </div>
 <div class="section level2">
-<h2 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
+<h2 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
 </h2>
+<div class="section level4">
+<h4 id="spring-run-monitoring-datasets">Spring Run Monitoring Datasets<a class="anchor" aria-label="anchor" href="#spring-run-monitoring-datasets"></a>
+</h4>
+<p>Adult and Juvenile monitoring datasets from 7 systems are compiled within this data package. All data can be found on the <a href="https://portal.edirepository.org/nis/simpleSearch" class="external-link">Environmental Data Initiatives Data Portal</a> by searching “SR JPE.”</p>
+</div>
+<div class="section level4">
+<h4 id="acoustic-tagging-survival-data">Acoustic Tagging Survival Data<a class="anchor" aria-label="anchor" href="#acoustic-tagging-survival-data"></a>
+</h4>
+<p>NOAA collects acoustic tagging data as part of the Central Valley Enhanced Acoustic Tagging Project. This data package queries tagging data from many studies using the ERDDAP data server. We processed data, aggregating detection sites into 3 distinct locations and processing fish detection data to create a capture history for each fish.</p>
+</div>
+<div class="section level4">
+<h4 id="genetics-data">Genetics Data<a class="anchor" aria-label="anchor" href="#genetics-data"></a>
+</h4>
+<p>Genetics monitoring data is also included in this data package to prepare data inputs for a probabilistic length at date (PLAD) model. Genetics data is pulled directly from the SR JPE genetics database into this data package.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="explore-datasets">Explore datasets<a class="anchor" aria-label="anchor" href="#explore-datasets"></a>
