@@ -1,5 +1,5 @@
 ---
-title: "Summary of Data Used in JPE"
+title: "Draft Summary of Data Used in JPE"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{trap_effort}
@@ -115,7 +115,7 @@ plot_data |>
   ggplot2::ggplot(aes(x = date, 
                       y = sampling_type, 
                       color = sampling_type)) + 
-  geom_point(shape = 15, size = 3.5) +
+  geom_point(shape = 15, size = 4) +
   scale_color_manual(values = colors_full) +
   theme_minimal() +
   labs(y = "",
