@@ -41,10 +41,13 @@ The goal of this document is to process covariates for use in SR JPE stock recru
 
 ```{r}
 covariate_references <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0")
-kable(covariate_references) |> 
+kable(covariate_references |> select(`Covariate Type`, `Structure`, `Rationale`)) |> 
   kable_classic(full_width = T)
 ```
 # Preparing Covariates 
+This document focus on preparing flow and temperature covariates for initial testing in stock recruit. 
+
+
 ## Temperature
 
 Temperature has been found to influence spawning and rearing. Therefore it is expected to affect the translation from stock to recruit. Temperature can be included in multiple different formats including:
