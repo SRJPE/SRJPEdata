@@ -80,6 +80,8 @@ navbar:
         href: articles/years_to_include_analysis.html
       - text: 'Passage to Spawner Model Covariate Prep'
         href: articles/prep_environmental_covariates.html
+      - text: 'Stock Recruit Model Covariate Prep'
+        href: articles/sr_covariates.html
       - text: 'Summary of Data for Modeling '
         href: articles/summary_of_data_for_modeling.html
         

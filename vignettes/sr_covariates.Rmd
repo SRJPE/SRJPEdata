@@ -35,7 +35,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 
 # Selecting Stock Recruit (SR) Environmental Covariates
 
-The goal of this document is to process covariates for use in SR JPE stock recruitment modeling. Initial literature review and planning was conducted by FlowWest to outline covariates that are expected to be important based on past research. This work can be found [here](https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0). FlowWest reviewed covariates with the modeling advisory team to generate the following environmental covariates table to test within the SR model. 
+The goal of this document is to process covariates for use in SR JPE stock recruitment modeling. FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found [here](https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0). FlowWest reviewed covariates with the modeling advisory team to generate the following environmental covariates table to test within the SR model. 
 
 *Table 1. Summary of covariates to include in stock recruit modeling based on preliminary literature review*
 
@@ -103,7 +103,8 @@ std_temp_dd_spawn |>
   ggplot(aes(x = year, y = gdd_spawn, color = stream_site)) + 
   geom_line() +
   labs(x = "",
-       y = "Sum of daily mean temperatures during spawning/incubation time period (Aug-Dec)") +
+       title = "Sum of daily mean temperatures during spawning/incubation time period (Aug-Dec)",
+       y = "Total Degree Days (Aug-Dec)") +
   scale_color_manual(values = colors_full) +
   theme_minimal()
 # years for each stream, data are complete
@@ -174,7 +175,7 @@ std_temp_7dadm_threshold <- full_join(std_temp_7dadm_above_13,
 ggplot(std_temp_7dadm_threshold, aes(x = year, y = week, color = threshold)) +
   geom_point() +
   facet_wrap(~stream_site) +
-  scale_color_manual(values = colors_full) +
+  scale_color_manual(values = c("#F5CDB4", "#9A8822")) +
   theme_minimal()
 ```
 
@@ -267,11 +268,12 @@ std_flow_spawn_summary |>
   ggplot(aes(x = year, y = value, color = statistic)) +
   geom_line() +
   facet_wrap(~stream_site, scales = "free_y") + 
+  labs(x = "year", y = "Flow CFS") + 
   scale_color_manual(values = colors_full) +
   theme_minimal()
 ```
 
-*Figure 4. Plot of annual summarized (mean, median, max, min) max temperatures during the spawning and incubation time period (Aug - Dec)*
+*Figure 4. Plot of annual summarized (mean, median, max, min) max flows during the spawning and incubation time period (Aug - Dec)*
 
 ```{r}
 std_flow_rear_summary <- standard_flow |> 
@@ -290,15 +292,18 @@ std_flow_rear_summary <- standard_flow |>
 
 ```{r}
 std_flow_rear_summary |> 
+  filter(year > 2000) |> 
   mutate(stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) |> 
   ggplot(aes(x = year, y = value, color = statistic)) +
   geom_line() +
   facet_wrap(~stream_site, scales = "free_y") + 
+  labs(x = "year", 
+       y = "Flow CFS") + 
   scale_color_manual(values = colors_full) +
   theme_minimal()
 ```
 
-*Figure 5. Plot of annual summarized (mean, median, max, min) max temperatures during the rearing time period (Nov - July)*
+*Figure 5. Plot of annual summarized (mean, median, max, min) max flows during the rearing time period (Nov - July)*
 
 ```{r}
 std_flow_final <- std_flow_spawn_summary |> 
@@ -314,9 +319,15 @@ std_flow_final <- std_flow_spawn_summary |>
          median_flow = median,
          max_flow = max,
          min_flow = min) |> 
-  mutate(lifestage = "rearing")) |> glimpse()
+  mutate(lifestage = "rearing")) 
   
 ```
+
+## Combine and Save Covariate Data 
+
+All covariate datasets are combined into one table and saved as an export from the SRJPEdata package. This data can be accessed using `SRJPEdata::stock_recruit_covariates` and can be joined to the `SRJPEdata::site_lookup` table in order to fill in covariates for each site and year. 
+
+The first 10 rows of `SRJPEdata::stock_recruit_covariates` are shown below. 
 
 ```{r}
 
@@ -333,8 +344,9 @@ stock_recruit_covariates <- std_temp_dd_spawn |>
   full_join(std_flow_final |> 
               mutate(covariate_type = "flow")) |>  
   pivot_longer(cols = c(gdd_spawn, above_13_temp_day, above_13_temp_week, weekly_max_temp_max, weekly_max_temp_mean, weekly_max_temp_median, mean_flow, max_flow, min_flow, median_flow), values_to = "value", names_to = "covariate_structure") |> 
-  filter(!is.na(value)) |> 
-    glimpse()
+  filter(!is.na(value)) 
+
+knitr::kable(head(stock_recruit_covariates, 10))
 ```
 
 ```{r}
