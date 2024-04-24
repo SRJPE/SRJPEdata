@@ -26,8 +26,8 @@ reciever_data <- pull_reciever_data_from_ERDDAP()
 # Retrieve list of all studyIDs on FED_JSATS
 study_ids <- pull_study_ids_from_ERDDAP()
 
-ids_with_spring <- which(str_detect(study_ids, "Spring"))
-spring_ids <- study_ids[ids_with_spring]
+# ids_with_spring <- which(str_detect(study_ids, "Spring"))
+# spring_ids <- study_ids[ids_with_spring]
 # Cannot download all at once so just pull jpe ids for now
 jpe_ids <- c("SacRiverSpringJPE_2022",
              "BattleCk_Wild_2014", "CNFH_FMR_2019", "CNFH_FMR_2020", 
@@ -56,6 +56,7 @@ jpe_detections <- purrr::map(jpe_ids, pull_detections_data_from_ERDDAP) |>
 
 # Join all tables together to get detections associated with fish releases 
 joined_detections <- fish_data |> 
+  filter(study_id %in% jpe_ids) |> 
   inner_join(jpe_detections, 
              by = c("study_id" = "study_id", 
                     "fish_id" = "fish_id")) |> # Used inner join because that is what the example ERDAPP script was doing, think through this more
@@ -154,12 +155,14 @@ map_reaches <- aggregate$reach_meta_aggregate %>%
 # Create Encounter History list and inp file for Sac River model------------------------------------------------------------------
 all_encounter_history <- make_fish_encounter_history(detections = all_aggregated, 
                                                      aggregated_reciever_metadata = aggregate$reach_meta_aggregate,
-                                                     released_fish_table = fish_data)
+                                                     released_fish_table = fish_data |> filter(study_id %in% jpe_ids))
 
 # Add in fish information to inp file
 # First add in fish info
 surv_model_inputs_with_fish_information <- all_encounter_history %>%
-  left_join(fish_data %>% select(fish_id, study_id, fish_length, fish_weight, fish_type,fish_release_date,
+  left_join(fish_data %>% 
+              filter(study_id %in% jpe_ids) |> 
+              select(fish_id, study_id, fish_length, fish_weight, fish_type,fish_release_date,
                                    release_location), by = c("fish_id" = "fish_id")) |> 
   mutate(year = year(as.Date(fish_release_date, format="%m/%d/%Y"))) |> glimpse()
 
