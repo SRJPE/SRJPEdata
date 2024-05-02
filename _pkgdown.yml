@@ -21,6 +21,10 @@ reference:
   desc: Data used as inputs to juvenile bt-spas-x abundance model 
 - contents: 
   - weekly_juvenile_abundance_model_data
+- subtitle: Survival Datasets
+  desc: Data used as inputs to survival model 
+- contents: 
+  - survival_model_inputs
   
 - title: Helper Data 
   desc: Data used as helper datasets to generate model data
@@ -47,6 +51,10 @@ reference:
   - chosen_site_years_to_model
   - btspasx_special_priors_data
   - weekly_hours_fished
+- subtitle: Environmental Data
+  desc: Environmental gage data used pulled from USGS/CDEC and used as covatiates to models 
+- contents: 
+  - environmental_data    
   
 - title: Helper Functions 
   desc: Functions used to generate model data

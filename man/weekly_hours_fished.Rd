@@ -10,7 +10,7 @@ Dataframe containing 7 columns (stream, site, subsite, site_group, week, year, h
 \item \code{year}: year
 \item \code{stream}: Stream RST is located on
 \item \code{site}: Site RST is located on
-\item \code{site_group}: Site group
+\item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 \item \code{week}: Week
 \item \code{hours_fished}: Number of hours that a trap was operated in a given week. Capped at 168.
 }

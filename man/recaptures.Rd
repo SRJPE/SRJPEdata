@@ -10,7 +10,7 @@
 \item \code{stream}: Stream RST is located on
 \item \code{site}: Site RST is located on
 \item \code{subsite}: Specific trap site
-\item \code{site_group}: Site group
+\item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 \item \code{count}: Number of fish caught
 \item \code{release_id}: The unique identifier for each release trial
 \item \code{fork_length}: Fork length measure of catch in mm

@@ -1,4 +1,3 @@
-# TODO descide if we also want to export weekly summaries...probably not necessary, leaving in for now so I don't break something 
 #' @title Passage to Spawner Model Covariates Standard
 #' @name p2s_model_covariates_standard
 #' @description The passage to spawner model covariates standard table contains environmental
@@ -32,14 +31,14 @@
 #'   \item \code{count}: weekly count of number of 
 #'   \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish 
 #'   \item \code{number_released}: Number of efficiency trial fish released
-#'   \item \code{number_recaptured}: Number of efficency trial fish recaptured
-#'   \item \code{effort}: Hours fished on a stream (TODO: rename to hours fished)
+#'   \item \code{number_recaptured}: Number of efficiency trial fish recaptured
+#'   \item \code{hours_fished}: Hours fished on a stream 
 #'   \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
 #'   \item \code{life_stage}: Life stage of juvenile fish 
-#'   \item \code{average_stream_effort}: Average hours fished on a given stream, used to standize 
+#'   \item \code{average_stream_effort}: Average hours fished on a given stream, used to standardize 
 #'   \item \code{standardized_flow}: Flow standardized across years and sites 
 #'   \item \code{run_year}: Run year 
-#'   \item \code{catch_standardized_by_effort}: Catch standardized by hours fished in a given week 
+#'   \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week 
 #'   \item \code{standardized_efficiency}: Efficiency standardized across years 
 #'   \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search `?SRJPEdata::btspasx_special_priors_data`
 #'   }
@@ -70,7 +69,7 @@
 #'   \item \code{stream}: Stream RST is located on  
 #'   \item \code{site}: Site RST is located on   
 #'   \item \code{subsite}: Specific trap site   
-#'   \item \code{site_group}: Site group    
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   \item \code{count}: Number of fish caught  
 #'   \item \code{run}: Run of catch  
 #'   \item \code{life_stage}: Life Stage of catch  
@@ -187,7 +186,7 @@
 #'   \item \code{stream}: stream where efficiency trial conducted
 #'   \item \code{site}: site where efficiency trial conducted 
 #'   \item \code{subsite}: subsite where efficiency trial conducted
-#'   \item \code{site_group}: site group where efficiency trial conducted
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   \item \code{fork_length}: fork length of released fish 
 #'   }
 'release_fish'
@@ -201,7 +200,7 @@
 #'   \item \code{stream}: Stream RST is located on  
 #'   \item \code{site}: Site RST is located on   
 #'   \item \code{subsite}: Specific trap site   
-#'   \item \code{site_group}: Site group    
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   \item \code{count}: Number of fish caught 
 #'   \item \code{release_id}: The unique identifier for each release trial  
 #'   \item \code{fork_length}: Fork length measure of catch in mm   
@@ -266,7 +265,7 @@
 #'   \item \code{ladder}: the ladder the fish was observed at
 #'   \item \code{flow}: flow in cfs at the weir
 #'   \item \code{temperature}: temperature in C at the weir
-#'   \item \code{hours}: hours the camera was in operation #TODO confirm
+#'   \item \code{hours}: hours the camera was in operation 
 #'   \item \code{comments}: comments
 #'   }
 'upstream_passage'
@@ -296,7 +295,6 @@
 #' @name redd
 #' @description Raw redd survey monitoring data. Redd survey data is available 
 #' for Battle Creek, Clear Creek, Feather River, Mill Creek, Yuba River. 
-#' TODO link to vignette on age_index when available 
 #' @format 
 #' \itemize{
 #'   \item \code{date}: year data were collected
@@ -385,7 +383,7 @@
 #'   \item \code{monitoring_year} : year 
 #'   \item \code{stream}: Stream RST is located on  
 #'   \item \code{site}: Site RST is located on   
-#'   \item \code{site_group}: Site group    
+#'   \item \code{site_group}:Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   \item \code{min_date} : Minimum date of sampling season to include 
 #'   \item \code{min_week} : Minimum week of sampling season to include 
 #'   \item \code{max_date} : Maximum date of sampling season to include  
@@ -417,19 +415,45 @@
 #'  \item \code{year}: year 
 #'   \item \code{stream}: Stream RST is located on  
 #'   \item \code{site}: Site RST is located on   
-#'   \item \code{site_group}: Site group   
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   \item \code{week}: Week 
 #'   \item \code{hours_fished}: Number of hours that a trap was operated in a given week. Capped at 168. 
 #'   }
 'weekly_hours_fished'
 
-# TODO - get env data figured out 
-# #' @title Environmental Gage Data
-# #' @name environmental_data
-# #' @description Environmental gage data for each tributary in the SR JPE. 
-# #' TODO add gage is in list format to make explicit or link to source vignette 
-# #' @format 
-# #' \itemize{
-# #'   \item \code{col 1}:col 1  
-# #'   }
-# environmental_data'
+#' @title Environmental Gage Data
+#' @name environmental_data
+#' @description Environmental gage data for each tributary in the SR JPE.
+#' @format
+#' \itemize{
+#'   \item \code{date}: Date associated with environmental measure 
+#'   \item \code{statistic}: Summary static used to summarize flow and temperature measures into a single daily reccord (min, mean, max)
+#'   \item \code{value}: Flow or temperature measurements 
+#'   \item \code{stream}: Stream environmental data is collected on  
+#'   \item \code{gage_agency}: Agency providing flow or temperature data, most data pulled from CDEC or USGS
+#'   \item \code{gage_number}: Unique identifier of gage used to query flow and temperature data
+#'   \item \code{parameter}: Parameter measured, includes "flow" and "temperature"
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+#'   }
+#'   @source USGS/CDEC/FWS. See `data-raw/pull_environmental_data.R` for more details.
+'environmental_data'
+
+#' @title Survival Model Data
+#' @name survival_model_inputs
+#' @description Acoustic tagging data used to model survival for the SR JPE 
+#' @format
+#' \itemize{
+#'   \item \code{fish_id}: Unique identifier associated with each released fish 
+#'   \item \code{ch}: Capture history of each fish describing detection at reciever location, 0 indicated not detected, 1 indicates detected 
+#'   \item \code{study_id}: Unique identifier associated with each release group 
+#'   \item \code{fish_length}: Fork length of fish in mm 
+#'   \item \code{fish_weight}: Weight of fish in grams 
+#'   \item \code{fish_type}: Type of fish used in release trial, typically indicated where that fish came from and species of fish 
+#'   \item \code{fish_release_date}: Date of release 
+#'   \item \code{release_location}: Location of release 
+#'   \item \code{year}: Year of release 
+#'   }
+#'   @source Central Valley Enhanced Acoustic Tagging Project. 
+#'   This data package queries tagging data from many studies using the ERDDAP data server.
+#'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
+'survival_model_inputs'

@@ -3,11 +3,12 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   prep_environmental_covariates: prep_environmental_covariates.html
+  sr_covariates: sr_covariates.html
   summary_of_data_for_modeling: summary_of_data_for_modeling.html
   trap_effort: trap_effort.html
   yearling_ruleset: yearling_ruleset.html
   years_to_include_analysis: years_to_include_analysis.html
-last_built: 2024-03-20T15:14Z
+last_built: 2024-05-02T17:34Z
 urls:
   reference: https://SRJPE.github.io/SRJPEdata/reference
   article: https://SRJPE.github.io/SRJPEdata/articles

@@ -20,7 +20,7 @@
 \item \code{ladder}: the ladder the fish was observed at
 \item \code{flow}: flow in cfs at the weir
 \item \code{temperature}: temperature in C at the weir
-\item \code{hours}: hours the camera was in operation #TODO confirm
+\item \code{hours}: hours the camera was in operation
 \item \code{comments}: comments
 }
 }

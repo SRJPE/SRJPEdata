@@ -10,7 +10,7 @@ Dataframe with 186 rows and 8 columns
 \item \code{monitoring_year} : year
 \item \code{stream}: Stream RST is located on
 \item \code{site}: Site RST is located on
-\item \code{site_group}: Site group
+\item \code{site_group}:Site group, used to separate traps within the same stream that have unique environmental conditions.
 \item \code{min_date} : Minimum date of sampling season to include
 \item \code{min_week} : Minimum week of sampling season to include
 \item \code{max_date} : Maximum date of sampling season to include

@@ -45,6 +45,5 @@ redd
 \description{
 Raw redd survey monitoring data. Redd survey data is available
 for Battle Creek, Clear Creek, Feather River, Mill Creek, Yuba River.
-TODO link to vignette on age_index when available
 }
 \keyword{datasets}

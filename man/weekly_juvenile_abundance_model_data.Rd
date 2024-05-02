@@ -14,14 +14,14 @@ A tibble with 9,457 rows and 17 columns
 \item \code{count}: weekly count of number of
 \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish
 \item \code{number_released}: Number of efficiency trial fish released
-\item \code{number_recaptured}: Number of efficency trial fish recaptured
-\item \code{effort}: Hours fished on a stream (TODO: rename to hours fished)
+\item \code{number_recaptured}: Number of efficiency trial fish recaptured
+\item \code{hours_fished}: Hours fished on a stream
 \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
 \item \code{life_stage}: Life stage of juvenile fish
-\item \code{average_stream_effort}: Average hours fished on a given stream, used to standize
+\item \code{average_stream_effort}: Average hours fished on a given stream, used to standardize
 \item \code{standardized_flow}: Flow standardized across years and sites
 \item \code{run_year}: Run year
-\item \code{catch_standardized_by_effort}: Catch standardized by hours fished in a given week
+\item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week
 \item \code{standardized_efficiency}: Efficiency standardized across years
 \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search \code{?SRJPEdata::btspasx_special_priors_data}
 }

@@ -11,7 +11,7 @@ Dataframe with \strong{TODO EMPTY IN DATABASE CURRENTLY} and 6 columns
 \item \code{stream}: stream where efficiency trial conducted
 \item \code{site}: site where efficiency trial conducted
 \item \code{subsite}: subsite where efficiency trial conducted
-\item \code{site_group}: site group where efficiency trial conducted
+\item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 \item \code{fork_length}: fork length of released fish
 }
 }
