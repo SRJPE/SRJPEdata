@@ -21,7 +21,7 @@
 #' @title Weekly BT-SPAS-X Model Data
 #' @name weekly_juvenile_abundance_model_data
 #' @description Weekly Rotary Screw Trap (RST) catch summaries, weekly RST effort effort, and weekly standardized flow, 
-#' for spring run tributaries modeled in BT-SPAS-X. TODO - consider removing count, effort, and flow_cfs since we have somewhat duplicative columns 
+#' for spring run tributaries modeled in BT-SPAS-X.
 #' @format A tibble with 9,457 rows and 17 columns 
 #' \itemize{
 #'   \item \code{year}: year 
@@ -72,7 +72,7 @@
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   \item \code{count}: Number of fish caught  
 #'   \item \code{run}: Run of catch  
-#'   \item \code{life_stage}: Life Stage of catch  
+#'   \item \code{life_stage}: Life Stage of catch, standardized based on FL (fork lenght < 45mm = "fry", fork length > 45mm and < yearling cutoff == "smolt")  
 #'   \item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch  
 #'   \item \code{dead}: Mortality status of catch  
 #'   \item \code{fork_length}: Fork length measure of catch in mm  
@@ -275,7 +275,6 @@
 #' @description Carcass Estimates produced by analyzing mark-recapture carcass surveys
 #' with a Cormack-Jolly-Seber (CJS) model. Performed on the Yuba River, Feather River, and 
 #' Butte Creek. Butte Creek uses the `escapeMR` package applied to raw count data.
-#' TODO add source to show / explain specific sites we have this for 
 #' @format 
 #' \itemize{
 #'   \item \code{year}: year data were collected
@@ -444,7 +443,7 @@
 #' @format
 #' \itemize{
 #'   \item \code{fish_id}: Unique identifier associated with each released fish 
-#'   \item \code{ch}: Capture history of each fish describing detection at reciever location, 0 indicated not detected, 1 indicates detected 
+#'   \item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected 
 #'   \item \code{study_id}: Unique identifier associated with each release group 
 #'   \item \code{fish_length}: Fork length of fish in mm 
 #'   \item \code{fish_weight}: Weight of fish in grams 

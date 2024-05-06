@@ -14,7 +14,7 @@ A dataframe with 511,961 rows and 14 columns
 \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 \item \code{count}: Number of fish caught
 \item \code{run}: Run of catch
-\item \code{life_stage}: Life Stage of catch
+\item \code{life_stage}: Life Stage of catch, standardized based on FL (fork lenght < 45mm = "fry", fork length > 45mm and < yearling cutoff == "smolt")
 \item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch
 \item \code{dead}: Mortality status of catch
 \item \code{fork_length}: Fork length measure of catch in mm

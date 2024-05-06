@@ -36,6 +36,6 @@ weekly_juvenile_abundance_model_data
 }
 \description{
 Weekly Rotary Screw Trap (RST) catch summaries, weekly RST effort effort, and weekly standardized flow,
-for spring run tributaries modeled in BT-SPAS-X. TODO - consider removing count, effort, and flow_cfs since we have somewhat duplicative columns
+for spring run tributaries modeled in BT-SPAS-X.
 }
 \keyword{datasets}

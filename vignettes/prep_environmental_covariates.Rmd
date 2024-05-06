@@ -55,12 +55,12 @@ gdd_base_trib <- 20
 migratory_months <- 3:5
 holding_months <- 5:8
 
-# read in standard temperature (database-tables does not have the mean column)
-# TODO when temperature_data_pull.Rmd creates a data object, use that
-standard_temp <- read_csv(here::here("data-raw", "database-tables", "standard_temperature.csv"))
+# read in temperature data pull (database-tables does not have the mean column)
+standard_temperature <- SRJPEdata::environmental_data |> 
+  filter(parameter == "temperature")
 
 # calculate sum of days above the thresholds
-gdd_sac <- standard_temp |> 
+gdd_sac <- standard_temperature |> 
   filter(month(date) %in% migratory_months, 
          stream == "sacramento river",
          statistic == "mean") |> 
@@ -71,7 +71,7 @@ gdd_sac <- standard_temp |>
   rename(year = `year(date)`) |>
   ungroup()
 
-gdd_trib <- standard_temp |>
+gdd_trib <- standard_temperature |>
   filter(month(date) %in% holding_months, 
         stream != "sacramento river",
         statistic == "mean") |>
@@ -104,17 +104,15 @@ gdd |>
 Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# TODO update to use data object from flow data pull . Rmd
-# TODO update format to account for new environmental_gage data object, will have date, site, stream, gage agency, gage number, parameter, statistic, value, unit(?)
-
 migratory_and_holding_months <- 3:8
 
-flow_metrics <- read_csv(here::here("data-raw", "database-tables", "standard_flow.csv")) |> 
+flow_metrics <- SRJPEdata::environmental_data |> 
+  filter(parameter == "flow") |> 
   filter(month(date) %in% migratory_and_holding_months) |>
   mutate(year = year(date)) |>
   group_by(stream, year) |>
-  summarise(mean_flow = mean(flow_cfs, na.rm = T),
-            max_flow = max(flow_cfs, na.rm = T)) |> 
+  summarise(mean_flow = mean(value, na.rm = T),
+            max_flow = max(value, na.rm = T)) |> 
   ungroup()
 
 knitr::kable(head(flow_metrics, 10))

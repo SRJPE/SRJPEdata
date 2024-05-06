@@ -9,16 +9,15 @@ source("data-raw/pull_tables_from_database.R") # pulls in all standard datasets 
 # Catch Formatting --------------------------------------------------------------
 # Rewrite script from catch pulled from JPE database
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
-catch |> glimpse()
+rst_catch |> glimpse()
 chosen_site_years_to_model |> glimpse()
 
 # add lifestage and yearling logic to catch table, filter to chinook 
-standard_catch_unmarked <- catch |> 
+standard_catch_unmarked <- rst_catch |> 
   filter(species == "chinook") |>  # filter for only chinook
   mutate(month = month(date), # add to join with lad and yearling
          day = day(date)) |> 
   left_join(daily_yearling_ruleset) |> 
-  # TODO decide if we want to documenat lifestage for model in yearling vignette as well or elsewhere. 
   mutate(is_yearling = case_when((fork_length <= cutoff & !run %in% c("fall","late fall", "winter")) ~ F,
                                  (fork_length > cutoff & !run %in% c("fall","late fall", "winter")) ~ T,
                                  (run %in% c("fall","late fall", "winter")) ~ NA,
@@ -34,8 +33,6 @@ standard_catch_unmarked <- catch |>
 
 
 # FL-based lifestage logic ------------------------------------------------
-# TODO consider making this a vignette, at the very least explain our assumptions in a vignette 
-
 # add logic to assign lifestage_for_model 
 # extrapolate lifestage for model for plus count fish/fish without fork lenghts based on weekly fl probabilities
 # Create table with prob fry, smolt, and yearlings for each stream, site, week, year
@@ -138,8 +135,6 @@ catch_with_inclusion_criteria <- updated_standard_catch |>
 
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
-# TODO review logic with Ashley/Liz to confirm 
-# TODO confirm that okay to remove Run designation here! (causes many to many join problems with hatch fish), seems okay to remove since we are later using PLAD to designate 
 weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
@@ -219,30 +214,37 @@ weekly_catch_effort <- left_join(weekly_standard_catch_unmarked, weekly_effort) 
   mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
 
 # Environmental -----------------------------------------------------------
+source("data-raw/pull_environmental_data.R")
 
-# TODO pull flow_standard_format.Rmd into this repo as a vignette, clean up 
-# # Source vignette 
-weekly_flow <- standard_flow |> 
+# update site lookup so joins to env data better
+lookup_updated_site_group <- site_lookup |>
+  mutate(site_group = ifelse(site_group %in% 
+                               c("upper feather lfc","upper feather hfc","lower feather river"),
+                             site_group, NA))
+
+env_with_sites <- environmental_data |> 
+  left_join(lookup_updated_site_group)  |> glimpse()
+
+weekly_flow <- env_with_sites |> 
+  filter(parameter == "flow",
+         statistic == "mean") |> 
   mutate(week = week(date),
          year = year(date)) |> 
-  group_by(week, year, stream, site, source) |> 
-  summarize(mean_flow = mean(flow_cfs, na.rm = T)) |> glimpse()
+  group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
+  summarize(mean_flow = mean(value, na.rm = T)) |> glimpse()
 
-# TODO pull temperature_standard_format.Rmd into this repo as a vignette, clean up 
-# # Source vignette 
-weekly_temperature <- standard_temperature |> 
+weekly_temperature <- env_with_sites |> 
+  filter(parameter == "temperature",
+         statistic == "mean")  |> 
   mutate(week = week(date),
          year = year(date)) |> 
-  group_by(week, year, stream, site, subsite, source) |> 
-  summarize(mean_temperature = mean(mean_daily_temp_c, na.rm = T)) |> glimpse()
-# Trap with Catch --------------------------------------------------------------
-# TODO is this used? NO remove for now - can add back in later 
+  group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
+  summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
 glimpse(efficiency_summary)
 
-# TODO add in flow and median fork length info (currently not in database)
 weekly_efficiency <- efficiency_summary |> 
   group_by(stream, site, site_group, 
            week_released = day(date_released), 
@@ -252,20 +254,18 @@ weekly_efficiency <- efficiency_summary |>
   ungroup() |> 
   glimpse()
 
-# TODO update to source this file and save direct model inputs instead 
-
-
 weekly_standard_catch_unmarked  |> glimpse()
 weekly_efficiency |> glimpse()
-standard_flow |> glimpse()
 
 # reformat flow data and summarize weekly
 # TODO 32 NAs, fill in somehow  
-flow_reformatted <- standard_flow |> 
+flow_reformatted <- env_with_sites |> 
+  filter(parameter == "flow",
+         statistic == "mean") |> 
   mutate(year = year(date),
          week = week(date)) |> 
-  group_by(year, week, site, stream, source) |> 
-  summarise(flow_cfs = mean(flow_cfs, na.rm = T)) |> 
+  group_by(year, week, site, stream, gage_agency, gage_number) |> 
+  summarise(flow_cfs = mean(value, na.rm = T)) |> 
   glimpse()
 
 weekly_efficiency |> glimpse()
@@ -286,14 +286,14 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
   left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
   # select columns that josh uses 
   select(year, week, stream, site, count, mean_fork_length, 
-         number_released, number_recaptured, effort = hours_fished, 
+         number_released, number_recaptured, hours_fished, 
          flow_cfs, life_stage) |> 
   group_by(stream) |> 
-  mutate(average_stream_effort = mean(effort, na.rm = TRUE),
+  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE),
          standardized_flow = as.vector(scale(flow_cfs))) |> # standardizes and centers see ?scale
   ungroup() |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year),
-         catch_standardized_by_effort = ifelse(is.na(effort), count, round(count * average_stream_effort / effort, 0))) |> 
+         catch_standardized_by_hours_fished = ifelse(is.na(hours_fished), count, round(count * average_stream_hours_fished / hours_fished, 0))) |> 
   glimpse()
 
 # Add in standardized efficiency flows 
@@ -325,7 +325,6 @@ weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |>
   left_join(efficiency_standard_flows, by = c("year", "week", "stream", "site"))
 
 # ADD special priors data in 
-# TODO ask Josh how he generates these / come up with update workflow
 btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", "Special_Priors.csv")) |>
   mutate(site = ifelse(Stream_Site == "battle creek_ubc", "ubc", NA)) |>
   select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max)
@@ -342,4 +341,4 @@ weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
 # Why does battle start in 2007 - did we intentionally leave early years out of database 
 usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)
 
-weekly_model_data |> filter(site == "ubc", year == 2009, week == 4) 
+weekly_juvenile_abundance_model_data |> filter(site == "ubc", year == 2009, week == 4) 

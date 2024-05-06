@@ -7,7 +7,7 @@
 \format{
 \itemize{
 \item \code{fish_id}: Unique identifier associated with each released fish
-\item \code{ch}: Capture history of each fish describing detection at reciever location, 0 indicated not detected, 1 indicates detected
+\item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected
 \item \code{study_id}: Unique identifier associated with each release group
 \item \code{fish_length}: Fork length of fish in mm
 \item \code{fish_weight}: Weight of fish in grams

@@ -30,7 +30,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
                   "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
                   "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
 )
-# source(here::here("data-raw", "pull_tables_from_database.R"))
+source(here::here("data-raw", "pull_environmental_data.R"))
 ```
 
 # Selecting Stock Recruit (SR) Environmental Covariates
@@ -58,7 +58,7 @@ Temperature has been found to influence spawning and rearing. Therefore it is ex
 - *In development: Emergence date (calculated from temperature and spawning date)*
 
 ```{r, include=F}
-# google cloud set up
+# pull in standard temp from env data
 standard_temperature <- SRJPEdata::environmental_data |> 
   filter(parameter == "temperature")
 ```
@@ -121,7 +121,7 @@ Day of the year and week when the 7DADM is above 13C
 
 - Data are not filtered to the spawning time period (Aug-Dec) as this threshold is typically met before August
 - Below 13C is not included as this does not make sense in terms of impact on salmon. Temperatures are rarely below 13C during the spawning time period and if they are, unlikely to be significantly cold enough to have an impact
-- TODO - Currently do not have max daily temperatures for the Sacramento so mainstem is not included
+- Note, We currently do not have max daily temperatures for the Sacramento so mainstem is not included
  
 ```{r, include = F}
 # 1. hypothesized for spawning so select spawning time period 

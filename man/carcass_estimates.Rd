@@ -27,6 +27,5 @@ carcass_estimates
 Carcass Estimates produced by analyzing mark-recapture carcass surveys
 with a Cormack-Jolly-Seber (CJS) model. Performed on the Yuba River, Feather River, and
 Butte Creek. Butte Creek uses the \code{escapeMR} package applied to raw count data.
-TODO add source to show / explain specific sites we have this for
 }
 \keyword{datasets}
