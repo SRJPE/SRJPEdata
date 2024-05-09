@@ -111,7 +111,7 @@ reach_metadata <- get_receiver_sites_metadata(all_detections)
 region_mapped_reach_metadata <- reach_metadata %>%
   filter(receiver_general_location %in% c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec","Altube Island","MillCk_RST_Rel",
                     "MillCk2_Rel","DeerCk_RST_Rel","Mill_Ck_Conf",
-                    "Abv_WoodsonBr","Blw_Woodson",
+                    "Abv_WoodsonBr","Blw_Woodson", "ButteBr","BlwButteBr",
                     "I80-50_Br","TowerBridge",
                     "ToeDrainBase","Hwy84Ferry",
                     "BeniciaE","BeniciaW","ChippsE","ChippsW"))%>%
@@ -156,6 +156,7 @@ map_reaches <- aggregate$reach_meta_aggregate %>%
 all_encounter_history <- make_fish_encounter_history(detections = all_aggregated, 
                                                      aggregated_reciever_metadata = aggregate$reach_meta_aggregate,
                                                      released_fish_table = fish_data |> filter(study_id %in% jpe_ids))
+
 
 # Add in fish information to inp file
 # First add in fish info
