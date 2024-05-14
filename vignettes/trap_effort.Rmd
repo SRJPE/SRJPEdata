@@ -258,7 +258,7 @@ hours_fished_combined <- bind_rows(method_one,
   mutate(hours_fished = ifelse(is.na(hours_fished), 24, hours_fished)) %>% 
   rename(date = trap_stop_date) %>% 
   group_by(stream, site, subsite, site_group, date) %>% 
-  summarize(hours_fished = sum(hours_fished)) 
+  summarise(hours_fished = sum(hours_fished)) 
 ```
 
 ## Summarized by week
@@ -270,7 +270,7 @@ weekly_hours_fished <- hours_fished_combined %>%
   mutate(week = week(date),
          year = year(date)) %>% 
   group_by(stream, site, subsite, site_group, week, year) %>% 
-  summarize(hours_fished = sum(hours_fished),
+  summarise(hours_fished = sum(hours_fished),
             hours_fished = ifelse(hours_fished > 168, 168, hours_fished)) |>  #only 168 hours in a year 
   ungroup()
 

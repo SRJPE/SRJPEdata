@@ -1,20 +1,20 @@
-# Create data file for Run Size and Proportion Captured models.
-# Assume that if trap was fished and no chinook caught, a value of u = 0 is in the input file
-# and that if trap was not fished there is no record in file
+library(SRJPEdata)
+library(tidyverse)
+#mill deer 2022/2023
 
-# Scripts to prepare data for model
-library(lubridate)
-source("data-raw/pull_tables_from_database.R") # pulls in all standard datasets on GCP
+rst_catch <- read_csv("https://raw.githubusercontent.com/SRJPE/jpe-deer-mill-edi/2022-efficiency/data/deer_mill_catch_edi.csv") |> 
+  mutate(run = NA) |> glimpse()
+trap <- read_csv("https://raw.githubusercontent.com/SRJPE/jpe-deer-mill-edi/2022-efficiency/data/deer_mill_trap_edi.csv") |> glimpse()
+release <- read_csv("https://raw.githubusercontent.com/SRJPE/jpe-deer-mill-edi/2022-efficiency/data/deer_mill_release_edi.csv") |> glimpse()
+recaptures <- read_csv("https://raw.githubusercontent.com/SRJPE/jpe-deer-mill-edi/2022-efficiency/data/deer_mill_recapture_edi.csv") |> glimpse()
 
-# Catch Formatting --------------------------------------------------------------
-# Rewrite script from catch pulled from JPE database
-# Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 rst_catch |> glimpse()
-chosen_site_years_to_model |> glimpse()
+SRJPEdata::chosen_site_years_to_model |> glimpse()
 
 # add lifestage and yearling logic to catch table, filter to chinook 
 standard_catch_unmarked <- rst_catch |> 
-  filter(species == "chinook") |>  # filter for only chinook
+  filter(date > as.Date("2022-09-01")) |> 
+  filter(species == "chinook salmon") |>  # filter for only chinook
   mutate(month = month(date), # add to join with lad and yearling
          day = day(date)) |> 
   left_join(daily_yearling_ruleset) |> 
@@ -27,8 +27,10 @@ standard_catch_unmarked <- rst_catch |>
                                 fork_length > 45 & run %in% c("fall", "late fall", "winter", "not recorded") ~ "smolt",
                                 fork_length > 45 & stream == "sacramento river" ~ "smolt",
                                 fork_length <= 45 ~ "fry", # logic from flora includes week (all weeks but 7, 8, 9 had this threshold) but I am not sure this is necessary, worth talking through
-                                T ~ NA)) |> 
-  select(-species, -month, -day, -cutoff, -actual_count) |> 
+                                T ~ NA),
+         site = ifelse(stream == "mill creek", "mill creek", "deer creek"),
+         adipose_clipped = FALSE) |> 
+  select(-species, -month, -day, -cutoff) |> 
   glimpse()
 
 
@@ -42,7 +44,7 @@ weekly_lifestage_bins <- standard_catch_unmarked |>
   group_by(year, week, stream, site) |> 
   summarise(percent_fry = sum(life_stage == "fry")/n(),
             percent_smolt = sum(life_stage == "smolt")/n(),
-            percent_yearling = sum(life_stage == "yearling")/n()) |> 
+            percent_yearling = sum(life_stage == "yearling")/n()) |>
   ungroup() |> 
   glimpse() 
 
@@ -124,14 +126,15 @@ updated_standard_catch |>
 
 # Filter to use includion criteria ---------------------------------------------
 catch_with_inclusion_criteria <- updated_standard_catch |> 
-  mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
-  left_join(years_to_include) |> 
-  mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
-         # if the year was not included in the list of years to include then should be FALSE
-         include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
-  filter(include_in_model) |> 
-  select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
-  glimpse()
+  mutate(site_group = "site group") |> glimpse()
+  # mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
+  # left_join(years_to_include) |> 
+  # mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
+  #        # if the year was not included in the list of years to include then should be FALSE
+  #        include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
+  # filter(include_in_model) |> 
+  # select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
+  # glimpse()
 
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
@@ -139,7 +142,7 @@ weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |>
   mutate(week = week(date),
          year = year(date)) |> 
   group_by(week, year, stream, site, site_group, life_stage) %>% #removed run & adclip here 
-  summarize(mean_fork_length = mean(fork_length, na.rm = T),
+  summarise(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count, na.rm = T))  |>  
   filter(count > 0) |> 
@@ -152,7 +155,7 @@ weekly_standard_catch_zeros <- catch_with_inclusion_criteria |>
   mutate(week = week(date),
          year = year(date)) |> 
   group_by(week, year, stream, site, site_group, life_stage) %>% #removed run & adclip here  
-  summarize(mean_fork_length = mean(fork_length, na.rm = T),
+  summarise(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count, na.rm = T))  |>  
   filter(count == 0) |> 
@@ -169,7 +172,7 @@ hatch_per_week <- catch_with_inclusion_criteria |>
   mutate(week = week(date),
          year = year(date)) |> 
   group_by(week, year, stream, site, site_group, life_stage) |> 
-  summarize(count = sum(count, na.rm = TRUE)) |> 
+  summarise(count = sum(count, na.rm = TRUE)) |> 
   ungroup() |> 
   mutate(expanded_weekly_hatch_count = ifelse(stream == "feather river", 
                                               count, 
@@ -231,7 +234,7 @@ weekly_flow <- env_with_sites |>
   mutate(week = week(date),
          year = year(date)) |> 
   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
-  summarize(mean_flow = mean(value, na.rm = T)) |> glimpse()
+  summarise(mean_flow = mean(value, na.rm = T)) |> glimpse()
 
 weekly_temperature <- env_with_sites |> 
   filter(parameter == "temperature",
@@ -239,18 +242,21 @@ weekly_temperature <- env_with_sites |>
   mutate(week = week(date),
          year = year(date)) |> 
   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
-  summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
+  summarise(mean_temperature = mean(value, na.rm = T)) |> glimpse()
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
 glimpse(efficiency_summary)
+efficiency_summary <- full_join(release, recaptures) |> 
+  mutate(site = ifelse(stream == "mill creek", "mill creek", "deer creek"), 
+         site_group = ifelse(stream == "mill creek", "mill creek", "deer creek")) |> glimpse()
 
 weekly_efficiency <- efficiency_summary |> 
   group_by(stream, site, site_group, 
-           week_released = day(date_released), 
-           year_released = year(date_released)) |> 
-  summarize(number_released = sum(number_released, na.rm = TRUE),
-            number_recaptured = sum(number_recaptured, na.rm = TRUE)) |> 
+           week_released = day(release_date), 
+           year_released = year(release_date)) |> 
+  summarise(number_released = sum(number_released, na.rm = TRUE),
+            number_recaptured = sum(total_recaptured, na.rm = TRUE)) |> 
   ungroup() |> 
   glimpse()
 
@@ -270,18 +276,38 @@ flow_reformatted <- env_with_sites |>
 
 weekly_efficiency |> glimpse()
 
-weekly_effort_by_site |> glimpse()
 
-catch_reformatted <- weekly_standard_catch |>  glimpse()
+catch_reformatted <- weekly_standard_catch |>  
+  mutate(site_group = ifelse(stream == "mill creek", "mill creek", "deer creek"),) |> glimpse()
+
+weekly_effort_by_site <- trap %>% 
+  mutate(site = ifelse(stream == "mill creek", "mill creek", "deer creek"),  
+         site_group = ifelse(stream == "mill creek", "mill creek", "deer creek"),
+         subsite = ifelse(stream == "mill creek", "mill creek", "deer creek"),) |> 
+  rename(trap_stop_date = date) |> 
+  distinct(trap_stop_date, stream, site, subsite, site_group) %>% 
+  mutate(hours_fished_methodology = "24 hour assumption") %>% 
+  mutate(hours_fished = 24) |> 
+  rename(date = trap_stop_date) %>% 
+  group_by(stream, site, subsite, site_group, date) %>% 
+  summarise(hours_fished = sum(hours_fished)) |> 
+  mutate(week = week(date),
+         year = year(date)) %>% 
+  group_by(stream, site, subsite, site_group, week, year) %>% 
+  summarise(hours_fished = sum(hours_fished),
+            hours_fished = ifelse(hours_fished > 168, 168, hours_fished)) |>  #only 168 hours in a year 
+  ungroup()
+
+weekly_effort_by_site
 
 # Combine all 3 tables together 
 weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
-  left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site")) |> 
+  left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site", "site_group")) |> 
   # Join efficnecy data to catch data
   left_join(weekly_efficiency, 
             by = c("week" = "week_released",
                    "year" = "year_released", "stream", 
-                   "site")) |> 
+                   "site", "site_group")) |> 
   # join flow data to dataset
   left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
   # select columns that josh uses 
@@ -331,14 +357,9 @@ btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", 
 
 # JOIN special priors with weekly model data
 # first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
-weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
+weekly_juvenile_abundance_model_data_mill_deer_2022_2023 <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log((count / 1000) + 1) / 0.025)) |> # maximum possible value for log N across strata
   select(-special_prior)
 
-
-# TODO data checks 
-# Why does battle start in 2007 - did we intentionally leave early years out of database 
-usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)
-
-weekly_juvenile_abundance_model_data |> filter(site == "ubc", year == 2009, week == 4) 
+usethis::use_data(weekly_juvenile_abundance_model_data_mill_deer_2022_2023)
