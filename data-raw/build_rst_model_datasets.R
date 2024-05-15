@@ -9,7 +9,7 @@ source("data-raw/pull_tables_from_database.R") # pulls in all standard datasets 
 # Catch Formatting --------------------------------------------------------------
 # Rewrite script from catch pulled from JPE database
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
-rst_catch |> glimpse()
+SRJPEdata::rst_catch |> glimpse()
 chosen_site_years_to_model |> glimpse()
 
 # add lifestage and yearling logic to catch table, filter to chinook 
@@ -326,14 +326,14 @@ weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |>
 
 # ADD special priors data in 
 btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", "Special_Priors.csv")) |>
-  mutate(site = ifelse(Stream_Site == "battle creek_ubc", "ubc", NA)) |>
-  select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max)
+  mutate(site = sub(".*_", "", Stream_Site)) |>
+  select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max) |> glimpse()
 
 # JOIN special priors with weekly model data
 # first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
 weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
-  mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log((count / 1000) + 1) / 0.025)) |> # maximum possible value for log N across strata
+  mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
   select(-special_prior)
 
 
