@@ -345,4 +345,4 @@ weekly_juvenile_abundance_model_data_mill_deer_2022_2023 <- weekly_model_data_wi
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
   select(-special_prior)
 
-usethis::use_data(weekly_juvenile_abundance_model_data_mill_deer_2022_2023)
+usethis::use_data(weekly_juvenile_abundance_model_data_mill_deer_2022_2023, overwrite = TRUE)
