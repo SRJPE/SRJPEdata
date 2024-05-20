@@ -198,24 +198,6 @@ weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |>
 # Bins need to match PLAD bins (or finer) so we can map
 # Think through how hatchery would play in here  
 
-# Trap Formatting ---------------------------------------------------------
-# Weekly effort from vignette/trap_effort.Rmd
-weekly_effort_by_site <- weekly_effort |> 
-  group_by(week, year, stream, site, site_group) %>% 
-  summarize(hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
-  ungroup()
-
-# Catch & Effort ----------------------------------------------------------
-
-# Join weekly effort data to weekly catch data
-# there are a handful of cases where hours fished is NA. 
-# weekly hours fished will be assumed to be 168 hours (24 hours * 7) as most
-# traps fish continuously. Ideally these data points would be filled in, however,
-# after extensive effort 54 still remain. It is unlikely that these datapoints
-# will have a huge effect in such a large data set.
-weekly_catch_effort <- left_join(weekly_standard_catch_unmarked, weekly_effort) |> 
-  mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
-
 # Environmental -----------------------------------------------------------
 source("data-raw/pull_environmental_data.R")
 
@@ -246,14 +228,15 @@ weekly_temperature <- env_with_sites |>
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
-glimpse(efficiency_summary)
+# glimpse(efficiency_summary)
 efficiency_summary <- full_join(release, recaptures) |> 
+  filter(release_date > as.Date("2022-09-01")) |> 
   mutate(site = ifelse(stream == "mill creek", "mill creek", "deer creek"), 
          site_group = ifelse(stream == "mill creek", "mill creek", "deer creek")) |> glimpse()
 
 weekly_efficiency <- efficiency_summary |> 
   group_by(stream, site, site_group, 
-           week_released = day(release_date), 
+           week_released = week(release_date), 
            year_released = year(release_date)) |> 
   summarise(number_released = sum(number_released, na.rm = TRUE),
             number_recaptured = sum(total_recaptured, na.rm = TRUE)) |> 
@@ -307,7 +290,7 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
   left_join(weekly_efficiency, 
             by = c("week" = "week_released",
                    "year" = "year_released", "stream", 
-                   "site", "site_group")) |> 
+                   "site", "site_group")) |>
   # join flow data to dataset
   left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
   # select columns that josh uses 
@@ -352,14 +335,14 @@ weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |>
 
 # ADD special priors data in 
 btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", "Special_Priors.csv")) |>
-  mutate(site = ifelse(Stream_Site == "battle creek_ubc", "ubc", NA)) |>
+  mutate(site = sub(".*_", "", Stream_Site)) |>
   select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max)
 
 # JOIN special priors with weekly model data
 # first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
 weekly_juvenile_abundance_model_data_mill_deer_2022_2023 <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
-  mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log((count / 1000) + 1) / 0.025)) |> # maximum possible value for log N across strata
+  mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
   select(-special_prior)
 
 usethis::use_data(weekly_juvenile_abundance_model_data_mill_deer_2022_2023)

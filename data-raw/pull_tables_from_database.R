@@ -12,7 +12,7 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       user = Sys.getenv("jpe_db_user_id"),
                       password = Sys.getenv("jpe_db_password"),
                       port = 5432)
-# DBI::dbListTables(con)
+DBI::dbListTables(con)
 
 # PULL IN RST DATA -------------------------------------------------------------
 # Pull in Catch table
