@@ -295,7 +295,15 @@ chosen_site_years_to_model <- include |>
                                 site %in% hfc_sites ~ "feather river hfc",
                                 T ~ NA)) |> 
   filter(exclude == F) |> 
-  select(monitoring_year, stream, site_group, site, min_date, min_week, max_date, max_week)
+  select(monitoring_year, stream, site_group, site, min_date, min_week, max_date, max_week) |> 
+  mutate(site_group = case_when(stream == "deer creek" ~ "deer creek",
+                                stream == "butte creek" ~ "butte creek", 
+                                stream == "mill creek" ~ "mill creek", 
+                                site == "knights landing" ~ "knights landing",
+                                site == "tisdale" ~ "tisdale", 
+                                stream == "yuba river" ~ "yuba river",
+                                stream == "clear creek" ~ "clear creek", 
+                                stream == "battle creek" ~ "battle creek"))
 
 usethis::use_data(chosen_site_years_to_model, overwrite = TRUE)
 ```

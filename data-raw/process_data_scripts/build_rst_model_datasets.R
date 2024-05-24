@@ -243,12 +243,12 @@ weekly_temperature <- env_with_sites |>
 # pulled in release_summary
 glimpse(efficiency_summary)
 
-weekly_efficiency <- efficiency_summary |> 
+weekly_efficiency <- left_join(release, recaptures) |> 
   group_by(stream, site, site_group, 
            week_released = day(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
-            number_recaptured = sum(number_recaptured, na.rm = TRUE)) |> 
+            number_recaptured = sum(count, na.rm = TRUE)) |> 
   ungroup() |> 
   glimpse()
 
@@ -334,9 +334,5 @@ weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
   select(-special_prior)
 
-
-# TODO data checks 
-# Why does battle start in 2007 - did we intentionally leave early years out of database 
+# write to package 
 usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)
-
-weekly_juvenile_abundance_model_data |> filter(site == "ubc", year == 2009, week == 4) 

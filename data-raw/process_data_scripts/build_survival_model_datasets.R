@@ -17,8 +17,7 @@ joined_detections <- fish_data |>
                     "fish_id" = "fish_id")) |> # Used inner join because that is what the example ERDAPP script was doing, think through this more
   left_join(reciever_data) |> 
   mutate(latitude = as.numeric(latitude), 
-         longitude = as.numeric(longitude)) |> 
-  glimpse()
+         longitude = as.numeric(longitude)) 
 
 # MAP 
 detect_summary <- aggregate(list(fish_count = joined_detections$fish_id), 
@@ -26,7 +25,7 @@ detect_summary <- aggregate(list(fish_count = joined_detections$fish_id),
                                       latitude = joined_detections$receiver_general_latitude, 
                                       longitude = joined_detections$receiver_general_longitude), function(x){length(unique(x))}) |> 
   mutate(latitude = as.numeric(latitude), 
-        longitude = as.numeric(longitude)) |> glimpse()
+        longitude = as.numeric(longitude)) 
 
 library(ggplot2)
 library(mapdata)
@@ -120,7 +119,7 @@ surv_model_inputs_with_fish_information <- all_encounter_history %>%
               filter(study_id %in% jpe_ids) |> 
               select(fish_id, study_id, fish_length, fish_weight, fish_type,fish_release_date,
                                    release_location), by = c("fish_id" = "fish_id")) |> 
-  mutate(year = year(as.Date(fish_release_date, format="%m/%d/%Y"))) |> glimpse()
+  mutate(year = year(as.Date(fish_release_date, format="%m/%d/%Y"))) 
 
 survival_model_inputs <- surv_model_inputs_with_fish_information
 usethis::use_data(survival_model_inputs, overwrite = TRUE)
@@ -135,6 +134,6 @@ fish_summary <- surv_model_inputs_with_fish_information %>%
             N=n(),
             recaptured_site_1 = sum(str_split(ch, "")[[1]][2] == "1"),
             recaptured_site_2 = sum(str_split(ch, "")[[1]][3] == "1"),
-            recaptured_site_3 = sum(str_split(ch, "")[[1]][3] == "1")) |> glimpse()
+            recaptured_site_3 = sum(str_split(ch, "")[[1]][3] == "1")) 
 
 
