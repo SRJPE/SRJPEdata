@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 
 ```{r setup, echo = FALSE}
 library(SRJPEdata)
-source(here::here("data-raw", "pull_tables_from_database.R"))
 
 colors_small <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
                             "#899DA4", "#C93312", "#DC863B" # royal 1 (- 3)

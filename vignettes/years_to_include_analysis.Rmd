@@ -26,7 +26,6 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
                   "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
                   "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
 )
-source(here::here("data-raw", "pull_tables_from_database.R"))
 ```
 
 The Spring Run Juvenile Production Estimate is trained on historical Rotary Screw Trap and Adult Surveys. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and Adult years to include.
@@ -161,8 +160,39 @@ plotly::ggplotly(heat_map)
 
 We utilized above cumulative catch curves and heatmaps come up with a list of years to exclude from modeling. See a section of this years to exclude table below.
 
+For ongoing data collection and more recent seasons, we applied an automatic check to determine if a year should be excluded. We use the following criteria to asses if a recent rst season should be excluded from analysis: 
+
+* Missing 4 consecutive weeks in the critical window, OR 
+* If 25% of the weeks are missing (this test is used in place of or origional criteria of "exclude years with lots of missing data from cumulative catch curves" )
+
+We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.
+
 ```{r, echo = FALSE}
 years_to_exclude_rst_data <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
+
+# Bind in new rows from recent data 
+if (month(Sys.Date()) %in% c(8, 9, 10)) {
+  max_old_year <- max(years_to_exclude_rst_data$year)
+  new_years_to_exclude <- SRJPEdata::rst_trap |> 
+    mutate(week = ifelse(is.na(trap_stop_date), week(trap_start_date), week(trap_stop_date)),
+           year = ifelse(is.na(trap_stop_date), year(trap_start_date), year(trap_stop_date))) |> 
+    filter(year > max_old_year) |> 
+    group_by(stream, site, subsite, site_group, week, year) |> 
+    tally() |> 
+    ungroup() |> 
+    group_by(stream, site, subsite, site_group, year) |> 
+    summarise(number_weeks = n()) |> glimpse()# add in logic for consecutive weeks
+    ungroup() |> 
+    mutate(exclude = ifelse(number_weeks < 20, TRUE, FALSE),
+           exclusion_type = "automatic", 
+           reason_for_exclusion = "less than 75% of weeks sampled") |> 
+    filter(exclude) |> 
+    select(stream, year, exclusion_type, reason_for_exclusion)
+  years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
+}  
+
+
+
 usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
 years_exclude_nice_names <- years_to_exclude_rst_data |> select("Stream" = stream, 
                                                     "Year" = year, 
@@ -172,6 +202,7 @@ knitr::kable(head(years_exclude_nice_names, 10))
 ```
 
 *... with `r nrow(years_to_exclude_rst_data) - 10` more rows*
+
 
 ## Applying to modeling datasets
 

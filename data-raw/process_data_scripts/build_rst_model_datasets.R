@@ -1,10 +1,9 @@
 # Create data file for Run Size and Proportion Captured models.
 # Assume that if trap was fished and no chinook caught, a value of u = 0 is in the input file
 # and that if trap was not fished there is no record in file
-
-# Scripts to prepare data for model
+library(SRJPEdata)
 library(lubridate)
-source("data-raw/pull_tables_from_database.R") # pulls in all standard datasets on GCP
+library(tidyverse)
 
 # Catch Formatting --------------------------------------------------------------
 # Rewrite script from catch pulled from JPE database
@@ -13,6 +12,7 @@ SRJPEdata::rst_catch |> glimpse()
 chosen_site_years_to_model |> glimpse()
 
 # add lifestage and yearling logic to catch table, filter to chinook 
+# TODO remove run logic here
 standard_catch_unmarked <- rst_catch |> 
   filter(species == "chinook") |>  # filter for only chinook
   mutate(month = month(date), # add to join with lad and yearling
@@ -214,8 +214,6 @@ weekly_catch_effort <- left_join(weekly_standard_catch_unmarked, weekly_effort) 
   mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
 
 # Environmental -----------------------------------------------------------
-source("data-raw/pull_environmental_data.R")
-
 # update site lookup so joins to env data better
 lookup_updated_site_group <- site_lookup |>
   mutate(site_group = ifelse(site_group %in% 

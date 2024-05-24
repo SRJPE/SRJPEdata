@@ -1,9 +1,6 @@
 # Create data file for passage-to-spawner (P2S) model
 library(tidyverse)
 
-# Pull tables using pull data script 
-source('data-raw/pull_tables_from_database.R')
-
 # upstream passage and estimates -----------------------------------------------
 # upstream passage - use these data for passage timing calculations
 upstream_passage <- SRJPEdata::upstream_passage |> 
@@ -11,16 +8,16 @@ upstream_passage <- SRJPEdata::upstream_passage |>
   mutate(stream = tolower(stream),
          year = year(date)) |>
   filter(run %in% c("spring", NA, "not recorded")) |>
-  group_by(year, passage_direction, stream) |>
+  group_by(year, direction, stream) |>
   summarise(count = sum(count, na.rm = T)) |>
   ungroup() |>
-  pivot_wider(names_from = passage_direction, values_from = count) |>
+  pivot_wider(names_from = direction, values_from = count) |>
   # calculate upstream passage for streams where passage direction is recorded
   mutate(down = ifelse(is.na(down), 0, down),
-         up = case_when(stream %in% c("deer creek", "mill creek") ~ `NA`,
+         up = case_when(stream %in% c("deer creek", "mill creek") ~ NA,
                         !stream %in% c("deer creek", "mill creek") & is.na(up) ~ 0,
-                        TRUE ~ up)) |>
-  select(-`NA`) |>
+                        TRUE ~ up)) |> 
+  select(-`not recorded`) |>
   group_by(year, stream) |>
   summarise(count = round(up - down), 0) |>
   select(year, count, stream) |>
@@ -34,8 +31,8 @@ upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates |>
   glimpse()
 
 # holding -----------------------------------------------------------------
-holding <- SRJPEdata::holding |>
-  group_by(year, stream) |>
+holding <- SRJPEdata::holding |> 
+  group_by(year = year(date), stream) |>
   summarise(count = sum(count, na.rm = T)) |>
   ungroup() |>
   glimpse()
@@ -44,12 +41,12 @@ holding <- SRJPEdata::holding |>
 # have a method for each stream 
 # Use max daily reach count summed across year to get max annual count for streams
 # that do not have redd id 
-redd_non_battle_clear <- SRJPEdata::redd |>
+redd_non_battle_clear <- SRJPEdata::redd |> 
   filter(run %in% c("spring", "not recorded"),
-         species != "steelhead",
+         # species != "steelhead",
          !stream %in% c("battle creek", "clear creek")) |> 
   group_by(stream, reach, date) |> 
-  summarize(daily_reach_count = sum(redd_count, na.rm = TRUE)) |> 
+  summarize(daily_reach_count = n()) |> 
   ungroup() |> 
   group_by(year = year(date), stream, reach) |> 
   summarize(max_daily_reach_count = max(daily_reach_count, na.rm = TRUE)) |> 
@@ -62,11 +59,11 @@ redd_non_battle_clear <- SRJPEdata::redd |>
 # for streams with redd id, just sum redd count (each redd id is only counted once)
 battle_clear_redd <- SRJPEdata::redd |>
   filter(run %in% c("spring", "not recorded"),
-         species %in% c("not recorded", NA, "chinook", "unknown"),
+         # species %in% c("not recorded", NA, "chinook", "unknown"),
          stream %in% c("battle creek", "clear creek"),
          !reach %in% c("R6", "R6A", "R6B", "R7")) |> #TODO remove once reaches are standardized
   group_by(year = year(date), stream) |> 
-  summarize(count = sum(redd_count, na.rm = TRUE)) |> 
+  summarize(count = n()) |> 
   ungroup()
 
 redd_data <- bind_rows(redd_non_battle_clear, battle_clear_redd) |> glimpse()
@@ -76,7 +73,7 @@ redd_data <- bind_rows(redd_non_battle_clear, battle_clear_redd) |> glimpse()
 
 # estimates from CJS model (carcass survey)
 carcass_estimates <- SRJPEdata::carcass_estimates |> 
-  rename(carcass_spawner_estimate = spawner_abundance_estimate) |>
+  rename(carcass_spawner_estimate = carcass_estimate) |>
   glimpse()
 
 # join all together for raw input table for P2S (will be joined to environmental variables) -------------------------------
@@ -92,7 +89,7 @@ observed_adult_input <- full_join(upstream_passage_estimates |>
             by = c("year", "stream")) |>
   full_join(carcass_estimates |>
               rename(carcass_estimate = carcass_spawner_estimate) |>
-              select(-c(lower, upper, confidence_interval)),
+              select(-c(lower_bound_estimate, upper_bound_estimate, confidence_level)),
             by = c("year", "stream")) |> 
   pivot_longer(c(upstream_estimate, redd_count, holding_count, carcass_estimate),
                values_to = "count",

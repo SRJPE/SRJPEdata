@@ -33,6 +33,7 @@ try(if(!exists("battle_creek_data_query"))
          as_tibble() |> 
          rename(date = Date) |> 
          mutate(stream = "battle creek", # add additional columns for stream, gage info, and parameter 
+                site_group = "battle creek",
                 gage_agency = "USGS",
                 gage_number = "11376550",
                 parameter = "flow",
@@ -58,6 +59,7 @@ battle_creek_daily_temp <- ubc_temp_raw |>
             min = min(temp_degC, na.rm = TRUE)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
   mutate(stream = "battle creek",  
+         site_group = "battle creek",
          gage_agency = "USFWS",
          gage_number = "UBC",
          parameter = "temperature") |> 
@@ -88,6 +90,7 @@ try(if(!exists("butte_creek_data_query"))
                    min = min(parameter_value, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
          mutate(stream = "butte creek",
+                site_group = "butte creek",
                 gage_agency = "CDEC",
                 gage_number = "BCK",
                 parameter = "flow"
@@ -120,6 +123,7 @@ try(if(!exists("butte_creek_temp_query"))
                    min = min(temp_degC, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
          mutate(stream = "butte creek",
+                site_group = "butte creek",
                 gage_agency = "CDEC",
                 gage_number = "BCK",
                 parameter = "temperature")))
@@ -150,6 +154,7 @@ try(if(!exists("clear_creek_data_query"))
          as_tibble() |> 
          rename(date = Date) |>
          mutate(stream = "clear creek",
+                site_group = "clear creek",
                 gage_agency = "USGS",
                 gage_number = "11372000",
                 parameter = "flow"
@@ -175,6 +180,7 @@ upperclear_creek_daily_temp <- upperclear_temp_raw |>
             min = min(temp_degC)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
   mutate(stream = "clear creek",  
+         site_group = "clear creek",
          site = "ucc",
          gage_agency = "USFWS",
          gage_number = "UCC",
@@ -193,7 +199,8 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
             max = max(temp_degC),
             min = min(temp_degC)) |> 
   pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "clear creek",  
+  mutate(stream = "clear creek", 
+         site_group = "clear creek",
          site = "lcc",
          gage_agency = "USFWS",
          gage_number = "LCC",
@@ -222,6 +229,7 @@ try(if(!exists("deer_creek_data_query"))
          as_tibble() |> 
          rename(date = Date) |> 
          mutate(stream = "deer creek", 
+                site_group = "deer creek",
                 gage_agency = "USGS",
                 gage_number = "11383500",
                 parameter = "flow",
@@ -255,6 +263,7 @@ try(if(!exists("deer_creek_temp_query"))
                    min = min(temp_degC, na.rm = TRUE)) |>
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
          mutate(stream = "deer creek",
+                site_group = "deer creek",
                 gage_agency = "CDEC",
                 gage_number = "DCV",
                 parameter = "temperature")))
@@ -471,6 +480,7 @@ try(if(!exists("mill_creek_data_query"))
          as_tibble() |> 
          rename(date = Date) |> 
          mutate(stream = "mill creek", 
+                site_group = "mill creek",
                 gage_agency = "USGS",
                 gage_number = "11381500",
                 parameter = "flow",
@@ -504,6 +514,7 @@ try(if(!exists("mill_creek_temp_query"))
                    min = min(temp_degC, na.rm = TRUE)) |> 
          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
          mutate(stream = "mill creek",
+                site_group = "mill creek",
                 gage_agency = "CDEC",
                 gage_number = "MLM",
                 parameter = "temperature")))
@@ -533,7 +544,7 @@ try(if(!exists("sac_river_data_query"))
          select(Date, value =  X_00060_00003) |>  
          as_tibble() |> 
          rename(date = Date) |> 
-         mutate(stream = "sacramento river", 
+         mutate(stream = "sacramento river",
                 gage_agency = "USGS",
                 gage_number = "11390500",
                 parameter = "flow",
@@ -593,6 +604,7 @@ try(if(!exists("yuba_river_data_query"))
          as_tibble() |> 
          rename(date = Date) |> 
          mutate(stream = "yuba river",  
+                site_group = "yuba river",
                 gage_agency = "USGS",
                 gage_number = "11421000",
                 parameter = "flow",
@@ -631,6 +643,7 @@ try(if(!exists("yuba_river_temp_query"))
               min = min(parameter_value, na.rm = TRUE)) |> 
     pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
     mutate(stream = "yuba river",
+           site_group = "yuba river", 
            gage_agency = "CDEC",
            gage_number = "YR7",
            parameter = "temperature") |> 
@@ -649,23 +662,26 @@ flow <- bind_rows(battle_creek_daily_flows,
                   clear_creek_daily_flows,
                   deer_creek_daily_flows,
                   mill_creek_daily_flows,
-                  sac_river_daily_flows,
+                  sac_river_daily_flows |> mutate(site_group = "tisdale"),
+                  sac_river_daily_flows |> mutate(site_group = "knights landing"),
                   yuba_river_daily_flows,
                   feather_hfc_river_daily_flows,
                   feather_lfc_river_daily_flows,
                   lower_feather_river_daily_flows) |>  glimpse()
 
-ggplot(flow |> 
-         filter(statistic == "mean"),
-       aes(x= date, y = value, color=site_group)) +
-  geom_line() +
-  facet_wrap(~stream)
+## QC plot 
+# ggplot(flow |> 
+#          filter(statistic == "mean"),
+#        aes(x= date, y = value, color=site_group)) +
+#   geom_line() +
+#   facet_wrap(~stream)
 
 #Combine all temperature data from different streams
 temp <- bind_rows(battle_creek_daily_temp,
                   butte_creek_daily_temp,
                   deer_creek_daily_temp,
                   mill_creek_daily_temp,
+                  sac_river_daily_temp,
                   sac_river_daily_temp,
                   yuba_river_daily_temp,
                   feather_lfc_river_daily_temp,
@@ -675,11 +691,12 @@ temp <- bind_rows(battle_creek_daily_temp,
                   lowerclear_creek_daily_temp) |> 
   select(-site) |> glimpse()
 
-ggplot(temp |> 
-         filter(statistic == "mean"),
-       aes(x= date, y = value, color=site_group)) +
-  geom_line() +
-  facet_wrap(~stream)
+# Quick QC plot
+# ggplot(temp |> 
+#          filter(statistic == "mean"),
+#        aes(x= date, y = value, color=site_group)) +
+#   geom_line() +
+#   facet_wrap(~stream)
 
 environmental_data <- bind_rows(temp,
                                 flow)

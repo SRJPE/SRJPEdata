@@ -37,6 +37,9 @@
     <loc>https://SRJPE.github.io/SRJPEdata/index.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/prep_environmental_covariates.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/aggregate_detections_butte.html</loc>
   </url>
   <url>
@@ -125,5 +128,14 @@
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_model_data.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/trap_effort.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/yearling_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/years_to_include_analysis.html</loc>
   </url>
 </urlset>

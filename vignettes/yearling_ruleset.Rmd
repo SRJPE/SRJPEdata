@@ -20,7 +20,6 @@ library(lubridate)
 rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
   mutate(date_for_plot = as_date(date_for_plot))
 daily_ruleset_all <- read.csv(here::here("data-raw", "helper-tables", "daily_yearling_ruleset.csv"))
-source(here::here("data-raw", "pull_tables_from_database.R"))
 ```
 
 ## Generate Yearling Rulesets 

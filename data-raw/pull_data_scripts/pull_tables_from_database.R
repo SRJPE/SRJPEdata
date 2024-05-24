@@ -12,7 +12,7 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       user = Sys.getenv("jpe_db_user_id"),
                       password = Sys.getenv("jpe_db_password"),
                       port = 5432)
-DBI::dbListTables(con)
+ DBI::dbListTables(con)
 
 # PULL IN RST DATA -------------------------------------------------------------
 # Pull in Catch table
@@ -60,30 +60,28 @@ try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
   rst_trap <- SRJPEdata::rst_trap
   warning(paste("No new rst trap datasets detected in the database. RST trap data not updated on", Sys.Date()))
 })
-
-# Pull in efficiency Summary 
-# Need med fork length released, med fork length at recapture, flow at release, ect. 
-try(efficiency_summary_query <- dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
-                                                tl.subsite, tl.site_group, rs.number_released, rs.number_recaptured, r.definition as run, 
+# Pull in efficiency data 
+# release table 
+ try(release_query <- dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
+                                                tl.subsite, tl.site_group, rs.number_released, r.definition as run, 
                                                 ls.definition as life_stage, o.definition as origin
-                                                FROM release_summary rs 
+                                                FROM release rs 
                                                 left join trap_location tl on rs.trap_location_id = tl.id 
                                                 left join run r on rs.run_id = r.id
                                                 left join lifestage ls on rs.lifestage_id = ls.id
                                                 left join origin o on rs.origin_id = o.id"))
-
-try(if(!exists("efficiency_summary_query"))
-  efficiency_summary <- SRJPEdata::efficiency_summary
-  else(efficiency_summary <- efficiency_summary_query))
-
-try(if(nrow(efficiency_summary_query) <= nrow(SRJPEdata::efficiency_summary)) {
-  efficiency_summary <- SRJPEdata::efficiency_summary
-  warning(paste("No new efficiency summary datasets detected in the database. Efficency summary data not updated on", Sys.Date()))
-})
+ try(if(!exists("release_query"))
+   release <- SRJPEdata::release
+   else(efficiency_summary <- efficiency_summary_query))
+ 
+ try(if(nrow(release_query) <= nrow(SRJPEdata::release)) {
+   release <- SRJPEdata::release
+   warning(paste("No new release datasets detected in the database. Release data not updated on", Sys.Date()))
+ })
 
 
 # Pull in release fish info, Fork length for release trials 
-# TODO NO DATA IN RELEASE FISH - FIX
+# TODO Update if we get data in release fish 
 # release_fish <- dbGetQuery(con, "SELECT rf.release_id, tl.stream, tl.site, tl.subsite, tl.site_group, rf.fork_length
 #                                  FROM released_fish rf 
 #                                  left join trap_location tl on rf.trap_location_id = tl.id") 
@@ -111,12 +109,8 @@ try(if(nrow(recaptures_query) <= nrow(SRJPEdata::recaptures)) {
 ## SAVE TO DATA PACKAGE ---
 usethis::use_data(rst_catch, overwrite = TRUE)
 usethis::use_data(rst_trap, overwrite = TRUE)
-usethis::use_data(efficiency_summary, overwrite = TRUE)
-# usethis::use_data(release_fish, overwrite = TRUE)
+usethis::use_data(release, overwrite = TRUE)
 usethis::use_data(recaptures, overwrite = TRUE)
-
-# glimpse(recaptured)
-
 
 # PULL IN ADULT DATA -------------------------------------------------------------
 # Pull in passage raw counts 
