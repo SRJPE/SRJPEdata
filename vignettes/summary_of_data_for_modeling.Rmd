@@ -35,13 +35,14 @@ colors_full <-  c("#9986A5", "#C18748", #Royal 2
 ```
 
 ### Overview
-The spring run juvenile production estimate (SR JPE) contains many submodels that rely on different data sets. This document is currently focused on chinook monitoring data that will be used to train the stock recruit model. 
+
+The spring run juvenile production estimate (SR JPE) contains a suite of sub-models that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to train the stock recruit model. 
 
 Additional sections will be added to highlight survival, genetics, and covariate data. 
 
 # Stock Recruit Modeling Data Selection
 
-Collecting and selecting spring run chinook monitoring data to use in the spring run juvenile production estimate (SR JPE) was a multistep and iterative process. We acquired datasets, hosted a workshop to define a ruleset for evaluating years to exclude based on missing data ([see years to include vignette for an in depth overview of this process](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html)), selected data where there was both adult and juvenile data overlap, and finally selected a single adult dataset to use for each year and stream. The diagram below visualizes this process and shows how many total datasets we retained along the way.
+Gathering and identifying spring run Chinook monitoring data to use in the spring run juvenile production estimate (SR JPE) was an iterative, multistep process. We acquired, processed and described monitoring data, hosted workshops to define a ruleset for evaluating years to exclude based on missing data ([see years to include vignette for an in depth overview of this process](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html)), selected data where there was both adult and juvenile data overlap, and finally selected a single adult dataset to use for each year and stream. The diagram below visualizes this process and shows the total number of datasets we retained along the way.
 
 ![](images/data_selection_diagram.png){width=108%}
 
@@ -49,7 +50,7 @@ Collecting and selecting spring run chinook monitoring data to use in the spring
 
 ## Monitoring Data Overview
 
-Extensive spring run chinook monitoring is conducted throughout the Central Valley. Monitoring programs have been collecting data since the 1990s and monitoring has increased through time to expand monitoring types and data collection coverage across seven tributaries and the Sacramento river mainstem.
+Extensive spring run Chinook monitoring is conducted throughout the Central Valley. Monitoring programs have been collecting data since the 1990s and monitoring has increased through time to expand monitoring types and data collection coverage across the seven tributaries and mainstem Sacramento River (identified as the geographic scope for the SR JPE).
 
 The plot below shows all monitoring coverage of rotary screw trap, adult upstream passage, adult holding, adult redd, and adult carcass survey data.
 
@@ -137,10 +138,11 @@ plot_data |>
   guides(alpha = FALSE)
 ```
 
-*Plot does not include Sacramento River mainstem monitoring. This data may also be utilized by the JPE but will not be included in the Stock Recruit models*
+*Plot does not include Sacramento River mainstem monitoring. This data may also be utilized by the SR JPE but will not be included in the Stock Recruit models*
 
 ### Filtering data to years that contain both juvinile and adult monitoring
-In order to utilize data for the spring run chinook juvenile production estimate, we need both juvenile data inputs (RST data) and adult data inputs (adults) for each year. The plot below shows the time windows where there is overlapping juvenile and adult monitoring on each tributary. While this limits the total monitoring used for the JPE, it still gives us a few large windows for most monitoring programs.
+
+In order to utilize data for the SR JPE, we need both juvenile data inputs (RST data) and adult data inputs (adults) for each year. The plot below shows the time windows where there is overlapping juvenile and adult monitoring on each tributary. While this limits the total monitoring used for the JPE, it still gives us a few large windows for most monitoring programs.
 
 ```{r, echo = FALSE}
 potential_jpe_window <- plot_data |> 
@@ -174,22 +176,22 @@ avaliable_years_plot <- potential_jpe_window |>
 avaliable_years_plot
 ```
 
-*Gray boxes indicate that monitoring occurred but that data is not being utalized for the stock recruit since a year does not have both adult and juvenile data* 
+*Gray boxes indicate that monitoring occurred but that data is not being utilized for the stock recruit since a year does not have both adult and juvenile data* 
 
 ## Excluding Incomplete Years 
 
-Although the SR JPE aims to utilize all available data, there are some years where data is sparse and is excluded from analysis. This decision process is documented in depth in the [Years to Include Analysis](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html).
+Although the SR JPE aims to utilize all available data, there are some years where data is sparse and is excluded from analysis. This decision process is documented in the [Years to Include Analysis](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html).
 
-
-After filtering the RST and Adult data to remove incomplete or inconsistent years. We are left with the following windows avaliable for the SR JPE. Gray boxes indicate that monitoring occurred but that data is not being utilized for the JPE. See years to exclude tables for additional information on why a year might be excluded.
+After filtering the RST and adult data to remove incomplete or inconsistent years, we are left with the following windows for the SR JPE. Gray boxes indicate that monitoring occurred but that data is not being utilized for the JPE. See years to exclude tables for additional information on why a year might be excluded.
 
 ```{r, echo = FALSE}
-rst_years_to_exclude <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv")) |> 
+load(here::here("data", "years_to_exclude_rst_data.rda")) 
+rst_years_to_exclude <- years_to_exclude_rst_data |> 
   mutate(exclude = TRUE)
 
-adult_years_to_exclude <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
+load(here::here("data", "years_to_exclude_adult.rda"))
+adult_years_to_exclude <- years_to_exclude_adult |> 
   mutate(exclude = TRUE)
-
 
 rst_plot_data <- rst_catch |> 
   mutate(week = week(date),
@@ -331,12 +333,12 @@ avaliable_years_plot
 ```
 
 
-*Gray boxes indicate that monitoring occurred but that data is not being utalized for the stock recruit. Data may be excluded because there is not adult and juvenile annual overlap or because the data was considered incomplete for a given monitoring type and year.* 
+*Gray boxes indicate that monitoring occurred but that data is not being utilized for the stock recruit. Data may be excluded because there is not adult and juvenile annual overlap or because the data was considered incomplete for a given monitoring type and year.* 
 
 
 ## Summary Table, Years to use for model
 
-The summary table below states which years we have overlapping RST and Adult data. This table accounts for years excluded based on data quality and completeness considerations.
+The summary table below describes which years have overlapping RST and adult data. This table accounts for years excluded based on data quality and completeness considerations.
 
 ```{r, echo = FALSE, message=FALSE}
 test <- updated_potential_jpe_window |>
@@ -365,7 +367,7 @@ This table shows us that there are a total of `r sum(years_for_jpe$"Total Number
 
 ## Selecting Adult Data Type to Use
 
-There are 35 year, stream combinations where there are multiple adult data types to pick from. These occur for: "butte creek", "battle creek", "clear creek", and "feather river."
+There are 35 year/stream combinations where there are multiple adult data types to pick from. These occur for: "butte creek", "battle creek", "clear creek", and "feather river."
 
 We used the following logic to select the data to use in these cases:
 
@@ -401,7 +403,7 @@ knitr::kable(head(multiple_adult_data_options, 10))
 
 ## Proposed Data to Use in SR JPE
 
-The table below compiles all the filtering above to provide a summary of the data utalized by the JPE for each stream and year. 
+The table below compiles all the filtering above to provide a summary of the data utilized by the JPE for each stream and year. 
 
 ```{r, echo = FALSE}
 data_used_in_jpe <- updated_plot_data |> 
