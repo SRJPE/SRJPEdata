@@ -32,9 +32,14 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 )
 ```
 
-# Selecting Stock Recruit Environmental Covariates
+There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selction and processing for different models: (1) Stock Recruit Covariates (this document) and (2) Adult Model Covariates.
 
-The goal of this document is to process covariates for use in SR JPE stock recruitment modeling. FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found [here](https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0). FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to generate the following environmental covariates table to test within the SR model. 
+The goal of this document is to process covariates for use in SR JPE stock recruitment modeling. 
+
+## Selecting Stock Recruit Environmental Covariates
+
+FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found [here](https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0). FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to generate the following environmental covariates table to test within the SR model. 
+
 
 *Table 1. Summary of covariates to include in stock recruit modeling based on preliminary literature review.*
 
@@ -44,12 +49,12 @@ kable(covariate_references |> select(`Covariate Type`, `Structure`, `Rationale`)
   kable_classic(full_width = T)
 ```
 
-# Preparing Covariates 
+## Preparing Covariates 
 
 This document focuses on preparing flow and temperature covariates for use in stock recruit modeling and exploratory analysis. 
 
 
-## Temperature
+### Temperature
 
 Temperature has been found to influence spawning and rearing. Therefore it is expected to affect the translation from stock to recruit. Temperature can be included in multiple different formats which target different lifestages including:
 
@@ -64,7 +69,7 @@ standard_temperature <- SRJPEdata::environmental_data |>
   filter(parameter == "temperature")
 ```
 
-### Number of degree days
+#### Number of degree days
 
 Degree days is defined here as the sum of the daily mean temperatures between August and December (spawning time period) by year and stream. 
 
@@ -121,7 +126,7 @@ std_temp_dd_spawn |>
 
 *Figure 1. Annual sum of daily mean temperatures during spawning and incubation time period (Aug - Dec)*
 
-### Day of year when 7DADM drops above/below 13 C
+#### Day of year when 7DADM drops above/below 13 C
 
 This covariate is defined as the day of the year and week when the 7DADM is above 13C
 
@@ -195,7 +200,7 @@ std_temp_7dadm_final <- std_temp_7dadm_above_13 |>
   select(stream, above_13_temp_day, above_13_temp_week, year) |> glimpse()
 ```
 
-### Max temperature
+#### Max temperature
 
 This covariate is defined as the summarized annual weekly max temperature.
 
@@ -230,7 +235,7 @@ std_temp_weekly |>
 
 *Figure 3. Plot of mean, median, max of the maximum weekly temperature*
 
-### Emergence date
+#### Emergence date
 
 *In development*
 
@@ -245,7 +250,7 @@ Ei = daily contribution to development (ranging from 0 to 1)
 
 Constants derived from [Beacham and Murray (1990)](https://afspubs.onlinelibrary.wiley.com/doi/epdf/10.1577/1548-8659%281990%29119%3C0927%3ATESADO%3E2.3.CO%3B2)
 
-## Flow
+### Flow
 
 Precipitation and streamflow have been found to influence spawning and rearing. Therefore it is expected to affect the translation from stock to recruit. Streamflow can be included in multiple different formats including:
 
@@ -255,7 +260,7 @@ Precipitation and streamflow have been found to influence spawning and rearing. 
 standard_flow <- SRJPEdata::environmental_data |> filter(parameter == "flow")
 ```
 
-### Mean, median, max flow
+#### Mean, median, max flow
 
 These covariates summarize daily max flows as annual mean/median/max/min within the spawning and rearing time period.
 
@@ -336,7 +341,7 @@ std_flow_final <- std_flow_spawn_summary |>
   
 ```
 
-## Combine and Save Covariate Data 
+### Combine and Save Covariate Data 
 
 All covariate datasets are combined into one table and saved as an export from the SRJPEdata package. This data can be accessed using `SRJPEdata::stock_recruit_covariates` and can be joined to the `SRJPEdata::site_lookup` table in order to fill in covariates for each site and year. 
 
