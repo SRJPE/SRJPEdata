@@ -24,22 +24,22 @@ daily_ruleset_all <- read.csv(here::here("data-raw", "helper-tables", "daily_yea
 
 ## Generate Yearling Rulesets 
 
-Raw catch from the trap does not consistently differentiate between yearling and YOY Chinook. FlowWest presented a proposed methodology at a LHD ruleset workshop (see [lhd shiny](https://flowwest.shinyapps.io/lhd-workshop-shiny/) for workshop materials) and worked with watershed experts to define methodology to systematically determine life history for each tributary (described below).
+Raw catch from the trap does not consistently differentiate between yearling and young of year (YOY) Chinook. FlowWest presented a proposed methodology at a life history diversity (LHD) ruleset workshop (see [lhd shiny](https://flowwest.shinyapps.io/lhd-workshop-shiny/) for workshop materials) and worked with watershed experts to define a methodology to systematically determine life history for each tributary (described below).
 
 ### Approach: 
 
 1) Set weekly cutoff values: Use visual determination on fork length over time scatter plots to set weekly cutoff values of yearlings vs YOY. 
 2) Generate daily cutoff values: Use linear interpolation to extrapolate weekly cutoffs into daily values. 
-3) Review & Update: Share proposed cutoff values with watershed experts to review. Update as needed. 
+3) Review & update: Share proposed cutoff values with watershed experts to review. Update as needed. 
 4) Apply cutoff to catch data: Use daily cutoff values to generate a yearling column in the catch data. 
 
 ## Set Weekly Cutoff Values & Generate daily cutoff values
 
-FlowWest proposed weekly cutoff values and used these weekly cutoff values and generated daily values using a linear approximation function, `approxfun`. 
+FlowWest proposed weekly cutoff values and used these weekly cutoff values to generate daily values using a linear approximation function, `approxfun`. 
 
 `generate_cutoff <- approxfun(date, fork_length_cutoff, rule = 2)`
 
-The plot below shows the update cutoff values with linear interpolation betweek weekly cutoffs for Deer Creek. 
+The plot below shows the updated cutoff values with linear interpolation of weekly cutoffs for Deer Creek. 
 
 ```{r}
 # PLOT EXAMPLE FOR DEER 
@@ -152,10 +152,10 @@ usethis::use_data(daily_yearling_ruleset, overwrite = TRUE)
 
 ## Review & Update
 
-FlowWest shared above plot for each watershed and asked stream experts to review. We incoperated in feedback on modifying rulesets to better seperate yearlings and YOY. 
+FlowWest shared above plot for each watershed and asked stream experts to review. We incorporated feedback and modified rulesets to better separate yearlings and YOY. 
 
-## Apply cutoff to catch data
+## Apply Cutoff to Catch Data
 
-FlowWest then took daily cutoff line (shown in plot above) and used it as a threshold to classify Yearling vs YOY in historical catch data. We added an `is_yearling` column to the table and set `is_yearling = TRUE` for any fish whoes fork length exceeded the yearling cutoff on a given date. 
+FlowWest took the daily cutoff line (shown in plot above) and used it as a threshold to classify yearling vs YOY in historical catch data. We added an `is_yearling` column to the catch data and set `is_yearling = TRUE` for any fish with a fork length that exceeded the yearling cutoff on a given date. 
 
-Applied in the weekly_data_summaries script. 
+This is applied in the weekly_data_summary script. 
