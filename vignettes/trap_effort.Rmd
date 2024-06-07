@@ -67,7 +67,6 @@ take the average cone RPMs and divide `total_revolutions`/average RMP/60 to get 
 
 ```{r, helpers2}
 # calculating hours fished when have start and stop datetime
-# TODO double check this calculation 
 revolution_calculated_hours_fished <- function(dat){
   dat %>%
     filter(!is.na(rpm_start) | !is.na(rpm_end), !is.na(total_revolutions)) %>% 
