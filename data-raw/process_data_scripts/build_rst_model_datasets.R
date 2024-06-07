@@ -243,7 +243,7 @@ weekly_temperature <- env_with_sites |>
 # pulled in release_summary
 glimpse(efficiency_summary)
 
-weekly_efficiency <- left_join(release, recaptures) |> 
+weekly_efficiency <- left_join(release, recaptures, by = c("release_id", "stream", "site", "site_group", "run", "life_stage")) |> 
   group_by(stream, site, site_group, 
            week_released = day(date_released), 
            year_released = year(date_released)) |> 
