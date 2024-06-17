@@ -85,8 +85,13 @@ Degree days is defined here as the sum of the daily mean temperatures between Au
 #             month_min = month(min)) |> 
 #   filter(month_min > 8)
 # Need to remove following years because incomplete: 1997 feather river, 1998 deer mill, 1999 butte and yuba
+monthly_mean <- standard_temperature |> 
+  mutate(year = year(date),
+         month = month(date),
+         value = ifelse(is.nan(value), NA, value)) |> 
+  group_by(year, month, stream, site_group, statistic, gage_agency, gage_number, parameter) |> 
+  summarize(monthly_average = mean(value, na.rm = T)) 
 
-#TODO This approach is pretty vulnerable to missing data. We should probably take an monthly average and then sum.
 std_temp_dd_spawn <- standard_temperature |> 
   mutate(year = year(date),
          rm = case_when(stream %in% c("feather river") & year == 1997 ~ "incomplete",
@@ -95,6 +100,13 @@ std_temp_dd_spawn <- standard_temperature |>
                         stream %in% c("butte creek", "yuba river") & year == 1999 ~ "incomplete",
                         T ~ "complete"),
          value = ifelse(is.nan(value), NA, value)) |> 
+  group_by(year, stream, site_group, statistic, gage_agency, gage_number, parameter) |> 
+  arrange() |> 
+  mutate(rolling_3_day_mean = rollapply(value, 3, mean, align = "center", fill = NA),
+         value = ifelse(is.na(value), rolling_3_day_mean, value),
+         month = month(date)) |> 
+  left_join(monthly_mean) |> 
+  mutate(value = ifelse(is.na(value), monthly_average, value)) |> 
   filter(month(date) %in% c(8:12), stream != "sacramento river", rm != "incomplete") |> # filter to the spawning and incubation time period, not including sacramento because spawning is happening in tributaries
   select(date, year, stream, gage_agency, gage_number, site_group, statistic, value) |> 
   pivot_wider(id_cols = c(date, year, stream, gage_agency, gage_number, site_group), 
