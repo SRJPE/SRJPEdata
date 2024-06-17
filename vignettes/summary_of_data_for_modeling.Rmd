@@ -189,7 +189,7 @@ After filtering the RST and adult data to remove incomplete or inconsistent year
 ```{r, echo = FALSE}
 # TODO add a label with the number of years excluded
 # TODO review with erin because looks like a lot of Feather River years are removed.
-load(here::here("data", "years_to_exclude_rst_data.rda")) 
+SRJPEdata::years_to_exclude_rst_data
 rst_years_to_exclude <- years_to_exclude_rst_data |> 
   mutate(exclude = TRUE)
 
