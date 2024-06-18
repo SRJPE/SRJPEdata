@@ -28,7 +28,7 @@ There are multiple covariates used in SR JPE modeling that were developed throug
 
 The Passage to Spawner (P2S) model relates spawner counts (from redd or holding surveys) to upstream passage counts obtained by video systems. This model is restricted to streams with reliable redd or holding surveys and reliable upstream passage counts. It is also restricted to years where the redd/holding and upstream passage datasets overlap. This vignette describes the process of pulling and processing environmental covariates for use in the P2S model.
 
-## Selecting Stock Recruit Environmental Covariates
+## Selecting Adult Environmental Covariates
 
 Potential environmental covariates hypothesized to influence prespawn mortality were proposed in meetings with the SR JPE Modeling Advisory Team (MAT). Five initial categories were identified: 
 
