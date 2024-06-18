@@ -80,8 +80,8 @@ navbar:
     href: reference/index.html
   - text: 'Articles'
     menu: 
-      - text: 'Yearling Analysis'
-        href: articles/yearling_ruleset.html
+      - text: 'Lifestage Rulesets'
+        href: articles/lifestage_ruleset.html
       - text: 'Hours Fished Analysis'
         href: articles/trap_effort.html
       - text: 'Monitoring Years to Include'
