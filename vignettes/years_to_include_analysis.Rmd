@@ -36,12 +36,12 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 
 1)  First exclude years with lots of missing data from cumulative catch curves. See `data-raw/years_to_exclude.csv` (exclusion_type = "really low sampling").
 2)  Exclude yearlings from cumulative catch curves.
-3)  Use updated cumulative catch curves to determine the critical window (average window over all historical years that captures 75% percent of catch). See [heatmaps in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) to view critical window.
+3)  Use updated cumulative catch curves to determine the critical window (average window over all historical years that captures 75% percent of catch).
 4)  Remove additional years where there is no sampling for 4 consecutive weeks within the critical window. See `data-raw/years_to_exclude.csv` (exclusion_type = "missing four consecutive weeks in critical window").
 
 ### Cumulative catch curves
 
-The cumulative catch curve below shows cumulative catch over time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used similar plots for each tributary to exclude years where there is very limited sampling. See additional [cumulative catch curves in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) for each tributary.
+The cumulative catch curve below shows cumulative catch over time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used similar plots for each tributary to exclude years where there is very limited sampling. 
 
 ```{r, echo = FALSE}
 standard_catch <- SRJPEdata::rst_catch 
@@ -82,8 +82,6 @@ plotly::plot_ly(spring_run_cumulative |> filter(stream == "battle creek"), x = ~
 ### Heat map of all tributaries
 
 The heat map below shows when sampling occurs for all streams. It shows that sampling is more complete across traps from 2004 - 2009 and from mid November to July. Some traps have continued sampling throughout the season. Some years there are gaps within season for specific traps or across multiple traps.
-
-See [heatmaps in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) to view additional plots for each stream.
 
 ```{r, echo = FALSE}
 # Need to join catch_data_week to make sure all weeks get included in the 
@@ -341,7 +339,7 @@ Additionally we conducted outreach to stream teams to review our list and highli
 
 #### Cumulative catch curves
 
-The cumulative catch curve below shows cumulative upstream passage over time for Battle Creek. We used similar plots for each tributary with video data to exclude years where there is very limited sampling. This plot shows that in 2006 and 2019, upstream passage monitoring started late in the season on Battle Creek. See additional [cumulative catch curves in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) for each tributary.
+The cumulative catch curve below shows cumulative upstream passage over time for Battle Creek. We used similar plots for each tributary with video data to exclude years where there is very limited sampling. This plot shows that in 2006 and 2019, upstream passage monitoring started late in the season on Battle Creek. 
 
 ```{r, echo = FALSE}
 standard_upstream <- SRJPEdata::upstream_passage
@@ -387,8 +385,6 @@ plotly::plot_ly(spring_run_cumulative_upstream_passage |>
 #### Heat map of all tributaries
 
 The heat map below shows when video monitoring occurs for all streams. Some video passage systems have continued footage throughout the season. Some years there are gaps within season for specific systems.
-
-See [heatmaps in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) to view additional plots for each stream.
 
 ```{r, echo = FALSE}
 #TODO strange that max is 4.5
@@ -463,8 +459,6 @@ plotly::ggplotly(upstream_heat_map)
 ### Survey Data
 
 The below heat map shows Battle Creek redd survey coverage. It shows decent coverage of redd surveys across reaches and years with some gaps in early years and more gaps post 2015. We excluded years where less than 50% of reaches were sampled. 
-
-See [heatmaps in shiny](https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/) to view additional plots for each stream.
 
 ```{r, echo = FALSE}
 # REDD 
