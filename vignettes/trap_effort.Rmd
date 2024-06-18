@@ -231,7 +231,7 @@ knitr::kable(head(deer_mill_hours_fished, 5))
 
 # Combine Data
 
-We combined all methods to create one table with daily hours fished for each trap.
+We combined all methods to create one table with daily hours fished for each trap. We added rows with 0 effort for days that where there is no trapping data. 
 
 ```{r, echo = FALSE}
 # all wee need is stop_date, hours_fished, stream, site
@@ -262,7 +262,9 @@ hours_fished_combined <- bind_rows(method_one,
   mutate(hours_fished = ifelse(is.na(hours_fished), 24, hours_fished)) %>% 
   rename(date = trap_stop_date) %>% 
   group_by(stream, site, subsite, site_group, date) %>% 
-  summarise(hours_fished = sum(hours_fished)) 
+  summarise(hours_fished = sum(hours_fished)) |> 
+  padr::pad(interval = "day") |> # pad to create days when there are gaps 
+  mutate(hours_fished = ifelse(is.na(hours_fished), 0, hours_fished)) # fill these gaps with 0 effort 
 ```
 
 ## Summarized by week
