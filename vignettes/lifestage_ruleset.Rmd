@@ -40,9 +40,12 @@ FlowWest proposed weekly cutoff values and used these weekly cutoff values to ge
 
 The plot below shows the updated cutoff values with linear interpolation of weekly cutoffs for Deer Creek. 
 
+**Note: You can view all code used to generate plots and tables in this markdown [here.](https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd)**
+
 ```{r}
 # PLOT EXAMPLE FOR DEER 
 stream_name <- "deer creek"
+
 rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
   mutate(date_for_plot = as_date(date_for_plot))
 
@@ -158,15 +161,13 @@ FlowWest shared above plot for each watershed and asked stream experts to review
 
 FlowWest took the daily cutoff line (shown in plot above) and used it as a threshold to classify yearling vs YOY in historical catch data. We added an `is_yearling` column to the catch data and set `is_yearling = TRUE` for any fish with a fork length that exceeded the yearling cutoff on a given date. 
 
-This is applied in the weekly_data_summary script. 
+The following code is applied in the `weekly_data_summary` script. 
 
-```{r, echo = F}
+```{r, include = TRUE, echo = TRUE}
 # Note this is not the final dataset as lifestage is added below
-# apply cutoffs to catch data
-# create lifestage field based on fork length
 standard_catch_unmarked_w_yearling <- rst_catch |> 
   filter(species == "chinook") |>  # filter for only chinook
-  mutate(month = month(date), # add to join with lad and yearling
+  mutate(month = month(date), 
          day = day(date)) |> 
   left_join(daily_yearling_ruleset) |> 
   mutate(is_yearling = case_when((fork_length <= cutoff & !run %in% c("fall","late fall", "winter")) ~ F,

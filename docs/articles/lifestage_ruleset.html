@@ -131,6 +131,8 @@ values to generate daily values using a linear approximation function,
 <p><code>generate_cutoff &lt;- approxfun(date, fork_length_cutoff, rule = 2)</code></p>
 <p>The plot below shows the updated cutoff values with linear
 interpolation of weekly cutoffs for Deer Creek.</p>
+<p><strong>Note: You can view all code used to generate plots and tables
+in this markdown <a href="https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd" class="external-link">here.</a></strong></p>
 <p><img src="lifestage_ruleset_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
 </div>
 <div class="section level3">
@@ -148,7 +150,19 @@ as a threshold to classify yearling vs YOY in historical catch data. We
 added an <code>is_yearling</code> column to the catch data and set
 <code>is_yearling = TRUE</code> for any fish with a fork length that
 exceeded the yearling cutoff on a given date.</p>
-<p>This is applied in the weekly_data_summary script.</p>
+<p>The following code is applied in the <code>weekly_data_summary</code>
+script.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Note this is not the final dataset as lifestage is added below</span></span>
+<span><span class="va">standard_catch_unmarked_w_yearling</span> <span class="op">&lt;-</span> <span class="va">rst_catch</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">species</span> <span class="op">==</span> <span class="st">"chinook"</span><span class="op">)</span> <span class="op">|&gt;</span>  <span class="co"># filter for only chinook</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>month <span class="op">=</span> <span class="fu">month</span><span class="op">(</span><span class="va">date</span><span class="op">)</span>, </span>
+<span>         day <span class="op">=</span> <span class="fu">day</span><span class="op">(</span><span class="va">date</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">daily_yearling_ruleset</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>is_yearling <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="op">(</span><span class="va">fork_length</span> <span class="op">&lt;=</span> <span class="va">cutoff</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">run</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fall"</span>,<span class="st">"late fall"</span>, <span class="st">"winter"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">F</span>,</span>
+<span>                                 <span class="op">(</span><span class="va">fork_length</span> <span class="op">&gt;</span> <span class="va">cutoff</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">run</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fall"</span>,<span class="st">"late fall"</span>, <span class="st">"winter"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">T</span>,</span>
+<span>                                 <span class="op">(</span><span class="va">run</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fall"</span>,<span class="st">"late fall"</span>, <span class="st">"winter"</span><span class="op">)</span><span class="op">)</span> <span class="op">~</span> <span class="cn">NA</span>,</span>
+<span>                                 <span class="cn">T</span> <span class="op">~</span> <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
