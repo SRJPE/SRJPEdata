@@ -204,7 +204,7 @@ standard_catch_unmarked <- standard_catch_unmarked_w_yearling |>
                                 fork_length > 45  ~ "smolt",
                                 fork_length <= 45 ~ "fry", # logic from flora includes week (all weeks but 7, 8, 9 had this threshold) but I am not sure this is necessary, worth talking through
                                 T ~ NA)) |> 
-  select(-species, -month, -day, -cutoff, -actual_count, -is_yearling, - weight) 
+  select(-species, -month, -day, -cutoff, -actual_count, -is_yearling) 
 
 knitr::kable(head(standard_catch_unmarked, 10))
 ```

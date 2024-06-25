@@ -14,6 +14,22 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       port = 5432)
  DBI::dbListTables(con)
 
+# PULL IN HELPER TABLES 
+ try(trap_location_query <- dbGetQuery(con, "SELECT *
+                                       FROM trap_location"))
+ 
+ try(if(!exists("trap_location_query"))
+   rst_trap_locations <- SRJPEdata::rst_trap_locations
+   else(rst_trap_locations <- trap_location_query))
+ 
+ try(if(nrow(trap_location_query) <= nrow(SRJPEdata::rst_trap_locations)) {
+   rst_trap_locations <- SRJPEdata::rst_trap_locations
+   warning(paste("No new rst locations added to the database."))
+ })
+ 
+ usethis::use_data(rst_trap_locations, overwrite = TRUE)
+ 
+ 
 # PULL IN RST DATA -------------------------------------------------------------
 # Pull in Catch table
 try(rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.subsite, tl.site_group, 
@@ -211,4 +227,6 @@ usethis::use_data(upstream_passage_estimates, overwrite = TRUE)
 usethis::use_data(holding, overwrite = TRUE)
 usethis::use_data(redd, overwrite = TRUE)
 usethis::use_data(carcass_estimates, overwrite = TRUE)
+
+
 

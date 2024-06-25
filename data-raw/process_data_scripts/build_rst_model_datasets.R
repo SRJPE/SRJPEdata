@@ -9,6 +9,7 @@ library(tidyverse)
 # Rewrite script from catch pulled from JPE database
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 SRJPEdata::rst_catch |> glimpse()
+updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
 chosen_site_years_to_model |> glimpse()
 
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
@@ -90,7 +91,7 @@ weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |>
 
 # Trap Formatting ---------------------------------------------------------
 # Weekly effort from vignette/trap_effort.Rmd
-weekly_effort_by_site <- weekly_effort |> 
+weekly_effort_by_site <- weekly_hours_fished |> 
   group_by(week, year, stream, site, site_group) %>% 
   summarize(hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
   ungroup()
@@ -103,18 +104,14 @@ weekly_effort_by_site <- weekly_effort |>
 # traps fish continuously. Ideally these data points would be filled in, however,
 # after extensive effort 54 still remain. It is unlikely that these datapoints
 # will have a huge effect in such a large data set.
-weekly_catch_effort <- left_join(weekly_standard_catch_unmarked, weekly_effort) |> 
+
+# TODO 
+weekly_catch_effort <- full_join(weekly_standard_catch_unmarked, weekly_hours_fished) |> 
   mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
 
 # Environmental -----------------------------------------------------------
-# update site lookup so joins to env data better
-lookup_updated_site_group <- site_lookup |>
-  mutate(site_group = ifelse(site_group %in% 
-                               c("upper feather lfc","upper feather hfc","lower feather river"),
-                             site_group, NA))
-
 env_with_sites <- environmental_data |> 
-  left_join(lookup_updated_site_group)  |> glimpse()
+  left_join(site_lookup)  |> glimpse()
 
 weekly_flow <- env_with_sites |> 
   filter(parameter == "flow",
@@ -134,8 +131,6 @@ weekly_temperature <- env_with_sites |>
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
-glimpse(efficiency_summary)
-
 weekly_efficiency <- left_join(release, recaptures, by = c("release_id", "stream", "site", "site_group", "run", "life_stage")) |> 
   group_by(stream, site, site_group, 
            week_released = day(date_released), 
@@ -226,6 +221,14 @@ weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
   select(-special_prior)
+
+# filter to only include complete season data 
+if (month(Sys.date()) %in% c(9:12, 1:5)) {
+  weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data |> 
+    filter(run_year < year(Sys.Date()))
+}
+
+# TODO add in additional check to ensure that we do not have partial seasons on last year
 
 # write to package 
 usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)

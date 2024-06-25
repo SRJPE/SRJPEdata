@@ -3,7 +3,7 @@ library(CDECRetrieve)
 library(dataRetrieval)
 
 ### Read in lookup table for environmental data --------------------------------
-site_lookup <- read_csv(here::here("data-raw", "database-tables", "trap_location.csv")) |> 
+site_lookup <- SRJPEdata::rst_trap_locations |> 
   select(stream, site, subsite, site_group) |> 
   distinct()
 # save as data object 
@@ -431,7 +431,7 @@ try(feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor
 feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
            gage_number == "GRL" & 
-           parameter == "temperature") |> 
+           parameter == "temperature") 
 
 # Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull

@@ -166,20 +166,22 @@ For ongoing data collection and more recent seasons, we applied an automatic che
 We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.
 
 ```{r, echo = FALSE}
-years_to_exclude_rst_data <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
+years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data
 
 # Bind in new rows from recent data 
-if (month(Sys.Date()) %in% c(8, 9, 10)) {
+if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 
   max_old_year <- max(years_to_exclude_rst_data$year)
+  # Consider thinking about adding subsites together, right now it looks like subsites are fished equally
   new_years_to_exclude <- SRJPEdata::rst_trap |> 
     mutate(week = ifelse(is.na(trap_stop_date), week(trap_start_date), week(trap_stop_date)),
-           year = ifelse(is.na(trap_stop_date), year(trap_start_date), year(trap_stop_date))) |> 
-    filter(year > max_old_year) |> 
-    group_by(stream, site, subsite, site_group, week, year) |> 
+           year = ifelse(is.na(trap_stop_date), year(trap_start_date), year(trap_stop_date)),
+           monitoring_year = ifelse(week >= 45, year + 1, year)) |> 
+    filter(monitoring_year > max_old_year) |> 
+    group_by(stream, site, subsite, site_group, week, monitoring_year) |> 
     tally() |> 
     ungroup() |> 
-    group_by(stream, site, subsite, site_group, year) |> 
-    summarise(number_weeks = n()) |> glimpse()# add in logic for consecutive weeks
+    group_by(stream, site, subsite, site_group, monitoring_year) |> 
+    summarise(number_weeks = n()) |> # TODO potentially add in logic for consecutive weeks
     ungroup() |> 
     mutate(exclude = ifelse(number_weeks < 20, TRUE, FALSE),
            exclusion_type = "automatic", 

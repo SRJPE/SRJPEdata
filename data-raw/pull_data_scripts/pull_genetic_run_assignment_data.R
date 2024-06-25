@@ -1,9 +1,19 @@
-# script to pull genetics data from the run-id-database
+# Pull data from Azure Database 
+library(DBI)
+library(tidyverse)
+library(lubridate)
+library(SRJPEdata)
 
-# remotes::install_github("SRJPE/grunID")
-library(grunID) 
+# CONNECT TO DB & VIEW TABLES --------------------------------------------------
+# Use DBI - dbConnect to connect to database - keep user id and password sectret
+con <- DBI::dbConnect(drv = RPostgres::Postgres(),
+                      host = "run-id-database.postgres.database.azure.com",
+                      dbname = "postgres",
+                      user = Sys.getenv("runid_db_user"),
+                      password = Sys.getenv("runid_db_password"),
+                      port = 5432)
 
-con <- gr_db_connect()
+DBI::dbListTables(con)
 
 completed_genetic_samples <- DBI::dbGetQuery(con, 
                                             "SELECT s.id AS sample_id, s.datetime_collected, se.first_sample_date, s.fork_length_mm, 
