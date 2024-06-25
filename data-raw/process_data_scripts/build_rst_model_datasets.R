@@ -229,6 +229,23 @@ if (month(Sys.date()) %in% c(9:12, 1:5)) {
 }
 
 # TODO add in additional check to ensure that we do not have partial seasons on last year
+tryCatch({
+  site <- weekly_juvenile_abundance_model_data$site |> unique()
+  check_for_full_season <- function(selected_site) {
+    filtered_data <- weekly_juvenile_abundance_model_data |> 
+      filter(site == selected_site)
+    max_year <- max(filtered_data$run_year)
+    max_week <- filtered_data |> 
+      filter(run_year == max_year, week < 45) |> 
+      pull(week) |> 
+      max()
+    if (max_week < 20) {
+      warning(paste("The data for", selected_site, "in", max_year, "only goes to", max_week, "and should not be used as a full season."))
+    } 
+  }
+  # map through sites
+  purrr::map(site, check_for_full_season) |> reduce(append)
+})
 
 # write to package 
 usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)
