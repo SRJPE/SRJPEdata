@@ -103,14 +103,7 @@ try(if(nrow(rst_trap_query_pilot) <= nrow(SRJPEdata::rst_trap)) {
 })
 # Pull in efficiency data 
 # release table 
-try(release_query_pilot <- dbGetQuery(con, "SELECT r.released_at, rs.release_site_name, 
-                                                tl.subsite, tl.site_group, rs.number_released, r.definition as run, 
-                                                ls.definition as life_stage, o.definition as origin
-                                                FROM release r 
-                                                left join release_site rs on (rs.release_site_id = tl.id) 
-                                                left join run r on rs.run_id = r.id
-                                                left join lifestage ls on rs.lifestage_id = ls.id
-                                                left join origin o on rs.origin_id = o.id"))
+try(release_query_pilot <- dbGetQuery(con, ""))
 try(if(!exists("release_query_pilot"))
   release <- SRJPEdata::release |> filter(stream %in% c("mill creek", "deer creek"))
   else(release <- release_query_pilot))
@@ -126,12 +119,7 @@ try(if(nrow(release_query_pilot) <= nrow(SRJPEdata::release)) {
 # glimpse(release_fish)
 
 # Pull Recaptures ---
-try(recaptures_query_pilot <- dbGetQuery(con, "SELECT rf.date, rf.count, rf.release_id, tl.stream, tl.site, tl.subsite, tl.site_group, rf.fork_length, rf.dead, 
-                                         rf.weight, r.definition as run, ls.definition as life_stage, rf.adipose_clipped
-                                         FROM recaptured_fish rf 
-                                         left join trap_location tl on rf.trap_location_id = tl.id 
-                                         left join run r on rf.run_id = r.id
-                                         left join lifestage ls on rf.lifestage_id = ls.id"))
+try(recaptures_query_pilot <- dbGetQuery(con, ""))
 
 try(if(!exists("recaptures_query_pilot"))
   recaptures <- SRJPEdata::recaptures |> filter(stream %in% c("mill creek", "deer creek"))
