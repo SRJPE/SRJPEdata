@@ -72,7 +72,7 @@ try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
                                                 left join origin o on rs.origin_id = o.id"))
  try(if(!exists("release_query"))
    release <- SRJPEdata::release
-   else(efficiency_summary <- efficiency_summary_query))
+   else(release <- release_query))
  
  try(if(nrow(release_query) <= nrow(SRJPEdata::release)) {
    release <- SRJPEdata::release
