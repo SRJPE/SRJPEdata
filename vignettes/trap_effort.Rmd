@@ -34,18 +34,17 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 
 ```
 
-Hours fished is not included as a variable in the data and needs to be calculated.
-This file calculates hours fished by date, stream and site.
+In order to estimate juvenile abundance (see the BTSPASX in the SRJPEmodel package) from catch data collected at rotary screw traps we need to know how efficient the traps are (what percent of the population is captured in the traps?) and the amount of time the trap is sampling. Hours fished is a calculated field. The goal of this document is to calculate hours fished by date, stream and site.
 
 Data were checked and cleaned in scripts available [here](https://github.com/FlowWest/JPE-datasets/tree/main/scripts/rst).
 Cleaned data were saved on the JPE cloud database and pulled using the `pull_tables_from_database.R` script. 
 
 ## Methods
 
-We explored three primary methods to calculate hours fished. Methods were chosen based on data collected at the RST site. When no times, trap revolutions, or trap RPMs were collected we assume 24 hours for each day that trap is fishing. The trap revolution method is commonly used by RST programs but we were not able to get reasonable results for most programs we tried it on so we ended up relying on trap times instead of revolutions. This may be due to different methods for determining cone rotation rate. For instance, Battle measures the average time per rotation whereas Feather River and Knights Landing measure the revolutions per minute. Using total revolutions and the cone rotation rate to calculate sampling period may be useful in the future when methods are more similar.  
+We explored three primary methods to calculate hours fished. Methods were chosen based on data collected at the RST site. When no times, trap revolutions, or trap revolutions per minute (RPMs) were collected, we assume 24 hours for each day that trap is fishing. The trap revolution method is commonly used by RST programs but we were not able to get reasonable results for most programs we tried it on so we ended up relying on trap times instead of revolutions. This may be due to different methods for determining cone rotation rate. For instance, Battle measures the average time per rotation whereas Feather River and Knights Landing measure the revolutions per minute. Using total revolutions and the cone rotation rate to calculate sampling period may be useful in the future when methods are more similar.  
 
-1) Use start and stop time. 
-2) Use rpms start, rpms end, and total revolutions (Method 2 was used as a comparison method but was ultimatly not picked as the final method used for any traps.)
+1) Use start and stop time
+2) Use RPMs start, RPMs end, and total revolutions (Method 2 was used as a comparison method but was ultimately not picked as the final method)
 3) Use start time only 
 
 Below is the code for each of the methods described above: 
@@ -104,13 +103,15 @@ in nonsensical hours fished. In these cases, we assume 24 hour sampling periods.
 - If only a date is available and no time, assume 24 hour sampling periods for each date.
 - If information is missing or there are typos, assume 24 hour sampling periods.
 
-## Hours fished {.tabset}
+## Hours Fished {.tabset}
 
-## Method 1: Battle creek, Clear Creek, Feather, Kinghts, Tisdale
+## Method 1: Battle Creek, Clear Creek, Feather River, Knights Landing, Tisdale
 
 The above creeks have data available to calculate the hours fished. There are a few
 cases when start date is NA. For these we fill in the start date assuming
-it is the sample date of the previous record.
+it is the sample date of the previous record. Note that there are some records with 0 hours.
+These occur because trap visit data was entered when the trap was not in service and
+then a new trap visit entry was recorded once the trap started working again.
 
 ```{r, battle, echo = FALSE}
 method_one_hours_fished <- filter(SRJPEdata::rst_trap, stream %in% 
@@ -127,7 +128,9 @@ knitr::kable(head(method_one_hours_fished |>
 ```
 
 ### QC
-The dot plot below shows hours fished for each stream by date. Most dots appear to be hovering around the 24 hour mark but a few outliers are greater than 1000 or less than -1000 and skew the plot. 
+
+The dot plot below shows hours fished for each stream by date. Most dots appear to be hovering around the 24 hour mark but a few are greater than 1000 or less than -1000 and skew the plot. 
+
 ```{r, echo = FALSE}
 method_one_hours_fished %>% 
   ggplot(aes(x = stop_datetime, y = hours_fished, color = stream)) +
@@ -138,7 +141,7 @@ method_one_hours_fished %>%
        title = "Hours Fished Calculated Using Method One")
 ```
 
-The histogram below shows data filtered to remove the outliers and we still see some inconsistencies with hours fished below or equal to 0. 
+The histogram below shows data filtered to remove the outliers though there are still some inconsistencies with hours fished below or equal to 0. As mentioned above there are reasons why hours fished may be 0.
 
 ```{r, echo = FALSE}
 method_one_hours_fished %>% 
@@ -153,7 +156,7 @@ method_one_hours_fished %>%
 ```
 
 
-## Method 3: Butte creek & Yuba 
+## Method 3: Butte Creek & Yuba River
 
 Hours fished are calculated by taking the difference between the date/time at each 
 observation. 
@@ -191,7 +194,9 @@ method_three_hours_fished %>%
 # trying to figure out where to set cut of for effort
 # decided to set as 5 days - 120 hours
 ```
-Anything greater than 5 days of trap operation was considered a mistake and set at 24 hours instead. The histogram below shows data filtered to remove the outliers and we still see some inconsistencies with hours fished below or equal to 0. 
+
+Anything greater than 5 days of trap operation was considered a mistake and set at 24 hours instead. The histogram below shows data filtered to remove the outliers though we still see some inconsistencies with hours fished below or equal to 0. 
+
 ```{r, echo = FALSE}
 method_three_hours_fished %>% 
   filter(hours_fished < 200) %>% 
@@ -207,11 +212,11 @@ method_three_hours_fished %>%
 #   filter(hours_fished > 5000) %>% tally()
 ```
 
-## Mill & Deer creek
+## Mill Creek & Deer Creek
 
-Mill & Deer Creek do not have data available (no time variable) to calculate hours
-Mill & Deer Creek also does not have sample period revolutions so we cannot use trap revolutions 
-fished so assume 24 hours for every day with data. 
+Mill & Deer creeks do not have data available (no time variable) to calculate hours fished.
+Mill & Deer creeks also do not have sample period revolutions so we cannot use trap revolutions 
+fished. We therefore assume 24 hours fished for every day with data. 
 
 ```{r, deer & mill, echo = FALSE}
 ## Deer & mill #####
@@ -224,9 +229,9 @@ knitr::kable(head(deer_mill_hours_fished, 5))
 ```
 
 
-# Combine data
+# Combine Data
 
-We combined all methods to create one table with daily hours fished for each trap.
+We combined all methods to create one table with daily hours fished for each trap. We added rows with 0 effort for days that where there is no trapping data. 
 
 ```{r, echo = FALSE}
 # all wee need is stop_date, hours_fished, stream, site
@@ -257,12 +262,14 @@ hours_fished_combined <- bind_rows(method_one,
   mutate(hours_fished = ifelse(is.na(hours_fished), 24, hours_fished)) %>% 
   rename(date = trap_stop_date) %>% 
   group_by(stream, site, subsite, site_group, date) %>% 
-  summarise(hours_fished = sum(hours_fished)) 
+  summarise(hours_fished = sum(hours_fished)) |> 
+  padr::pad(interval = "day") |> # pad to create days when there are gaps 
+  mutate(hours_fished = ifelse(is.na(hours_fished), 0, hours_fished)) # fill these gaps with 0 effort 
 ```
 
 ## Summarized by week
 
-We grouped hours fish data by site, subsite, week, and year and summarized to come up with a weekly hours fished. We capped hours fish to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week.  
+We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week.  
 
 ```{r, echo = FALSE}
 weekly_hours_fished <- hours_fished_combined %>% 
@@ -279,7 +286,7 @@ usethis::use_data(weekly_hours_fished, overwrite = TRUE)
 
 ### QC
 
-The following plots provide visuals to show weekly hours fished for all tributaries.
+The following plots provide visuals to show weekly hours fished for all tributaries. Note that this is for all years of data so there are multiple datapoints for a given week due to multiple years being represented.
 
 ```{r, echo = FALSE}
 weekly_effort %>% 

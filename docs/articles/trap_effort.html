@@ -51,7 +51,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/yearling_ruleset.html">Yearling Analysis</a>
+      <a href="../articles/lifestage_ruleset.html">Lifestage Rulesets</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
@@ -101,9 +101,12 @@
 
     
     
-<p>Hours fished is not included as a variable in the data and needs to
-be calculated. This file calculates hours fished by date, stream and
-site.</p>
+<p>In order to estimate juvenile abundance (see the BTSPASX in the
+SRJPEmodel package) from catch data collected at rotary screw traps we
+need to know how efficient the traps are (what percent of the population
+is captured in the traps?) and the amount of time the trap is sampling.
+Hours fished is a calculated field. The goal of this document is to
+calculate hours fished by date, stream and site.</p>
 <p>Data were checked and cleaned in scripts available <a href="https://github.com/FlowWest/JPE-datasets/tree/main/scripts/rst" class="external-link">here</a>.
 Cleaned data were saved on the JPE cloud database and pulled using the
 <code>pull_tables_from_database.R</code> script.</p>
@@ -112,21 +115,21 @@ Cleaned data were saved on the JPE cloud database and pulled using the
 </h3>
 <p>We explored three primary methods to calculate hours fished. Methods
 were chosen based on data collected at the RST site. When no times, trap
-revolutions, or trap RPMs were collected we assume 24 hours for each day
-that trap is fishing. The trap revolution method is commonly used by RST
-programs but we were not able to get reasonable results for most
-programs we tried it on so we ended up relying on trap times instead of
-revolutions. This may be due to different methods for determining cone
-rotation rate. For instance, Battle measures the average time per
-rotation whereas Feather River and Knights Landing measure the
-revolutions per minute. Using total revolutions and the cone rotation
-rate to calculate sampling period may be useful in the future when
-methods are more similar.</p>
+revolutions, or trap revolutions per minute (RPMs) were collected, we
+assume 24 hours for each day that trap is fishing. The trap revolution
+method is commonly used by RST programs but we were not able to get
+reasonable results for most programs we tried it on so we ended up
+relying on trap times instead of revolutions. This may be due to
+different methods for determining cone rotation rate. For instance,
+Battle measures the average time per rotation whereas Feather River and
+Knights Landing measure the revolutions per minute. Using total
+revolutions and the cone rotation rate to calculate sampling period may
+be useful in the future when methods are more similar.</p>
 <ol style="list-style-type: decimal">
-<li>Use start and stop time.</li>
-<li>Use rpms start, rpms end, and total revolutions (Method 2 was used
-as a comparison method but was ultimatly not picked as the final method
-used for any traps.)</li>
+<li>Use start and stop time</li>
+<li>Use RPMs start, RPMs end, and total revolutions (Method 2 was used
+as a comparison method but was ultimately not picked as the final
+method)</li>
 <li>Use start time only</li>
 </ol>
 <p>Below is the code for each of the methods described above:</p>
@@ -193,15 +196,19 @@ sampling periods.</li>
 </div>
 </div>
 <div class="section level3">
-<h3 class="tabset" id="hours-fished">Hours fished<a class="anchor" aria-label="anchor" href="#hours-fished"></a>
+<h3 class="tabset" id="hours-fished">Hours Fished<a class="anchor" aria-label="anchor" href="#hours-fished"></a>
 </h3>
 </div>
 <div class="section level3">
-<h3 id="method-1-battle-creek-clear-creek-feather-kinghts-tisdale">Method 1: Battle creek, Clear Creek, Feather, Kinghts, Tisdale<a class="anchor" aria-label="anchor" href="#method-1-battle-creek-clear-creek-feather-kinghts-tisdale"></a>
+<h3 id="method-1-battle-creek-clear-creek-feather-river-knights-landing-tisdale">Method 1: Battle Creek, Clear Creek, Feather River, Knights Landing,
+Tisdale<a class="anchor" aria-label="anchor" href="#method-1-battle-creek-clear-creek-feather-river-knights-landing-tisdale"></a>
 </h3>
 <p>The above creeks have data available to calculate the hours fished.
 There are a few cases when start date is NA. For these we fill in the
-start date assuming it is the sample date of the previous record.</p>
+start date assuming it is the sample date of the previous record. Note
+that there are some records with 0 hours. These occur because trap visit
+data was entered when the trap was not in service and then a new trap
+visit entry was recorded once the trap started working again.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="15%">
@@ -273,17 +280,17 @@ start date assuming it is the sample date of the previous record.</p>
 <h4 id="qc">QC<a class="anchor" aria-label="anchor" href="#qc"></a>
 </h4>
 <p>The dot plot below shows hours fished for each stream by date. Most
-dots appear to be hovering around the 24 hour mark but a few outliers
-are greater than 1000 or less than -1000 and skew the plot.
-<img src="trap_effort_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
-<p>The histogram below shows data filtered to remove the outliers and we
-still see some inconsistencies with hours fished below or equal to
-0.</p>
+dots appear to be hovering around the 24 hour mark but a few are greater
+than 1000 or less than -1000 and skew the plot.</p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
+<p>The histogram below shows data filtered to remove the outliers though
+there are still some inconsistencies with hours fished below or equal to
+0. As mentioned above there are reasons why hours fished may be 0.</p>
 <p><img src="trap_effort_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="method-3-butte-creek-yuba">Method 3: Butte creek &amp; Yuba<a class="anchor" aria-label="anchor" href="#method-3-butte-creek-yuba"></a>
+<h3 id="method-3-butte-creek-yuba-river">Method 3: Butte Creek &amp; Yuba River<a class="anchor" aria-label="anchor" href="#method-3-butte-creek-yuba-river"></a>
 </h3>
 <p>Hours fished are calculated by taking the difference between the
 date/time at each observation.</p>
@@ -361,21 +368,21 @@ date/time at each observation.</p>
 we see several distinct bands of dots in 24 hour increments, indicating
 that the trap is most often checked every day but that there are some
 instances where it is checked every other or every few days.</p>
-<p><img src="trap_effort_files/figure-html/unnamed-chunk-4-1.png" width="768">
-Anything greater than 5 days of trap operation was considered a mistake
-and set at 24 hours instead. The histogram below shows data filtered to
-remove the outliers and we still see some inconsistencies with hours
-fished below or equal to 0.
-<img src="trap_effort_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
+<p>Anything greater than 5 days of trap operation was considered a
+mistake and set at 24 hours instead. The histogram below shows data
+filtered to remove the outliers though we still see some inconsistencies
+with hours fished below or equal to 0.</p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="mill-deer-creek">Mill &amp; Deer creek<a class="anchor" aria-label="anchor" href="#mill-deer-creek"></a>
+<h3 id="mill-creek-deer-creek">Mill Creek &amp; Deer Creek<a class="anchor" aria-label="anchor" href="#mill-creek-deer-creek"></a>
 </h3>
-<p>Mill &amp; Deer Creek do not have data available (no time variable)
-to calculate hours Mill &amp; Deer Creek also does not have sample
-period revolutions so we cannot use trap revolutions fished so assume 24
-hours for every day with data.</p>
+<p>Mill &amp; Deer creeks do not have data available (no time variable)
+to calculate hours fished. Mill &amp; Deer creeks also do not have
+sample period revolutions so we cannot use trap revolutions fished. We
+therefore assume 24 hours fished for every day with data.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="15%">
@@ -445,22 +452,25 @@ hours for every day with data.</p>
 </table>
 </div>
 <div class="section level2">
-<h2 id="combine-data">Combine data<a class="anchor" aria-label="anchor" href="#combine-data"></a>
+<h2 id="combine-data">Combine Data<a class="anchor" aria-label="anchor" href="#combine-data"></a>
 </h2>
 <p>We combined all methods to create one table with daily hours fished
-for each trap.</p>
+for each trap. We added rows with 0 effort for days that where there is
+no trapping data.</p>
 <div class="section level3">
 <h3 id="summarized-by-week">Summarized by week<a class="anchor" aria-label="anchor" href="#summarized-by-week"></a>
 </h3>
-<p>We grouped hours fish data by site, subsite, week, and year and
-summarized to come up with a weekly hours fished. We capped hours fish
-to 168 for each stream, assuming that a single trap could not run for
-more hours than there are in a week.</p>
+<p>We grouped hours fished data by site, subsite, week, and year and
+summarized to come up with a weekly hours fished dataset. We capped
+hours fished to 168 for each stream, assuming that a single trap could
+not run for more hours than there are in a week.</p>
 <div class="section level4">
 <h4 id="qc-2">QC<a class="anchor" aria-label="anchor" href="#qc-2"></a>
 </h4>
 <p>The following plots provide visuals to show weekly hours fished for
-all tributaries.</p>
+all tributaries. Note that this is for all years of data so there are
+multiple datapoints for a given week due to multiple years being
+represented.</p>
 <p><img src="trap_effort_files/figure-html/unnamed-chunk-8-1.png" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-8-2.png" width="768"></p>
 </div>
 </div>

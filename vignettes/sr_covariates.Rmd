@@ -32,24 +32,31 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 )
 ```
 
-# Selecting Stock Recruit (SR) Environmental Covariates
+There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selction and processing for different models: (1) Stock Recruit Covariates (this document) and (2) Adult Model Covariates.
 
-The goal of this document is to process covariates for use in SR JPE stock recruitment modeling. FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found [here](https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0). FlowWest reviewed covariates with the modeling advisory team to generate the following environmental covariates table to test within the SR model. 
+The goal of this document is to process covariates for use in SR JPE stock recruitment modeling. 
 
-*Table 1. Summary of covariates to include in stock recruit modeling based on preliminary literature review*
+## Selecting Stock Recruit Environmental Covariates
+
+FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found [here](https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0). FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to generate the following environmental covariates table to test within the SR model. 
+
+
+*Table 1. Summary of covariates to include in stock recruit modeling based on preliminary literature review.*
 
 ```{r}
 covariate_references <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0")
 kable(covariate_references |> select(`Covariate Type`, `Structure`, `Rationale`)) |> 
   kable_classic(full_width = T)
 ```
-# Preparing Covariates 
-This document focus on preparing flow and temperature covariates for initial testing in stock recruit. 
+
+## Preparing Covariates 
+
+This document focuses on preparing flow and temperature covariates for use in stock recruit modeling and exploratory analysis. 
 
 
-## Temperature
+### Temperature
 
-Temperature has been found to influence spawning and rearing. Therefore it is expected to affect the translation from stock to recruit. Temperature can be included in multiple different formats including:
+Temperature has been found to influence spawning and rearing. Therefore it is expected to affect the translation from stock to recruit. Temperature can be included in multiple different formats which target different lifestages including:
 
 - Number of degree days
 - Day of year when 7DADM is above 13 C
@@ -62,11 +69,11 @@ standard_temperature <- SRJPEdata::environmental_data |>
   filter(parameter == "temperature")
 ```
 
-### Number of degree days
+#### Number of degree days
 
-Sum of the daily mean temperatures between August and December (spawning time period) by year and stream. 
+Degree days is defined here as the sum of the daily mean temperatures between August and December (spawning time period) by year and stream. 
 
-*Note that for streams with multiple locations the max daily mean was selected.*
+*Note that for streams with multiple locations the max daily mean was selected. Clear Creek 2020 value is low which may be due to a few missing data points in December. This approach is vulnerable to missing data.*
 
 ```{r, include = F}
 # 1. Filter data to the spawning and incubation time period
@@ -78,32 +85,49 @@ Sum of the daily mean temperatures between August and December (spawning time pe
 #             month_min = month(min)) |> 
 #   filter(month_min > 8)
 # Need to remove following years because incomplete: 1997 feather river, 1998 deer mill, 1999 butte and yuba
+monthly_mean <- standard_temperature |> 
+  mutate(year = year(date),
+         month = month(date),
+         value = ifelse(is.nan(value), NA, value)) |> 
+  group_by(year, month, stream, site_group, statistic, gage_agency, gage_number, parameter) |> 
+  summarize(monthly_average = mean(value, na.rm = T)) 
+
 std_temp_dd_spawn <- standard_temperature |> 
   mutate(year = year(date),
          rm = case_when(stream %in% c("feather river") & year == 1997 ~ "incomplete",
+                        stream %in% c("feather river") & year == 1999 ~ "incomplete",
                         stream %in% c("deer creek", "mill creek") & year == 1998 ~ "incomplete",
                         stream %in% c("butte creek", "yuba river") & year == 1999 ~ "incomplete",
-                        T ~ "complete")) |> 
+                        T ~ "complete"),
+         value = ifelse(is.nan(value), NA, value)) |> 
+  group_by(year, stream, site_group, statistic, gage_agency, gage_number, parameter) |> 
+  arrange() |> 
+  mutate(rolling_3_day_mean = rollapply(value, 3, mean, align = "center", fill = NA),
+         value = ifelse(is.na(value), rolling_3_day_mean, value),
+         month = month(date)) |> 
+  left_join(monthly_mean) |> 
+  mutate(value = ifelse(is.na(value), monthly_average, value)) |> 
   filter(month(date) %in% c(8:12), stream != "sacramento river", rm != "incomplete") |> # filter to the spawning and incubation time period, not including sacramento because spawning is happening in tributaries
   select(date, year, stream, gage_agency, gage_number, site_group, statistic, value) |> 
   pivot_wider(id_cols = c(date, year, stream, gage_agency, gage_number, site_group), 
               values_from = "value", names_from = "statistic") |> 
   group_by(date, stream, year, gage_agency, gage_number, site_group) |> 
-  summarize(max_mean = max(mean, na.rm = T)) |> 
+  summarize(max_mean = max(mean)) |> 
   group_by(year, stream, gage_agency, gage_number, site_group) |> 
-  summarize(gdd_spawn = sum(max_mean)) |> glimpse()
+  summarize(gdd_spawn = sum(max_mean, na.rm = T)) |> glimpse()
 ```
 
 
 ```{r}
 
 std_temp_dd_spawn |> 
-  mutate(stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) |> 
+  mutate(stream_site = ifelse(is.na(site_group), stream, site_group)) |> 
   ggplot(aes(x = year, y = gdd_spawn, color = stream_site)) + 
   geom_line() +
   labs(x = "",
        title = "Sum of daily mean temperatures during spawning/incubation time period (Aug-Dec)",
-       y = "Total Degree Days (Aug-Dec)") +
+       y = "Total Degree Days (Aug-Dec)", 
+       color = "") +
   scale_color_manual(values = colors_full) +
   theme_minimal()
 # years for each stream, data are complete
@@ -114,13 +138,13 @@ std_temp_dd_spawn |>
 
 *Figure 1. Annual sum of daily mean temperatures during spawning and incubation time period (Aug - Dec)*
 
-### Day of year when 7DADM drops above/below 13 C
+#### Day of year when 7DADM drops above/below 13 C
 
-Day of the year and week when the 7DADM is above 13C
+This covariate is defined as the day of the year and week when the 7DADM is above 13C
 
 - Data are not filtered to the spawning time period (Aug-Dec) as this threshold is typically met before August
 - Below 13C is not included as this does not make sense in terms of impact on salmon. Temperatures are rarely below 13C during the spawning time period and if they are, unlikely to be significantly cold enough to have an impact
-- Note, We currently do not have max daily temperatures for the Sacramento so mainstem is not included
+- Note, we currently do not have max daily temperatures for the Sacramento so mainstem is not included. There are a few datapoints based on the plot below that are worth further investigation.
  
 ```{r, include = F}
 # 1. hypothesized for spawning so select spawning time period 
@@ -163,19 +187,20 @@ std_temp_7dadm_below_13 <- std_temp_7dadm_interpolated |>
   rename(below_13 = week)
 ```
 
-**Plot of week where threshold is met (above or below 13) for all years and streams**
+**Plot of week where threshold is met (above 13 C) for all years and streams**
 
 ```{r}
 # Explore data
-std_temp_7dadm_threshold <- full_join(std_temp_7dadm_above_13, 
-                                      std_temp_7dadm_below_13) |> 
-  pivot_longer(cols = c(above_13, below_13), values_to = "week", names_to = "threshold") |> 
-  mutate(stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) 
+std_temp_7dadm_threshold <- std_temp_7dadm_above_13 |> 
+  pivot_longer(cols = c(above_13), values_to = "week", names_to = "threshold") |> 
+  mutate(stream_site = ifelse(is.na(site_group), stream, site_group)) 
 ggplot(std_temp_7dadm_threshold, aes(x = year, y = week, color = threshold)) +
   geom_point() +
   facet_wrap(~stream_site) +
-  scale_color_manual(values = c("#F5CDB4", "#9A8822")) +
-  theme_minimal()
+  scale_color_manual(values = c("#9A8822")) +
+  theme_minimal() +
+  labs(x = "") +
+  theme(legend.position = "none")
 ```
 
 *Figure 2. Plot of week where threshold is met (above or below 13) for all years and streams*
@@ -187,9 +212,11 @@ std_temp_7dadm_final <- std_temp_7dadm_above_13 |>
   select(stream, above_13_temp_day, above_13_temp_week, year) |> glimpse()
 ```
 
-### Max temperature
+#### Max temperature
 
-- Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) across years. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the daily mean.
+This covariate is defined as the summarized annual weekly max temperature.
+
+- Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) across years within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the daily mean.
 - Summarize the weekly max for each stream and year by finding the mean, median, and max.
 
 ```{r, include = F}
@@ -220,7 +247,7 @@ std_temp_weekly |>
 
 *Figure 3. Plot of mean, median, max of the maximum weekly temperature*
 
-### Emergence date
+#### Emergence date
 
 *In development*
 
@@ -235,16 +262,19 @@ Ei = daily contribution to development (ranging from 0 to 1)
 
 Constants derived from [Beacham and Murray (1990)](https://afspubs.onlinelibrary.wiley.com/doi/epdf/10.1577/1548-8659%281990%29119%3C0927%3ATESADO%3E2.3.CO%3B2)
 
-## Flow
+### Flow
 
 Precipitation and streamflow have been found to influence spawning and rearing. Therefore it is expected to affect the translation from stock to recruit. Streamflow can be included in multiple different formats including:
+
 - Mean, median, max precipitation (or streamflow)
 
 ```{r}
 standard_flow <- SRJPEdata::environmental_data |> filter(parameter == "flow")
 ```
 
-### Mean, median, max flow
+#### Mean, median, max flow
+
+These covariates summarize daily max flows as annual mean/median/max/min within the spawning and rearing time period.
 
 ```{r}
 std_flow_spawn_summary <- standard_flow |> 
@@ -263,7 +293,8 @@ std_flow_spawn_summary <- standard_flow |>
 
 ```{r}
 std_flow_spawn_summary |> 
-  mutate(stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) |> 
+  filter(year > 1999) |> 
+  mutate(stream_site = ifelse(is.na(site_group), stream, site_group)) |> 
   ggplot(aes(x = year, y = value, color = statistic)) +
   geom_line() +
   facet_wrap(~stream_site, scales = "free_y") + 
@@ -292,7 +323,7 @@ std_flow_rear_summary <- standard_flow |>
 ```{r}
 std_flow_rear_summary |> 
   filter(year > 2000) |> 
-  mutate(stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) |> 
+  mutate(stream_site = ifelse(is.na(site_group), stream, site_group)) |> 
   ggplot(aes(x = year, y = value, color = statistic)) +
   geom_line() +
   facet_wrap(~stream_site, scales = "free_y") + 
@@ -322,7 +353,7 @@ std_flow_final <- std_flow_spawn_summary |>
   
 ```
 
-## Combine and Save Covariate Data 
+### Combine and Save Covariate Data 
 
 All covariate datasets are combined into one table and saved as an export from the SRJPEdata package. This data can be accessed using `SRJPEdata::stock_recruit_covariates` and can be joined to the `SRJPEdata::site_lookup` table in order to fill in covariates for each site and year. 
 
