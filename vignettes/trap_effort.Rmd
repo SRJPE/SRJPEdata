@@ -269,16 +269,34 @@ hours_fished_combined <- bind_rows(method_one,
 
 ## Summarized by week
 
-We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week.  
+We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week. Before 2005 trap data is not available for Knights Landing, we assume 168 hours when trap data is missing.  
 
 ```{r, echo = FALSE}
-weekly_hours_fished <- hours_fished_combined %>% 
+weekly_hours_fished_raw <- hours_fished_combined %>% 
   mutate(week = week(date),
          year = year(date)) %>% 
   group_by(stream, site, subsite, site_group, week, year) %>% 
   summarise(hours_fished = sum(hours_fished),
             hours_fished = ifelse(hours_fished > 168, 168, hours_fished)) |>  #only 168 hours in a year 
   ungroup()
+
+# we need to check to make sure there is not missing trap data (no hours fished when we have catch)
+# 607 obs
+
+weeks_with_missing_trap_data <- SRJPEdata::rst_catch |> 
+  mutate(week = week(date),
+         year = year(date)) |> 
+  group_by(stream, site, subsite, site_group, week, year) |> 
+  summarize(count = sum(count)) |> 
+  full_join(weekly_hours_fished_raw) |> 
+  filter(is.na(hours_fished))
+
+weeks_with_missing_trap_data |> group_by(year, stream, site, subsite) |> tally()
+
+weekly_hours_fished <- weekly_hours_fished_raw |> 
+  bind_rows(weeks_with_missing_trap_data |> 
+              select(-count)) |> 
+  mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished)) # when there is missing trap data we assume 24 hours/day fished
 
 # Save to package
 usethis::use_data(weekly_hours_fished, overwrite = TRUE)
