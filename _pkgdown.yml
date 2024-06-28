@@ -92,6 +92,8 @@ navbar:
         href: articles/sr_covariates.html
       - text: 'Summary of Data for Modeling '
         href: articles/summary_of_data_for_modeling.html
+  - text: 'News'
+    href: news/index.html
         
 repo:
  url:

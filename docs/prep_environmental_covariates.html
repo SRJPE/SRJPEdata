@@ -32,7 +32,7 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
-      <a href="articles/yearling_ruleset.html">Yearling Analysis</a>
+      <a href="articles/lifestage_ruleset.html">Lifestage Rulesets</a>
     </li>
     <li>
       <a href="articles/trap_effort.html">Hours Fished Analysis</a>
@@ -50,6 +50,9 @@
       <a href="articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
   </ul></li>
+<li>
+  <a href="news/index.html">News</a>
+</li>
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/SRJPE/SRJPEdata" class="external-link">
     <span class="fab fa-github fa-lg"></span>
@@ -69,16 +72,20 @@
     </div>
 
 
+<p>There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selction and processing for different models: (1) Stock Recruit Covariates and (2) Adult Model Covariates (this document).</p>
 <p>The Passage to Spawner (P2S) model relates spawner counts (from redd or holding surveys) to upstream passage counts obtained by video systems. This model is restricted to streams with reliable redd or holding surveys and reliable upstream passage counts. It is also restricted to years where the redd/holding and upstream passage datasets overlap. This vignette describes the process of pulling and processing environmental covariates for use in the P2S model.</p>
-<p>Potential environmental covariates hypothesized to influence prespawn mortality were proposed in meetings with the SRJPE Modeling Advisory Team (MAT). Five initial categories were identified:</p>
-<ul><li>temperature,</li>
-<li>flow,</li>
-<li>passage timing,</li>
-<li>water year type,</li>
-<li>and total passage.</li>
-</ul><p>There are many ways to summarize each of these categories and initial analyses helped identify collinearity and performance of each potential method by regressing prespawn mortality (calculated as <code>upstream_count / spawner_count</code>) against the environmental variable. When we were using redd counts as <code>spawner_count</code>, our model assumed a 50/50 sex ratio and modified that equation to be <code>upstream_count / (spawner_count * 0.5)</code>. Generally, one redd per female is a reasonable assumption although our model left the possibility open for more than one redd per female <a href="https://www.researchgate.net/publication/233231658_The_Number_of_Redds_Constructed_per_Female_Spring_Chinook_Salmon_in_the_Wenatchee_River_Basin" class="external-link">(source)</a>.</p>
+<div class="section level2">
+<h2 id="selecting-adult-environmental-covariates">Selecting Adult Environmental Covariates<a class="anchor" aria-label="anchor" href="#selecting-adult-environmental-covariates"></a></h2>
+<p>Potential environmental covariates hypothesized to influence prespawn mortality were proposed in meetings with the SR JPE Modeling Advisory Team (MAT). Five initial categories were identified:</p>
+<ul><li>temperature</li>
+<li>flow</li>
+<li>water year type</li>
+<li>passage timing</li>
+<li>total passage</li>
+</ul><p>There are many ways to summarize each of these categories and initial analyses helped identify collinearity and performance of each potential method by regressing prespawn mortality (calculated as <code>upstream_count / spawner_count</code>) against the environmental variable. When we were using redd counts as <code>spawner_count</code>, our model assumed a 50/50 sex ratio and modified that equation to be <code>upstream_count / (spawner_count * 0.5)</code>. Generally, one redd per female is a reasonable assumption although our model left the possibility open for more than one redd per female <a href="https://www.researchgate.net/publication/233231658_The_Number_of_Redds_Constructed_per_Female_Spring_Chinook_Salmon_in_the_Wenatchee_River_Basin" class="external-link">(source)</a>. Note that this covariate analysis and preparation does not include the Sacramento River mainstem as spring run do not spawn on the mainstem Sacramento.</p>
+</div>
 <div class="section level2 tabset">
-<h2 class="tabset" id="format-environmental-variables">Format environmental variables<a class="anchor" aria-label="anchor" href="#format-environmental-variables"></a></h2>
+<h2 class="tabset" id="preparing-covariates">Preparing Covariates<a class="anchor" aria-label="anchor" href="#preparing-covariates"></a></h2>
 <div class="section level3">
 <h3 id="temperature">Temperature<a class="anchor" aria-label="anchor" href="#temperature"></a></h3>
 <p>Several approaches were considered for summarizing temperature:</p>
@@ -87,7 +94,7 @@
 <li>Growing degree days (GDD) with a base temperature of 0 degrees Celsius <a href="https://www.researchgate.net/publication/279930331_Fish_growth_and_degree-days_I_Selecting_a_base_temperature_for_a_within-population_study%20and%20input%20from%20MAT%20team" class="external-link">(source)</a><br></li>
 <li>Degree Day 20 (DD20), where cumulative degree days are calculated against a threshold of 20 degrees Celsius <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274" class="external-link">(source)</a>
 </li>
-</ol><p>Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary.</p>
+</ol><p>Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. The resulting dataset is as follows (note that DD less than 0 are set to 0):</p>
 <table class="table"><thead><tr class="header"><th align="right">year</th>
 <th align="left">stream</th>
 <th align="right">gdd_trib</th>
@@ -143,13 +150,14 @@
 <td align="right">282.67653</td>
 <td align="right">0</td>
 <td align="right">282.68</td>
-</tr></tbody></table><div class="float">
-<img src="figure/unnamed-chunk-2-1.png" alt="plot of chunk unnamed-chunk-2"><div class="figcaption">plot of chunk unnamed-chunk-2</div>
+</tr></tbody></table><p>The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:</p>
+<div class="float">
+<img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><div class="figcaption">plot of chunk unnamed-chunk-3</div>
 </div>
 </div>
 <div class="section level3">
 <h3 id="flow">Flow<a class="anchor" aria-label="anchor" href="#flow"></a></h3>
-<p>Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year.</p>
+<p>Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:</p>
 <table class="table"><thead><tr class="header"><th align="left">stream</th>
 <th align="right">year</th>
 <th align="right">mean_flow</th>
@@ -194,13 +202,25 @@
 <td align="right">1971</td>
 <td align="right">585.0380</td>
 <td align="right">2500</td>
-</tr></tbody></table><div class="float">
-<img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><div class="figcaption">plot of chunk unnamed-chunk-3</div>
+</tr></tbody></table><p>The following plot is of max flow (cfs) over time for all tributaries:</p>
+<div class="float">
+<img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"><div class="figcaption">plot of chunk unnamed-chunk-5</div>
 </div>
 </div>
 <div class="section level3">
+<h3 id="water-year-type">Water Year Type<a class="anchor" aria-label="anchor" href="#water-year-type"></a></h3>
+<p>To account for the influence of large scale interannual climate variability, we investigated water year type as a covariate as described by the <a href="https://cdec.water.ca.gov/reportapp/javareports?name=WSIHIST" class="external-link">California Department of Water Resources</a> and available in the <a href="https://cloud.r-project.org/web/packages/waterYearType/index.html" class="external-link">waterYearType package in R</a>.</p>
+<p>We used the <code>waterYearType</code> package to pull water year assignments as a categorical covariate. Some streams had very few data points (i.e. for Mill Creek, only seven years were considered dependable), so we simplified all potential categories of water year type into either dry (<code>Dry</code>, <code>Below Normal</code>, <code>Critical</code>) or wet (<code>Wet</code>, <code>Above Normal</code>). The table below summarizes the number of dry and wet years that were included:</p>
+<table class="table"><thead><tr class="header"><th align="left">Water Year Type</th>
+<th align="right">Count</th>
+</tr></thead><tbody><tr class="odd"><td align="left">dry</td>
+<td align="right">60</td>
+</tr><tr class="even"><td align="left">wet</td>
+<td align="right">52</td>
+</tr></tbody></table></div>
+<div class="section level3">
 <h3 id="passage-timing">Passage Timing<a class="anchor" aria-label="anchor" href="#passage-timing"></a></h3>
-<p>Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power.</p>
+<p>Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power. Passage timing was summarized as the mean, median, and min day of passage. The resulting dataset is as follows:</p>
 <table class="table"><colgroup><col width="6%"><col width="16%"><col width="27%"><col width="25%"><col width="24%"></colgroup><thead><tr class="header"><th align="right">year</th>
 <th align="left">stream</th>
 <th align="right">median_passage_timing</th>
@@ -256,21 +276,11 @@
 <td align="right">22.0</td>
 <td align="right">22.95187</td>
 <td align="right">19</td>
-</tr></tbody></table><div class="float">
-<img src="figure/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"><div class="figcaption">plot of chunk unnamed-chunk-4</div>
+</tr></tbody></table><p>The following plot is of median passage over time for all tributaries:</p>
+<div class="float">
+<img src="figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8"><div class="figcaption">plot of chunk unnamed-chunk-8</div>
 </div>
 </div>
-<div class="section level3">
-<h3 id="water-year-type">Water Year Type<a class="anchor" aria-label="anchor" href="#water-year-type"></a></h3>
-<p>To account for the influence of large scale interannual climate variability, we investigated water year type as a covariate as described by the <a href="https://cdec.water.ca.gov/reportapp/javareports?name=WSIHIST" class="external-link">California Department of Water Resources</a> and available in the <a href="https://cloud.r-project.org/web/packages/waterYearType/index.html" class="external-link">waterYearType package in R</a>.</p>
-<p>We used the <code>waterYearType</code> package to pull water year assignments as a categorical covariate. Because for some streams we had very few data points (i.e. for Mill Creek, only seven years were considered dependable), we simplified all potential categories of water year type into either dry (<code>Dry</code>, <code>Below Normal</code>, <code>Critical</code>) or wet (<code>Wet</code>, <code>Above Normal</code>).</p>
-<table class="table"><thead><tr class="header"><th align="left">Water Year Type</th>
-<th align="right">Count</th>
-</tr></thead><tbody><tr class="odd"><td align="left">dry</td>
-<td align="right">60</td>
-</tr><tr class="even"><td align="left">wet</td>
-<td align="right">52</td>
-</tr></tbody></table></div>
 <div class="section level3">
 <h3 id="total-passage-as-index">Total Passage as Index<a class="anchor" aria-label="anchor" href="#total-passage-as-index"></a></h3>
 <p>We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality.</p>
@@ -308,13 +318,12 @@
 <td align="left">clear creek</td>
 <td align="right">9</td>
 </tr></tbody></table><div class="float">
-<img src="figure/unnamed-chunk-6-1.png" alt="plot of chunk unnamed-chunk-6"><div class="figcaption">plot of chunk unnamed-chunk-6</div>
+<img src="figure/unnamed-chunk-9-1.png" alt="plot of chunk unnamed-chunk-9"><div class="figcaption">plot of chunk unnamed-chunk-9</div>
 </div>
 </div>
-</div>
-<div class="section level2">
-<h2 id="combine-and-standardize">Combine and standardize<a class="anchor" aria-label="anchor" href="#combine-and-standardize"></a></h2>
-<p>Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as <code>1</code> for wet (wet, above normal) and <code>0</code> for dry (below normal, dry, critical).</p>
+<div class="section level3">
+<h3 id="combine-and-save-covariate-data">Combine and Save Covariate Data<a class="anchor" aria-label="anchor" href="#combine-and-save-covariate-data"></a></h3>
+<p>Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as <code>1</code> for wet (wet, above normal) and <code>0</code> for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):</p>
 <table class="table"><colgroup><col width="5%"><col width="14%"><col width="9%"><col width="14%"><col width="9%"><col width="16%"><col width="29%"></colgroup><thead><tr class="header"><th align="right">year</th>
 <th align="left">stream</th>
 <th align="right">wy_type</th>
@@ -325,79 +334,81 @@
 </tr></thead><tbody><tr class="odd"><td align="right">1962</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.5100941</td>
+<td align="right">-0.5103739</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="even"><td align="right">1963</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.6858838</td>
+<td align="right">0.6857655</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="odd"><td align="right">1964</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-1.0336666</td>
+<td align="right">-1.0340171</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="even"><td align="right">1965</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.2708985</td>
+<td align="right">-0.2711460</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="odd"><td align="right">1966</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.8861627</td>
+<td align="right">-0.8864933</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="even"><td align="right">1967</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.3107644</td>
+<td align="right">-0.3110173</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="odd"><td align="right">1968</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.6429805</td>
+<td align="right">-0.6432783</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="even"><td align="right">1969</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.4835168</td>
+<td align="right">-0.4837930</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="odd"><td align="right">1970</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.3240531</td>
+<td align="right">-0.3243078</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 </tr><tr class="even"><td align="right">1971</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.3337348</td>
+<td align="right">0.3335689</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-</tr></tbody></table><div class="float">
-<img src="figure/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"><div class="figcaption">plot of chunk unnamed-chunk-7</div>
+</tr></tbody></table><p>The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:</p>
+<div class="float">
+<img src="figure/unnamed-chunk-11-1.png" alt="plot of chunk unnamed-chunk-11"><div class="figcaption">plot of chunk unnamed-chunk-11</div>
 </div>
 <div class="section level4">
 <h4 id="save-data-object">Save data object<a class="anchor" aria-label="anchor" href="#save-data-object"></a></h4>
 <p>Data object saved in <code>SRJPEdata</code> as <code>p2s_model_covariates_standard.rds</code>. To access documentation search <code>?SRJPEdata::p2s_model_covariates_standard.rds</code>.</p>
+</div>
 </div>
 </div>
 

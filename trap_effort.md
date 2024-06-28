@@ -161,9 +161,34 @@ We combined all methods to create one table with daily hours fished for each tra
 
 ## Summarized by week
 
-We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week.  
+We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week. Before 2005 trap data is not available for Knights Landing, we assume 168 hours when trap data is missing.  
 
 
+```
+## # A tibble: 19 × 5
+## # Groups:   year, stream, site [12]
+##     year stream           site            subsite             n
+##    <dbl> <chr>            <chr>           <chr>           <int>
+##  1  1995 sacramento river knights landing 8.3                 3
+##  2  1995 sacramento river knights landing 8.4                 7
+##  3  1996 sacramento river knights landing 8.3                40
+##  4  1996 sacramento river knights landing 8.4                40
+##  5  1997 sacramento river knights landing 8.3                53
+##  6  1997 sacramento river knights landing 8.4                53
+##  7  1998 sacramento river knights landing 8.3                33
+##  8  1998 sacramento river knights landing 8.4                52
+##  9  1999 sacramento river knights landing 8.3                39
+## 10  1999 sacramento river knights landing 8.4                39
+## 11  2000 sacramento river knights landing 8.3                25
+## 12  2000 sacramento river knights landing 8.4                27
+## 13  2000 sacramento river knights landing knights landing    14
+## 14  2001 sacramento river knights landing knights landing    23
+## 15  2002 sacramento river knights landing knights landing    14
+## 16  2003 sacramento river knights landing knights landing    44
+## 17  2004 sacramento river knights landing knights landing    36
+## 18  2005 sacramento river knights landing knights landing    39
+## 19  2006 sacramento river knights landing knights landing    26
+```
 
 ### QC
 

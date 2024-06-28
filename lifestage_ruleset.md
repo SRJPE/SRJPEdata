@@ -78,32 +78,32 @@ In addition to differentiating between yearling and YOY it is important for the 
 The first step was to apply a lifestage cutoff to catch records that had fork lengths recorded. These cutoffs are `fork_length < 45 = fry`, `fork_length > 45 = smolt`, `fork_length > yearling_cutoff = yearling`.
 
 
-|date       |stream       |site |subsite |site_group   | count|run       |life_stage |adipose_clipped |dead  | fork_length|
-|:----------|:------------|:----|:-------|:------------|-----:|:---------|:----------|:---------------|:-----|-----------:|
-|2003-11-04 |battle creek |ubc  |ubc     |battle creek |     1|late fall |yearling   |FALSE           |FALSE |         114|
-|2003-11-25 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          33|
-|2003-11-27 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|
-|2003-11-29 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          36|
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     3|spring    |fry        |FALSE           |FALSE |          34|
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          35|
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     2|fall      |fry        |FALSE           |FALSE |          33|
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     2|spring    |fry        |FALSE           |FALSE |          34|
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|
+|date       |stream       |site |subsite |site_group   | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight|
+|:----------|:------------|:----|:-------|:------------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|
+|2003-11-04 |battle creek |ubc  |ubc     |battle creek |     1|late fall |yearling   |FALSE           |FALSE |         114|     NA|
+|2003-11-25 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          33|     NA|
+|2003-11-27 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|
+|2003-11-29 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          36|     NA|
+|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     3|spring    |fry        |FALSE           |FALSE |          34|     NA|
+|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          35|     NA|
+|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     2|fall      |fry        |FALSE           |FALSE |          33|     NA|
+|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|
+|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     2|spring    |fry        |FALSE           |FALSE |          34|     NA|
+|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|
 
 ### Determine year specific lifestage proportions
 
 There are 25964 entries with missing lifestage due to missing fork length data. 
 
 
-|date       |stream       |site |subsite |site_group   | count|run    |life_stage |adipose_clipped |dead  | fork_length|
-|:----------|:------------|:----|:-------|:------------|-----:|:------|:----------|:---------------|:-----|-----------:|
-|2003-12-13 |battle creek |ubc  |ubc     |battle creek |     2|fall   |NA         |FALSE           |FALSE |          NA|
-|2003-12-13 |battle creek |ubc  |ubc     |battle creek |     1|spring |NA         |FALSE           |FALSE |          NA|
-|2003-12-14 |battle creek |ubc  |ubc     |battle creek |   125|fall   |NA         |FALSE           |FALSE |          NA|
-|2003-12-14 |battle creek |ubc  |ubc     |battle creek |    28|spring |NA         |FALSE           |FALSE |          NA|
-|2003-12-21 |battle creek |ubc  |ubc     |battle creek |   109|fall   |NA         |FALSE           |FALSE |          NA|
-|2003-12-28 |battle creek |ubc  |ubc     |battle creek |    33|fall   |NA         |FALSE           |FALSE |          NA|
+|date       |stream       |site |subsite |site_group   | count|run    |life_stage |adipose_clipped |dead  | fork_length| weight|
+|:----------|:------------|:----|:-------|:------------|-----:|:------|:----------|:---------------|:-----|-----------:|------:|
+|2003-12-13 |battle creek |ubc  |ubc     |battle creek |     2|fall   |NA         |FALSE           |FALSE |          NA|     NA|
+|2003-12-13 |battle creek |ubc  |ubc     |battle creek |     1|spring |NA         |FALSE           |FALSE |          NA|     NA|
+|2003-12-14 |battle creek |ubc  |ubc     |battle creek |   125|fall   |NA         |FALSE           |FALSE |          NA|     NA|
+|2003-12-14 |battle creek |ubc  |ubc     |battle creek |    28|spring |NA         |FALSE           |FALSE |          NA|     NA|
+|2003-12-21 |battle creek |ubc  |ubc     |battle creek |   109|fall   |NA         |FALSE           |FALSE |          NA|     NA|
+|2003-12-28 |battle creek |ubc  |ubc     |battle creek |    33|fall   |NA         |FALSE           |FALSE |          NA|     NA|
 
 The first step in filling in these missing lifestages was to find the proportion for each lifestage category for a given stream, site, week, and year. This information could then be used to fill in the lifestage for missing rows within a week.
 
@@ -132,18 +132,18 @@ For weeks that had no fork length data in a given week, we calculated a general 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
 
 
-|date       |stream       |site |subsite |site_group   | count|run       |life_stage |adipose_clipped |dead  | fork_length| week| year|model_lifestage_method   |
-|:----------|:------------|:----|:-------|:------------|-----:|:---------|:----------|:---------------|:-----|-----------:|----:|----:|:------------------------|
-|2003-11-04 |battle creek |ubc  |ubc     |battle creek |     1|late fall |yearling   |FALSE           |FALSE |         114|   44| 2003|assigned from fl cutoffs |
-|2003-11-25 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          33|   47| 2003|assigned from fl cutoffs |
-|2003-11-27 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|   48| 2003|assigned from fl cutoffs |
-|2003-11-29 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          36|   48| 2003|assigned from fl cutoffs |
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     3|spring    |fry        |FALSE           |FALSE |          34|   48| 2003|assigned from fl cutoffs |
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          35|   48| 2003|assigned from fl cutoffs |
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     2|fall      |fry        |FALSE           |FALSE |          33|   48| 2003|assigned from fl cutoffs |
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|   48| 2003|assigned from fl cutoffs |
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     2|spring    |fry        |FALSE           |FALSE |          34|   48| 2003|assigned from fl cutoffs |
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|   48| 2003|assigned from fl cutoffs |
+|date       |stream       |site |subsite |site_group   | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight| week| year|model_lifestage_method   |
+|:----------|:------------|:----|:-------|:------------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|----:|----:|:------------------------|
+|2003-11-04 |battle creek |ubc  |ubc     |battle creek |     1|late fall |yearling   |FALSE           |FALSE |         114|     NA|   44| 2003|assigned from fl cutoffs |
+|2003-11-25 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          33|     NA|   47| 2003|assigned from fl cutoffs |
+|2003-11-27 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
+|2003-11-29 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          36|     NA|   48| 2003|assigned from fl cutoffs |
+|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     3|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
+|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          35|     NA|   48| 2003|assigned from fl cutoffs |
+|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     2|fall      |fry        |FALSE           |FALSE |          33|     NA|   48| 2003|assigned from fl cutoffs |
+|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
+|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     2|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
+|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
 
 ### Review lifestage
 

@@ -31,20 +31,21 @@ library(ggplot2)
 library(mapdata)
 library(ggrepel)
 
+# Map for data check -----------------------------------------------------------
 ## Set boundary box for map
-xlim <- c(-123, -121)
-ylim <- c(37.5, 40.6)
-usa <- map_data("worldHires", ylim = ylim, xlim = xlim)
-rivers <- map_data("rivers", ylim = ylim, xlim = xlim)
-rivers <- rivers[rivers$lat < max(ylim),]
-ggplot() +
-  geom_polygon(data = usa, aes(x = long, y = lat, group = group), fill = "grey80") +
-  geom_path(data = rivers, aes(x = long, y = lat, group = group), size = 1, color = "white", lineend = "round") +
-  geom_point(data = detect_summary, aes(x = longitude, y = latitude), shape=23, fill="blue", color="darkred", size=3) +
-  geom_text_repel(data = detect_summary, aes(x = longitude, y = latitude, label = fish_count)) +
-  theme_bw() + ylab("latitude") + xlab("longitude") +
-  coord_fixed(1.3, xlim = xlim, ylim = ylim) +
-  ggtitle("Location of study detections w/ count of unique fish visits")
+# xlim <- c(-123, -121)
+# ylim <- c(37.5, 40.6)
+# usa <- map_data("worldHires", ylim = ylim, xlim = xlim)
+# rivers <- map_data("rivers", ylim = ylim, xlim = xlim)
+# rivers <- rivers[rivers$lat < max(ylim),]
+# ggplot() +
+#   geom_polygon(data = usa, aes(x = long, y = lat, group = group), fill = "grey80") +
+#   geom_path(data = rivers, aes(x = long, y = lat, group = group), size = 1, color = "white", lineend = "round") +
+#   geom_point(data = detect_summary, aes(x = longitude, y = latitude), shape=23, fill="blue", color="darkred", size=3) +
+#   geom_text_repel(data = detect_summary, aes(x = longitude, y = latitude, label = fish_count)) +
+#   theme_bw() + ylab("latitude") + xlab("longitude") +
+#   coord_fixed(1.3, xlim = xlim, ylim = ylim) +
+#   ggtitle("Location of study detections w/ count of unique fish visits")
 
 ## USE FLORA LOGIC TO FORMAT CH ---- she groups fish into 4 detection sites,
 # use floras functions to generate table with CH 

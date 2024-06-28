@@ -56,7 +56,7 @@ The plot below shows all monitoring coverage of rotary screw trap, adult upstrea
 
 ```{r, echo = FALSE}
 # Create plot with Stream on the y axis, year on x axis and 
-rst_plot_data <- rst_catch |> 
+rst_plot_data <- SRJPEdata::rst_catch |> 
   mutate(week = week(date),
          year = year(date),
          month = month(date)) |> 
@@ -68,13 +68,13 @@ rst_plot_data <- rst_catch |>
   select(year, month, stream, site, subsite, site_group, monthly_catch_exists, sampling_exists, sampling_type) |> 
   mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) 
 
-adult_carcass_plot_data <- carcass_estimates |> 
+adult_carcass_plot_data <- SRJPEdata::carcass_estimates |> 
   mutate(sampling_type = "carcass estimate",
          sampling_exists = 100) |> 
   select(year, stream, sampling_type, sampling_exists) |> 
   mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) 
 
-upstream_passage_plot_data <- upstream_passage_estimates |> 
+upstream_passage_plot_data <- SRJPEdata::upstream_passage_estimates |> 
   mutate(sampling_type = "upstream passage estimate",
          sampling_exists = 100) |> 
   select(year, stream, sampling_type, sampling_exists) |> 
@@ -83,7 +83,7 @@ upstream_passage_plot_data <- upstream_passage_estimates |>
 # TODO figure out where redd data is for clear 
 # note that ashley identified the issue in the data prep for the db and fixed it. assigned inigo to update db
 # follow up on this first week of June
-redd_plot_data <- redd |> 
+redd_plot_data <- SRJPEdata::redd |> 
   mutate(week = week(date),
          year = year(date),
          month = month(date)) |> 
@@ -94,7 +94,7 @@ redd_plot_data <- redd |>
   select(year, month, stream, sampling_exists, sampling_type) |> 
   mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) 
 
-holding_plot_data <- holding |> 
+holding_plot_data <- SRJPEdata::holding |> 
   mutate(week = week(date),
          year = year(date),
          month = month(date)) |> 
@@ -302,7 +302,7 @@ updated_plot_data <- bind_rows(rst_plot_data,
 
 ```{r, echo = FALSE}
 updated_potential_jpe_window <- updated_plot_data |> 
-  filter(exclude == FALSE) |> 
+  filter(exclude == FALSE) |>
   pivot_wider(id_cols = c("date", "year", "month", "stream", "site", "subsite"),
               names_from = sampling_type,
               values_from = sampling_exists) |>
