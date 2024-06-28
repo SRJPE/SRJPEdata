@@ -51,11 +51,11 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
 
 
 try(if(!exists("rst_catch_query_pilot"))
-  rst_catch <- SRJPEdata::rst_catch |> filter(stream %in% c("mill Creek", "deer Creek"))
-  else(rst_catch <- rst_catch_query_pilot))
+  rst_catch_pilot <- SRJPEdata::rst_catch |> filter(stream %in% c("mill creek", "deer creek"))
+  else(rst_catch_pilot <- rst_catch_query_pilot))
 
-try(if(nrow(rst_catch_query_pilot) <= nrow(SRJPEdata::rst_catch)) {
-  rst_catch <- SRJPEdata::rst_catch  |> filter(stream %in% c("mill Creek", "deer Creek"))
+try(if(nrow(rst_catch_query_pilot) <= nrow(SRJPEdata::rst_catch |> filter(stream %in% c("mill creek", "deer creek")))) {
+  rst_catch_pilot <- SRJPEdata::rst_catch  |> filter(stream %in% c("mill creek", "deer creek"))
   warning(paste("No new rst catch datasets detected in the database. RST catch data not updated on", Sys.Date()))
 })
 
@@ -94,11 +94,11 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
 
 
 try(if(!exists("rst_trap_query_pilot"))
-  rst_trap <- SRJPEdata::rst_trap_pilot |> filter(stream %in% c("mill creek", "deer creek"))
-  else(rst_trap <- rst_trap_query))
+  rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
+  else(rst_trap_pilot <- rst_trap_query))
 
-try(if(nrow(rst_trap_query_pilot) <= nrow(SRJPEdata::rst_trap)) {
-  rst_trap <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
+try(if(nrow(rst_trap_query_pilot) <= nrow(SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek")))) {
+  rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
   warning(paste("No new rst trap datasets detected in the database. RST trap data not updated on", Sys.Date()))
 })
 # Pull in efficiency data 
