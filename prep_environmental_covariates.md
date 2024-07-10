@@ -91,8 +91,8 @@ We used the `waterYearType` package to pull water year assignments as a categori
 
 |Water Year Type | Count|
 |:---------------|-----:|
-|dry             |    60|
-|wet             |    52|
+|dry             |    63|
+|wet             |    53|
 
 ### Passage Timing
 
