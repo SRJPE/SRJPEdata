@@ -2,7 +2,7 @@
 title: "Years to Include"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{years_to_include_analysis}
+  %\VignetteIndexEntry{Years to Include}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -148,7 +148,7 @@ heat_map <- ggplot(plot_data, aes(x = fake_date, y = wy, fill = n_streams, text 
   theme_minimal() + 
   ylab('water year') +
   xlab("") + 
-  scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(heat_map) 
 
@@ -453,7 +453,7 @@ upstream_heat_map <- ggplot(updstream_plot_data,
   theme_minimal() + 
   ylab('water year') +
   xlab("") + 
-  scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(upstream_heat_map) 
 ```
@@ -486,7 +486,7 @@ redd_heat_map <- ggplot(redd_by_reach, aes(x = reach, y = year, fill = n)) +
   theme_minimal() + 
   ylab('water year') +
   xlab("") +
-  scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of visits")
 
 plotly::ggplotly(redd_heat_map) 

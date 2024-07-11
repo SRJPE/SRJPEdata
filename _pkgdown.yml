@@ -33,7 +33,6 @@ reference:
 - contents: 
   - rst_catch
   - rst_trap
-  - efficiency_summary
   - release_fish
   - recaptures 
 - subtitle: Adult Datasets

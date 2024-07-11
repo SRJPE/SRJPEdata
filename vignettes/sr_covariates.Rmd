@@ -2,7 +2,7 @@
 title: "Stock Recruit Covariates"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SRcovariates}
+  %\VignetteIndexEntry{Stock Recruit Covariates}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

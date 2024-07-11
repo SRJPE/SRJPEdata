@@ -2,7 +2,7 @@
 title: "Calculating Hours Fished"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{trap_effort}
+  %\VignetteIndexEntry{Calculating Hours Fished}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
