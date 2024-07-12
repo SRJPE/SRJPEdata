@@ -2,7 +2,7 @@
 title: "Years to Include"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{years_to_include_analysis}
+  %\VignetteIndexEntry{Years to Include}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -26,7 +26,7 @@ The cumulative catch curve below shows cumulative catch over time for Battle Cre
 
 
 ```
-#> Error in path.expand(path): invalid 'path' argument
+#> Error in loadNamespace(name): there is no package called 'webshot'
 ```
 
 ### Heat map of all tributaries
@@ -35,7 +35,7 @@ The heat map below shows when sampling occurs for all streams. It shows that sam
 
 
 ```
-#> Error in path.expand(path): invalid 'path' argument
+#> Error in loadNamespace(name): there is no package called 'webshot'
 ```
 
 ### Years to exclude
@@ -77,22 +77,22 @@ The table below shows a section of this table:
 
 
 
-| monitoring_year|stream           |site            |subsite            |min_date   | min_week|max_date   | max_week|
-|---------------:|:----------------|:---------------|:------------------|:----------|--------:|:----------|--------:|
-|            1995|deer creek       |deer creek      |deer creek         |1994-10-03 |       40|1995-06-18 |       25|
-|            1996|butte creek      |okie dam        |okie dam 1         |1995-12-01 |       48|1996-04-29 |       18|
-|            1996|butte creek      |okie dam        |okie dam fyke trap |1995-12-01 |       48|1996-04-29 |       18|
-|            1996|butte creek      |okie dam        |NA                 |1995-12-06 |       49|1996-04-19 |       16|
-|            1996|deer creek       |deer creek      |deer creek         |1995-11-29 |       48|1996-06-24 |       26|
-|            1996|mill creek       |mill creek      |mill creek         |1995-12-09 |       49|1996-06-24 |       26|
-|            1996|sacramento river |knights landing |8.3                |1995-12-18 |       51|1996-06-28 |       26|
-|            1996|sacramento river |knights landing |8.4                |1995-11-21 |       47|1996-06-28 |       26|
-|            1997|sacramento river |knights landing |8.3                |1996-09-30 |       40|1997-08-29 |       35|
-|            1997|sacramento river |knights landing |8.4                |1996-09-30 |       40|1997-08-29 |       35|
+| monitoring_year|stream           |site                    |subsite    |min_date   | min_week|max_date   | max_week|
+|---------------:|:----------------|:-----------------------|:----------|:----------|--------:|:----------|--------:|
+|            1994|sacramento river |red bluff diversion dam |gate 1     |1994-08-19 |       33|1994-08-31 |       35|
+|            1994|sacramento river |red bluff diversion dam |gate 10    |1994-08-29 |       35|1994-08-31 |       35|
+|            1994|sacramento river |red bluff diversion dam |gate 11    |1994-07-18 |       29|1994-08-24 |       34|
+|            1995|deer creek       |deer creek              |deer creek |1994-10-03 |       40|1995-06-18 |       25|
+|            1995|sacramento river |red bluff diversion dam |gate 1     |1994-09-01 |       35|1995-08-31 |       35|
+|            1995|sacramento river |red bluff diversion dam |gate 10    |1994-09-01 |       35|1995-08-31 |       35|
+|            1995|sacramento river |red bluff diversion dam |gate 11    |1995-03-03 |        9|1995-08-31 |       35|
+|            1995|sacramento river |red bluff diversion dam |gate 2     |1995-01-25 |        4|1995-05-04 |       18|
+|            1995|sacramento river |red bluff diversion dam |gate 3     |1994-10-18 |       42|1995-08-31 |       35|
+|            1995|sacramento river |red bluff diversion dam |gate 5     |1994-09-22 |       38|1995-04-27 |       17|
 
 
 
-*... with 259 more rows*
+*... with 470 more rows*
 
 ## Adult Data - Years to Include in Model
 
@@ -129,7 +129,7 @@ The cumulative catch curve below shows cumulative upstream passage over time for
 
 
 ```
-#> Error in path.expand(path): invalid 'path' argument
+#> Error in loadNamespace(name): there is no package called 'webshot'
 ```
 
 #### Heat map of all tributaries
@@ -138,7 +138,7 @@ The heat map below shows when video monitoring occurs for all streams. Some vide
 
 
 ```
-#> Error in path.expand(path): invalid 'path' argument
+#> Error in loadNamespace(name): there is no package called 'webshot'
 ```
 
 ### Survey Data
@@ -147,7 +147,7 @@ The below heat map shows Battle Creek redd survey coverage. It shows decent cove
 
 
 ```
-#> Error in path.expand(path): invalid 'path' argument
+#> Error in loadNamespace(name): there is no package called 'webshot'
 ```
 
 ### Years to exclude

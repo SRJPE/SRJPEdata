@@ -2,7 +2,7 @@
 title: "Calculating Hours Fished"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{trap_effort}
+  %\VignetteIndexEntry{Calculating Hours Fished}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -29,7 +29,7 @@ Below is the code for each of the methods described above:
 1) If the start and stop date/time of the sampling period are available, simply subtract the difference in time.
 
 
-```r
+``` r
 # calculating hours fished when have start and stop datetime
 hours_fished <- function(dat){
   dat %>%
@@ -44,7 +44,7 @@ hours_fished <- function(dat){
 take the average cone RPMs and divide `total_revolutions`/average RMP/60 to get total hours fished.
 
 
-```r
+``` r
 # calculating hours fished when have start and stop datetime
 revolution_calculated_hours_fished <- function(dat){
   dat %>%
@@ -61,7 +61,7 @@ revolution_calculated_hours_fished <- function(dat){
 3) If only one date is available, assume that the end date is the date sampled on the following day.
 
 
-```r
+``` r
 # calculating hours fished when have only date and time
 hours_fished_one_date <- function(dat) {
   dat %>%
@@ -146,11 +146,11 @@ fished. We therefore assume 24 hours fished for every day with data.
 
 |trap_stop_date |stream     |site       |subsite    |site_group |hours_fished_methodology | hours_fished|
 |:--------------|:----------|:----------|:----------|:----------|:------------------------|------------:|
-|1994-10-13     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1994-10-15     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1994-10-16     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1994-10-18     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1994-10-22     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
+|1992-10-14     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
+|1992-10-17     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
+|1992-10-30     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
+|1992-11-04     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
+|1992-11-05     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
 
 
 # Combine Data
@@ -165,29 +165,21 @@ We grouped hours fished data by site, subsite, week, and year and summarized to 
 
 
 ```
-## # A tibble: 19 × 5
-## # Groups:   year, stream, site [12]
-##     year stream           site            subsite             n
-##    <dbl> <chr>            <chr>           <chr>           <int>
-##  1  1995 sacramento river knights landing 8.3                 3
-##  2  1995 sacramento river knights landing 8.4                 7
-##  3  1996 sacramento river knights landing 8.3                40
-##  4  1996 sacramento river knights landing 8.4                40
-##  5  1997 sacramento river knights landing 8.3                53
-##  6  1997 sacramento river knights landing 8.4                53
-##  7  1998 sacramento river knights landing 8.3                33
-##  8  1998 sacramento river knights landing 8.4                52
-##  9  1999 sacramento river knights landing 8.3                39
-## 10  1999 sacramento river knights landing 8.4                39
-## 11  2000 sacramento river knights landing 8.3                25
-## 12  2000 sacramento river knights landing 8.4                27
-## 13  2000 sacramento river knights landing knights landing    14
-## 14  2001 sacramento river knights landing knights landing    23
-## 15  2002 sacramento river knights landing knights landing    14
-## 16  2003 sacramento river knights landing knights landing    44
-## 17  2004 sacramento river knights landing knights landing    36
-## 18  2005 sacramento river knights landing knights landing    39
-## 19  2006 sacramento river knights landing knights landing    26
+## # A tibble: 275 × 5
+## # Groups:   year, stream, site [52]
+##     year stream           site                    subsite     n
+##    <dbl> <chr>            <chr>                   <chr>   <int>
+##  1  1994 sacramento river red bluff diversion dam gate 1      6
+##  2  1994 sacramento river red bluff diversion dam gate 10     4
+##  3  1994 sacramento river red bluff diversion dam gate 11     6
+##  4  1994 sacramento river red bluff diversion dam gate 3     11
+##  5  1994 sacramento river red bluff diversion dam gate 5     15
+##  6  1994 sacramento river red bluff diversion dam gate 7     12
+##  7  1994 sacramento river red bluff diversion dam gate 9     16
+##  8  1995 sacramento river knights landing         8.3         3
+##  9  1995 sacramento river knights landing         8.4         7
+## 10  1995 sacramento river red bluff diversion dam gate 1     32
+## # ℹ 265 more rows
 ```
 
 ### QC

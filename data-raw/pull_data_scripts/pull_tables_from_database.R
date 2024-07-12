@@ -8,7 +8,7 @@ library(SRJPEdata)
 # Use DBI - dbConnect to connect to database - keep user id and password sectret
 con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       host = "jpe-db.postgres.database.azure.com",
-                      dbname = "postgres",
+                      dbname = "jpedb-prod",
                       user = Sys.getenv("jpe_db_user_id"),
                       password = Sys.getenv("jpe_db_password"),
                       port = 5432)

@@ -48,7 +48,7 @@ FlowWest took the daily cutoff line (shown in plot above) and used it as a thres
 The following code is applied in the `weekly_data_summary` script. 
 
 
-```r
+``` r
 # Note this is not the final dataset as lifestage is added below
 standard_catch_unmarked_w_yearling <- rst_catch |> 
   filter(species == "chinook") |>  # filter for only chinook
@@ -78,48 +78,48 @@ In addition to differentiating between yearling and YOY it is important for the 
 The first step was to apply a lifestage cutoff to catch records that had fork lengths recorded. These cutoffs are `fork_length < 45 = fry`, `fork_length > 45 = smolt`, `fork_length > yearling_cutoff = yearling`.
 
 
-|date       |stream       |site |subsite |site_group   | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight|
-|:----------|:------------|:----|:-------|:------------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|
-|2003-11-04 |battle creek |ubc  |ubc     |battle creek |     1|late fall |yearling   |FALSE           |FALSE |         114|     NA|
-|2003-11-25 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          33|     NA|
-|2003-11-27 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|
-|2003-11-29 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          36|     NA|
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     3|spring    |fry        |FALSE           |FALSE |          34|     NA|
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          35|     NA|
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     2|fall      |fry        |FALSE           |FALSE |          33|     NA|
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     2|spring    |fry        |FALSE           |FALSE |          34|     NA|
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|
+|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight|
+|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|
+|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |fry        |FALSE           |NA   |          40|      0|
+|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  | 17100|fall |fry        |FALSE           |NA   |           0|      0|
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          35|      0|
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     3|fall |fry        |FALSE           |NA   |          38|      0|
+|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     6|fall |fry        |FALSE           |NA   |          37|      0|
+|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          38|      0|
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          34|      0|
+|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          36|      0|
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     4|fall |fry        |FALSE           |NA   |          36|      0|
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     2|fall |fry        |FALSE           |NA   |          37|      0|
 
 ### Determine year specific lifestage proportions
 
-There are 25964 entries with missing lifestage due to missing fork length data. 
+There are 44880 entries with missing lifestage due to missing fork length data. 
 
 
-|date       |stream       |site |subsite |site_group   | count|run    |life_stage |adipose_clipped |dead  | fork_length| weight|
-|:----------|:------------|:----|:-------|:------------|-----:|:------|:----------|:---------------|:-----|-----------:|------:|
-|2003-12-13 |battle creek |ubc  |ubc     |battle creek |     2|fall   |NA         |FALSE           |FALSE |          NA|     NA|
-|2003-12-13 |battle creek |ubc  |ubc     |battle creek |     1|spring |NA         |FALSE           |FALSE |          NA|     NA|
-|2003-12-14 |battle creek |ubc  |ubc     |battle creek |   125|fall   |NA         |FALSE           |FALSE |          NA|     NA|
-|2003-12-14 |battle creek |ubc  |ubc     |battle creek |    28|spring |NA         |FALSE           |FALSE |          NA|     NA|
-|2003-12-21 |battle creek |ubc  |ubc     |battle creek |   109|fall   |NA         |FALSE           |FALSE |          NA|     NA|
-|2003-12-28 |battle creek |ubc  |ubc     |battle creek |    33|fall   |NA         |FALSE           |FALSE |          NA|     NA|
+|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight|
+|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|
+|2002-03-13 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |NA         |FALSE           |NA   |          NA|      0|
+|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     7|fall |NA         |FALSE           |NA   |          NA|      0|
+|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     3|fall |NA         |FALSE           |NA   |          NA|      0|
+|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     6|fall |NA         |FALSE           |NA   |          NA|      0|
+|2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|
+|2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|
 
 The first step in filling in these missing lifestages was to find the proportion for each lifestage category for a given stream, site, week, and year. This information could then be used to fill in the lifestage for missing rows within a week.
 
 
-| year| week|stream     |site       | percent_fry| percent_smolt| percent_yearling|
-|----:|----:|:----------|:----------|-----------:|-------------:|----------------:|
-| 1992|   42|deer creek |deer creek |           0|             0|                1|
-| 1992|   44|deer creek |deer creek |           0|             0|                1|
-| 1992|   45|deer creek |deer creek |           0|             0|                1|
-| 1992|   46|deer creek |deer creek |           0|             0|                1|
-| 1992|   48|deer creek |deer creek |           0|             0|                1|
-| 1992|   49|deer creek |deer creek |           0|             0|                1|
-| 1994|   40|deer creek |deer creek |           0|             0|                1|
-| 1994|   41|deer creek |deer creek |           0|             0|                1|
-| 1994|   42|deer creek |deer creek |           0|             0|                1|
-| 1994|   43|deer creek |deer creek |           0|             0|                1|
+| year| week|stream           |site                    | percent_fry| percent_smolt| percent_yearling|
+|----:|----:|:----------------|:-----------------------|-----------:|-------------:|----------------:|
+| 1992|   42|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   44|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   45|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   46|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   48|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   49|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1994|   29|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
+| 1994|   30|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
+| 1994|   31|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
+| 1994|   32|sacramento river |red bluff diversion dam |         0.1|           0.9|                0|
 
 ### Determine general weekly lifestage proportions
 
@@ -132,18 +132,18 @@ For weeks that had no fork length data in a given week, we calculated a general 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
 
 
-|date       |stream       |site |subsite |site_group   | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight| week| year|model_lifestage_method   |
-|:----------|:------------|:----|:-------|:------------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|----:|----:|:------------------------|
-|2003-11-04 |battle creek |ubc  |ubc     |battle creek |     1|late fall |yearling   |FALSE           |FALSE |         114|     NA|   44| 2003|assigned from fl cutoffs |
-|2003-11-25 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          33|     NA|   47| 2003|assigned from fl cutoffs |
-|2003-11-27 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
-|2003-11-29 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          36|     NA|   48| 2003|assigned from fl cutoffs |
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     3|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
-|2003-11-30 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          35|     NA|   48| 2003|assigned from fl cutoffs |
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     2|fall      |fry        |FALSE           |FALSE |          33|     NA|   48| 2003|assigned from fl cutoffs |
-|2003-12-01 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     2|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
-|2003-12-02 |battle creek |ubc  |ubc     |battle creek |     1|spring    |fry        |FALSE           |FALSE |          34|     NA|   48| 2003|assigned from fl cutoffs |
+|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight| week| year|model_lifestage_method   |
+|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|----:|----:|:------------------------|
+|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |fry        |FALSE           |NA   |          40|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  | 17100|fall |fry        |FALSE           |NA   |           0|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          35|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     3|fall |fry        |FALSE           |NA   |          38|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     6|fall |fry        |FALSE           |NA   |          37|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          38|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          34|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          36|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     4|fall |fry        |FALSE           |NA   |          36|      0|    3| 1999|assigned from fl cutoffs |
+|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     2|fall |fry        |FALSE           |NA   |          37|      0|    3| 1999|assigned from fl cutoffs |
 
 ### Review lifestage
 
