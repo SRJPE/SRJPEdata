@@ -1,4 +1,4 @@
-pandoc: 3.1.11
+pandoc: 3.1.1
 pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
@@ -8,7 +8,7 @@ articles:
   summary_of_data_for_modeling: summary_of_data_for_modeling.html
   trap_effort: trap_effort.html
   years_to_include_analysis: years_to_include_analysis.html
-last_built: 2024-07-12T21:29Z
+last_built: 2024-07-15T00:04Z
 urls:
   reference: https://SRJPE.github.io/SRJPEdata/reference
   article: https://SRJPE.github.io/SRJPEdata/articles
