@@ -1,0 +1,272 @@
+---
+title: "Adult Model Covariates"
+# output: html_document # to see tabset
+output:
+  html_document:
+     code_folding: hide
+     theme: flatly
+# output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{prep_environmental_covariates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, 
+                      fig.width = 8, fig.height = 6)
+
+library(tidyverse)
+library(waterYearType)
+library(SRJPEdata)
+
+colors_small <-  c("#9A8822", "#74A089", #Royal 2
+                            "#899DA4", "#C93312", "#DC863B")
+```
+
+There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selction and processing for different models: (1) Stock Recruit Covariates and (2) Adult Model Covariates (this document).
+
+The Passage to Spawner (P2S) model relates spawner counts (from redd or holding surveys) to upstream passage counts obtained by video systems. This model is restricted to streams with reliable redd or holding surveys and reliable upstream passage counts. It is also restricted to years where the redd/holding and upstream passage datasets overlap. This vignette describes the process of pulling and processing environmental covariates for use in the P2S model.
+
+## Selecting Adult Environmental Covariates
+
+Potential environmental covariates hypothesized to influence prespawn mortality were proposed in meetings with the SR JPE Modeling Advisory Team (MAT). Five initial categories were identified: 
+
+* temperature
+* flow
+* water year type
+* passage timing
+* total passage
+
+There are many ways to summarize each of these categories and initial analyses helped identify collinearity and performance of each potential method by regressing prespawn mortality (calculated as `upstream_count / spawner_count`) against the environmental variable. When we were using redd counts as `spawner_count`, our model assumed a 50/50 sex ratio and modified that equation to be `upstream_count / (spawner_count * 0.5)`. Generally, one redd per female is a reasonable assumption although our model left the possibility open for more than one redd per female [(source)](https://www.researchgate.net/publication/233231658_The_Number_of_Redds_Constructed_per_Female_Spring_Chinook_Salmon_in_the_Wenatchee_River_Basin). Note that this covariate analysis and preparation does not include the Sacramento River mainstem as spring run do not spawn on the mainstem Sacramento.
+
+## Preparing Covariates {.tabset}
+
+### Temperature 
+
+Several approaches were considered for summarizing temperature: 
+
+1. Proportion of days where the temperature surpassed a threshold of 20 degrees Celsius [(source)](https://www.noaa.gov/sites/default/files/legacy/document/2020/Oct/07354626766.pdf) 
+2. Growing degree days (GDD) with a base temperature of 0 degrees Celsius [(source)](https://www.researchgate.net/publication/279930331_Fish_growth_and_degree-days_I_Selecting_a_base_temperature_for_a_within-population_study and input from MAT team)  
+3. Degree Day 20 (DD20), where cumulative degree days are calculated against a threshold of 20 degrees Celsius [(source)](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274) 
+
+Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. The resulting dataset is as follows (note that DD less than 0 are set to 0):
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# set thresholds and months
+gdd_base_sac <- 20 # https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274
+gdd_base_trib <- 20
+migratory_months <- 3:5
+holding_months <- 5:8
+
+# read in temperature data pull (database-tables does not have the mean column)
+standard_temperature <- SRJPEdata::environmental_data |> 
+  filter(parameter == "temperature")
+
+# calculate sum of days above the thresholds
+gdd_sac <- standard_temperature |> 
+  filter(month(date) %in% migratory_months, 
+         stream == "sacramento river",
+         statistic == "mean") |> 
+  mutate(gdd_sac = value - gdd_base_sac,
+         gdd_sac = ifelse(gdd_sac < 0, 0, gdd_sac)) |>
+  group_by(year(date)) |>
+  summarise(gdd_sac = sum(gdd_sac, na.rm = T)) |>
+  rename(year = `year(date)`) |>
+  ungroup()
+
+gdd_trib <- standard_temperature |>
+  filter(month(date) %in% holding_months, 
+        stream != "sacramento river",
+        statistic == "mean") |>
+  mutate(gdd_trib = value - gdd_base_trib,
+         gdd_trib = ifelse(gdd_trib < 0, 0, gdd_trib)) |>
+  group_by(year(date), stream) |>
+  summarise(gdd_trib = sum(gdd_trib, na.rm = T)) |>
+  rename(year = `year(date)`) |>
+  ungroup()
+
+gdd <- left_join(gdd_trib, gdd_sac,
+                 by = c("year")) |>
+  mutate(gdd_sac = ifelse(is.na(gdd_sac), 0, gdd_sac),
+         gdd_total = round(gdd_sac + gdd_trib, 2))
+
+knitr::kable(head(gdd, 10))
+```
+
+The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+gdd |> 
+  ggplot(aes(x = year, y = gdd_total)) + 
+  geom_line(color = "#899DA4") +
+  facet_wrap(~stream, scales = "free_y") + 
+  labs(x = "",
+       y = "GDD total",
+       title = "Growing Degree Days above 20 degrees C Over Migratory and Holding Period \n (March through August) By Stream") +
+  theme_minimal()
+```
+
+### Flow 
+
+Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+migratory_and_holding_months <- 3:8
+
+flow_metrics <- SRJPEdata::environmental_data |> 
+  filter(parameter == "flow") |> 
+  filter(month(date) %in% migratory_and_holding_months) |>
+  mutate(year = year(date)) |>
+  group_by(stream, year) |>
+  summarise(mean_flow = mean(value, na.rm = T),
+            max_flow = max(value, na.rm = T)) |> 
+  ungroup()
+
+knitr::kable(head(flow_metrics, 10))
+```
+
+The following plot is of max flow (cfs) over time for all tributaries:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+flow_metrics |> 
+  ggplot(aes(x = year, y = max_flow)) + 
+  geom_line(color = "#899DA4") +
+  facet_wrap(~stream, scales = "free_y") + 
+  labs(x = "",
+       y = "Max Flow (cfs)",
+       title = "Maximum Migratory and Holding (March through August) Flow (cfs) By Stream") +
+  theme_minimal()
+```
+
+### Water Year Type
+
+To account for the influence of large scale interannual climate variability, we investigated water year type as a covariate as described by the [California Department of Water Resources](https://cdec.water.ca.gov/reportapp/javareports?name=WSIHIST) and available in the [waterYearType package in R](https://cloud.r-project.org/web/packages/waterYearType/index.html). 
+
+We used the `waterYearType` package to pull water year assignments as a categorical covariate. Some streams had very few data points (i.e. for Mill Creek, only seven years were considered dependable), so we simplified all potential categories of water year type into either dry (`Dry`, `Below Normal`, `Critical`) or wet (`Wet`, `Above Normal`). The table below summarizes the number of dry and wet years that were included:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+water_year_data <- waterYearType::water_year_indices |>
+  mutate(water_year_type = case_when(Yr_type %in% c("Wet", "Above Normal") ~ "wet",
+                               Yr_type %in% c("Dry", "Below Normal", "Critical") ~ "dry",
+                               TRUE ~ Yr_type)) |>
+  filter(location == "Sacramento Valley") |>
+  dplyr::select(WY, water_year_type)
+
+knitr::kable(water_year_data |> filter(!is.na(water_year_type)) |> 
+               group_by(water_year_type) |> tally() |> 
+               rename("Water Year Type" = water_year_type,
+                      "Count" = n))
+
+```
+
+### Passage Timing
+
+Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power. Passage timing was summarized as the mean, median, and min day of passage. The resulting dataset is as follows:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# pull raw upstream counts because they still contain date
+upstream_passage_timing <- SRJPEdata::upstream_passage  |> 
+  filter(!is.na(date),
+         run %in% c("spring","not recorded"),
+         direction %in% c(NA, "up")) |>
+  mutate(stream = tolower(stream),
+         year = year(date),
+         week = week(date)) |>
+  group_by(year, stream) |>
+  summarise(median_passage_timing = median(week, na.rm = T),
+            mean_passage_timing = mean(week, na.rm = T),
+            min_passage_timing = min(week, na.rm = T)) |>
+  ungroup() 
+
+knitr::kable(head(upstream_passage_timing, 10))
+```
+
+The following plot is of median passage over time for all tributaries:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+upstream_passage_timing |> 
+  ggplot(aes(x = year, y = median_passage_timing)) + 
+  geom_line(color = "#899DA4") +
+  facet_wrap(~stream, scales = "free_y") + 
+  labs(x = "",
+       y = "Median Passage Timing",
+       title = "Median Passage Timing By Stream") +
+  theme_minimal()
+```
+
+### Total Passage as Index
+
+We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality. 
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# pull in passage estimates and use these for upstream_count
+upstream_passage_index <- SRJPEdata::upstream_passage_estimates |> 
+  mutate(passage_index = passage_estimate) |>
+  select(year, stream, passage_index)
+
+knitr::kable(head(upstream_passage_index, 10))
+
+upstream_passage_index |> 
+  ggplot(aes(x = year, y = passage_index)) + 
+  geom_line(color = "#899DA4") +
+  facet_wrap(~stream, scales = "free_y") + 
+  labs(x = "",
+       y = "Passage Index",
+       title = "Passage Index By Stream") +
+  theme_minimal()
+```
+
+### Combine and Save Covariate Data 
+
+Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+p2s_model_covariates_standard <- full_join(flow_metrics,
+                                             gdd,
+                                             by = c("year", "stream")) |>
+  full_join(upstream_passage_timing,
+            by = c("year", "stream")) |>
+  full_join(water_year_data,
+            by = c("year" = "WY")) |>
+  full_join(upstream_passage_index,
+            by = c("year", "stream")) |>
+  filter(!is.na(stream),
+         stream != "sacramento river") |>
+  select(-c(mean_flow, mean_passage_timing, min_passage_timing,
+            gdd_trib, gdd_sac)) |>
+  group_by(stream) |> 
+  mutate(wy_type = ifelse(water_year_type == "dry", 0, 1),
+         max_flow_std = as.vector(scale(max_flow)),
+         gdd_std = as.vector(scale(gdd_total)),
+         passage_index = as.vector(scale(passage_index)),
+         median_passage_timing_std = as.vector(scale(median_passage_timing))) |>
+  ungroup() |> 
+  select(year, stream, wy_type, max_flow_std, gdd_std, passage_index, median_passage_timing_std) |>
+  arrange(stream, year)
+
+knitr::kable(head(p2s_model_covariates_standard, 10))
+```
+
+The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+p2s_model_covariates_standard |> 
+  pivot_longer(max_flow_std:median_passage_timing_std, names_to = "variable", values_to = "standardized_value") |> 
+  ggplot(aes(x = year, y = standardized_value, color = variable)) + 
+  geom_line() +
+  scale_color_manual(values = colors_small) +
+  facet_wrap(~stream, scales = "free_y") + 
+  labs(x = "",
+       y = "Standardized Value",
+       title = "Standardized Environmental Covariates By Stream") +
+  theme_minimal() +
+  theme(legend.position = "bottom") 
+```
+
+#### Save data object
+Data object saved in `SRJPEdata` as `p2s_model_covariates_standard.rds`. To access documentation search `?SRJPEdata::p2s_model_covariates_standard.rds`.
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+usethis::use_data(p2s_model_covariates_standard, overwrite = TRUE)
+```

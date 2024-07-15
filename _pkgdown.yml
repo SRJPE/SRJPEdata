@@ -1,0 +1,100 @@
+title: SRJPEdata
+url: https://SRJPE.github.io/SRJPEdata/
+template:
+  bootswatch: flatly
+
+    
+home:
+  links:
+  - text: ITP Website
+    href: https://water.ca.gov/Programs/State-Water-Project/Endangered-Species-Protection
+
+reference:
+- title: Model Data 
+  desc: Data used directly as model inputs 
+- subtitle: Adult Datasets
+  desc: Data used as model inputs to passage to spawner (p2s) model or directly input to stock recruit 
+- contents: 
+  - p2s_model_covariates_standard
+  - observed_adult_input
+- subtitle: Juvenile Datasets
+  desc: Data used as inputs to juvenile bt-spas-x abundance model 
+- contents: 
+  - weekly_juvenile_abundance_model_data
+- subtitle: Survival Datasets
+  desc: Data used as inputs to survival model 
+- contents: 
+  - survival_model_inputs
+  
+- title: Helper Data 
+  desc: Data used as helper datasets to generate model data
+- subtitle: Juvenile Datasets
+  desc: RST monitoring datasets
+- contents: 
+  - rst_catch
+  - rst_trap
+  - release_fish
+  - recaptures 
+- subtitle: Adult Datasets
+  desc: Adult passage and survey monitoring datasets
+- contents: 
+  - upstream_passage
+  - upstream_passage_estimates 
+  - carcass_estimates 
+  - redd
+  - holding 
+- subtitle: Modeling Ruleset Datasets
+  desc: Helper datasets used to subset, categorize and describe model data, used to prepare weekly_juvenile_abundance_model_data
+- contents: 
+  - daily_yearling_ruleset
+  - chosen_site_years_to_model
+  - btspasx_special_priors_data
+  - weekly_hours_fished
+- subtitle: Environmental Data
+  desc: Environmental gage data used pulled from USGS/CDEC and used as covatiates to models 
+- contents: 
+  - environmental_data    
+  
+- title: Helper Functions 
+  desc: Functions used to generate model data
+- contents: 
+  - fahrenheit_to_celsius
+  - celsius_to_fahrenheit
+  - pull_detections_data_from_ERDDAP
+  - pull_fish_data_from_ERDDAP
+  - pull_reciever_data_from_ERDDAP
+  - pull_study_ids_from_ERDDAP
+  - aggregate_detections_butte
+  - aggregate_detections_sacramento
+  - get_receiver_sites_metadata
+  - make_fish_encounter_history
+  
+navbar:
+  structure:
+    left:  [home, reference, articles]
+    right: [github]  
+  type: default
+  left:
+  - text: 'Reference'
+    href: reference/index.html
+  - text: 'Articles'
+    menu: 
+      - text: 'Lifestage Rulesets'
+        href: articles/lifestage_ruleset.html
+      - text: 'Hours Fished Analysis'
+        href: articles/trap_effort.html
+      - text: 'Monitoring Years to Include'
+        href: articles/years_to_include_analysis.html
+      - text: 'Passage to Spawner Model Covariate Prep'
+        href: articles/prep_environmental_covariates.html
+      - text: 'Stock Recruit Model Covariate Prep'
+        href: articles/sr_covariates.html
+      - text: 'Summary of Data for Modeling '
+        href: articles/summary_of_data_for_modeling.html
+  - text: 'News'
+    href: news/index.html
+        
+repo:
+ url:
+  home: https://github.com/SRJPE/SRJPEdata
+  issue: https://github.com/SRJPE/SRJPEdata/issues/

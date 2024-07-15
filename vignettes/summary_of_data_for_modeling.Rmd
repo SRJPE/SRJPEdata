@@ -1,0 +1,466 @@
+---
+title: "Draft Summary of Data Used in JPE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Draft Summary of Data Used in JPE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.width=8, fig.height=6
+)
+```
+
+```{r setup, echo = FALSE}
+library(SRJPEdata)
+# source(here::here("data-raw", "pull_tables_from_database.R"))
+
+colors_small <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                            "#899DA4", "#C93312", "#DC863B" # royal 1 (- 3)
+)
+colors_full <-  c("#9986A5", "#C18748", #Royal 2
+                  "#899DA4", "#9A8822", # Grand Budapest 1 (-4)
+                  "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87", # Isle of dogs 2 altered slightly
+                  "#AC9765", "#b67c3b", "#175149", "#AF4E24", "#CEB175",
+                  "#E54E21", "#6C8645", "#C18748", "#FBA72A", "#D3D4D8", "#CB7A5C", "#5785C1")
+
+```
+
+### Overview
+
+The spring run juvenile production estimate (SR JPE) contains a suite of submodels that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to fit the stock recruit model. 
+
+Additional sections will be added to highlight survival, genetics, and covariate data. 
+
+# Stock Recruit Modeling Data Selection
+
+Gathering and identifying spring run Chinook monitoring data to use in the spring run juvenile production estimate (SR JPE) was an iterative, multistep process. We acquired, processed and described monitoring data, hosted workshops to define a ruleset for evaluating years to exclude based on missing data ([see years to include vignette for an in depth overview of this process](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html)), selected data where there was both adult and juvenile data, and finally selected a single adult dataset to use for each year and stream. The diagram below visualizes this process and shows the total number of datasets we retained along the way.
+
+![](images/data_selection_diagram.png){width=108%}
+
+*Distinct annual datasets are identified by looking at distinct year, stream, and monitoring types*
+
+## Monitoring Data Overview
+
+Extensive spring run Chinook monitoring is conducted throughout the Central Valley. Monitoring programs have been collecting data since the 1990s and monitoring has increased through time to expand monitoring types and data collection coverage across the seven tributaries and mainstem Sacramento River (identified as the geographic scope for the SR JPE).
+
+The plot below shows all monitoring coverage of rotary screw trap, adult upstream passage, adult holding, adult redd, and adult carcass survey data.
+
+```{r, echo = FALSE}
+# Create plot with Stream on the y axis, year on x axis and 
+rst_plot_data <- SRJPEdata::rst_catch |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream, site, subsite, site_group) |> 
+  summarize(monthly_catch_exists = ifelse(sum(count, na.rm = TRUE) > 0, TRUE, FALSE),
+            sampling_type = "rst",
+            sampling_exists = length(unique(date))/30 * 100) |> 
+  ungroup() |> 
+  select(year, month, stream, site, subsite, site_group, monthly_catch_exists, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) 
+
+adult_carcass_plot_data <- SRJPEdata::carcass_estimates |> 
+  mutate(sampling_type = "carcass estimate",
+         sampling_exists = 100) |> 
+  select(year, stream, sampling_type, sampling_exists) |> 
+  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) 
+
+upstream_passage_plot_data <- SRJPEdata::upstream_passage_estimates |> 
+  mutate(sampling_type = "upstream passage estimate",
+         sampling_exists = 100) |> 
+  select(year, stream, sampling_type, sampling_exists) |> 
+  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) 
+
+# TODO figure out where redd data is for clear 
+# note that ashley identified the issue in the data prep for the db and fixed it. assigned inigo to update db
+# follow up on this first week of June
+redd_plot_data <- SRJPEdata::redd |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream) |> 
+  summarize(sampling_type = "redd",
+            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
+  ungroup() |> 
+  select(year, month, stream, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) 
+
+holding_plot_data <- SRJPEdata::holding |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream) |> 
+  summarize(sampling_type = "holding",
+            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
+    ungroup() |> 
+  select(year, month, stream, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) 
+
+# Combine 
+plot_data <- bind_rows(rst_plot_data, 
+                       adult_carcass_plot_data, 
+                       redd_plot_data,
+                       holding_plot_data,
+                       upstream_passage_plot_data) |> 
+  filter(stream != "sacramento river") |> 
+  distinct() 
+
+plot_data |> 
+  ggplot2::ggplot(aes(x = date, 
+                      y = sampling_type, 
+                      color = sampling_type)) + 
+  geom_point(shape = 15, size = 2) +
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+  labs(y = "",
+       x = "",
+       title = "Monitoring Data Overview",
+       subtitle = "Historical Monitoring Coverage Accross SR JPE Tributaries"
+       ) +
+  facet_grid(rows=vars(factor(stream)), switch = "y") +
+  # facet_wrap(~stream)
+  theme(text = element_text(family = "Arial"),
+        strip.text.y.left = element_text(angle = 0, family = "Arial"), 
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        axis.text.y = element_blank(),
+        panel.spacing = unit(.5, "lines")
+        # plot.title = element_text(hjust = )
+        # panel.background = element_rect(fill = NA, color = "black")
+        ) +
+  guides(alpha = FALSE)
+```
+
+*Plot does not include Sacramento River mainstem monitoring. This data may also be utilized in the SR JPE but will not be included in the stock recruit models. For some monitoring types data is collected annually or monthly communicated through gaps in the colored lines.*
+
+### Filtering data to years that contain both juvinile and adult monitoring
+
+In order to utilize data for the stock recruit models, we need both juvenile data inputs (RST data) and adult data inputs (adults) for each year. The plot below shows the time windows where there is overlapping juvenile and adult monitoring on each tributary. While this limits the amount of data, it still provides a few large windows for most monitoring programs.
+
+```{r, echo = FALSE}
+potential_jpe_window <- plot_data |> 
+  pivot_wider(id_cols = c("date", "year", "month", "stream", "site", "subsite"),
+              names_from = sampling_type,
+              values_from = sampling_exists) |>
+  group_by(year, stream) |> 
+  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass estimate`)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(holding)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(`upstream passage estimate`)) ~ TRUE,
+                                            T ~ FALSE)) |> 
+  ungroup() 
+
+avaliable_years_plot <- potential_jpe_window |> 
+  filter(potential_SR_window) |> 
+  ggplot(aes(x = year, y = stream, color = potential_SR_window)) +
+  geom_point(data = potential_jpe_window, 
+             aes(x = year, y = stream), color = "gray", size = 6, shape = 15) + 
+  geom_point(size = 7, shape = 15) + 
+  theme_minimal() +
+  labs(y = "",
+       x = ""
+       # title = "Time Windows where Annual RST and Adult Data Exist"
+       ) +
+  scale_color_manual(values = colors_small) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0)) + 
+   scale_y_discrete(limits=rev)
+
+avaliable_years_plot
+```
+
+*Gray boxes indicate that monitoring occurred but data is not being utilized for the stock recruit since a year does not have both adult and juvenile data* 
+
+## Excluding Incomplete Years 
+
+Although the SR JPE aims to utilize all available data, there are some years where data is sparse and is excluded from analysis. This decision process is documented in the [Years to Include Analysis](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html).
+
+After filtering the RST and adult data to remove incomplete or inconsistent years, we are left with the following windows for the SR JPE. Gray boxes indicate that monitoring occurred but data is not being utilized for modeling. See years to exclude tables for additional information on why a year might be excluded.
+
+```{r, echo = FALSE}
+# TODO add a label with the number of years excluded
+# TODO review with erin because looks like a lot of Feather River years are removed.
+rst_years_to_exclude <- years_to_exclude_rst_data |> 
+  mutate(exclude = TRUE)
+
+load(here::here("data", "years_to_exclude_adult.rda"))
+adult_years_to_exclude <- years_to_exclude_adult |> 
+  mutate(exclude = TRUE) |> 
+  rename(sampling_type = data_type)
+
+rst_plot_data <- rst_catch |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream, site, subsite, site_group) |> 
+  summarize(monthly_catch_exists = ifelse(sum(count, na.rm = TRUE) > 0, TRUE, FALSE),
+            sampling_type = "rst",
+            sampling_exists = length(unique(date))/30 * 100) |> 
+  ungroup() |> 
+  select(year, month, stream, site, subsite, site_group, monthly_catch_exists, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
+  left_join(rst_years_to_exclude)  
+  # filter(is.na(exclude)) |> 
+  # select(-exclude, -notes, -exclusion_type, -reason_for_exclusion) 
+
+adult_carcass_plot_data <- carcass_estimates |> 
+  mutate(sampling_type = "carcass",
+         sampling_exists = 100) |> 
+  select(year, stream, sampling_type, sampling_exists) |> 
+  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) |> 
+ left_join(adult_years_to_exclude) 
+
+
+upstream_passage_plot_data <- upstream_passage_estimates |> 
+  mutate(sampling_type = "upstream passage",
+         sampling_exists = 100) |> 
+  select(year, stream, sampling_type, sampling_exists) |> 
+  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) |> 
+   left_join(adult_years_to_exclude) 
+
+#TODO where is clear creek redd data??
+redd_plot_data <- redd |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream) |>
+  summarize(sampling_type = "redd",
+            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
+  ungroup() |> 
+  distinct() |> 
+  select(year, month, stream, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
+  left_join(adult_years_to_exclude) 
+
+holding_plot_data <- SRJPEdata::holding |> 
+  mutate(week = week(date),
+         year = year(date),
+         month = month(date)) |> 
+  group_by(year, month, stream) |> 
+  summarize(sampling_type = "holding",
+            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
+    ungroup() |> 
+  distinct() |> 
+  select(year, month, stream, sampling_exists, sampling_type) |> 
+  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
+   left_join(adult_years_to_exclude) 
+
+# Combine 
+updated_plot_data <- bind_rows(rst_plot_data, 
+                       adult_carcass_plot_data, 
+                       redd_plot_data,
+                       holding_plot_data,
+                       upstream_passage_plot_data) |> 
+  filter(stream != "sacramento river") |> 
+  distinct() |> 
+  mutate(exclude = ifelse(is.na(exclude), FALSE, exclude))
+#   mutate(color = case_when(sampling_type == "rst" ~ colors_full[1], 
+#                            sampling_type == "holding" ~ colors_full[2],
+#                            sampling_type == "redd" ~ colors_full[3],
+#                            sampling_type == "carcass estimate" ~ colors_full[4],
+#                            sampling_type == "upstream passage estimate" ~ colors_full[5],
+#                            !is.na(exclude) ~ "gray"),
+#          shapes = ifelse(is.na(exclude), "0", "15")) 
+
+# plot_data |> 
+#   ggplot2::ggplot(aes(x = date, 
+#                       y = sampling_type, 
+#                       color = sampling_type,
+#                       alpha = sampling_exists)) + 
+#   geom_point(aes(shape = exclude)) +
+#   # geom_point(aes(color = exclude)) +
+#   scale_color_manual(values = colors_full) +
+#   theme_minimal() +
+#   labs(y = "",
+#        x = ""
+#        # title = "Monitoring Data Overview"
+#        ) +
+#   facet_grid(rows=vars(stream), switch = "y") +
+#   # facet_wrap(~stream)
+#   theme(text = element_text(family = "Arial"),
+#         strip.text.y.left = element_text(angle = 0, family = "Arial"), 
+#         legend.title = element_blank(),
+#         legend.position = "bottom",
+#         axis.text.y = element_blank(),
+#         panel.spacing = unit(.5, "lines"),
+#         plot.title = element_text(hjust = 0)
+#         # panel.background = element_rect(fill = NA, color = "black")
+#         ) +
+#   guides(alpha = FALSE)
+```
+
+
+
+```{r, echo = FALSE}
+updated_potential_jpe_window <- updated_plot_data |> 
+  filter(exclude == FALSE) |>
+  pivot_wider(id_cols = c("date", "year", "month", "stream", "site", "subsite"),
+              names_from = sampling_type,
+              values_from = sampling_exists) |>
+  group_by(year, stream) |> 
+  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass`)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(holding)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(`upstream passage`)) ~ TRUE,
+                                            T ~ FALSE)) |> 
+  ungroup() 
+
+
+
+avaliable_years_plot <- updated_potential_jpe_window |> 
+  filter(potential_SR_window) |> 
+  ggplot(aes(x = year, y = stream, color = potential_SR_window)) +
+  # add old data as a point layer to show total 
+  geom_point(data = potential_jpe_window, 
+             aes(x = year, y = stream), color = "gray", size = 6, shape = 15) + 
+  # add new data to show comparison, gray are excluded years
+  geom_point(size = 6, shape = 15) + 
+  theme_minimal() +
+  labs(y = "",
+       x = ""
+       # title = "Time Windows where Annual RST and Adult Data Exist"
+       ) +
+  scale_color_manual(values = colors_small) +
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0)) + 
+  scale_y_discrete(limits=rev)
+
+
+avaliable_years_plot
+```
+
+
+*Gray boxes indicate that monitoring occurred but data is not being utilized for the stock recruit. Data may be excluded because there is not adult and juvenile annual overlap or because the data was considered incomplete for a given monitoring type and year.* 
+
+
+## Summary Table of Years to Use for Stock Recruit
+
+The summary table below describes which years have overlapping RST and adult data. This table accounts for years excluded based on data quality and completeness considerations.
+
+```{r, echo = FALSE, message=FALSE}
+test <- updated_potential_jpe_window |>
+  filter(potential_SR_window) |>
+  group_by(stream) |>
+  summarise(n = n(),
+            years = toString(unique(year)))
+
+# remake -  manual for now 
+years_for_jpe <- tibble(Stream = unique(test$stream), 
+                        "Years to Include in Model" = c("2005 - 2006, 2009 - 2014, 2016, 2020 - ongoing", #Battle
+                                                        "2001 - 2004, 2007 - 2008, 2013 - 2014, 2016 - 2018, 2020 - ongoing", #Butte
+                                                        "2003 - 2010, 2012 - 2015, 2021 - ongoing", # clear
+                                                        "1992, 1995 - 1996, 2000 - 2003, 2005, 2007, 2009 - 2010, 2022 - ongoing", #deer 
+                                                        "2010 - 2012, 2018 - 2020, 2022 - ongoing", # feather
+                                                        "2000 - 2003, 2005 - 2008, 2010", #mill
+                                                        "2004 - 2008" #yuba
+                                                        ),
+                        "Total Number of Years" = c(11, 14, 13, 11, 7, 
+                                                    9, 
+                                                    5))
+
+knitr::kable(years_for_jpe)
+
+```
+
+This table shows us that there are a total of `r sum(years_for_jpe$"Total Number of Years")` stream years to use for developing the SR JPE stock recruit model. 
+
+## Selecting Adult Data Type to Use
+
+There are 35 stream year combinations where there are multiple adult data types to pick from. These occur for: "butte creek", "battle creek", "clear creek", and "feather river."
+
+The process of determining the appropriate adult data to use in stock recruit modeling for the SR JPE is currently ongoing. This information will be updated as the Modeling Team evaluates the tradeoffs associated with various data types in more detail.
+
+We used the following logic to select data to use in these cases:
+
+-   if `stream = "butte creek"` we used carcass estimate data (carcass estimate methods include mark recapture)
+-   if `stream = "battle creek"` we used...TODO
+-   if `stream = "clear creek"` we used...TODO
+-   if `stream = "feather river"` we used...TODO
+
+```{r, echo = FALSE}
+multiple_adult_data_options <- updated_plot_data |> 
+  filter(exclude == FALSE) |> 
+  left_join(updated_potential_jpe_window) |> 
+  filter(potential_SR_window == TRUE) |> 
+  group_by(year, stream) |> 
+  mutate(sampling_types = list(unique(sampling_type)),
+         num_sampling_types = purrr::map_int(sampling_types, length)) |> 
+  select(year, stream, sampling_types, num_sampling_types) |>
+  filter(num_sampling_types > 2) |> 
+  distinct() |> 
+  rename(Year = year,
+         Stream = stream, 
+         "Sampling Type" = sampling_types) |> 
+  select(-num_sampling_types) |> 
+  mutate("Selected Adult Data Type" = case_when(Stream == "butte creek" ~ "carcass estimate", 
+                                              Stream == "feather river" ~ "carcass estimate", 
+                                              T ~ "TBD"))
+
+knitr::kable(head(multiple_adult_data_options, 10))
+```
+
+
+*... with `r nrow(multiple_adult_data_options) - 10` more rows*
+
+## Proposed Data to Use in SR JPE
+
+The table below compiles all the filtering above to provide a summary of the data utilized for the stock recruit models for each stream and year. 
+
+```{r, echo = FALSE}
+data_used_in_jpe <- updated_plot_data |> 
+  filter(exclude == FALSE) |> 
+  left_join(updated_potential_jpe_window) |> 
+  filter(potential_SR_window == TRUE) |> 
+  group_by(year, stream) |> 
+  mutate(sampling_types = list(unique(sampling_type)),
+         num_sampling_types = purrr::map_int(sampling_types, length)) |> 
+  select(year, stream, sampling_types, num_sampling_types) |> 
+  distinct() |> 
+  mutate("Juvenile Data Type" = "rst", 
+         "Adult Data Type" = case_when(num_sampling_types == 2 ~ unlist(sampling_types[[1]][2]), 
+                                          num_sampling_types > 2 & stream == "butte creek" & grepl(sampling_types, "carcass estimate") ~ "carcass estimate",
+                                          num_sampling_types > 2 & stream == "feather river" & grepl(sampling_types, "carcass estimate") ~ "carcass estimate",
+                                          T ~ "TBD")) |> 
+  distinct() |> 
+  select(Year = year, 
+         Stream = stream, 
+         `Juvenile Data Type`,
+         `Adult Data Type`) 
+
+knitr::kable(head(data_used_in_jpe, 10))
+```
+
+*... with `r nrow(data_used_in_jpe) - 10` more rows*
+
+
+```{r, eval = FALSE, echo = FALSE, summary_stats_for_diagram_at_top}
+# Total number of annual datasets, tally has more than one for some RST because that is grouped by year and month
+# distinguishing between stream, sampling types, and years for distinct datasets (not )
+plot_data |> 
+  group_by(year, sampling_type, stream) |> 
+  tally()
+
+# total number after years to exclude added 
+updated_plot_data |>  
+  filter(exclude == FALSE) |> 
+  group_by(year, sampling_type, stream) |> 
+  tally()
+
+# check both adult and juvenile 
+updated_plot_data |>  
+  filter(exclude == FALSE) |> 
+  left_join(updated_potential_jpe_window) |> 
+  filter(potential_SR_window) |> 
+  group_by(year, sampling_type, stream) |> 
+  tally()
+
+```
