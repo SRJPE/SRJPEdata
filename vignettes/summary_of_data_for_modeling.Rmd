@@ -241,7 +241,7 @@ redd_plot_data <- redd |>
   mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
   left_join(adult_years_to_exclude) 
 
-holding_plot_data <- holding |> 
+holding_plot_data <- SRJPEdata::holding |> 
   mutate(week = week(date),
          year = year(date),
          month = month(date)) |> 
@@ -360,11 +360,11 @@ years_for_jpe <- tibble(Stream = unique(test$stream),
                                                         "2003 - 2010, 2012 - 2015, 2021 - ongoing", # clear
                                                         "1992, 1995 - 1996, 2000 - 2003, 2005, 2007, 2009 - 2010, 2022 - ongoing", #deer 
                                                         "2010 - 2012, 2018 - 2020, 2022 - ongoing", # feather
-                                                        #"2000 - 2003, 2005 - 2008, 2010", #mill
+                                                        "2000 - 2003, 2005 - 2008, 2010", #mill
                                                         "2004 - 2008" #yuba
                                                         ),
                         "Total Number of Years" = c(11, 14, 13, 11, 7, 
-                                                    #9, 
+                                                    9, 
                                                     5))
 
 knitr::kable(years_for_jpe)

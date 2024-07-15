@@ -26,7 +26,7 @@ The cumulative catch curve below shows cumulative catch over time for Battle Cre
 
 
 ```
-#> Error in loadNamespace(name): there is no package called 'webshot'
+#> Error in path.expand(path): invalid 'path' argument
 ```
 
 ### Heat map of all tributaries
@@ -35,7 +35,7 @@ The heat map below shows when sampling occurs for all streams. It shows that sam
 
 
 ```
-#> Error in loadNamespace(name): there is no package called 'webshot'
+#> Error in path.expand(path): invalid 'path' argument
 ```
 
 ### Years to exclude
@@ -129,7 +129,7 @@ The cumulative catch curve below shows cumulative upstream passage over time for
 
 
 ```
-#> Error in loadNamespace(name): there is no package called 'webshot'
+#> Error in path.expand(path): invalid 'path' argument
 ```
 
 #### Heat map of all tributaries
@@ -138,7 +138,7 @@ The heat map below shows when video monitoring occurs for all streams. Some vide
 
 
 ```
-#> Error in loadNamespace(name): there is no package called 'webshot'
+#> Error in path.expand(path): invalid 'path' argument
 ```
 
 ### Survey Data
@@ -147,7 +147,7 @@ The below heat map shows Battle Creek redd survey coverage. It shows decent cove
 
 
 ```
-#> Error in loadNamespace(name): there is no package called 'webshot'
+#> Error in path.expand(path): invalid 'path' argument
 ```
 
 ### Years to exclude

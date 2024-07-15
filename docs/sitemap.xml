@@ -1,52 +1,150 @@
-<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
-<url><loc>https://SRJPE.github.io/SRJPEdata/404.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/flow_data_pull.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/index.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/lifestage_ruleset.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/prep_environmental_covariates.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/sr_covariates.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/summary_of_data_for_modeling.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/temperature_data_pull.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/trap_effort.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/yearling_ruleset.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/articles/years_to_include_analysis.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/authors.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/index.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/lifestage_ruleset.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/news/index.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/prep_environmental_covariates.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/aggregate_detections_butte.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/aggregate_detections_sacramento.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/btspasx_special_priors_data.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/carcass_estimates.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/celsius_to_fahrenheit.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/chosen_site_years_to_model.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/daily_yearling_ruleset.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/efficiency_summary.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/environmental_data.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/fahrenheit_to_celsius.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/get_receiver_sites_metadata.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/holding.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/index.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/make_fish_encounter_history.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/observed_adult_input.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/p2s_model_covariates_standard.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/pull_detections_data_from_ERDDAP.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/pull_fish_data_from_ERDDAP.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/pull_reciever_data_from_ERDDAP.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/pull_study_ids_from_ERDDAP.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/recaptures.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/redd.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/release_fish.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/rst_catch.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/rst_trap.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/survival_model_inputs.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/upstream_passage.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/upstream_passage_estimates.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_hours_fished.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_model_data.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/trap_effort.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/yearling_ruleset.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/years_to_include_analysis.html</loc></url>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/404.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/flow_data_pull.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/lifestage_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/prep_environmental_covariates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/sr_covariates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/summary_of_data_for_modeling.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/temperature_data_pull.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/trap_effort.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/yearling_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/years_to_include_analysis.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/authors.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/index.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/lifestage_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/prep_environmental_covariates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/aggregate_detections_butte.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/aggregate_detections_sacramento.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/btspasx_special_priors_data.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/carcass_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/celsius_to_fahrenheit.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/chosen_site_years_to_model.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/daily_yearling_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/efficiency_summary.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/environmental_data.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/fahrenheit_to_celsius.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/get_receiver_sites_metadata.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/holding.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/make_fish_encounter_history.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/observed_adult_input.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/p2s_model_covariates_standard.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_detections_data_from_ERDDAP.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_fish_data_from_ERDDAP.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_reciever_data_from_ERDDAP.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/pull_study_ids_from_ERDDAP.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/recaptures.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/redd.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/release_fish.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/rst_catch.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/rst_trap.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/survival_model_inputs.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/upstream_passage.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/upstream_passage_estimates.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_hours_fished.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_model_data.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/trap_effort.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/yearling_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/years_to_include_analysis.html</loc>
+  </url>
 </urlset>
-

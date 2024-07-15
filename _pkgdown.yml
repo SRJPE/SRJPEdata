@@ -1,7 +1,6 @@
 title: SRJPEdata
 url: https://SRJPE.github.io/SRJPEdata/
 template:
-  bootstrap: 5
   bootswatch: flatly
 
     
