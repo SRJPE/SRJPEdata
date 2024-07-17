@@ -58,7 +58,7 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
 
 ### Flow 
 
@@ -80,7 +80,7 @@ Maximum flow more effectively captures the high flow events that support migrati
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
-![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
 
 ### Water Year Type
 
@@ -114,7 +114,7 @@ Passage timing was considered; however, limited data reduced the sample size of 
 
 The following plot is of median passage over time for all tributaries:
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
 
 ### Total Passage as Index
 
@@ -134,7 +134,7 @@ We hypothesized that total annual passage might be an indicator of density becau
 | 2000|battle creek |            78|
 | 2000|clear creek  |             9|
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 
 ### Combine and Save Covariate Data 
 
@@ -156,7 +156,7 @@ Both continuous environmental variables (flow and temperature) were standardized
 
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 
-![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15-1.png)
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
 
 #### Save data object
 Data object saved in `SRJPEdata` as `p2s_model_covariates_standard.rds`. To access documentation search `?SRJPEdata::p2s_model_covariates_standard.rds`.

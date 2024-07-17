@@ -13,7 +13,7 @@ source("data-raw/pull_data_scripts/pull_genetic_run_assignment_data.R")
 
 # in package (rebuild?)
 devtools::load_all()
-
+devtools::document()
 # Incorporate new data in rule sets/covariates 
 # Source all vignettes 
 knitr::knit("vignettes/prep_environmental_covariates.Rmd")
@@ -38,7 +38,7 @@ source("data-raw/process_data_scripts/build_survival_model_datasets.R")
 # add updated version number and description of updates into NEWS.md file, see
 # https://docs.google.com/document/d/1HgDlOpBMK5BVcrNnuB3CbZWsO6PyYbpJZdfM5C6NfRQ/edit for our versioning procedures 
 
-
+devtools::document()
 pkgdown::build_site()
 
 # TODO Probably want to add some checks here to make sure no data is turning up empty
