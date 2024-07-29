@@ -1,4 +1,9 @@
-```{r}
+---
+title: "Finding salmon minimum data for environmetal data pull"
+
+---
+
+```{r, include=FALSE}
 library(tidyverse)
 library(CDECRetrieve)
 library(dataRetrieval)
@@ -9,7 +14,7 @@ The purpose of this code is to figure out the minimum dates of all salmon data f
 
 ### Checking for date ranges
 
-```{r}
+```{r, echo=TRUE, warning=FALSE}
 #catch
 ggplot(rst_catch, aes(x = date, y = stream)) +
   geom_line() +
@@ -65,7 +70,18 @@ ggplot(upstream_passage_estimates, aes(x = year, y = stream)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-## Battle Creek ----
+Summary of minimum date ranges:
+
+  * Battle Creek - 1995
+  * Clear Creek - 1995
+  * Deer Creek - 1986
+  * Feather River - 1997
+  * Mill Creek - 1995 
+  * Sacramento River - 1994
+  * Yuba River - 1999
+  
+
+## Battle Creek ---
 
  * Earliest year of salmon data available = 1995
 
@@ -109,7 +125,9 @@ range(battle_upstream_estimates$year) #1995 2021
 ```
 
 
-### Clear Creek ---- 
+### Clear Creek --- 
+
+  * Earliest year of salmon data available = 1995
 
 *rst_catch*
 ```{r}
@@ -150,7 +168,7 @@ range(clear_upstream_estimates$year) # 1995 2021
 ```
 
 
-### Deer Creek ----
+### Deer Creek ---
 
   * Earliest year of salmon data available = 1986
 
@@ -187,7 +205,7 @@ range(deer_upstream_estimates$year) #2014 2020
 ```
 
 
-### Feather River ----
+### Feather River ---
 
   * Earliest year of salmon data available = 1997
 
@@ -224,7 +242,7 @@ range(feather_redd$date) #"2009-09-29" "2020-11-20"
 
 No *upstream_passage_estimates* for Feather River
 
-### Mill Creek ----
+### Mill Creek ---
 
   * Earliest year of salmon data available = 1995
 
@@ -269,7 +287,7 @@ range(mill_upstream_estimates$year) # 2014 2020
 ```
 
 
-### Sacramento River 
+### Sacramento River ---
 
   * Earliest year of salmon data available = 1994
 
@@ -289,7 +307,7 @@ No *redd* for Sacramento River
 No *upstream_passage_estimates* for Sacramento River
 
 
-### Yuba River 
+### Yuba River ---
 
   * Earliest year of salmon data available = 1999
 
