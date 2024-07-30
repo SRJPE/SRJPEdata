@@ -187,6 +187,7 @@ In addition to differentiating between yearling and YOY it is important for the 
 2. Determine year specific proportions for fry, smolt, yearling for each stream, site, week and year
 3. Determine general week proportions for fry, smolt, yearling for each stream, week
 4. Apply proportions to data to fill in missing lifestage
+5. Generate rows for when no fish of a particular lifestage are caught
 
 ### Create lifestage variable
 
@@ -319,9 +320,25 @@ no_catch <- standard_catch_unmarked |>
 
 # total rows of 528,596
 # expected to be larger than original because add lifestage rows
-updated_standard_catch <- bind_rows(combined_rst_wo_na_fl, na_filled_lifestage, no_catch, weeks_wo_lifestage) 
+updated_standard_catch_raw <- bind_rows(combined_rst_wo_na_fl, na_filled_lifestage, no_catch, weeks_wo_lifestage) 
 
 knitr::kable(head(updated_standard_catch, 10))
+```
+
+### Generate rows for when no fish of a lifestage are caught
+
+In order to improve the usability of this dataset (particulary for modeling) we decided to add rows for when a lifestage was not caught. For instance, there may be only fry caught on a particular day and when running the model for smolt that day would not show up in the dataset.
+
+```{r, echo = F}
+updated_standard_catch <- updated_standard_catch_raw |> 
+  group_by(date, stream, site, subsite, site_group, run, adipose_clipped, dead, fork_length, weight, week, year, model_lifestage_method, life_stage) |> 
+  summarize(count = sum(count)) |> 
+  pivot_wider(names_from = "life_stage", values_from = "count", values_fill = 0) |> # fill in zeros for lifestages where there are no fish
+  pivot_longer(cols = c(fry, smolt, yearling, `NA`), values_to = "count", names_to = "life_stage") |> # pivot back to the long table
+  filter(!(life_stage == "NA" & count == 0)) |> # remove the rows where NA lifestage is 0, we don't need these
+  mutate(life_stage = ifelse(life_stage == "NA", NA_character_, life_stage)) # make sure the NA lifestage are NA rather than character
+  
+
 ```
 
 ### Review lifestage
