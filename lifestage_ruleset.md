@@ -32,7 +32,7 @@ The plot below shows the updated cutoff values with linear interpolation of week
 
 **Note: You can view all code used to generate plots and tables in this markdown [here.](https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd)**
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
 
 
 
@@ -72,6 +72,7 @@ In addition to differentiating between yearling and YOY it is important for the 
 2. Determine year specific proportions for fry, smolt, yearling for each stream, site, week and year
 3. Determine general week proportions for fry, smolt, yearling for each stream, week
 4. Apply proportions to data to fill in missing lifestage
+5. Generate rows for when no fish of a particular lifestage are caught
 
 ### Create lifestage variable
 
@@ -145,13 +146,19 @@ We used these proportions to fill in missing lifestage values. See the final lif
 |1999-01-20 |battle creek |lbc  |lbc     |battle creek |     4|fall |fry        |FALSE           |NA   |          36|      0|    3| 1999|assigned from fl cutoffs |
 |1999-01-20 |battle creek |lbc  |lbc     |battle creek |     2|fall |fry        |FALSE           |NA   |          37|      0|    3| 1999|assigned from fl cutoffs |
 
+### Generate rows for when no fish of a lifestage are caught
+
+In order to improve the usability of this dataset (particulary for modeling) we decided to add rows for when a lifestage was not caught. For instance, there may be only fry caught on a particular day and when running the model for smolt that day would not show up in the dataset.
+
+
+
 ### Review lifestage
 
 The following plot shows the general patten in the lifestage field where fry are caught earlier in the year and smolt are caught later in the year.
 
 **Battle Creek: 2011**
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
+![plot of chunk unnamed-chunk-42](figure/unnamed-chunk-42-1.png)
 
 ## Save resulting data to package
 
