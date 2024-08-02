@@ -104,7 +104,7 @@ try(if(nrow(butte_creek_daily_flows) < nrow(butte_creek_existing_flow))
 ### Temp Data Pull 
 #### Gage #BCK
 ### Temp Data Pull Tests 
-try(butte_creek_temp_query <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "2000-01-01"))
+try(butte_creek_temp_query <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "1995-01-01"))
 # Filter existing data to use as a back up 
 butte_creek_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
@@ -140,12 +140,13 @@ try(if(nrow(butte_creek_daily_temp) < nrow(butte_creek_existing_temp))
 #Pull data
 
 ### Flow Data Pull Tests 
-try(clear_creek_data_query <- dataRetrieval::readNWISdv(11372000, "00060"))
+try(clear_creek_data_query <- dataRetrieval::readNWISdv(11372000, "00060", startDate = "1995-01-01"))
 # Filter existing data to use as a back up 
 clear_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11372000" & 
-           parameter == "flow")
+           parameter == "flow" &  
+           date >= as.Date("1995-01-01"))
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("clear_creek_data_query")) 
