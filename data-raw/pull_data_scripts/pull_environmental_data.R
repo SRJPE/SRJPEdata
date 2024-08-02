@@ -18,12 +18,13 @@ usethis::use_data(site_lookup, overwrite = TRUE)
 # Pull data 
 
 ### Flow Data Pull Tests
-try(battle_creek_data_query <- dataRetrieval::readNWISdv(11376550, "00060"), silent = TRUE)
+try(battle_creek_data_query <- dataRetrieval::readNWISdv(11376550, "00060", startDate = "1995-01-01"), silent = TRUE)
 # Filter existing data to use as a back up 
 battle_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11376550" & 
-           parameter == "flow") 
+           parameter == "flow" &  
+           date >= as.Date("1995-01-01")) 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("battle_creek_data_query")) 
