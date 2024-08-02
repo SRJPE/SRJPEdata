@@ -596,12 +596,13 @@ try(if(nrow(sac_river_daily_temp) < nrow(sac_river_existing_temp))
 #Pull data
 
 ### Flow Data Pull Tests
-try(yuba_river_data_query <- dataRetrieval::readNWISdv(11421000, "00060"), silent = TRUE)
+try(yuba_river_data_query <- dataRetrieval::readNWISdv(11421000, "00060", startDate = "1999-01-01"), silent = TRUE)
 # Filter existing data to use as a back up 
 yuba_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11421000" & 
-           parameter == "flow")
+           parameter == "flow" &  
+           date >= as.Date("1999-01-01"))
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("yuba_river_data_query")) 
@@ -631,7 +632,7 @@ yuba_river_interpolated <- read_csv(here::here("data-raw", "temperature-data", "
 ### Temp Data Pull 
 #### Gage #YR7
 ### Temp Data Pull Tests 
-try(yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "2024-02-07"))
+try(yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "1999-01-01"))
 # Filter existing data to use as a back up 
 yuba_river_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
