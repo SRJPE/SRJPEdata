@@ -535,12 +535,13 @@ try(if(nrow(mill_creek_daily_temp) < nrow(mill_creek_existing_temp))
 #Pull data
 
 ### Flow Data Pull Tests 
-try(sac_river_data_query <- dataRetrieval::readNWISdv(11390500, "00060"), silent = TRUE)
+try(sac_river_data_query <- dataRetrieval::readNWISdv(11390500, "00060", startDate = "1994-01-01"), silent = TRUE)
 # Filter existing data to use as a back up 
 sac_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11390500" & 
-           parameter == "flow") 
+           parameter == "flow" &  
+           date >= as.Date("1994-01-01")) 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("sac_river_data_query")) 
@@ -563,12 +564,13 @@ try(if(nrow(sac_river_daily_flows) < nrow(sac_river_existing_flow))
 ### Temp Data Pull 
 #### Gage #11390500
 ### Temp Data Pull Tests
-try(sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010"), silent = TRUE)
+try(sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", startDate = "1994-01-01"), silent = TRUE)
 # Filter existing data to use as a back up 
 sac_river_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" &
            gage_number == "11390500" &
-           parameter == "temperature") 
+           parameter == "temperature" &  
+           date >= as.Date("1994-01-01")) 
 # Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull
 try(if(!exists("sac_river_temp_query")) 
