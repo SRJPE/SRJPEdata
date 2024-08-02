@@ -216,12 +216,13 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
 #Pull data
 
 ### Flow Data Pull Tests 
-try(deer_creek_data_query <- dataRetrieval::readNWISdv(11383500, "00060"), silent = TRUE)
+try(deer_creek_data_query <- dataRetrieval::readNWISdv(11383500, "00060", startDate = "1986-01-01"), silent = TRUE)
 # Filter existing data to use as a back up 
 deer_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11383500" & 
-           parameter == "flow")
+           parameter == "flow" &  
+           date >= as.Date("1986-01-01"))
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("deer_creek_data_query")) 
@@ -245,7 +246,7 @@ try(if(nrow(deer_creek_daily_flows) < nrow(deer_creek_existing_flow))
 ### Temp Data Pull 
 #### Gage #DVC
 ### Temp Data Pull Tests 
-try(deer_creek_temp_query <- cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1995-01-01"))
+try(deer_creek_temp_query <- cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1986-01-01"))
 # Filter existing data to use as a back up 
 deer_creek_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
