@@ -397,7 +397,7 @@ feather_lfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", 
 ### Temp Data Pull Tests 
 
 #pulling temp data for Feather River Low Flow Channel - FRA
-try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25"))
+try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1997-01-01"))
 # Filter existing data to use as a back up 
 feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
@@ -469,12 +469,13 @@ try(if(nrow(feather_hfc_river_daily_temp) < nrow(feather_hfc_existing_temp))
 #Pull data
 
 ### Flow Data Pull Tests 
-try(mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060"), silent = TRUE)
+try(mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060", startDate = "1995-01-01"), silent = TRUE)
 # Filter existing data to use as a back up 
 mill_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11381500" & 
-           parameter == "flow") 
+           parameter == "flow" &  
+           date >= as.Date("1995-01-01")) 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("mill_creek_data_query")) 
@@ -498,7 +499,7 @@ try(if(nrow(mill_creek_daily_flows) < nrow(mill_creek_existing_flow))
 ### Temp Data Pull 
 #### Gage #MLM
 ### Temp Data Pull Tests 
-try(mill_creek_temp_query <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1996-01-01"))
+try(mill_creek_temp_query <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1995-01-01"))
 # Filter existing data to use as a back up 
 mill_creek_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
