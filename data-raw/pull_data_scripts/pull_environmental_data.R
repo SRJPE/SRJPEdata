@@ -283,12 +283,13 @@ try(if(nrow(deer_creek_daily_temp) < nrow(deer_creek_existing_temp))
 
 ### Flow Data Pull Tests 
 # Feather High Flow Channel 
-try(feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1996-01-01"))
+try(feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1997-01-01"))
 # Filter existing data to use as a back up 
 feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
            gage_number == "GRL" & 
-           parameter == "flow") 
+           parameter == "flow" &  
+           date >= as.Date("1997-01-01")) 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("feather_hfc_river_data_query")) 
@@ -313,7 +314,7 @@ try(if(nrow(feather_hfc_river_daily_flows) < nrow(feather_hfc_river_existing_flo
 
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
-try(feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060"), silent = TRUE)
+try(feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060", startDate = "1997-01-01"), silent = TRUE)
 # Filter existing data to use as a back up 
 feather_lfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
@@ -341,7 +342,7 @@ try(if(nrow(feather_lfc_river_daily_flows) < nrow(feather_lfc_river_existing_flo
 
 ### Flow Data Pull Tests 
 #Lower Feather data 
-try(lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "H", sensor_num = "20", start_date = "2010-01-01"))
+try(lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "H", sensor_num = "20", start_date = "1997-01-01"))
 # Filter existing data to use as a back up 
 lower_feather_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
@@ -396,7 +397,7 @@ feather_lfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", 
 ### Temp Data Pull Tests 
 
 #pulling temp data for Feather River Low Flow Channel - FRA
-try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "2024-02-07"))
+try(feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25"))
 # Filter existing data to use as a back up 
 feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" &
@@ -429,7 +430,7 @@ try(if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp))
 
 # Temperature data for HFC Feather River
 # pulling temp data for Feather River Low Flow Channel - FRA
-try(feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor_num = "25", start_date = "2024-02-07"))
+try(feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor_num = "25"))
 # Filter existing data to use as a back up 
 feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
