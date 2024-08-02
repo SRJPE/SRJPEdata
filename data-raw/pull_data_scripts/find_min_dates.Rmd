@@ -73,6 +73,7 @@ ggplot(upstream_passage_estimates, aes(x = year, y = stream)) +
 Summary of minimum date ranges:
 
   * Battle Creek - 1995
+  * Butte Creek - 1995
   * Clear Creek - 1995
   * Deer Creek - 1986
   * Feather River - 1997
@@ -123,6 +124,20 @@ battle_upstream_estimates <- upstream_passage_estimates |>
 
 range(battle_upstream_estimates$year) #1995 2021
 ```
+
+
+### Butte Creek --- 
+
+ * Earliest year of salmon data available = 1995
+
+```{r}
+buttle_catch <- rst_catch |> 
+  filter(stream == "butte creek") |> 
+  glimpse()
+
+range(buttle_catch$date, na.rm = TRUE) # 1995 2022
+```
+
 
 
 ### Clear Creek --- 
