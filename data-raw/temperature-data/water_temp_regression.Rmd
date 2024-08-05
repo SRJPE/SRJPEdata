@@ -32,18 +32,6 @@ Currently this analysis is performed for Feather River and Yuba River. The resul
 
 Butte Creek is used to build the regression models because the time series is complete and the data are high quality.
 
-## Overall approach for water temperature regression:
-
-1. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
-
-2. Fitting a linear regression models for mean, min, and max temperatures 
-
-3. Make predictions for new dataset using the fitted models
-
-4. Combine predictions with actual measurements and handle missing values
-
-5. Visualize the predicted and actual temperature over time to asses model performance trends
-
 ```{r, include = F}
 butte <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "2000-01-01")
 butte_format <- butte |> 
@@ -67,12 +55,13 @@ butte_format <- butte |>
 
 ### Data Preparation
 
-* Pulling in gage data from (GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC):
+1. Pull in gage data from (GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC):
 * GRL (2003-03-05 to 2007-06-01 H; 2020-01-04 to present E): located after Thermalito Afterbay
 * FRA (2002-01-01 to present): located between Lake Oroville and Thermalito Afterbay
-* Prepare datasets for regression analysis - dataset with no missing data (Butte Creek data) to train and dataset with missing data to predict (Feather River)
 
+2. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
  
+
 ```{r, include = F}
 # Pull in Gage Data that were extracted in the "data-raw/qc-markdowns/temperature_data_prep.Rmd"
 hfc_feather <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05", end_date = "2007-06-01")
@@ -189,13 +178,6 @@ ggplot(data = feather_lfc_regression_data_max, aes(x = butte_temp, y = temp)) +
 ```
 
 #### Building Mean Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # LFC regression and predictions
 
@@ -215,13 +197,6 @@ mean(abs((
 ```
 
 #### Building Min Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # MIN Regression
 split <-rsample::initial_split(feather_lfc_regression_data_min, prop = 0.8)
@@ -239,13 +214,6 @@ mean(abs((
 ```
 
 #### Building Max Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # MAX Regression
 split <-rsample::initial_split(feather_lfc_regression_data_max, prop = 0.8)
@@ -263,10 +231,6 @@ mean(abs((
 ```
 
 #### Predictions
-
-  * Combine Predictions (mean, min, max dataframes into one)
-  * Reshape data
-
 
 ```{r}
 # Predictions
@@ -294,9 +258,6 @@ ggplot(feather_lfc_max_predicted, aes(x = date, y = value)) +
 ```
 
 #### Full dataset
-
-  * Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)
-  * Visualize combined data
 
 ```{r}
 feather_gap_lfc <- bind_rows(feather_lfc_max_predicted,
@@ -402,13 +363,6 @@ ggplot(data = feather_hfc_regression_data_max, aes(x = butte_temp, y = temp)) +
 ```
 
 #### Building Mean Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # HFC regression and predictions
 
@@ -428,13 +382,6 @@ mean(abs((
 ```
 
 #### Building Min Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # MIN Regression
 split <-rsample::initial_split(feather_hfc_regression_data_min, prop = 0.8)
@@ -452,13 +399,6 @@ mean(abs((
 ```
 
 #### Building Max Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # MAX Regression
 split <-rsample::initial_split(feather_hfc_regression_data_max, prop = 0.8)
@@ -476,10 +416,6 @@ mean(abs((
 ```
 
 #### Predictions
-
-  * Combine Predictions (mean, min, max dataframes into one)
-  * Reshape data
-  
 ```{r}
 # Predictions
 feather_gap_predicted_mean_hfc <- predict(feather_hfc_mod_mean, feather_gap_mean)
@@ -507,9 +443,6 @@ ggplot(feather_hfc_max_predicted, aes(x = date, y = value)) +
 
 #### Full dataset
 
-  * Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)
-  * Visualize combined data
-  
 ```{r}
 feather_gap_hfc <- bind_rows(feather_hfc_max_predicted,
                              feather_hfc_mean_predicted,
@@ -546,10 +479,9 @@ write_csv(feather_gap_hfc, here::here("data-raw", "temperature-data", "feather_h
 
 ### Data Prepartion {.tabset}
 
- * Pulling in gage data from YR7 CDEC gage
- * YR7 data available from 2020 onwards 
- * Note: Temperature data collected along with RST data was originally used to fill the gap prior to 2020; however, due to inconsistencies in these data sources the resulting predicted mean values were lower than the min values as the RST data only has mean data. 
- * Prepare datasets for regression analysis - dataset with no missing data (Butte Creek data) to train and dataset with missing data to predict (Yuba River)
+1. Pull in gage data from YR7 CDEC gage, however, this only contains data from 2020 onwards. Temperature data collected along with RST data was originally used to fill the gap prior to 2020; however, due to inconsistencies in these data sources the resulting predicted mean values were lower than the min values as the RST data only has mean data. 
+
+2. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
 
 ```{r, include = F}
 # Gage Data
@@ -643,13 +575,6 @@ ggplot(data = yuba_regression_data_max, aes(x = butte_temp, y = temp)) +
 ```
 
 #### Building Mean Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # MEAN Regression
 split <-rsample::initial_split(yuba_regression_data_mean, prop = 0.8)
@@ -667,13 +592,6 @@ mean(abs((
 ```
 
 #### Building Min Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # MIN Regression
 split <-rsample::initial_split(yuba_regression_data_min, prop = 0.8)
@@ -691,13 +609,6 @@ mean(abs((
 ```
 
 #### Building Max Regression
-
-  * Splitting data
-  * Building the Model
-  * Model Summary
-  * Making predictions
-  * Evaluating predictions
-  
 ```{r}
 # MAX Regression
 split <-rsample::initial_split(yuba_regression_data_max, prop = 0.8)
@@ -715,9 +626,6 @@ mean(abs((
 ```
 
 #### Predictions
-
-  * Combine Predictions (mean, min, max dataframes into one)
-  * Reshape data
 
 ```{r}
 # Predictions
@@ -745,10 +653,6 @@ ggplot(yuba_max_predicted, aes(x = date, y = value)) +
 ```
 
 #### Full dataset
-
-  * Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)
-  * Visualize combined data
-  
 ```{r}
 yuba_gap <- bind_rows(yuba_max_predicted,
                       yuba_mean_predicted,
