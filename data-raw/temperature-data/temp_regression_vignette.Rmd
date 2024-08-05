@@ -1,5 +1,5 @@
 ---
-title: "Water Temperature Regression Analysis"
+title: "Water Temperature Regression Vignette"
 output: 
   html_document:
   theme: flatly
