@@ -70,6 +70,7 @@ butte_format <- butte |>
 * Pulling in gage data from (GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC):
 * GRL (2003-03-05 to 2007-06-01 H; 2020-01-04 to present E): located after Thermalito Afterbay
 * FRA (2002-01-01 to present): located between Lake Oroville and Thermalito Afterbay
+* Prepare datasets for regression analysis - dataset with no missing data (Butte Creek data) to train and dataset with missing data to predict (Feather River)
 
  
 ```{r, include = F}
@@ -545,9 +546,10 @@ write_csv(feather_gap_hfc, here::here("data-raw", "temperature-data", "feather_h
 
 ### Data Prepartion {.tabset}
 
-1. Pull in gage data from YR7 CDEC gage, however, this only contains data from 2020 onwards. Temperature data collected along with RST data was originally used to fill the gap prior to 2020; however, due to inconsistencies in these data sources the resulting predicted mean values were lower than the min values as the RST data only has mean data. 
-
-2. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
+ * Pulling in gage data from YR7 CDEC gage
+ * YR7 data available from 2020 onwards 
+ * Note: Temperature data collected along with RST data was originally used to fill the gap prior to 2020; however, due to inconsistencies in these data sources the resulting predicted mean values were lower than the min values as the RST data only has mean data. 
+ * Prepare datasets for regression analysis - dataset with no missing data (Butte Creek data) to train and dataset with missing data to predict (Yuba River)
 
 ```{r, include = F}
 # Gage Data
