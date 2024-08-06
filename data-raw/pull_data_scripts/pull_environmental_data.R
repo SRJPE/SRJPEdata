@@ -430,7 +430,7 @@ try(if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp))
 
 # Temperature data for HFC Feather River
 # pulling temp data for Feather River Low Flow Channel - FRA
-try(feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor_num = "25"))
+try(feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor_num = "25",  start_date = "1997-01-01"))
 # Filter existing data to use as a back up 
 feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
