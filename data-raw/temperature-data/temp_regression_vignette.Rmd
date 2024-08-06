@@ -23,26 +23,26 @@ knitr::opts_knit$set(root.dir)
 
 # Regression Analysis for Water Temperature Data
 
-The goal of this analysis is to develop a regression to predict water temperature when data are missing or the time series is incomplete.
+The goal of this analysis is to fill in data gaps where temperature data are missing or the time series is incomplete in order to make the dataset more useful for SR JPE modeling. Temperature is an important covariate in understanding juvenile production though the completeness of these data vary by location.
 
-Currently this analysis is performed for Feather River and Yuba River. The resulting dataset with predicted values are saved and integrated in the development of a water temperature dataset.
+Currently this analysis relies on a regression model and is performed for the Feather River and Yuba River. The resulting dataset with predicted values is saved and integrated in the development of a water temperature dataset.
 
 
 ## Data used to build models: Butte Creek
 
 Butte Creek is used to build the regression models because the time series is complete and the data are high quality.
-  * Date range covered is 1999 - 2024
+  * Date range covered in the Butte Creek temperature data is 1999 - 2024
   
   
 ## Overall approach for water temperature regression:
 
-1. Prepare datasets for regression analysis (dataset with no missing data to train and dataset with missing data to predict)
+1. Prepare datasets for regression analysis (dataset with no missing data is used to train the model and dataset with missing data is used to predict)
 
-2. Fitting a linear regression models for mean, min, and max temperatures 
+2. Fit linear regression models for mean, min, and max temperatures 
 
-3. Make predictions for new dataset using the fitted models
+3. Make predictions for missing data using the fitted models
 
-4. Combine predictions with actual measurements and handle missing values
+4. Combine predictions with actual measurements
 
 5. Visualize the predicted and actual temperature over time to asses model performance trends
 
@@ -70,18 +70,18 @@ butte_format <- butte |>
 ### Data Preparation and Approach
 
 1. Pull in gage data from CDEC (GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC):
-* GRL (2003-03-05 to 2007-06-01 H; 2020-01-04 to present E): located after Thermalito Afterbay
+* GRL (2003-03-05 to 2007-06-01 H; 2020-01-04 to present): located after Thermalito Afterbay
 * FRA (2002-01-01 to present): located between Lake Oroville and Thermalito Afterbay
 
 2. Prepare datasets for regression analysis:
-* Dataset with no missing data to train (Butte Creek)
-* Dataset with missing data to predict (Feather River)
+* Dataset with no missing data to train and test the model (Butte Creek and Feather River)
+* Dataset with missing data to make predictions (Feather River)
 
-3. Combine datasets with no missing data, and missing data
+3. Use data where there are no missing data from either dataset for regression modeling
 
-4. Identify gaps to predict
+4. Use the regression model to make predictions from the testing dataset and evaluate
 
-5. Use data where there are no missing data for either dataset for regression modeling
+5. Use the model to make predictions for missing data
  
 
 ```{r, include = F}
@@ -120,7 +120,7 @@ feather_lfc_format <- lfc_feather |>
                 parameter = "temperature")
 ```
 
-### LFC {.tabset}
+### Low Flow Channel (LFC) {.tabset}
 
 ```{r, include = F}
 # Prepare data for regression
@@ -175,35 +175,55 @@ feather_lfc_regression_data_max <- feather_lfc_regression_data_full |>
          temp = feather_temp_max)
 ```
 
+#### Visually check the relationship between Butte Creek and Feather River LFC water temperature
+
 *Plot of mean temp for Feather River LFC and Butte Creek*
+
+There is a linear correlation between mean water temperature on Butte Creek and Feather River LFC.
+
 ```{r, echo = F}
 # plot for mean
 ggplot(data = feather_lfc_regression_data_mean, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") +
+  labs(x = "Butte Creek mean water temperature (C)",
+       y = "Feather River LFC mean water temperature (C)") +
+  theme_minimal()
 ```
 
 *Plot of min temp for Feather River LFC and Butte Creek*
+
+Similar to mean temperature, there is a linear correlation for min temperature.
+
 ```{r, echo = F}
 # plot for min
 ggplot(data = feather_lfc_regression_data_min, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm")  +
+  labs(x = "Butte Creek min water temperature (C)",
+       y = "Feather River LFC min water temperature (C)") +
+  theme_minimal()
 ```
 
 *Plot of max temp for Feather River LFC and Butte Creek*
+
+Similar to mean and min, there is a linear correlation for max temperature.
+
 ```{r, echo = F}
 # plot for max
 ggplot(data = feather_lfc_regression_data_max, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm")  +
+  labs(x = "Butte Creek max water temperature (C)",
+       y = "Feather River LFC max water temperature (C)") +
+  theme_minimal()
 ```
 
 #### Building Mean Regression
 
   * Splitting data
-  * Building the Model
-  * Model Summary
+  * Building the model
+  * Model summary
   * Making predictions
   * Evaluating predictions
   
