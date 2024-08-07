@@ -1,5 +1,5 @@
 ---
-title: "Water Temperature Regression Vignette"
+title: "Filling in temperature data gaps"
 output: 
   html_document:
   theme: flatly
@@ -180,6 +180,7 @@ feather_lfc_regression_data_max <- feather_lfc_regression_data_full |>
 *Plot of mean temp for Feather River LFC and Butte Creek*
 
 There is a linear correlation between mean water temperature on Butte Creek and Feather River LFC.
+The plot suggests a strong linear relationship between the mean water temperatures of Butte Creek and Feather River LFC. The positive slope of the linear trend line implies that higher water temperatures in Butte Creek are associated with higher water temperatures in Feather River LFC. This visual representation supports the results of the linear regression analysis, which identified a statistically significant relationship between the mean water temperatures of these two locations.
 
 ```{r, echo = F}
 # plot for mean
@@ -227,7 +228,10 @@ ggplot(data = feather_lfc_regression_data_max, aes(x = butte_temp, y = temp)) +
   * Making predictions
   * Evaluating predictions
   
-```{r}
+Model evaluation
+The calculated MAPE is 0.08488823, which means the model's predictions are off by about 8.49% on average. This is considered a reasonably low error rate, indicating good predictive accuracy.
+  
+```{r, echo=TRUE}
 # LFC regression and predictions
 
 # MEAN Regression
@@ -243,6 +247,7 @@ test_predict_df <- test |>
 mean(abs((
   test_predict_df$predicted - test_predict_df$temp
 )) / test_predict_df$temp)
+
 ```
 
 #### Building Min Regression
