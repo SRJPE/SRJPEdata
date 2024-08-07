@@ -31,6 +31,7 @@ Currently this analysis relies on a regression model and is performed for the Fe
 ## Data used to build models: Butte Creek
 
 Butte Creek is used to build the regression models because the time series is complete and the data are high quality.
+
   * Date range covered in the Butte Creek temperature data is 1999 - 2024
   
   
@@ -177,10 +178,10 @@ feather_lfc_regression_data_max <- feather_lfc_regression_data_full |>
 
 #### Visually check the relationship between Butte Creek and Feather River LFC water temperature
 
-*Plot of mean temp for Feather River LFC and Butte Creek*
-
 There is a linear correlation between mean water temperature on Butte Creek and Feather River LFC.
-The plot suggests a strong linear relationship between the mean water temperatures of Butte Creek and Feather River LFC. The positive slope of the linear trend line implies that higher water temperatures in Butte Creek are associated with higher water temperatures in Feather River LFC. This visual representation supports the results of the linear regression analysis, which identified a statistically significant relationship between the mean water temperatures of these two locations.
+The plots bellow suggest a strong linear relationship between the mean, max and min water temperatures of Butte Creek and Feather River LFC. The positive slope of the linear trend line implies that higher water temperatures in Butte Creek are associated with higher water temperatures in Feather River LFC. These visual representations support the results of the linear regression analysis, which identified a statistically significant relationship between the mean, max and min water temperatures of these two locations.
+
+*Plot of mean temp for Feather River LFC and Butte Creek*
 
 ```{r, echo = F}
 # plot for mean
@@ -228,10 +229,10 @@ ggplot(data = feather_lfc_regression_data_max, aes(x = butte_temp, y = temp)) +
   * Making predictions
   * Evaluating predictions
   
-Model evaluation
-The calculated MAPE is 0.08488823, which means the model's predictions are off by about 8.49% on average. This is considered a reasonably low error rate, indicating good predictive accuracy.
+
+The calculated Mean Absolute Percentage Error (MAPE) is 0.08488823, which means the model's predictions are off by about 8.49% on average. This is considered a reasonably low error rate, indicating good predictive accuracy.
   
-```{r, echo=TRUE}
+```{r, echo=FALSE}
 # LFC regression and predictions
 
 # MEAN Regression
@@ -258,7 +259,10 @@ mean(abs((
   * Making predictions
   * Evaluating predictions
   
-```{r}
+
+The MAPE is calculated as 0.08800298, meaning the model's predictions are, on average, off by about 8.80%. This indicates a reasonably low error rate, suggesting good predictive accuracy.
+
+```{r, echo=FALSE}
 # MIN Regression
 split <-rsample::initial_split(feather_lfc_regression_data_min, prop = 0.8)
 train <- rsample::training(split)
@@ -282,7 +286,10 @@ mean(abs((
   * Making predictions
   * Evaluating predictions
   
-```{r}
+  
+The MAPE is calculated as 0.07784735, meaning the model's predictions are, on average, off by about 7.78%. This indicates a low error rate, suggesting high predictive accuracy.
+  
+```{r, echo=FALSE}
 # MAX Regression
 split <-rsample::initial_split(feather_lfc_regression_data_max, prop = 0.8)
 train <- rsample::training(split)
@@ -300,10 +307,12 @@ mean(abs((
 
 #### Predictions
 
-  * Combine Predictions (mean, min, max dataframes into one)
+  * Combine Predictions (mean, min, max data frames into one)
   * Reshape data
 
-```{r}
+The plot shows the predicted mean temperature of the Feather River LFC over time. The line represents the trend of the predicted mean temperatures, indicating how they change as the date progresses. This visualization helps to identify any patterns or trends in the mean water temperature over the observed period.
+
+```{r, echo=FALSE}
 # Predictions
 feather_gap_predicted_mean_lfc <- predict(feather_lfc_mod_mean, feather_gap_mean)
 feather_lfc_mean_predicted <- feather_gap_mean |> 
@@ -311,29 +320,55 @@ feather_lfc_mean_predicted <- feather_gap_mean |>
          statistic = "mean") |> 
   select(date, value, statistic)
 ggplot(feather_lfc_mean_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Mean Temperature Over Time",
+       x = "Date",
+       y = "Predicted Mean Temperature (°C)") +
+  theme_minimal()
+```
+
+The plot illustrates the predicted minimum temperature of the Feather River LFC over time. The line represents the trend of the predicted minimum temperatures, showing how they vary across different dates. This helps to understand the behavior of the minimum water temperatures in the river.
+
+```{r, echo=FALSE}
 feather_gap_predicted_min_lfc <- predict(feather_lfc_mod_min, feather_gap_min)
 feather_lfc_min_predicted <- feather_gap_min |> 
   mutate(value = feather_gap_predicted_min_lfc,
          statistic = "min") |> 
   select(date, value, statistic)
 ggplot(feather_lfc_min_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Minimum Temperature Over Time",
+       x = "Date",
+       y = "Predicted Minimum Temperature (°C)") +
+  theme_minimal()
+```
+
+The plot shows the predicted maximum temperature of the Feather River LFC over time. The line indicates the trend of the predicted maximum temperatures, showing how they change with respect to the date. This plot helps to visualize the highest expected water temperatures in the river over the given period.
+
+```{r, echo=FALSE}
 feather_gap_predicted_max_lfc <- predict(feather_lfc_mod_max, feather_gap_max)
 feather_lfc_max_predicted <- feather_gap_max |> 
   mutate(value = feather_gap_predicted_max_lfc,
          statistic = "max") |> 
   select(date, value, statistic)
 ggplot(feather_lfc_max_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Maximum Temperature Over Time",
+       x = "Date",
+       y = "Predicted Maximum Temperature (°C)") +
+  theme_minimal()
 ```
 
 #### Full dataset
 
   * Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)
   * Visualize combined data
+  
+The plot shows how the mean, minimum, and maximum temperatures of the Upper Feather River LFC vary over time.
+Interpolated values are seamlessly integrated where observed data is missing, ensuring a continuous temperature trend.
+The different colors for each statistic (mean, min, max) help in distinguishing the temperature trends and understanding the temperature fluctuations.
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 feather_gap_lfc <- bind_rows(feather_lfc_max_predicted,
                              feather_lfc_mean_predicted,
                              feather_lfc_min_predicted) |> 
@@ -412,28 +447,50 @@ feather_hfc_regression_data_max <- feather_hfc_regression_data_full |>
          temp = feather_temp_max)
 ```
 
+
+#### Visually check the relationship between Butte Creek and Feather River HFC water temperature
+
+There is a linear correlation between mean water temperature on Butte Creek and Feather River HFC.
+The plots bellow suggest a strong linear relationship between the mean, max and min water temperatures of Butte Creek and Feather River HFC. The positive slope of the linear trend line implies that higher water temperatures in Butte Creek are associated with higher water temperatures in Feather River HFC. These visual representations support the results of the linear regression analysis, which identified a statistically significant relationship between the mean, max and min water temperatures of these two locations.
+
 *Plot of mean temp for Feather River HFC and Butte Creek*
-```{r}
+
+```{r, echo=FALSE}
 # plot for mean
 ggplot(data = feather_hfc_regression_data_mean, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") +
+  labs(x = "Butte Creek mean water temperature (C)",
+       y = "Feather River HFC mean water temperature (C)") +
+  theme_minimal()
 ```
 
 *Plot of min temp for Feather River HFC and Butte Creek*
-```{r}
+
+Similar to mean temperature, there is a linear correlation for min temperature.
+
+```{r, echo=FALSE}
 # plot for mean
 ggplot(data = feather_hfc_regression_data_min, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") +
+  labs(x = "Butte Creek min water temperature (C)",
+       y = "Feather River HFC min water temperature (C)") +
+  theme_minimal()
 ```
 
 *Plot of max temp for Feather River HFC and Butte Creek*
-```{r}
-# plot for mean
+
+Similar to mean and min, there is a linear correlation for max temperature.
+
+```{r, echo=FALSE}
+# plot for max
 ggplot(data = feather_hfc_regression_data_max, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") +
+  labs(x = "Butte Creek max water temperature (C)",
+       y = "Feather River HFC max water temperature (C)") +
+  theme_minimal()
 ```
 
 #### Building Mean Regression
@@ -444,7 +501,11 @@ ggplot(data = feather_hfc_regression_data_max, aes(x = butte_temp, y = temp)) +
   * Making predictions
   * Evaluating predictions
   
-```{r}
+The calculation of MAPE of 12.52%. This indicates that, on average, the predictions are off by 12.52% from the actual values.
+
+This suggests that while the model explains a significant portion of the variability in the data and has statistically significant predictors, there is still room for improvement in prediction accuracy, as evidenced by the MAPE of around 12.52%.  
+
+```{r, echo=TRUE}
 # HFC regression and predictions
 
 # MEAN Regression
@@ -470,7 +531,9 @@ mean(abs((
   * Making predictions
   * Evaluating predictions
   
-```{r}
+The MAPE of 9.73% indicates that the model's predictions are, on average, off by less than 10%, which suggests good predictive accuracy. This model seems to perform slightly better than the mean regression model in terms of prediction accuracy, as indicated by the lower MAPE.
+
+```{r, echo=FALSE}
 # MIN Regression
 split <-rsample::initial_split(feather_hfc_regression_data_min, prop = 0.8)
 train <- rsample::training(split)
@@ -494,7 +557,9 @@ mean(abs((
   * Making predictions
   * Evaluating predictions
   
-```{r}
+The MAPE of 13.64% indicates that the model's predictions are, on average, off by about 13.64%, which is a bit higher than the previous models. This suggests that while the model fits the data well, there is more room for improvement in prediction accuracy compared to the mean and minimum regression models.
+
+```{r, echo=FALSE}
 # MAX Regression
 split <-rsample::initial_split(feather_hfc_regression_data_max, prop = 0.8)
 train <- rsample::training(split)
@@ -504,7 +569,7 @@ summary(feather_hfc_mod_max)
 test_predict <- predict(feather_hfc_mod_max, test)
 test_predict_df <- test |>
   mutate(predicted = test_predict)
-# evaluate predictions - MAPE of 10% is not bad
+# evaluate predictions - MAPE 
 mean(abs((
   test_predict_df$predicted - test_predict_df$temp
 )) / test_predict_df$temp)
@@ -515,7 +580,9 @@ mean(abs((
   * Combine Predictions (mean, min, max dataframes into one)
   * Reshape data
   
-```{r}
+The plot shows the predicted mean temperature of the Feather River HFC over time. The line represents the trend of the predicted mean temperatures, indicating how they change as the date progresses. This visualization helps to identify any patterns or trends in the mean water temperature over the observed period.
+
+```{r, echo=FALSE}
 # Predictions
 feather_gap_predicted_mean_hfc <- predict(feather_hfc_mod_mean, feather_gap_mean)
 feather_hfc_mean_predicted <- feather_gap_mean |> 
@@ -523,21 +590,43 @@ feather_hfc_mean_predicted <- feather_gap_mean |>
          statistic = "mean") |> 
   select(date, value, statistic)
 ggplot(feather_hfc_mean_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Mean Temperature Over Time",
+       x = "Date",
+       y = "Predicted Mean Temperature (°C)") +
+  theme_minimal()
+```
+
+The plot illustrates the predicted minimum temperature of the Feather River HFC over time. The line represents the trend of the predicted minimum temperatures, showing how they vary across different dates. This helps to understand the behavior of the minimum water temperatures in the river.
+
+```{r, echo=FALSE}
 feather_gap_predicted_min_hfc <- predict(feather_hfc_mod_min, feather_gap_min)
 feather_hfc_min_predicted <- feather_gap_min |> 
   mutate(value = feather_gap_predicted_min_hfc,
          statistic = "min") |> 
   select(date, value, statistic)
 ggplot(feather_hfc_min_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Minimum Temperature Over Time",
+       x = "Date",
+       y = "Predicted Minimum Temperature (°C)") +
+  theme_minimal()
+```
+
+The plot shows the predicted maximum temperature of the Feather River HFC over time. The line indicates the trend of the predicted maximum temperatures, showing how they change with respect to the date. This plot helps to visualize the highest expected water temperatures in the river over the given period.
+
+```{r, echo=FALSE}
 feather_gap_predicted_max_hfc <- predict(feather_hfc_mod_max, feather_gap_max)
 feather_hfc_max_predicted <- feather_gap_max |> 
   mutate(value = feather_gap_predicted_max_hfc,
          statistic = "max") |> 
   select(date, value, statistic)
 ggplot(feather_hfc_max_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Maximum Temperature Over Time",
+       x = "Date",
+       y = "Predicted Maximum Temperature (°C)") +
+  theme_minimal()
 ```
 
 #### Full dataset
@@ -546,7 +635,11 @@ ggplot(feather_hfc_max_predicted, aes(x = date, y = value)) +
   * Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)
   * Visualize combined data
 
-```{r}
+The plot shows how the mean, minimum, and maximum temperatures of the Upper Feather River HFC vary over time.
+Interpolated values are seamlessly integrated where observed data is missing, ensuring a continuous temperature trend.
+The different colors for each statistic (mean, min, max) help in distinguishing the temperature trends and understanding the temperature fluctuations.
+
+```{r, echo=FALSE, warning=FALSE}
 feather_gap_hfc <- bind_rows(feather_hfc_max_predicted,
                              feather_hfc_mean_predicted,
                              feather_hfc_min_predicted) |> 
@@ -661,28 +754,48 @@ yuba_regression_data_max <- yuba_regression_data_full |>
          temp = yuba_temp_max)
 ```
 
+#### Visually check the relationship between Butte Creek and Yuba River water temperature
+
+There is a linear correlation between mean water temperature on Butte Creek and Yuba River.
+The plots bellow suggest a strong linear relationship between the mean, max and min water temperatures of Butte Creek and Yuba River. The positive slope of the linear trend line implies that higher water temperatures in Butte Creek are associated with higher water temperatures in Yuba River. These visual representations support the results of the linear regression analysis, which identified a statistically significant relationship between the mean, max and min water temperatures of these two locations.
+
 *Plot of mean temp for Yuba River and Butte Creek*
-```{r}
+```{r, echo=FALSE}
 # plot for mean
 ggplot(data = yuba_regression_data_mean, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") +
+  labs(x = "Butte Creek mean water temperature (C)",
+       y = "Yuba River mean water temperature (C)") +
+  theme_minimal()
 ```
 
 *Plot of min temp for Yuba River and Butte Creek*
-```{r}
-# plot for mean
+
+Similar to mean temperature, there is a linear correlation for min temperature.
+
+```{r, echo=FALSE}
+# plot for min
 ggplot(data = yuba_regression_data_min, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") +
+  labs(x = "Butte Creek min water temperature (C)",
+       y = "Yuba River min water temperature (C)") +
+  theme_minimal()
 ```
 
 *Plot of max temp for Yuba River and Butte Creek*
-```{r}
-# plot for mean
+
+Similar to mean and min, there is a linear correlation for max temperature.
+
+```{r, echo=FALSE}
+# plot for max
 ggplot(data = yuba_regression_data_max, aes(x = butte_temp, y = temp)) +
   geom_point() +
-  stat_smooth(method = "lm")
+  stat_smooth(method = "lm") +
+  labs(x = "Butte Creek max water temperature (C)",
+       y = "Yuba River max water temperature (C)") +
+  theme_minimal()
 ```
 
 #### Building Mean Regression
@@ -693,7 +806,9 @@ ggplot(data = yuba_regression_data_max, aes(x = butte_temp, y = temp)) +
   * Making predictions
   * Evaluating predictions
   
-```{r}
+The MAPE of 7.29% indicates that the model's predictions are, on average, off by less than 10%, which suggests very good predictive accuracy. 
+
+```{r, echo=FALSE}
 # MEAN Regression
 split <-rsample::initial_split(yuba_regression_data_mean, prop = 0.8)
 train <- rsample::training(split)
@@ -717,7 +832,7 @@ mean(abs((
   * Making predictions
   * Evaluating predictions
   
-```{r}
+```{r, echo=FALSE}
 # MIN Regression
 split <-rsample::initial_split(yuba_regression_data_min, prop = 0.8)
 train <- rsample::training(split)
@@ -741,7 +856,7 @@ mean(abs((
   * Making predictions
   * Evaluating predictions
   
-```{r}
+```{r, echo=FALSE}
 # MAX Regression
 split <-rsample::initial_split(yuba_regression_data_max, prop = 0.8)
 train <- rsample::training(split)
@@ -762,7 +877,9 @@ mean(abs((
   * Combine Predictions (mean, min, max dataframes into one)
   * Reshape data
 
-```{r}
+The plot shows the predicted mean temperature of Yuba River over time. The line represents the trend of the predicted mean temperatures, indicating how they change as the date progresses. This visualization helps to identify any patterns or trends in the mean water temperature over the observed period.
+
+```{r, echo=FALSE}
 # Predictions
 yuba_gap_predicted_mean <- predict(yuba_mod_mean, yuba_gap_mean)
 yuba_mean_predicted <- yuba_gap_mean |> 
@@ -770,21 +887,43 @@ yuba_mean_predicted <- yuba_gap_mean |>
          statistic = "mean_predicted") |> 
   select(date, value, statistic)
 ggplot(yuba_mean_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Mean Temperature Over Time",
+       x = "Date",
+       y = "Predicted Mean Temperature (°C)") +
+  theme_minimal()
+```
+
+The plot illustrates the predicted minimum temperature of the Yuba River over time. The line represents the trend of the predicted minimum temperatures, showing how they vary across different dates. This helps to understand the behavior of the minimum water temperatures in the river.
+
+```{r, echo=FALSE}
 yuba_gap_predicted_min <- predict(yuba_mod_min, yuba_gap_min)
 yuba_min_predicted <- yuba_gap_min |> 
   mutate(value = yuba_gap_predicted_min,
          statistic = "min_predicted") |> 
   select(date, value, statistic)
 ggplot(yuba_min_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Minimum Temperature Over Time",
+       x = "Date",
+       y = "Predicted Minimum Temperature (°C)") +
+  theme_minimal()
+```
+
+The plot shows the predicted maximum temperature of Yuba River over time. The line indicates the trend of the predicted maximum temperatures, showing how they change with respect to the date. This plot helps to visualize the highest expected water temperatures in the river over the given period.
+
+```{r, echo=FALSE}
 yuba_gap_predicted_max <- predict(yuba_mod_max, yuba_gap_max)
 yuba_max_predicted <- yuba_gap_max |> 
   mutate(value = yuba_gap_predicted_max,
          statistic = "max_predicted") |> 
   select(date, value, statistic)
 ggplot(yuba_max_predicted, aes(x = date, y = value)) +
-  geom_line()
+  geom_line() +
+  labs(title = "Predicted Maximum Temperature Over Time",
+       x = "Date",
+       y = "Predicted Maximum Temperature (°C)") +
+  theme_minimal()
 ```
 
 #### Full dataset
@@ -792,7 +931,9 @@ ggplot(yuba_max_predicted, aes(x = date, y = value)) +
   * Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)
   * Visualize combined data
   
-```{r}
+The plot shows how the mean, minimum, and maximum temperatures of Yuba River vary over time. Interpolated values are seamlessly integrated where observed data is missing, ensuring a continuous temperature trend. The different colors for each statistic (mean, min, max) help in distinguishing the temperature trends and understanding the temperature fluctuations.
+  
+```{r, echo=FALSE}
 yuba_gap <- bind_rows(yuba_max_predicted,
                       yuba_mean_predicted,
                       yuba_min_predicted) |> 
