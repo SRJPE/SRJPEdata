@@ -89,6 +89,8 @@ navbar:
         href: articles/prep_environmental_covariates.html
       - text: 'Stock Recruit Model Covariate Prep'
         href: articles/sr_covariates.html
+      - text: 'Filling Temperature Data Gaps'
+        href: articles/temp_regression.html
       - text: 'Summary of Data for Modeling '
         href: articles/summary_of_data_for_modeling.html
   - text: 'News'

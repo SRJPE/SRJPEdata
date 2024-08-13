@@ -3,6 +3,8 @@
 # Need DB permissions set
 source("data-raw/pull_data_scripts/pull_tables_from_database.R")
 
+# temp regression vignette needs to come before the environmental data
+knitr::knit("vignettes/temp_regression.Rmd")
 # Next source environmental data 
 source("data-raw/pull_data_scripts/pull_environmental_data.R")
 

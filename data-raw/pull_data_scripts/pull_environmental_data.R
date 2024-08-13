@@ -159,7 +159,8 @@ try(if(!exists("clear_creek_data_query"))
                 site_group = "clear creek",
                 gage_agency = "USGS",
                 gage_number = "11372000",
-                parameter = "flow"
+                parameter = "flow",
+                statistic = "mean" # if query returns instantaneous data then report a min, mean, and max
          )))
 # Do a few additional flow data pull tests to confirm that new data pull has 
 # more data
@@ -169,7 +170,7 @@ try(if(nrow(clear_creek_daily_flows) < nrow(clear_creek_existing_flow))
 ### Temp Data Pull 
 #### Existing temp data
 ### Temp Data Pull Tests 
-#Upper Clear Lake
+#Upper Clear Creek
 upperclear_temp_raw <- readxl::read_excel(here::here("data-raw","temperature-data", "battle_clear_temp.xlsx"), sheet = 2)
 
 upperclear_creek_daily_temp <- upperclear_temp_raw |> 
@@ -189,7 +190,7 @@ upperclear_creek_daily_temp <- upperclear_temp_raw |>
          parameter = "temperature") |> 
   glimpse()
 
-#Lower Clear Lake
+#Lower Clear Creek
 lowerclear_temp_raw <- readxl::read_excel(here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"), sheet = 3)
 
 lowerclear_creek_daily_temp <- lowerclear_temp_raw |> 
@@ -342,7 +343,8 @@ try(if(nrow(feather_lfc_river_daily_flows) < nrow(feather_lfc_river_existing_flo
 
 ### Flow Data Pull Tests 
 #Lower Feather data 
-try(lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "H", sensor_num = "20", start_date = "1997-01-01"))
+try(lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "E", sensor_num = "20", start_date = "2010-01-01"))
+
 # Filter existing data to use as a back up 
 lower_feather_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
@@ -415,14 +417,18 @@ try(if(!exists("feather_lfc_temp_query"))
          summarise(mean= mean(parameter_value, na.rm = TRUE),
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "feather river",
+         pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+         full_join(feather_lfc_interpolated) |> 
+         # we want to use the query values instead of the interpolated values where they exist
+         mutate(value = ifelse(!is.na(query_value), query_value, value),
+                gage_agency = ifelse(!is.na(query_value), "CDEC", gage_agency),
+                gage_number = ifelse(!is.na(query_value), "FRA", gage_number),
+                stream = "feather river",
                 site_group = "upper feather lfc",
-                gage_agency = "CDEC",
-                gage_number = "FRA",
                 parameter = "temperature") |> 
-         bind_rows(feather_lfc_interpolated)
+         select(-query_value)
   ))
+
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data 
 try(if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp)) 
@@ -449,13 +455,16 @@ try(if(!exists("feather_hfc_temp_query"))
          summarise(mean= mean(parameter_value, na.rm = TRUE),
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "feather river",
+         pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+         full_join(feather_hfc_interpolated) |> 
+         # we want to use the query values instead of the interpolated values where they exist
+         mutate(value = ifelse(!is.na(query_value), query_value, value),
+                gage_agency = ifelse(!is.na(query_value), "CDEC", gage_agency),
+                gage_number = ifelse(!is.na(query_value), "GRL", gage_number),
+                stream = "feather river",
                 site_group = "upper feather hfc",
-                gage_agency = "CDEC",
-                gage_number = "GRL",
                 parameter = "temperature") |> 
-         bind_rows(feather_hfc_interpolated)
+         select(-query_value)
   ))
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data 
@@ -583,7 +592,8 @@ try(if(!exists("sac_river_temp_query"))
          mutate(stream = "sacramento river",
                 gage_agency = "USGS",
                 gage_number = "11390500",
-                parameter = "temperature")))
+                parameter = "temperature",
+                statistic = "mean")))
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data  
 try(if(nrow(sac_river_daily_temp) < nrow(sac_river_existing_temp)) 
@@ -642,21 +652,25 @@ yuba_river_existing_temp <- SRJPEdata::environmental_data |>
 # if exists - reformat new data pull           
 try(if(!exists("yuba_river_temp_query"))
   yuba_river_daily_temp <- yuba_river_existing_temp
-  else({yuba_river_daily_temp <- yuba_river_temp_query |> 
+  else(yuba_river_daily_temp <- yuba_river_temp_query |> 
     mutate(date = as_date(datetime)) |> 
     mutate(year = year(datetime)) |> 
     group_by(date) |> 
     summarise(mean= mean(parameter_value, na.rm = TRUE),
               max = max(parameter_value, na.rm = TRUE),
               min = min(parameter_value, na.rm = TRUE)) |> 
-    pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-    mutate(stream = "yuba river",
-           site_group = "yuba river", 
-           gage_agency = "CDEC",
-           gage_number = "YR7",
-           parameter = "temperature") |> 
-    bind_rows(yuba_river_interpolated)
-  } ))
+    pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+      full_join(yuba_river_interpolated) |> 
+      # we want to use the query values instead of the interpolated values where they exist
+      mutate(value = ifelse(!is.na(query_value), query_value, value),
+             gage_agency = ifelse(!is.na(query_value), "CDEC", gage_agency),
+             gage_number = ifelse(!is.na(query_value), "YR7", gage_number),
+             stream = "yuba river",
+             site_group = "yuba river",
+             parameter = "temperature") |> 
+      select(-query_value)
+    ))
+
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data  
 try(if(nrow(yuba_river_daily_temp) < nrow(yuba_river_existing_temp)) 

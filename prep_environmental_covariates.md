@@ -42,19 +42,91 @@ Several approaches were considered for summarizing temperature:
 
 Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. The resulting dataset is as follows (note that DD less than 0 are set to 0):
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> year </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:right;"> gdd_trib </th>
+   <th style="text-align:right;"> gdd_sac </th>
+   <th style="text-align:right;"> gdd_total </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 9.900463 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 9.90 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 79.307870 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 79.31 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> mill creek </td>
+   <td style="text-align:right;"> 24.350443 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 24.35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 38.893518 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 38.89 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 191.700593 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 191.70 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> feather river </td>
+   <td style="text-align:right;"> 57.894549 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 57.89 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> mill creek </td>
+   <td style="text-align:right;"> 97.261574 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 97.26 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> yuba river </td>
+   <td style="text-align:right;"> 419.491828 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 419.49 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2001 </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 70.303241 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 70.30 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2001 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 17.078134 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 17.08 </td>
+  </tr>
+</tbody>
+</table>
 
-| year|stream        |  gdd_trib| gdd_sac| gdd_total|
-|----:|:-------------|---------:|-------:|---------:|
-| 1999|deer creek    |  79.30787|       0|     79.31|
-| 1999|mill creek    |  24.35044|       0|     24.35|
-| 2000|butte creek   |  38.89352|       0|     38.89|
-| 2000|deer creek    | 191.70059|       0|    191.70|
-| 2000|feather river |  47.67365|       0|     47.67|
-| 2000|mill creek    |  97.26157|       0|     97.26|
-| 2000|yuba river    | 430.34858|       0|    430.35|
-| 2001|butte creek   |  70.30324|       0|     70.30|
-| 2001|clear creek   |  17.07813|       0|     17.08|
-| 2001|deer creek    | 282.67653|       0|    282.68|
+
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
@@ -64,19 +136,80 @@ The following plot is of the growing degree days above the 20 degree threshold o
 
 Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:right;"> year </th>
+   <th style="text-align:right;"> mean_flow </th>
+   <th style="text-align:right;"> max_flow </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:right;"> 1002.4837 </td>
+   <td style="text-align:right;"> 6430 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1996 </td>
+   <td style="text-align:right;"> 608.5326 </td>
+   <td style="text-align:right;"> 2120 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1997 </td>
+   <td style="text-align:right;"> 373.1795 </td>
+   <td style="text-align:right;"> 540 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:right;"> 1075.1304 </td>
+   <td style="text-align:right;"> 3220 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:right;"> 595.3370 </td>
+   <td style="text-align:right;"> 1890 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:right;"> 489.3913 </td>
+   <td style="text-align:right;"> 1950 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2001 </td>
+   <td style="text-align:right;"> 312.9402 </td>
+   <td style="text-align:right;"> 1130 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2002 </td>
+   <td style="text-align:right;"> 357.4565 </td>
+   <td style="text-align:right;"> 617 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2003 </td>
+   <td style="text-align:right;"> 604.3207 </td>
+   <td style="text-align:right;"> 2740 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2004 </td>
+   <td style="text-align:right;"> 452.6250 </td>
+   <td style="text-align:right;"> 1370 </td>
+  </tr>
+</tbody>
+</table>
 
-|stream       | year| mean_flow| max_flow|
-|:------------|----:|---------:|--------:|
-|battle creek | 1962|  381.2174|     1230|
-|battle creek | 1963|  546.4620|     3030|
-|battle creek | 1964|  299.2228|      442|
-|battle creek | 1965|  531.6793|     1590|
-|battle creek | 1966|  354.5272|      664|
-|battle creek | 1967|  638.0163|     1530|
-|battle creek | 1968|  379.7011|     1030|
-|battle creek | 1969|  666.6467|     1270|
-|battle creek | 1970|  541.0217|     1510|
-|battle creek | 1971|  585.0380|     2500|
+
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
@@ -88,29 +221,116 @@ To account for the influence of large scale interannual climate variability, we 
 
 We used the `waterYearType` package to pull water year assignments as a categorical covariate. Some streams had very few data points (i.e. for Mill Creek, only seven years were considered dependable), so we simplified all potential categories of water year type into either dry (`Dry`, `Below Normal`, `Critical`) or wet (`Wet`, `Above Normal`). The table below summarizes the number of dry and wet years that were included:
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Water Year Type </th>
+   <th style="text-align:right;"> Count </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> dry </td>
+   <td style="text-align:right;"> 63 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> wet </td>
+   <td style="text-align:right;"> 53 </td>
+  </tr>
+</tbody>
+</table>
 
-|Water Year Type | Count|
-|:---------------|-----:|
-|dry             |    63|
-|wet             |    53|
+
 
 ### Passage Timing
 
 Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power. Passage timing was summarized as the mean, median, and min day of passage. The resulting dataset is as follows:
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> year </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:right;"> median_passage_timing </th>
+   <th style="text-align:right;"> mean_passage_timing </th>
+   <th style="text-align:right;"> min_passage_timing </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 23.5 </td>
+   <td style="text-align:right;"> 24.03333 </td>
+   <td style="text-align:right;"> 22 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 25.0 </td>
+   <td style="text-align:right;"> 24.58824 </td>
+   <td style="text-align:right;"> 21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 28.0 </td>
+   <td style="text-align:right;"> 28.48684 </td>
+   <td style="text-align:right;"> 21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2001 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 21.5 </td>
+   <td style="text-align:right;"> 23.33784 </td>
+   <td style="text-align:right;"> 19 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2002 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 27.0 </td>
+   <td style="text-align:right;"> 27.90909 </td>
+   <td style="text-align:right;"> 21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2003 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 33.0 </td>
+   <td style="text-align:right;"> 32.00000 </td>
+   <td style="text-align:right;"> 25 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2004 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 24.0 </td>
+   <td style="text-align:right;"> 24.34783 </td>
+   <td style="text-align:right;"> 22 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2005 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 24.0 </td>
+   <td style="text-align:right;"> 24.81395 </td>
+   <td style="text-align:right;"> 21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2006 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 25.5 </td>
+   <td style="text-align:right;"> 25.77500 </td>
+   <td style="text-align:right;"> 24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2007 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 22.0 </td>
+   <td style="text-align:right;"> 22.95187 </td>
+   <td style="text-align:right;"> 19 </td>
+  </tr>
+</tbody>
+</table>
 
-| year|stream       | median_passage_timing| mean_passage_timing| min_passage_timing|
-|----:|:------------|---------------------:|-------------------:|------------------:|
-| 1998|battle creek |                  23.5|            24.03333|                 22|
-| 1999|battle creek |                  25.0|            24.58824|                 21|
-| 2000|battle creek |                  28.0|            28.48684|                 21|
-| 2001|battle creek |                  21.5|            23.33784|                 19|
-| 2002|battle creek |                  27.0|            27.90909|                 21|
-| 2003|battle creek |                  33.0|            32.00000|                 25|
-| 2004|battle creek |                  24.0|            24.34783|                 22|
-| 2005|battle creek |                  24.0|            24.81395|                 21|
-| 2006|battle creek |                  25.5|            25.77500|                 24|
-| 2007|battle creek |                  22.0|            22.95187|                 19|
+
 
 The following plot is of median passage over time for all tributaries:
 
@@ -120,19 +340,67 @@ The following plot is of median passage over time for all tributaries:
 
 We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality. 
 
-
-| year|stream       | passage_index|
-|----:|:------------|-------------:|
-| 1995|battle creek |            66|
-| 1995|clear creek  |             2|
-| 1996|battle creek |            35|
-| 1997|battle creek |           107|
-| 1998|battle creek |           178|
-| 1998|clear creek  |            47|
-| 1999|battle creek |            73|
-| 1999|clear creek  |            35|
-| 2000|battle creek |            78|
-| 2000|clear creek  |             9|
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> year </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:right;"> passage_index </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 66 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1996 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1997 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 107 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 178 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 47 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 73 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 78 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 9 </td>
+  </tr>
+</tbody>
+</table>
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 
@@ -140,19 +408,113 @@ We hypothesized that total annual passage might be an indicator of density becau
 
 Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> year </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:right;"> wy_type </th>
+   <th style="text-align:right;"> max_flow_std </th>
+   <th style="text-align:right;"> gdd_std </th>
+   <th style="text-align:right;"> passage_index </th>
+   <th style="text-align:right;"> median_passage_timing_std </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 3.0591938 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.6837483 </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1996 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.0870719 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.8597315 </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1997 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -1.0024763 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.4509963 </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.8456181 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.0479381 </td>
+   <td style="text-align:right;"> -0.1057615 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -0.0715332 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.6440101 </td>
+   <td style="text-align:right;"> 0.3595891 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -0.0301580 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.6156258 </td>
+   <td style="text-align:right;"> 1.2902904 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2001 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.5956197 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.4282888 </td>
+   <td style="text-align:right;"> -0.7262290 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2002 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.9493780 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.2018445 </td>
+   <td style="text-align:right;"> 0.9800567 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2003 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.5146161 </td>
+   <td style="text-align:right;"> -0.8093821 </td>
+   <td style="text-align:right;"> 0.1961676 </td>
+   <td style="text-align:right;"> 2.8414592 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2004 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> -0.4301187 </td>
+   <td style="text-align:right;"> -0.8391369 </td>
+   <td style="text-align:right;"> -0.5475032 </td>
+   <td style="text-align:right;"> 0.0493554 </td>
+  </tr>
+</tbody>
+</table>
 
-| year|stream       | wy_type| max_flow_std| gdd_std| passage_index| median_passage_timing_std|
-|----:|:------------|-------:|------------:|-------:|-------------:|-------------------------:|
-| 1962|battle creek |       0|   -0.5103739|      NA|            NA|                        NA|
-| 1963|battle creek |       1|    0.6857655|      NA|            NA|                        NA|
-| 1964|battle creek |       0|   -1.0340171|      NA|            NA|                        NA|
-| 1965|battle creek |       1|   -0.2711460|      NA|            NA|                        NA|
-| 1966|battle creek |       0|   -0.8864933|      NA|            NA|                        NA|
-| 1967|battle creek |       1|   -0.3110173|      NA|            NA|                        NA|
-| 1968|battle creek |       0|   -0.6432783|      NA|            NA|                        NA|
-| 1969|battle creek |       1|   -0.4837930|      NA|            NA|                        NA|
-| 1970|battle creek |       1|   -0.3243078|      NA|            NA|                        NA|
-| 1971|battle creek |       1|    0.3335689|      NA|            NA|                        NA|
+
 
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 

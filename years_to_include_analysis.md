@@ -49,24 +49,82 @@ For ongoing data collection and more recent seasons, we applied an automatic che
 
 We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Stream </th>
+   <th style="text-align:right;"> Year </th>
+   <th style="text-align:left;"> Exclusion Type </th>
+   <th style="text-align:left;"> Notes </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2003 </td>
+   <td style="text-align:left;"> really low sampling </td>
+   <td style="text-align:left;"> only a few weeks of data </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2007 </td>
+   <td style="text-align:left;"> really low sampling </td>
+   <td style="text-align:left;"> only 12 week of data </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2015 </td>
+   <td style="text-align:left;"> missing four consecutive weeks in critical window </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 2019 </td>
+   <td style="text-align:left;"> really low sampling </td>
+   <td style="text-align:left;"> only 10 weeks of data </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 2005 </td>
+   <td style="text-align:left;"> really low sampling </td>
+   <td style="text-align:left;"> only 6 weeks of data </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 1997 </td>
+   <td style="text-align:left;"> missing four consecutive weeks in critical window </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 2006 </td>
+   <td style="text-align:left;"> missing four consecutive weeks in critical window </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:left;"> missing four consecutive weeks in critical window </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 1993 </td>
+   <td style="text-align:left;"> really low sampling </td>
+   <td style="text-align:left;"> only 6 weeks of data </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:left;"> really low sampling </td>
+   <td style="text-align:left;"> only 6 weeks of data </td>
+  </tr>
+</tbody>
+</table>
 
 
-|Stream       | Year|Exclusion Type                                    |Notes                    |
-|:------------|----:|:-------------------------------------------------|:------------------------|
-|battle creek | 2003|really low sampling                               |only a few weeks of data |
-|battle creek | 2007|really low sampling                               |only 12 week of data     |
-|battle creek | 2015|missing four consecutive weeks in critical window |NA                       |
-|butte creek  | 2019|really low sampling                               |only 10 weeks of data    |
-|butte creek  | 2005|really low sampling                               |only 6 weeks of data     |
-|butte creek  | 1997|missing four consecutive weeks in critical window |NA                       |
-|butte creek  | 2006|missing four consecutive weeks in critical window |NA                       |
-|butte creek  | 1998|missing four consecutive weeks in critical window |NA                       |
-|deer creek   | 1993|really low sampling                               |only 6 weeks of data     |
-|deer creek   | 1994|really low sampling                               |only 6 weeks of data     |
 
-
-
-*... with 15 more rows*
+*... with 20 more rows*
 
 
 ### Applying to Modeling Datasets
@@ -75,20 +133,122 @@ In order to apply the years to exclude information to the modeling datasets we d
 
 The table below shows a section of this table:
 
-
-
-| monitoring_year|stream           |site                    |subsite    |min_date   | min_week|max_date   | max_week|
-|---------------:|:----------------|:-----------------------|:----------|:----------|--------:|:----------|--------:|
-|            1994|sacramento river |red bluff diversion dam |gate 1     |1994-08-19 |       33|1994-08-31 |       35|
-|            1994|sacramento river |red bluff diversion dam |gate 10    |1994-08-29 |       35|1994-08-31 |       35|
-|            1994|sacramento river |red bluff diversion dam |gate 11    |1994-07-18 |       29|1994-08-24 |       34|
-|            1995|deer creek       |deer creek              |deer creek |1994-10-03 |       40|1995-06-18 |       25|
-|            1995|sacramento river |red bluff diversion dam |gate 1     |1994-09-01 |       35|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 10    |1994-09-01 |       35|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 11    |1995-03-03 |        9|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 2     |1995-01-25 |        4|1995-05-04 |       18|
-|            1995|sacramento river |red bluff diversion dam |gate 3     |1994-10-18 |       42|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 5     |1994-09-22 |       38|1995-04-27 |       17|
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> monitoring_year </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:left;"> subsite </th>
+   <th style="text-align:left;"> min_date </th>
+   <th style="text-align:right;"> min_week </th>
+   <th style="text-align:left;"> max_date </th>
+   <th style="text-align:right;"> max_week </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 1 </td>
+   <td style="text-align:left;"> 1994-08-19 </td>
+   <td style="text-align:right;"> 33 </td>
+   <td style="text-align:left;"> 1994-08-31 </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 10 </td>
+   <td style="text-align:left;"> 1994-08-29 </td>
+   <td style="text-align:right;"> 35 </td>
+   <td style="text-align:left;"> 1994-08-31 </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 11 </td>
+   <td style="text-align:left;"> 1994-07-18 </td>
+   <td style="text-align:right;"> 29 </td>
+   <td style="text-align:left;"> 1994-08-24 </td>
+   <td style="text-align:right;"> 34 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> 1994-10-03 </td>
+   <td style="text-align:right;"> 40 </td>
+   <td style="text-align:left;"> 1995-06-18 </td>
+   <td style="text-align:right;"> 25 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 1 </td>
+   <td style="text-align:left;"> 1994-09-01 </td>
+   <td style="text-align:right;"> 35 </td>
+   <td style="text-align:left;"> 1995-08-31 </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 10 </td>
+   <td style="text-align:left;"> 1994-09-01 </td>
+   <td style="text-align:right;"> 35 </td>
+   <td style="text-align:left;"> 1995-08-31 </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 11 </td>
+   <td style="text-align:left;"> 1995-03-03 </td>
+   <td style="text-align:right;"> 9 </td>
+   <td style="text-align:left;"> 1995-08-31 </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 2 </td>
+   <td style="text-align:left;"> 1995-01-25 </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:left;"> 1995-05-04 </td>
+   <td style="text-align:right;"> 18 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 3 </td>
+   <td style="text-align:left;"> 1994-10-18 </td>
+   <td style="text-align:right;"> 42 </td>
+   <td style="text-align:left;"> 1995-08-31 </td>
+   <td style="text-align:right;"> 35 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:left;"> gate 5 </td>
+   <td style="text-align:left;"> 1994-09-22 </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:left;"> 1995-04-27 </td>
+   <td style="text-align:right;"> 17 </td>
+  </tr>
+</tbody>
+</table>
 
 
 
@@ -154,20 +314,78 @@ The below heat map shows Battle Creek redd survey coverage. It shows decent cove
 
 We utilized above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling for adult data. See a section of the "years to exclude" table below.
 
-
-
-|Stream       | Year|Data Type        |Exclusion Type                                                                                                                                    |
-|:------------|----:|:----------------|:-------------------------------------------------------------------------------------------------------------------------------------------------|
-|clear creek  | 2018|upstream passage |Missing march/april                                                                                                                               |
-|clear creek  | 2019|upstream passage |Missing march/april                                                                                                                               |
-|clear creek  | 2023|upstream passage |Over a third of the year the weir was open due to high flows, data was deemed to be too poor to verify and enter in master database at this time. |
-|battle creek | 2017|carcass          |Missing 50% or more of reach coverage                                                                                                             |
-|battle creek | 2008|carcass          |Missing 50% or more of reach coverage                                                                                                             |
-|battle creek | 2019|carcass          |Missing 50% or more of reach coverage                                                                                                             |
-|butte creek  | 2015|carcass          |Very limited coverage on D-E reaches                                                                                                              |
-|clear creek  | 2011|carcass          |Missing reach 3, 4, and some of reach 5                                                                                                           |
-|clear creek  | 2016|carcass          |Missing reach 1, 3, 4, and some of reach 5                                                                                                        |
-|clear creek  | 2017|carcass          |Missing reach 1, 2, 4, and some of reach 5                                                                                                        |
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Stream </th>
+   <th style="text-align:right;"> Year </th>
+   <th style="text-align:left;"> Data Type </th>
+   <th style="text-align:left;"> Exclusion Type </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 2018 </td>
+   <td style="text-align:left;"> upstream passage </td>
+   <td style="text-align:left;"> Missing march/april </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 2019 </td>
+   <td style="text-align:left;"> upstream passage </td>
+   <td style="text-align:left;"> Missing march/april </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 2023 </td>
+   <td style="text-align:left;"> upstream passage </td>
+   <td style="text-align:left;"> Over a third of the year the weir was open due to high flows, data was deemed to be too poor to verify and enter in master database at this time. </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2017 </td>
+   <td style="text-align:left;"> carcass </td>
+   <td style="text-align:left;"> Missing 50% or more of reach coverage </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2008 </td>
+   <td style="text-align:left;"> carcass </td>
+   <td style="text-align:left;"> Missing 50% or more of reach coverage </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2019 </td>
+   <td style="text-align:left;"> carcass </td>
+   <td style="text-align:left;"> Missing 50% or more of reach coverage </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 2015 </td>
+   <td style="text-align:left;"> carcass </td>
+   <td style="text-align:left;"> Very limited coverage on D-E reaches </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 2011 </td>
+   <td style="text-align:left;"> carcass </td>
+   <td style="text-align:left;"> Missing reach 3, 4, and some of reach 5 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 2016 </td>
+   <td style="text-align:left;"> carcass </td>
+   <td style="text-align:left;"> Missing reach 1, 3, 4, and some of reach 5 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 2017 </td>
+   <td style="text-align:left;"> carcass </td>
+   <td style="text-align:left;"> Missing reach 1, 2, 4, and some of reach 5 </td>
+  </tr>
+</tbody>
+</table>
 
 
 

@@ -32,7 +32,7 @@ The plot below shows the updated cutoff values with linear interpolation of week
 
 **Note: You can view all code used to generate plots and tables in this markdown [here.](https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd)**
 
-![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 
 
@@ -78,49 +78,389 @@ In addition to differentiating between yearling and YOY it is important for the 
 
 The first step was to apply a lifestage cutoff to catch records that had fork lengths recorded. These cutoffs are `fork_length < 45 = fry`, `fork_length > 45 = smolt`, `fork_length > yearling_cutoff = yearling`.
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> date </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:left;"> subsite </th>
+   <th style="text-align:left;"> site_group </th>
+   <th style="text-align:right;"> count </th>
+   <th style="text-align:left;"> run </th>
+   <th style="text-align:left;"> life_stage </th>
+   <th style="text-align:left;"> adipose_clipped </th>
+   <th style="text-align:left;"> dead </th>
+   <th style="text-align:right;"> fork_length </th>
+   <th style="text-align:right;"> weight </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 1999-01-19 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 40 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-19 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 17100 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 35 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 34 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 36 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 36 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
 
-|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight|
-|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|
-|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |fry        |FALSE           |NA   |          40|      0|
-|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  | 17100|fall |fry        |FALSE           |NA   |           0|      0|
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          35|      0|
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     3|fall |fry        |FALSE           |NA   |          38|      0|
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     6|fall |fry        |FALSE           |NA   |          37|      0|
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          38|      0|
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          34|      0|
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          36|      0|
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     4|fall |fry        |FALSE           |NA   |          36|      0|
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     2|fall |fry        |FALSE           |NA   |          37|      0|
+
 
 ### Determine year specific lifestage proportions
 
 There are 44880 entries with missing lifestage due to missing fork length data. 
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> date </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:left;"> subsite </th>
+   <th style="text-align:left;"> site_group </th>
+   <th style="text-align:right;"> count </th>
+   <th style="text-align:left;"> run </th>
+   <th style="text-align:left;"> life_stage </th>
+   <th style="text-align:left;"> adipose_clipped </th>
+   <th style="text-align:left;"> dead </th>
+   <th style="text-align:right;"> fork_length </th>
+   <th style="text-align:right;"> weight </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 2002-03-13 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 2002-01-01 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 7 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 2002-01-01 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 2002-01-01 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 2002-01-06 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 2002-01-06 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
 
-|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight|
-|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|
-|2002-03-13 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     7|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     3|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     6|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|
+
 
 The first step in filling in these missing lifestages was to find the proportion for each lifestage category for a given stream, site, week, and year. This information could then be used to fill in the lifestage for missing rows within a week.
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> year </th>
+   <th style="text-align:right;"> week </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:right;"> percent_fry </th>
+   <th style="text-align:right;"> percent_smolt </th>
+   <th style="text-align:right;"> percent_yearling </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 1992 </td>
+   <td style="text-align:right;"> 42 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1992 </td>
+   <td style="text-align:right;"> 44 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1992 </td>
+   <td style="text-align:right;"> 45 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1992 </td>
+   <td style="text-align:right;"> 46 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1992 </td>
+   <td style="text-align:right;"> 48 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1992 </td>
+   <td style="text-align:right;"> 49 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:right;"> 29 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1.0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:right;"> 30 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1.0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:right;"> 31 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:right;"> 0.0 </td>
+   <td style="text-align:right;"> 1.0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1994 </td>
+   <td style="text-align:right;"> 32 </td>
+   <td style="text-align:left;"> sacramento river </td>
+   <td style="text-align:left;"> red bluff diversion dam </td>
+   <td style="text-align:right;"> 0.1 </td>
+   <td style="text-align:right;"> 0.9 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
 
-| year| week|stream           |site                    | percent_fry| percent_smolt| percent_yearling|
-|----:|----:|:----------------|:-----------------------|-----------:|-------------:|----------------:|
-| 1992|   42|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   44|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   45|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   46|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   48|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   49|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1994|   29|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
-| 1994|   30|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
-| 1994|   31|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
-| 1994|   32|sacramento river |red bluff diversion dam |         0.1|           0.9|                0|
+
 
 ### Determine general weekly lifestage proportions
 
@@ -132,19 +472,201 @@ For weeks that had no fork length data in a given week, we calculated a general 
 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> date </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:left;"> subsite </th>
+   <th style="text-align:left;"> site_group </th>
+   <th style="text-align:right;"> count </th>
+   <th style="text-align:left;"> run </th>
+   <th style="text-align:left;"> life_stage </th>
+   <th style="text-align:left;"> adipose_clipped </th>
+   <th style="text-align:left;"> dead </th>
+   <th style="text-align:right;"> fork_length </th>
+   <th style="text-align:right;"> weight </th>
+   <th style="text-align:right;"> week </th>
+   <th style="text-align:right;"> year </th>
+   <th style="text-align:left;"> model_lifestage_method </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 1999-01-19 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 40 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-19 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 17100 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 35 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 6 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 38 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 34 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> lcc </td>
+   <td style="text-align:left;"> clear creek </td>
+   <td style="text-align:right;"> 5 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 36 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 4 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 36 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1999-01-20 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> lbc </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 2 </td>
+   <td style="text-align:left;"> fall </td>
+   <td style="text-align:left;"> fry </td>
+   <td style="text-align:left;"> FALSE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:right;"> 37 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 3 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> assigned from fl cutoffs </td>
+  </tr>
+</tbody>
+</table>
 
-|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight| week| year|model_lifestage_method   |
-|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|----:|----:|:------------------------|
-|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |fry        |FALSE           |NA   |          40|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  | 17100|fall |fry        |FALSE           |NA   |           0|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          35|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     3|fall |fry        |FALSE           |NA   |          38|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     6|fall |fry        |FALSE           |NA   |          37|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          38|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          34|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          36|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     4|fall |fry        |FALSE           |NA   |          36|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     2|fall |fry        |FALSE           |NA   |          37|      0|    3| 1999|assigned from fl cutoffs |
+
 
 ### Generate rows for when no fish of a lifestage are caught
 
@@ -158,7 +680,7 @@ The following plot shows the general patten in the lifestage field where fry are
 
 **Battle Creek: 2011**
 
-![plot of chunk unnamed-chunk-42](figure/unnamed-chunk-42-1.png)
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
 
 ## Save resulting data to package
 
