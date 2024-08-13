@@ -82,7 +82,7 @@ butte_format <- butte |>
 
 ```{r, include = F}
 # Pull in Gage Data that were extracted in the "data-raw/qc-markdowns/temperature_data_prep.Rmd"
-hfc_feather <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05", end_date = "2007-06-01")
+hfc_feather <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25", start_date = "2003-03-05")
 feather_hfc_format <- hfc_feather |> 
          mutate(date = as_date(datetime),
                 temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>

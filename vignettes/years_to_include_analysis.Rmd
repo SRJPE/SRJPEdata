@@ -187,7 +187,7 @@ if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at 
            exclusion_type = "automatic", 
            reason_for_exclusion = "less than 75% of weeks sampled") |> 
     filter(exclude) |> 
-    select(stream, year, exclusion_type, reason_for_exclusion)
+    select(stream, year = monitoring_year, exclusion_type, reason_for_exclusion) 
   years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
 }  
 

@@ -115,6 +115,7 @@ std_temp_dd_spawn <- standard_temperature |>
   summarize(max_mean = max(mean)) |> 
   group_by(year, stream, gage_agency, gage_number, site_group) |> 
   summarize(gdd_spawn = sum(max_mean, na.rm = T)) |> glimpse()
+
 ```
 
 
