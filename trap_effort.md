@@ -93,14 +93,68 @@ it is the sample date of the previous record. Note that there are some records w
 These occur because trap visit data was entered when the trap was not in service and
 then a new trap visit entry was recorded once the trap started working again.
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> start_datetime </th>
+   <th style="text-align:left;"> stop_datetime </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:left;"> subsite </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> hours_fished_methodology </th>
+   <th style="text-align:left;"> hours_fished </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 1997-12-22 10:40:00 </td>
+   <td style="text-align:left;"> 1997-12-22 10:40:00 </td>
+   <td style="text-align:left;"> eye riffle </td>
+   <td style="text-align:left;"> eye riffle_north </td>
+   <td style="text-align:left;"> feather river </td>
+   <td style="text-align:left;"> using start time and stop time </td>
+   <td style="text-align:left;"> 0.00 hours </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-12-22 10:40:00 </td>
+   <td style="text-align:left;"> 1997-12-23 11:40:00 </td>
+   <td style="text-align:left;"> eye riffle </td>
+   <td style="text-align:left;"> eye riffle_north </td>
+   <td style="text-align:left;"> feather river </td>
+   <td style="text-align:left;"> using start time and stop time </td>
+   <td style="text-align:left;"> 25.00 hours </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-12-26 13:56:00 </td>
+   <td style="text-align:left;"> 1997-12-26 13:56:00 </td>
+   <td style="text-align:left;"> eye riffle </td>
+   <td style="text-align:left;"> eye riffle_north </td>
+   <td style="text-align:left;"> feather river </td>
+   <td style="text-align:left;"> using start time and stop time </td>
+   <td style="text-align:left;"> 0.00 hours </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-12-26 13:56:00 </td>
+   <td style="text-align:left;"> 1997-12-27 09:56:00 </td>
+   <td style="text-align:left;"> eye riffle </td>
+   <td style="text-align:left;"> eye riffle_north </td>
+   <td style="text-align:left;"> feather river </td>
+   <td style="text-align:left;"> using start time and stop time </td>
+   <td style="text-align:left;"> 20.00 hours </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-12-27 09:56:00 </td>
+   <td style="text-align:left;"> 1997-12-28 09:11:00 </td>
+   <td style="text-align:left;"> eye riffle </td>
+   <td style="text-align:left;"> eye riffle_north </td>
+   <td style="text-align:left;"> feather river </td>
+   <td style="text-align:left;"> using start time and stop time </td>
+   <td style="text-align:left;"> 23.25 hours </td>
+  </tr>
+</tbody>
+</table>
 
-|start_datetime      |stop_datetime       |site       |subsite          |stream        |hours_fished_methodology       |hours_fished |
-|:-------------------|:-------------------|:----------|:----------------|:-------------|:------------------------------|:------------|
-|1997-12-22 10:40:00 |1997-12-22 10:40:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |0.00 hours   |
-|1997-12-22 10:40:00 |1997-12-23 11:40:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |25.00 hours  |
-|1997-12-26 13:56:00 |1997-12-26 13:56:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |0.00 hours   |
-|1997-12-26 13:56:00 |1997-12-27 09:56:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |20.00 hours  |
-|1997-12-27 09:56:00 |1997-12-28 09:11:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |23.25 hours  |
+
 
 ### QC
 
@@ -118,14 +172,68 @@ The histogram below shows data filtered to remove the outliers though there are 
 Hours fished are calculated by taking the difference between the date/time at each 
 observation. 
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> start_datetime </th>
+   <th style="text-align:left;"> end_datetime </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:left;"> subsite </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> hours_fished_methodology </th>
+   <th style="text-align:right;"> hours_fished </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 1997-01-18 09:00:00 </td>
+   <td style="text-align:left;"> 1997-01-19 09:00:00 </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:left;"> using only start time </td>
+   <td style="text-align:right;"> 24.00 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-03-05 09:00:00 </td>
+   <td style="text-align:left;"> 1997-03-06 09:00:00 </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:left;"> using only start time </td>
+   <td style="text-align:right;"> 24.00 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-03-11 07:00:00 </td>
+   <td style="text-align:left;"> 1997-03-12 09:15:00 </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:left;"> using only start time </td>
+   <td style="text-align:right;"> 26.25 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-03-12 09:15:00 </td>
+   <td style="text-align:left;"> 1997-03-15 09:00:00 </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:left;"> using only start time </td>
+   <td style="text-align:right;"> 71.75 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1997-03-15 09:00:00 </td>
+   <td style="text-align:left;"> 1997-03-16 09:30:00 </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> adams dam </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:left;"> using only start time </td>
+   <td style="text-align:right;"> 24.50 </td>
+  </tr>
+</tbody>
+</table>
 
-|start_datetime      |end_datetime        |site      |subsite   |stream      |hours_fished_methodology | hours_fished|
-|:-------------------|:-------------------|:---------|:---------|:-----------|:------------------------|------------:|
-|1997-01-18 09:00:00 |1997-01-19 09:00:00 |adams dam |adams dam |butte creek |using only start time    |        24.00|
-|1997-03-05 09:00:00 |1997-03-06 09:00:00 |adams dam |adams dam |butte creek |using only start time    |        24.00|
-|1997-03-11 07:00:00 |1997-03-12 09:15:00 |adams dam |adams dam |butte creek |using only start time    |        26.25|
-|1997-03-12 09:15:00 |1997-03-15 09:00:00 |adams dam |adams dam |butte creek |using only start time    |        71.75|
-|1997-03-15 09:00:00 |1997-03-16 09:30:00 |adams dam |adams dam |butte creek |using only start time    |        24.50|
+
 
 ### QC
 
@@ -143,14 +251,68 @@ Mill & Deer creeks do not have data available (no time variable) to calculate ho
 Mill & Deer creeks also do not have sample period revolutions so we cannot use trap revolutions 
 fished. We therefore assume 24 hours fished for every day with data. 
 
+<table>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> trap_stop_date </th>
+   <th style="text-align:left;"> stream </th>
+   <th style="text-align:left;"> site </th>
+   <th style="text-align:left;"> subsite </th>
+   <th style="text-align:left;"> site_group </th>
+   <th style="text-align:left;"> hours_fished_methodology </th>
+   <th style="text-align:right;"> hours_fished </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 1992-10-14 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> 24 hour assumption </td>
+   <td style="text-align:right;"> 24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1992-10-17 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> 24 hour assumption </td>
+   <td style="text-align:right;"> 24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1992-10-30 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> 24 hour assumption </td>
+   <td style="text-align:right;"> 24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1992-11-04 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> 24 hour assumption </td>
+   <td style="text-align:right;"> 24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1992-11-05 </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> deer creek </td>
+   <td style="text-align:left;"> 24 hour assumption </td>
+   <td style="text-align:right;"> 24 </td>
+  </tr>
+</tbody>
+</table>
 
-|trap_stop_date |stream     |site       |subsite    |site_group |hours_fished_methodology | hours_fished|
-|:--------------|:----------|:----------|:----------|:----------|:------------------------|------------:|
-|1992-10-14     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1992-10-17     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1992-10-30     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1992-11-04     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-|1992-11-05     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
+
 
 
 # Combine Data
@@ -165,21 +327,21 @@ We grouped hours fished data by site, subsite, week, and year and summarized to 
 
 
 ```
-## # A tibble: 275 × 5
-## # Groups:   year, stream, site [52]
-##     year stream           site                    subsite     n
-##    <dbl> <chr>            <chr>                   <chr>   <int>
-##  1  1994 sacramento river red bluff diversion dam gate 1      6
-##  2  1994 sacramento river red bluff diversion dam gate 10     4
-##  3  1994 sacramento river red bluff diversion dam gate 11     6
-##  4  1994 sacramento river red bluff diversion dam gate 3     11
-##  5  1994 sacramento river red bluff diversion dam gate 5     15
-##  6  1994 sacramento river red bluff diversion dam gate 7     12
-##  7  1994 sacramento river red bluff diversion dam gate 9     16
-##  8  1995 sacramento river knights landing         8.3         3
-##  9  1995 sacramento river knights landing         8.4         7
-## 10  1995 sacramento river red bluff diversion dam gate 1     32
-## # ℹ 265 more rows
+#> # A tibble: 275 × 5
+#> # Groups:   year, stream, site [52]
+#>     year stream           site                    subsite     n
+#>    <dbl> <chr>            <chr>                   <chr>   <int>
+#>  1  1994 sacramento river red bluff diversion dam gate 1      6
+#>  2  1994 sacramento river red bluff diversion dam gate 10     4
+#>  3  1994 sacramento river red bluff diversion dam gate 11     6
+#>  4  1994 sacramento river red bluff diversion dam gate 3     11
+#>  5  1994 sacramento river red bluff diversion dam gate 5     15
+#>  6  1994 sacramento river red bluff diversion dam gate 7     12
+#>  7  1994 sacramento river red bluff diversion dam gate 9     16
+#>  8  1995 sacramento river knights landing         8.3         3
+#>  9  1995 sacramento river knights landing         8.4         7
+#> 10  1995 sacramento river red bluff diversion dam gate 1     32
+#> # ℹ 265 more rows
 ```
 
 ### QC

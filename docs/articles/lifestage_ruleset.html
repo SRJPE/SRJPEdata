@@ -187,6 +187,8 @@ each stream, site, week and year</li>
 <li>Determine general week proportions for fry, smolt, yearling for each
 stream, week</li>
 <li>Apply proportions to data to fill in missing lifestage</li>
+<li>Generate rows for when no fish of a particular lifestage are
+caught</li>
 </ol>
 <div class="section level3">
 <h3 id="create-lifestage-variable">Create lifestage variable<a class="anchor" aria-label="anchor" href="#create-lifestage-variable"></a>
@@ -619,23 +621,23 @@ for each lifestage category for a given stream, site, and week.</p>
 </h3>
 <p>We used these proportions to fill in missing lifestage values. See
 the final lifestage designations below.</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="7%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
 <col width="8%">
-<col width="3%">
-<col width="5%">
-<col width="8%">
-<col width="4%">
-<col width="3%">
-<col width="7%">
 <col width="10%">
 <col width="3%">
-<col width="8%">
+<col width="7%">
 <col width="4%">
 <col width="3%">
 <col width="3%">
-<col width="17%">
+<col width="15%">
+<col width="6%">
+<col width="3%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">date</th>
@@ -643,9 +645,7 @@ the final lifestage designations below.</p>
 <th align="left">site</th>
 <th align="left">subsite</th>
 <th align="left">site_group</th>
-<th align="right">count</th>
 <th align="left">run</th>
-<th align="left">life_stage</th>
 <th align="left">adipose_clipped</th>
 <th align="left">dead</th>
 <th align="right">fork_length</th>
@@ -653,180 +653,191 @@ the final lifestage designations below.</p>
 <th align="right">week</th>
 <th align="right">year</th>
 <th align="left">model_lifestage_method</th>
+<th align="left">life_stage</th>
+<th align="right">count</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">1999-01-19</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">79</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
+<td align="left">assigned from fl cutoffs</td>
+<td align="left">fry</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">79</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
+<td align="left">assigned from fl cutoffs</td>
+<td align="left">smolt</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">79</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
+<td align="left">assigned from fl cutoffs</td>
+<td align="left">yearling</td>
 <td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">40</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
 </tr>
 <tr class="even">
-<td align="left">1999-01-19</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">17100</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
 <td align="left">FALSE</td>
 <td align="left">NA</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
+<td align="right">87</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
 <td align="left">assigned from fl cutoffs</td>
+<td align="left">fry</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
-<td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">87</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
+<td align="left">assigned from fl cutoffs</td>
+<td align="left">smolt</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">87</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
+<td align="left">assigned from fl cutoffs</td>
+<td align="left">yearling</td>
 <td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">35</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr>
-<tr class="even">
-<td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">3</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">38</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
 </tr>
 <tr class="odd">
-<td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">6</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
 <td align="left">FALSE</td>
 <td align="left">NA</td>
-<td align="right">37</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
+<td align="right">93</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
 <td align="left">assigned from fl cutoffs</td>
+<td align="left">fry</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">5</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
 <td align="left">FALSE</td>
 <td align="left">NA</td>
-<td align="right">38</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
+<td align="right">93</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
 <td align="left">assigned from fl cutoffs</td>
+<td align="left">smolt</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
-<td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">93</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
+<td align="left">assigned from fl cutoffs</td>
+<td align="left">yearling</td>
 <td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">34</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
 </tr>
 <tr class="even">
-<td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">5</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
+<td align="left">1992-10-14</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="left">not recorded</td>
 <td align="left">FALSE</td>
 <td align="left">NA</td>
-<td align="right">36</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
+<td align="right">94</td>
+<td align="right">NA</td>
+<td align="right">42</td>
+<td align="right">1992</td>
 <td align="left">assigned from fl cutoffs</td>
-</tr>
-<tr class="odd">
-<td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">4</td>
-<td align="left">fall</td>
 <td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">36</td>
 <td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr>
-<tr class="even">
-<td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">2</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">37</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level3">
+<h3 id="generate-rows-for-when-no-fish-of-a-lifestage-are-caught">Generate rows for when no fish of a lifestage are caught<a class="anchor" aria-label="anchor" href="#generate-rows-for-when-no-fish-of-a-lifestage-are-caught"></a>
+</h3>
+<p>In order to improve the usability of this dataset (particulary for
+modeling) we decided to add rows for when a lifestage was not caught.
+For instance, there may be only fry caught on a particular day and when
+running the model for smolt that day would not show up in the
+dataset.</p>
 </div>
 <div class="section level3">
 <h3 id="review-lifestage">Review lifestage<a class="anchor" aria-label="anchor" href="#review-lifestage"></a>
@@ -835,7 +846,7 @@ the final lifestage designations below.</p>
 where fry are caught earlier in the year and smolt are caught later in
 the year.</p>
 <p><strong>Battle Creek: 2011</strong></p>
-<p><img src="lifestage_ruleset_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
+<p><img src="lifestage_ruleset_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
 </div>
 </div>
 <div class="section level2">

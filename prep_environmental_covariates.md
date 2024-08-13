@@ -55,80 +55,82 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 <tbody>
   <tr>
    <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> butte creek </td>
+   <td style="text-align:right;"> 9.900463 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 9.90 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
    <td style="text-align:left;"> deer creek </td>
-   <td style="text-align:right;"> 79.30787 </td>
+   <td style="text-align:right;"> 79.307870 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 79.31 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 1999 </td>
    <td style="text-align:left;"> mill creek </td>
-   <td style="text-align:right;"> 24.35044 </td>
+   <td style="text-align:right;"> 24.350443 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 24.35 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 2000 </td>
    <td style="text-align:left;"> butte creek </td>
-   <td style="text-align:right;"> 38.89352 </td>
+   <td style="text-align:right;"> 38.893518 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 38.89 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 2000 </td>
    <td style="text-align:left;"> deer creek </td>
-   <td style="text-align:right;"> 191.70059 </td>
+   <td style="text-align:right;"> 191.700593 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 191.70 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 2000 </td>
    <td style="text-align:left;"> feather river </td>
-   <td style="text-align:right;"> 41.54767 </td>
+   <td style="text-align:right;"> 57.894549 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 41.55 </td>
+   <td style="text-align:right;"> 57.89 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 2000 </td>
    <td style="text-align:left;"> mill creek </td>
-   <td style="text-align:right;"> 97.26157 </td>
+   <td style="text-align:right;"> 97.261574 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 97.26 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 2000 </td>
    <td style="text-align:left;"> yuba river </td>
-   <td style="text-align:right;"> 424.80334 </td>
+   <td style="text-align:right;"> 419.491828 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 424.80 </td>
+   <td style="text-align:right;"> 419.49 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 2001 </td>
    <td style="text-align:left;"> butte creek </td>
-   <td style="text-align:right;"> 70.30324 </td>
+   <td style="text-align:right;"> 70.303241 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 70.30 </td>
   </tr>
   <tr>
    <td style="text-align:right;"> 2001 </td>
    <td style="text-align:left;"> clear creek </td>
-   <td style="text-align:right;"> 17.07813 </td>
+   <td style="text-align:right;"> 17.078134 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 17.08 </td>
-  </tr>
-  <tr>
-   <td style="text-align:right;"> 2001 </td>
-   <td style="text-align:left;"> deer creek </td>
-   <td style="text-align:right;"> 282.67653 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 282.68 </td>
   </tr>
 </tbody>
 </table>
 
+
+
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
-![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
 
 ### Flow 
 
@@ -146,70 +148,72 @@ Maximum flow more effectively captures the high flow events that support migrati
 <tbody>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1962 </td>
-   <td style="text-align:right;"> 381.2174 </td>
-   <td style="text-align:right;"> 1230 </td>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:right;"> 1002.4837 </td>
+   <td style="text-align:right;"> 6430 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1963 </td>
-   <td style="text-align:right;"> 546.4620 </td>
-   <td style="text-align:right;"> 3030 </td>
+   <td style="text-align:right;"> 1996 </td>
+   <td style="text-align:right;"> 608.5326 </td>
+   <td style="text-align:right;"> 2120 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1964 </td>
-   <td style="text-align:right;"> 299.2228 </td>
-   <td style="text-align:right;"> 442 </td>
+   <td style="text-align:right;"> 1997 </td>
+   <td style="text-align:right;"> 373.1795 </td>
+   <td style="text-align:right;"> 540 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1965 </td>
-   <td style="text-align:right;"> 531.6793 </td>
-   <td style="text-align:right;"> 1590 </td>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:right;"> 1075.1304 </td>
+   <td style="text-align:right;"> 3220 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1966 </td>
-   <td style="text-align:right;"> 354.5272 </td>
-   <td style="text-align:right;"> 664 </td>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:right;"> 595.3370 </td>
+   <td style="text-align:right;"> 1890 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1967 </td>
-   <td style="text-align:right;"> 638.0163 </td>
-   <td style="text-align:right;"> 1530 </td>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:right;"> 489.3913 </td>
+   <td style="text-align:right;"> 1950 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1968 </td>
-   <td style="text-align:right;"> 379.7011 </td>
-   <td style="text-align:right;"> 1030 </td>
+   <td style="text-align:right;"> 2001 </td>
+   <td style="text-align:right;"> 312.9402 </td>
+   <td style="text-align:right;"> 1130 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1969 </td>
-   <td style="text-align:right;"> 666.6467 </td>
-   <td style="text-align:right;"> 1270 </td>
+   <td style="text-align:right;"> 2002 </td>
+   <td style="text-align:right;"> 357.4565 </td>
+   <td style="text-align:right;"> 617 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1970 </td>
-   <td style="text-align:right;"> 541.0217 </td>
-   <td style="text-align:right;"> 1510 </td>
+   <td style="text-align:right;"> 2003 </td>
+   <td style="text-align:right;"> 604.3207 </td>
+   <td style="text-align:right;"> 2740 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1971 </td>
-   <td style="text-align:right;"> 585.0380 </td>
-   <td style="text-align:right;"> 2500 </td>
+   <td style="text-align:right;"> 2004 </td>
+   <td style="text-align:right;"> 452.6250 </td>
+   <td style="text-align:right;"> 1370 </td>
   </tr>
 </tbody>
 </table>
 
+
+
 The following plot is of max flow (cfs) over time for all tributaries:
 
-![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png)
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
 
 ### Water Year Type
 
@@ -235,6 +239,8 @@ We used the `waterYearType` package to pull water year assignments as a categori
   </tr>
 </tbody>
 </table>
+
+
 
 ### Passage Timing
 
@@ -324,9 +330,11 @@ Passage timing was considered; however, limited data reduced the sample size of 
 </tbody>
 </table>
 
+
+
 The following plot is of median passage over time for all tributaries:
 
-![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
 
 ### Total Passage as Index
 
@@ -394,7 +402,7 @@ We hypothesized that total annual passage might be an indicator of density becau
 </tbody>
 </table>
 
-![plot of chunk unnamed-chunk-20](figure/unnamed-chunk-20-1.png)
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 
 ### Combine and Save Covariate Data 
 
@@ -414,101 +422,103 @@ Both continuous environmental variables (flow and temperature) were standardized
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:right;"> 1962 </td>
+   <td style="text-align:right;"> 1995 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 3.0591938 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.6837483 </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1996 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.0870719 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.8597315 </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1997 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -1.0024763 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.4509963 </td>
+   <td style="text-align:right;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1998 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> 0.8456181 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.0479381 </td>
+   <td style="text-align:right;"> -0.1057615 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 1999 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -0.0715332 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.6440101 </td>
+   <td style="text-align:right;"> 0.3595891 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2000 </td>
+   <td style="text-align:left;"> battle creek </td>
+   <td style="text-align:right;"> 1 </td>
+   <td style="text-align:right;"> -0.0301580 </td>
+   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.6156258 </td>
+   <td style="text-align:right;"> 1.2902904 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 2001 </td>
    <td style="text-align:left;"> battle creek </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> -0.5103739 </td>
+   <td style="text-align:right;"> -0.5956197 </td>
    <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.4282888 </td>
+   <td style="text-align:right;"> -0.7262290 </td>
   </tr>
   <tr>
-   <td style="text-align:right;"> 1963 </td>
-   <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.6857655 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-  <tr>
-   <td style="text-align:right;"> 1964 </td>
+   <td style="text-align:right;"> 2002 </td>
    <td style="text-align:left;"> battle creek </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> -1.0340171 </td>
+   <td style="text-align:right;"> -0.9493780 </td>
    <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.2018445 </td>
+   <td style="text-align:right;"> 0.9800567 </td>
   </tr>
   <tr>
-   <td style="text-align:right;"> 1965 </td>
+   <td style="text-align:right;"> 2003 </td>
    <td style="text-align:left;"> battle creek </td>
    <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> -0.2711460 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> 0.5146161 </td>
+   <td style="text-align:right;"> -0.8093821 </td>
+   <td style="text-align:right;"> 0.1961676 </td>
+   <td style="text-align:right;"> 2.8414592 </td>
   </tr>
   <tr>
-   <td style="text-align:right;"> 1966 </td>
+   <td style="text-align:right;"> 2004 </td>
    <td style="text-align:left;"> battle creek </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> -0.8864933 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-  <tr>
-   <td style="text-align:right;"> 1967 </td>
-   <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> -0.3110173 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-  <tr>
-   <td style="text-align:right;"> 1968 </td>
-   <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> -0.6432783 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-  <tr>
-   <td style="text-align:right;"> 1969 </td>
-   <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> -0.4837930 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-  <tr>
-   <td style="text-align:right;"> 1970 </td>
-   <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> -0.3243078 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-  </tr>
-  <tr>
-   <td style="text-align:right;"> 1971 </td>
-   <td style="text-align:left;"> battle creek </td>
-   <td style="text-align:right;"> 1 </td>
-   <td style="text-align:right;"> 0.3335689 </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
-   <td style="text-align:right;"> NA </td>
+   <td style="text-align:right;"> -0.4301187 </td>
+   <td style="text-align:right;"> -0.8391369 </td>
+   <td style="text-align:right;"> -0.5475032 </td>
+   <td style="text-align:right;"> 0.0493554 </td>
   </tr>
 </tbody>
 </table>
 
+
+
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 
-![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
 
 #### Save data object
 Data object saved in `SRJPEdata` as `p2s_model_covariates_standard.rds`. To access documentation search `?SRJPEdata::p2s_model_covariates_standard.rds`.
