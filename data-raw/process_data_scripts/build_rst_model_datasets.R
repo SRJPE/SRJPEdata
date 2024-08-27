@@ -101,23 +101,10 @@ weekly_effort_by_site <- weekly_hours_fished |>
   summarize(hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
   ungroup()
 
-# Catch & Effort ----------------------------------------------------------
-
-# Join weekly effort data to weekly catch data
-# there are a handful of cases where hours fished is NA. 
-# weekly hours fished will be assumed to be 168 hours (24 hours * 7) as most
-# traps fish continuously. Ideally these data points would be filled in, however,
-# after extensive effort 54 still remain. It is unlikely that these datapoints
-# will have a huge effect in such a large data set.
-
-# TODO Discuss with Ashley if we need to retain subsite in weekly_standard_catch...
-# TODO commenting out for now because it appears we do this join later in the script. Discuss if we can remove this full section
-# weekly_catch_effort <- full_join(weekly_standard_catch_with_hatch_designation, weekly_hours_fished) |> 
-#   mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
-
 # Environmental -----------------------------------------------------------
 env_with_sites <- environmental_data |> 
-  left_join(site_lookup)  |> glimpse()
+  left_join(site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
+  glimpse()
 
 weekly_flow <- env_with_sites |> 
   filter(parameter == "flow",
@@ -166,13 +153,14 @@ flow_reformatted <- env_with_sites |>
   summarise(flow_cfs = mean(value, na.rm = T)) |> 
   glimpse()
 
+# Combine catch (weekly_standard_catch), weekly efficiency, and weekly effort by site 
 weekly_efficiency |> glimpse()
 
 weekly_effort_by_site |> glimpse()
 
+# TODO do we want to use the weekly_standard_catch_with_hatch_designation instead
 catch_reformatted <- weekly_standard_catch |>  glimpse()
 
-# TODO do we want to use the weekly_standard_catch_with_hatch_designation instead
 # Combine all 3 tables together 
 weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
   left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site")) |> 
