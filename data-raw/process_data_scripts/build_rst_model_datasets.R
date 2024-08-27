@@ -10,16 +10,19 @@ library(tidyverse)
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 SRJPEdata::rst_catch |> glimpse()
 updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
-chosen_site_years_to_model |> glimpse()
+chosen_site_years_to_model |> glimpse() 
+# Note: updated below years_to_include to chosen_site_years_to_model (this is more up to date version)
+# TODO however, years_to_include included a subsite (CONFIRM that we do not need subsite), after discussing, delete old version
 
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 
 ### ----------------------------------------------------------------------------
 
-# Filter to use includion criteria ---------------------------------------------
+# Filter to use inclusion criteria ---------------------------------------------
+# TODO this is the slowest block...
 catch_with_inclusion_criteria <- updated_standard_catch |> 
   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
-  left_join(years_to_include) |> 
+  left_join(chosen_site_years_to_model) |> 
   mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
          # if the year was not included in the list of years to include then should be FALSE
          include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
@@ -58,6 +61,8 @@ weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros,
                                    weekly_standard_catch_zeros) |> glimpse()
 
 # Add hatchery column 
+# Currently not included in josh model data but can be added by changing join on 
+# line 176 below
 hatch_per_week <- catch_with_inclusion_criteria |> 
   filter(adipose_clipped == TRUE) |> 
   mutate(week = week(date),
@@ -105,9 +110,10 @@ weekly_effort_by_site <- weekly_hours_fished |>
 # after extensive effort 54 still remain. It is unlikely that these datapoints
 # will have a huge effect in such a large data set.
 
-# TODO 
-weekly_catch_effort <- full_join(weekly_standard_catch_unmarked, weekly_hours_fished) |> 
-  mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
+# TODO Discuss with Ashley if we need to retain subsite in weekly_standard_catch...
+# TODO commenting out for now because it appears we do this join later in the script. Discuss if we can remove this full section
+# weekly_catch_effort <- full_join(weekly_standard_catch_with_hatch_designation, weekly_hours_fished) |> 
+#   mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
 
 # Environmental -----------------------------------------------------------
 env_with_sites <- environmental_data |> 
@@ -131,16 +137,22 @@ weekly_temperature <- env_with_sites |>
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
-weekly_efficiency <- left_join(release, recaptures, by = c("release_id", "stream", "site", "site_group", "run", "life_stage")) |> 
-  group_by(stream, site, site_group, 
-           week_released = day(date_released), 
+weekly_efficiency <- 
+  left_join(release, 
+            recaptures |> # need to summarize first so you don't get duplicated release data when joining
+              group_by(release_id, stream, site, site_group) |> 
+              summarize(count = sum(count, na.rm = T)),
+            by = c("release_id", "stream", "site", "site_group")) |> 
+  group_by(stream, 
+           site, 
+           site_group, 
+           week_released = week(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
             number_recaptured = sum(count, na.rm = TRUE)) |> 
   ungroup() |> 
   glimpse()
 
-weekly_standard_catch_unmarked  |> glimpse()
 weekly_efficiency |> glimpse()
 
 # reformat flow data and summarize weekly
@@ -160,6 +172,7 @@ weekly_effort_by_site |> glimpse()
 
 catch_reformatted <- weekly_standard_catch |>  glimpse()
 
+# TODO do we want to use the weekly_standard_catch_with_hatch_designation instead
 # Combine all 3 tables together 
 weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
   left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site")) |> 
