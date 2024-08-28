@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
       </span>
     </div>
 
@@ -64,6 +64,9 @@
     </li>
     <li>
       <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
+    </li>
+    <li>
+      <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
     </li>
     <li>
       <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
@@ -178,73 +181,73 @@ The resulting dataset is as follows (note that DD less than 0 are set to
 <tbody>
 <tr class="odd">
 <td align="right">1999</td>
-<td align="left">deer creek</td>
-<td align="right">79.30787</td>
+<td align="left">butte creek</td>
+<td align="right">9.900463</td>
 <td align="right">0</td>
-<td align="right">79.31</td>
+<td align="right">9.90</td>
 </tr>
 <tr class="even">
 <td align="right">1999</td>
+<td align="left">deer creek</td>
+<td align="right">79.307870</td>
+<td align="right">0</td>
+<td align="right">79.31</td>
+</tr>
+<tr class="odd">
+<td align="right">1999</td>
 <td align="left">mill creek</td>
-<td align="right">24.35044</td>
+<td align="right">24.350443</td>
 <td align="right">0</td>
 <td align="right">24.35</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">2000</td>
 <td align="left">butte creek</td>
-<td align="right">38.89352</td>
+<td align="right">38.893518</td>
 <td align="right">0</td>
 <td align="right">38.89</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">2000</td>
 <td align="left">deer creek</td>
-<td align="right">191.70059</td>
+<td align="right">191.700593</td>
 <td align="right">0</td>
 <td align="right">191.70</td>
 </tr>
-<tr class="odd">
-<td align="right">2000</td>
-<td align="left">feather river</td>
-<td align="right">47.67365</td>
-<td align="right">0</td>
-<td align="right">47.67</td>
-</tr>
 <tr class="even">
 <td align="right">2000</td>
+<td align="left">feather river</td>
+<td align="right">42.949757</td>
+<td align="right">0</td>
+<td align="right">42.95</td>
+</tr>
+<tr class="odd">
+<td align="right">2000</td>
 <td align="left">mill creek</td>
-<td align="right">97.26157</td>
+<td align="right">97.261574</td>
 <td align="right">0</td>
 <td align="right">97.26</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">2000</td>
 <td align="left">yuba river</td>
-<td align="right">430.34858</td>
+<td align="right">431.797968</td>
 <td align="right">0</td>
-<td align="right">430.35</td>
+<td align="right">431.80</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">2001</td>
 <td align="left">butte creek</td>
-<td align="right">70.30324</td>
+<td align="right">70.303241</td>
 <td align="right">0</td>
 <td align="right">70.30</td>
 </tr>
-<tr class="odd">
-<td align="right">2001</td>
-<td align="left">clear creek</td>
-<td align="right">17.07813</td>
-<td align="right">0</td>
-<td align="right">17.08</td>
-</tr>
 <tr class="even">
 <td align="right">2001</td>
-<td align="left">deer creek</td>
-<td align="right">282.67653</td>
+<td align="left">clear creek</td>
+<td align="right">17.078134</td>
 <td align="right">0</td>
-<td align="right">282.68</td>
+<td align="right">17.08</td>
 </tr>
 </tbody>
 </table>
@@ -272,63 +275,63 @@ follows:</p>
 <tbody>
 <tr class="odd">
 <td align="left">battle creek</td>
-<td align="right">1962</td>
-<td align="right">381.2174</td>
-<td align="right">1230</td>
+<td align="right">1995</td>
+<td align="right">1002.4837</td>
+<td align="right">6430</td>
 </tr>
 <tr class="even">
 <td align="left">battle creek</td>
-<td align="right">1963</td>
-<td align="right">546.4620</td>
-<td align="right">3030</td>
+<td align="right">1996</td>
+<td align="right">608.5326</td>
+<td align="right">2120</td>
 </tr>
 <tr class="odd">
 <td align="left">battle creek</td>
-<td align="right">1964</td>
-<td align="right">299.2228</td>
-<td align="right">442</td>
+<td align="right">1997</td>
+<td align="right">373.1795</td>
+<td align="right">540</td>
 </tr>
 <tr class="even">
 <td align="left">battle creek</td>
-<td align="right">1965</td>
-<td align="right">531.6793</td>
-<td align="right">1590</td>
+<td align="right">1998</td>
+<td align="right">1075.1304</td>
+<td align="right">3220</td>
 </tr>
 <tr class="odd">
 <td align="left">battle creek</td>
-<td align="right">1966</td>
-<td align="right">354.5272</td>
-<td align="right">664</td>
+<td align="right">1999</td>
+<td align="right">595.3370</td>
+<td align="right">1890</td>
 </tr>
 <tr class="even">
 <td align="left">battle creek</td>
-<td align="right">1967</td>
-<td align="right">638.0163</td>
-<td align="right">1530</td>
+<td align="right">2000</td>
+<td align="right">489.3913</td>
+<td align="right">1950</td>
 </tr>
 <tr class="odd">
 <td align="left">battle creek</td>
-<td align="right">1968</td>
-<td align="right">379.7011</td>
-<td align="right">1030</td>
+<td align="right">2001</td>
+<td align="right">312.9402</td>
+<td align="right">1130</td>
 </tr>
 <tr class="even">
 <td align="left">battle creek</td>
-<td align="right">1969</td>
-<td align="right">666.6467</td>
-<td align="right">1270</td>
+<td align="right">2002</td>
+<td align="right">357.4565</td>
+<td align="right">617</td>
 </tr>
 <tr class="odd">
 <td align="left">battle creek</td>
-<td align="right">1970</td>
-<td align="right">541.0217</td>
-<td align="right">1510</td>
+<td align="right">2003</td>
+<td align="right">604.3207</td>
+<td align="right">2740</td>
 </tr>
 <tr class="even">
 <td align="left">battle creek</td>
-<td align="right">1971</td>
-<td align="right">585.0380</td>
-<td align="right">2500</td>
+<td align="right">2004</td>
+<td align="right">452.6250</td>
+<td align="right">1370</td>
 </tr>
 </tbody>
 </table>
@@ -546,15 +549,15 @@ was coded as a binary variable as <code>1</code> for wet (wet, above
 normal) and <code>0</code> for dry (below normal, dry, critical). The
 resulting dataset is as follows (note that flow data has the longest
 time series available):</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
 <col width="5%">
 <col width="14%">
-<col width="9%">
+<col width="8%">
 <col width="14%">
-<col width="9%">
-<col width="16%">
-<col width="29%">
+<col width="12%">
+<col width="15%">
+<col width="28%">
 </colgroup>
 <thead><tr class="header">
 <th align="right">year</th>
@@ -567,94 +570,94 @@ time series available):</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">1962</td>
+<td align="right">1995</td>
 <td align="left">battle creek</td>
-<td align="right">0</td>
-<td align="right">-0.5103739</td>
+<td align="right">1</td>
+<td align="right">3.0591938</td>
 <td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">-0.6837483</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
-<td align="right">1963</td>
+<td align="right">1996</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.6857655</td>
+<td align="right">0.0870719</td>
 <td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">-0.8597315</td>
 <td align="right">NA</td>
 </tr>
 <tr class="odd">
-<td align="right">1964</td>
+<td align="right">1997</td>
 <td align="left">battle creek</td>
-<td align="right">0</td>
-<td align="right">-1.0340171</td>
+<td align="right">1</td>
+<td align="right">-1.0024763</td>
 <td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">-0.4509963</td>
 <td align="right">NA</td>
 </tr>
 <tr class="even">
-<td align="right">1965</td>
+<td align="right">1998</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.2711460</td>
+<td align="right">0.8456181</td>
 <td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">-0.0479381</td>
+<td align="right">-0.1057615</td>
 </tr>
 <tr class="odd">
-<td align="right">1966</td>
-<td align="left">battle creek</td>
-<td align="right">0</td>
-<td align="right">-0.8864933</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-</tr>
-<tr class="even">
-<td align="right">1967</td>
+<td align="right">1999</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.3110173</td>
+<td align="right">-0.0715332</td>
 <td align="right">NA</td>
+<td align="right">-0.6440101</td>
+<td align="right">0.3595891</td>
+</tr>
+<tr class="even">
+<td align="right">2000</td>
+<td align="left">battle creek</td>
+<td align="right">1</td>
+<td align="right">-0.0301580</td>
 <td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">-0.6156258</td>
+<td align="right">1.2902904</td>
 </tr>
 <tr class="odd">
-<td align="right">1968</td>
+<td align="right">2001</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.6432783</td>
+<td align="right">-0.5956197</td>
 <td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">-0.4282888</td>
+<td align="right">-0.7262290</td>
 </tr>
 <tr class="even">
-<td align="right">1969</td>
+<td align="right">2002</td>
 <td align="left">battle creek</td>
-<td align="right">1</td>
-<td align="right">-0.4837930</td>
+<td align="right">0</td>
+<td align="right">-0.9493780</td>
 <td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">0.2018445</td>
+<td align="right">0.9800567</td>
 </tr>
 <tr class="odd">
-<td align="right">1970</td>
+<td align="right">2003</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.3243078</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">0.5146161</td>
+<td align="right">-0.7272993</td>
+<td align="right">0.1961676</td>
+<td align="right">2.8414592</td>
 </tr>
 <tr class="even">
-<td align="right">1971</td>
+<td align="right">2004</td>
 <td align="left">battle creek</td>
-<td align="right">1</td>
-<td align="right">0.3335689</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
-<td align="right">NA</td>
+<td align="right">0</td>
+<td align="right">-0.4301187</td>
+<td align="right">-0.7493077</td>
+<td align="right">-0.5475032</td>
+<td align="right">0.0493554</td>
 </tr>
 </tbody>
 </table>

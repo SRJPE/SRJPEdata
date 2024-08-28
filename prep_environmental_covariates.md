@@ -43,18 +43,18 @@ Several approaches were considered for summarizing temperature:
 Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. The resulting dataset is as follows (note that DD less than 0 are set to 0):
 
 
-| year|stream        |  gdd_trib| gdd_sac| gdd_total|
-|----:|:-------------|---------:|-------:|---------:|
-| 1999|deer creek    |  79.30787|       0|     79.31|
-| 1999|mill creek    |  24.35044|       0|     24.35|
-| 2000|butte creek   |  38.89352|       0|     38.89|
-| 2000|deer creek    | 191.70059|       0|    191.70|
-| 2000|feather river |  47.67365|       0|     47.67|
-| 2000|mill creek    |  97.26157|       0|     97.26|
-| 2000|yuba river    | 430.34858|       0|    430.35|
-| 2001|butte creek   |  70.30324|       0|     70.30|
-| 2001|clear creek   |  17.07813|       0|     17.08|
-| 2001|deer creek    | 282.67653|       0|    282.68|
+| year|stream        |   gdd_trib| gdd_sac| gdd_total|
+|----:|:-------------|----------:|-------:|---------:|
+| 1999|butte creek   |   9.900463|       0|      9.90|
+| 1999|deer creek    |  79.307870|       0|     79.31|
+| 1999|mill creek    |  24.350443|       0|     24.35|
+| 2000|butte creek   |  38.893518|       0|     38.89|
+| 2000|deer creek    | 191.700593|       0|    191.70|
+| 2000|feather river |  42.949757|       0|     42.95|
+| 2000|mill creek    |  97.261574|       0|     97.26|
+| 2000|yuba river    | 431.797968|       0|    431.80|
+| 2001|butte creek   |  70.303241|       0|     70.30|
+| 2001|clear creek   |  17.078134|       0|     17.08|
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
@@ -67,16 +67,16 @@ Maximum flow more effectively captures the high flow events that support migrati
 
 |stream       | year| mean_flow| max_flow|
 |:------------|----:|---------:|--------:|
-|battle creek | 1962|  381.2174|     1230|
-|battle creek | 1963|  546.4620|     3030|
-|battle creek | 1964|  299.2228|      442|
-|battle creek | 1965|  531.6793|     1590|
-|battle creek | 1966|  354.5272|      664|
-|battle creek | 1967|  638.0163|     1530|
-|battle creek | 1968|  379.7011|     1030|
-|battle creek | 1969|  666.6467|     1270|
-|battle creek | 1970|  541.0217|     1510|
-|battle creek | 1971|  585.0380|     2500|
+|battle creek | 1995| 1002.4837|     6430|
+|battle creek | 1996|  608.5326|     2120|
+|battle creek | 1997|  373.1795|      540|
+|battle creek | 1998| 1075.1304|     3220|
+|battle creek | 1999|  595.3370|     1890|
+|battle creek | 2000|  489.3913|     1950|
+|battle creek | 2001|  312.9402|     1130|
+|battle creek | 2002|  357.4565|      617|
+|battle creek | 2003|  604.3207|     2740|
+|battle creek | 2004|  452.6250|     1370|
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
@@ -141,18 +141,18 @@ We hypothesized that total annual passage might be an indicator of density becau
 Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):
 
 
-| year|stream       | wy_type| max_flow_std| gdd_std| passage_index| median_passage_timing_std|
-|----:|:------------|-------:|------------:|-------:|-------------:|-------------------------:|
-| 1962|battle creek |       0|   -0.5103739|      NA|            NA|                        NA|
-| 1963|battle creek |       1|    0.6857655|      NA|            NA|                        NA|
-| 1964|battle creek |       0|   -1.0340171|      NA|            NA|                        NA|
-| 1965|battle creek |       1|   -0.2711460|      NA|            NA|                        NA|
-| 1966|battle creek |       0|   -0.8864933|      NA|            NA|                        NA|
-| 1967|battle creek |       1|   -0.3110173|      NA|            NA|                        NA|
-| 1968|battle creek |       0|   -0.6432783|      NA|            NA|                        NA|
-| 1969|battle creek |       1|   -0.4837930|      NA|            NA|                        NA|
-| 1970|battle creek |       1|   -0.3243078|      NA|            NA|                        NA|
-| 1971|battle creek |       1|    0.3335689|      NA|            NA|                        NA|
+| year|stream       | wy_type| max_flow_std|    gdd_std| passage_index| median_passage_timing_std|
+|----:|:------------|-------:|------------:|----------:|-------------:|-------------------------:|
+| 1995|battle creek |       1|    3.0591938|         NA|    -0.6837483|                        NA|
+| 1996|battle creek |       1|    0.0870719|         NA|    -0.8597315|                        NA|
+| 1997|battle creek |       1|   -1.0024763|         NA|    -0.4509963|                        NA|
+| 1998|battle creek |       1|    0.8456181|         NA|    -0.0479381|                -0.1057615|
+| 1999|battle creek |       1|   -0.0715332|         NA|    -0.6440101|                 0.3595891|
+| 2000|battle creek |       1|   -0.0301580|         NA|    -0.6156258|                 1.2902904|
+| 2001|battle creek |       0|   -0.5956197|         NA|    -0.4282888|                -0.7262290|
+| 2002|battle creek |       0|   -0.9493780|         NA|     0.2018445|                 0.9800567|
+| 2003|battle creek |       1|    0.5146161| -0.7272993|     0.1961676|                 2.8414592|
+| 2004|battle creek |       0|   -0.4301187| -0.7493077|    -0.5475032|                 0.0493554|
 
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 

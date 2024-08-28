@@ -32,7 +32,7 @@ The plot below shows the updated cutoff values with linear interpolation of week
 
 **Note: You can view all code used to generate plots and tables in this markdown [here.](https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd)**
 
-![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
 
 
@@ -133,18 +133,18 @@ For weeks that had no fork length data in a given week, we calculated a general 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
 
 
-|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight| week| year|model_lifestage_method   |
-|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|----:|----:|:------------------------|
-|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |fry        |FALSE           |NA   |          40|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-19 |clear creek  |lcc  |lcc     |clear creek  | 17100|fall |fry        |FALSE           |NA   |           0|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          35|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     3|fall |fry        |FALSE           |NA   |          38|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     6|fall |fry        |FALSE           |NA   |          37|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          38|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     1|fall |fry        |FALSE           |NA   |          34|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |clear creek  |lcc  |lcc     |clear creek  |     5|fall |fry        |FALSE           |NA   |          36|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     4|fall |fry        |FALSE           |NA   |          36|      0|    3| 1999|assigned from fl cutoffs |
-|1999-01-20 |battle creek |lbc  |lbc     |battle creek |     2|fall |fry        |FALSE           |NA   |          37|      0|    3| 1999|assigned from fl cutoffs |
+|date       |stream     |site       |subsite    |site_group |run          |adipose_clipped |dead | fork_length| weight| week| year|model_lifestage_method   |life_stage | count|
+|:----------|:----------|:----------|:----------|:----------|:------------|:---------------|:----|-----------:|------:|----:|----:|:------------------------|:----------|-----:|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|
+|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          94|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
 
 ### Generate rows for when no fish of a lifestage are caught
 
@@ -158,7 +158,7 @@ The following plot shows the general patten in the lifestage field where fry are
 
 **Battle Creek: 2011**
 
-![plot of chunk unnamed-chunk-42](figure/unnamed-chunk-42-1.png)
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
 
 ## Save resulting data to package
 
