@@ -1,5 +1,6 @@
 ---
 title: "Data checks"
+date: "2024-08-29"
 output: 
   html_document:
   theme: flatly
@@ -32,6 +33,7 @@ gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
 weekly_catch_old <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_catch_unmarked.csv"))
 weekly_catch_effort <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_catch_effort.csv"))
 weekly_efficiency_old <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_efficiency.csv"))
+flow_old <- read_csv(here::here("data-raw", "data-checks","10-2-23", "standard_flow.csv"))
 # weekly_efficiency_old <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_efficiency_from_josh.csv")) - check and this is the same as I pulled from cloud
 
 # check the version of weekly catch unmarked more recently updated
@@ -44,11 +46,13 @@ updated_weekly_catch_unmarked <- read_csv(here::here("data-raw", "data-checks", 
 # Final datasets used in SRJPEdata
 # TODO make sure we actually pull in data objects from the package
 weekly_catch_effort_new <- SRJPEdata::weekly_hours_fished
-weekly_efficiency_new <- SRJPEdata::weekly_efficiency
-weekly_efficiency_new <- weekly_efficiency # reran manually within the build_rst_model_datasets.R
-weekly_catch_new <- weekly_standard_catch
+#weekly_efficiency_new <- SRJPEdata::weekly_efficiency
+#weekly_efficiency_new <- weekly_efficiency # reran manually within the build_rst_model_datasets.R
+#weekly_catch_new <- weekly_standard_catch
 model_data <- weekly_juvenile_abundance_model_data
-
+weekly_efficiency_new <- model_data |> 
+  select(stream, site, week, year, number_released, number_recaptured) |> 
+  distinct()
 # database queries
 con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       host = "jpe-db.postgres.database.azure.com",
@@ -117,27 +121,7 @@ trap_for_josh <- read_csv(here::here("data-raw", "data-checks", "10-2-23","daily
 
 Goal: Compare new and old efficiency data
 
-- old: 1,310 rows (11 fields)
-- new: 1,347 rows (7 fields) -- ended up finding an error in prep script. this is now 1,321 rows
-- matching fields: stream, site, site_group, week_released, year_released, number_released, number_recaptured
-- non-matching fields: the old dataset includes median_fork_length_released, flow_at_recapture_day1, origin_released, median_fork_length_recaptured
-- Feather River sites were handled differently between the new and old datasets. For the old dataset we grouped everything by HFC or LFC.
-
-**Prior to this check the new weekly efficiency data prep had an error in it and was summarizing week as day. This is now fixed.**
-
-Beyond that there are a number of mismatches for each location so we need to figure out what is going on there.
-
-- 315 mismatches for number of recaptures (knights landing, lcc, lower feather river, okie dam, rbdd, tisdale, ubc, ucc)
-- 130 mismatches for number of releases (knights landing, lcc, okie dam, rbdd, tisdale, ubc, ucc)
-
-**Prior to this check the new weekly efficiency data prep did not summarize recaptures before joining to releases resulting in higher release number (duplicated) and lower efficiency. This is now fixed.**
-
-- 543 only in the new dataset (all feather sites plus few for other sites)
-- 532 only in the old dataset (feather site groups plus few for others)
-
-**We identified some issues in the database with the recaptured fish table. This has been resolved resulting in fewer issues with recaptures data**
-
-- 185 mismatches for number of recaptures
+Summary: I did a number of manual record by record checks and I am feeling confident that the new data are now good and the best version to use! Seems like there were some issues summarizing the old data by week. The biggest differences will be for Butte Creek and Sacramento River (where efficiency will be higher in some cases now). This is happening in 2.5% of the data or 158 cases out of 6,280.
 
 ```{r, include = F}
 # eff_compare <- comparedf(weekly_efficiency, weekly_efficiency_new)
@@ -147,12 +131,16 @@ Beyond that there are a number of mismatches for each location so we need to fig
 eff_join <- full_join(weekly_efficiency_old |> 
                         select(-c(site_group, median_fork_length_released, flow_at_recapture_day1, origin_released, median_fork_length_recaptured)) |> 
                                  rename(number_released_old = number_released,
-                                        number_recaptured_old = number_recaptured),
-                      weekly_efficiency |> 
-                        select(-c(site_group)) |> 
+                                        number_recaptured_old = number_recaptured,
+                                        year = year_released,
+                                        week = week_released),
+                      weekly_efficiency_new |> 
                         rename(number_released_new = number_released,
-                               number_recaptured_new = number_recaptured))
+                               number_recaptured_new = number_recaptured)) |> 
+  mutate(eff_old = number_recaptured_old/number_released_old,
+         eff_new = number_recaptured_new/number_released_new)
 
+eff_mismatch <- filter(eff_join, eff_old != eff_new)
 eff_mismatch_release <- filter(eff_join, number_released_old != number_released_new)
 eff_mismatch_recapture <- filter(eff_join, number_recaptured_old != number_recaptured_new)
 
@@ -180,7 +168,43 @@ eff_old_check <- eff_old_only |>
   filter(!site %in% c("red bluff diversion", "upper feather hfc", "upper feather lfc","ubc","lcc","ucc"))
 ```
 
-## Releases mismatches
+```{r}
+eff_join |>
+  mutate(perc_diff = ((eff_new - eff_old)/eff_old)*100) |> 
+  group_by(stream) |> 
+  summarize(mean_pdiff = mean(perc_diff, na.rm = T)) |> 
+  ggplot(aes(x = stream, y = mean_pdiff)) +
+  geom_col()
+
+```
+
+## Efficiency checks
+
+- old: 1,310 rows (11 fields)
+- new: 1,347 rows (7 fields) -- ended up finding an error in prep script. this is now 1,321 rows
+- matching fields: stream, site, site_group, week_released, year_released, number_released, number_recaptured
+- non-matching fields: the old dataset includes median_fork_length_released, flow_at_recapture_day1, origin_released, median_fork_length_recaptured
+- Feather River sites were handled differently between the new and old datasets. For the old dataset we grouped everything by HFC or LFC.
+
+**Prior to this check the new weekly efficiency data prep had an error in it and was summarizing week as day. This is now fixed.**
+
+Beyond that there are a number of mismatches for each location so we need to figure out what is going on there.
+
+- 315 mismatches for number of recaptures (knights landing, lcc, lower feather river, okie dam, rbdd, tisdale, ubc, ucc)
+- 130 mismatches for number of releases (knights landing, lcc, okie dam, rbdd, tisdale, ubc, ucc)
+
+**Prior to this check the new weekly efficiency data prep did not summarize recaptures before joining to releases resulting in higher release number (duplicated) and lower efficiency. This is now fixed.**
+
+- 543 only in the new dataset (all feather sites plus few for other sites)
+- 532 only in the old dataset (feather site groups plus few for others)
+
+**We identified some issues in the database with the recaptured fish table. This has been resolved resulting in fewer issues with recaptures data**
+
+- 185 mismatches for number of recaptures
+
+
+
+### Releases mismatches
 
 The most mismatches are happening for Battle and Clear. In the time between the new and old datasets, Battle and Clear posted their data on EDI and a lot of work went into data processing for EDI. The new datasets pulls data directly from EDI. 
 
@@ -195,7 +219,6 @@ We are going to pull in data from a different stages of processing to check wher
 - In the new dataset we do not include efficiency trials from 2003 for Battle and Clear
 
 I did a number of manual record by record checks and I am feeling confident that the new data are now good and the best version to use! Seems like there were some issues summarizing the old data by week.
-
 
 ```{r}
 eff_mismatch_release |> 
@@ -364,7 +387,7 @@ kl_2014 <- filter(eff_join, site == "knights landing", year_released == 2014)
 kl_new_2014 <- filter(weekly_efficiency, site == "knights landing", year_released == 2014)
 ```
 
-## Recaptures mismatches
+### Recaptures mismatches
 
 The same issue related to summarizing for multiple trials within a week seems to be happening for recaptures too which makes sense. I checked both battle and butte creek and the underlying data look good so the issue is in the summarizing of the old data.
 
@@ -743,5 +766,52 @@ hours_fished_join |>
   summarize(mean_pdiff = mean(perc_diff, na.rm = T)) |> 
   ggplot(aes(x = stream, y = mean_pdiff)) +
   geom_col()
+
+```
+
+# Flow
+
+Quick comparison to look at differences in the flow data provided
+
+- Need to summarize the old flow data by week first
+
+There are very few differences in the flow data. The main issue is that we are missing
+a lot of data in the new flow data. This is because the old data was provided for
+all available flow data where as the new data was joined to the catch data.
+
+To check the above assumption to compared data using the new flow data before joined
+with catch. This resulted in a lot fewer situations where we didn't have new flow data.
+There are more mismatches. I am not concerned about these mismatches because the assumption
+is that the new flow data is better and there are so few mismatches.
+
+```{r, include = F}
+weekly_flow_old <- flow_old |> 
+  group_by(stream, site, week = week(date), year = year(date)) |> 
+  summarize(mean_flow = mean(flow_cfs, na.rm = T),
+            median_flow = median(flow_cfs, na.rm = T),
+            max_flow = max(flow_cfs, na.rm = T))
+
+flow_join <- weekly_flow_old |> 
+  select(stream, site, week, year, flow_old = mean_flow) |> 
+  full_join(weekly_flow |> 
+              select(stream, site, week, year, flow_cfs = mean_flow))
+
+old_flow_only <- filter(flow_join, is.na(flow_cfs))
+new_flow_only <- filter(flow_join, is.na(flow_old))
+flow_mismatch <- flow_join |> 
+  filter(abs(flow_old - flow_cfs) > 100)
+```
+
+```{r}
+old_flow_only |> 
+  group_by(site) |> 
+  tally()
+
+flow_mismatch |> 
+  group_by(site) |> 
+  tally()
+```
+
+```{r}
 
 ```
