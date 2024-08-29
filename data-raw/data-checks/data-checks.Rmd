@@ -49,7 +49,7 @@ weekly_catch_effort_new <- SRJPEdata::weekly_hours_fished
 #weekly_efficiency_new <- SRJPEdata::weekly_efficiency
 #weekly_efficiency_new <- weekly_efficiency # reran manually within the build_rst_model_datasets.R
 #weekly_catch_new <- weekly_standard_catch
-model_data <- weekly_juvenile_abundance_model_data
+weekly_catch_new <- weekly_juvenile_abundance_model_data
 weekly_efficiency_new <- model_data |> 
   select(stream, site, week, year, number_released, number_recaptured) |> 
   distinct()
@@ -119,9 +119,9 @@ trap_for_josh <- read_csv(here::here("data-raw", "data-checks", "10-2-23","daily
 
 # Efficiency
 
-Goal: Compare new and old efficiency data
+**Goal:** Compare new and old weekly efficiency data
 
-Summary: I did a number of manual record by record checks and I am feeling confident that the new data are now good and the best version to use! Seems like there were some issues summarizing the old data by week. The biggest differences will be for Butte Creek and Sacramento River (where efficiency will be higher in some cases now). This is happening in 2.5% of the data or 158 cases out of 6,280.
+**Summary:** I did a number of manual record by record checks and I am feeling confident that the new data are now good and the best version to use! Seems like there were some issues summarizing the old data by week. The biggest differences will be for Butte Creek and Sacramento River (where efficiency will be higher in some cases now). This is happening in 2.5% of the data or 158 cases out of 6,280.
 
 ```{r, include = F}
 # eff_compare <- comparedf(weekly_efficiency, weekly_efficiency_new)
@@ -178,304 +178,19 @@ eff_join |>
 
 ```
 
-## Efficiency checks
-
-- old: 1,310 rows (11 fields)
-- new: 1,347 rows (7 fields) -- ended up finding an error in prep script. this is now 1,321 rows
-- matching fields: stream, site, site_group, week_released, year_released, number_released, number_recaptured
-- non-matching fields: the old dataset includes median_fork_length_released, flow_at_recapture_day1, origin_released, median_fork_length_recaptured
-- Feather River sites were handled differently between the new and old datasets. For the old dataset we grouped everything by HFC or LFC.
-
-**Prior to this check the new weekly efficiency data prep had an error in it and was summarizing week as day. This is now fixed.**
-
-Beyond that there are a number of mismatches for each location so we need to figure out what is going on there.
-
-- 315 mismatches for number of recaptures (knights landing, lcc, lower feather river, okie dam, rbdd, tisdale, ubc, ucc)
-- 130 mismatches for number of releases (knights landing, lcc, okie dam, rbdd, tisdale, ubc, ucc)
-
-**Prior to this check the new weekly efficiency data prep did not summarize recaptures before joining to releases resulting in higher release number (duplicated) and lower efficiency. This is now fixed.**
-
-- 543 only in the new dataset (all feather sites plus few for other sites)
-- 532 only in the old dataset (feather site groups plus few for others)
-
-**We identified some issues in the database with the recaptured fish table. This has been resolved resulting in fewer issues with recaptures data**
-
-- 185 mismatches for number of recaptures
-
-
-
-### Releases mismatches
-
-The most mismatches are happening for Battle and Clear. In the time between the new and old datasets, Battle and Clear posted their data on EDI and a lot of work went into data processing for EDI. The new datasets pulls data directly from EDI. 
-
-We are going to pull in data from a different stages of processing to check where the issue is happening
-
-1. Original data provided to us by stream teams
-2. Data on db
-
-- When comparing the different streams of data (EDI vs what was originally provided by stream teams) for Battle and Clear there are very little differences. One of the bigger differences is that in EDI Clear Creek has a site associated with it. Changing to a new data source is not the cause of the issues.
-- In this comparison we noticed that when the weekly efficiency data was being prepared, recaptures were not summarized before joined to release resulting in duplicated release values and much lower efficiency. This has been fixed.
-- After this fix, the remaining differences seem to happen when there were multiple trials in one week and the old data did not summarize this appropriately. There are also a few other differences that we attribute to data QC and improvements from pulling from EDI.
-- In the new dataset we do not include efficiency trials from 2003 for Battle and Clear
-
-I did a number of manual record by record checks and I am feeling confident that the new data are now good and the best version to use! Seems like there were some issues summarizing the old data by week.
-
-```{r}
-eff_mismatch_release |> 
-  group_by(site) |> 
-  tally()
-```
-
-**These are the weeks and years where issues are occurring**
-
-```{r}
-eff_mismatch_release |> 
-  filter(stream %in% c("battle creek", "clear creek")) |> 
-  group_by(site, year_released, week_released) |> 
-  tally()
-```
-
-```{r, include = F}
-# This code chunk checks the differences between the EDI and original data from Battle/Clear
-
-# These are the Battle and Clear data from EDI
-gcs_get_object(object_name = "rst/battle_clear_recapture_edi.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = here::here("data-raw", "data-checks", "10-2-23", "battle_clear_recapture.csv"),
-               overwrite = TRUE)
-gcs_get_object(object_name = "rst/battle_clear_release_edi.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = here::here("data-raw", "data-checks", "10-2-23", "battle_clear_release.csv"),
-               overwrite = TRUE)
-
-b_c_release <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "battle_clear_release.csv")) |> glimpse()
-b_c_recapture <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "battle_clear_recapture.csv"))
-
-b_c_mark_recapture <- left_join(b_c_release |> 
-                                  select(release_id, stream, site, date_released, number_released) |> 
-                                  group_by(release_id, stream, site, date_released) |> 
-                                  summarize(number_released_new = sum(number_released, na.rm = T)),
-                                b_c_recapture |> 
-  select(release_id, stream, site, number_recaptured) |> 
-  group_by(release_id, stream, site) |> 
-  summarize(number_recaptured_new = sum(number_recaptured, na.rm = T))) |> 
-  group_by(date_released, stream, site) |> 
-  summarize(number_released_new = sum(number_released_new, na.rm = T),
-            number_recaptured_new = sum(number_recaptured_new, na.rm = T))
-
-# These are the original mark recapture data provided
-gcs_get_object(object_name = "rst/battle-creek/data/battle_mark_reacpture.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = here::here("data-raw", "data-checks", "10-2-23", "battle_mark_reacpture.csv"),
-               overwrite = TRUE)
-b_mark_recapture_orig <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "battle_mark_reacpture.csv"))
-
-gcs_get_object(object_name = "rst/clear-creek/data/clear_mark_reacpture.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = here::here("data-raw", "data-checks", "10-2-23", "clear_mark_reacpture.csv"),
-               overwrite = TRUE)
-c_mark_recapture_orig <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "clear_mark_reacpture.csv"))
-
-b_c_mark_recapture_orig <- bind_rows(b_mark_recapture_orig |> 
-                           select(release_date, no_released, recaps) |> 
-                           rename(date_released = release_date) |> 
-                             group_by(date_released) |> 
-                             summarize(number_released_old = sum(no_released, na.rm = T),
-                                       number_recaptured_old = sum(recaps, na.rm = T)) |> 
-                           mutate(stream = "battle creek",
-                                  site = "ubc"),
-                           c_mark_recapture_orig |> 
-                             select(release_date, no_released, recaps) |> 
-                          rename(date_released = release_date) |> 
-                             group_by(date_released) |> 
-                             summarize(number_released_old = sum(no_released, na.rm = T),
-                                       number_recaptured_old = sum(recaps, na.rm = T)) |> 
-                           mutate(stream = "clear creek"))
-
-bc_eff_join <- full_join(b_c_mark_recapture_orig,
-                         b_c_mark_recapture) |> 
-  mutate(week = week(date_released),
-         year = year(date_released))
-# very little differences
-bc_eff_recap_mismatch <- bc_eff_join |> 
-  filter(number_recaptured_old != number_recaptured_new)
-bc_eff_rel_mismatch <- bc_eff_join |> 
-  filter(number_released_old != number_released_new)
-```
-
-Are the mismatches happening when there are multiple trials per week?
-
-A: Most of them but not all! There is something else going on.
-
-```{r}
-# now lets take a look at how this aligns with new and old datasets
-
-# Are all the mismatches happening when we have multiple trials in a week?
-b_c_number_trials <- release_query |> 
-  filter(stream %in% c("battle creek", "clear creek")) |> 
-  group_by(week_released = week(date_released), site, year_released = year(date_released)) |> 
-  summarize(number_trials = length(unique(release_id)))
-
-b_c_mismatch_release <- eff_mismatch_release |> 
-  filter(stream %in% c("battle creek", "clear creek")) |> 
-  left_join(b_c_number_trials)
-
-b_c_mismatch_release |> 
-  group_by(number_trials) |> 
-  tally()
-
-```
-
-Looking at the mismatches record by record for battle creek!
-
-- it looks like what happened in the old dataset is that the multiple weeks got summarized as the following week like if two for week 2 the second was counted as week 3. 
-- i am now convinced that the new battle and clear data are good and better than the old version.
-
-```{r, include = F}
-# now we need to look into specific rows that are different to figure out why
-# This requires going back to the database data because i want to see the data by release id rather than summarized
-trap_location_check |> view()
-# 2005
-# There are lot of issues in 2005 so lets look at those data
-# All the number of released are the same!
-b_2005_release_new <- filter(model_db_release, year(date_released) == 2005, trap_location_id %in% 1:5) |> 
-  mutate(week_released = week(date_released))
-b_2005_release_old <- filter(release_for_josh, stream == "battle creek", year(date_released) == 2005) |> 
-  mutate(week_released = week(date_released))
-# pull up the new and old data again!
-# it looks like what happened in the old dataset is that the multiple weeks got summarized as the following week like if two for week 2 the second was counted as week 3. 
-b_2005 <- filter(eff_join, stream == "battle creek", year_released == 2005)
-
-# 2012
-# There are lot of issues in 2012 so lets look at those data
-# All the number of released are the same!
-b_2012_release_new <- filter(model_db_release, year(date_released) == 2012, trap_location_id %in% 1:5) |> 
-  mutate(week_released = week(date_released))
-
-b_2012_release_old <- filter(release_for_josh, stream == "battle creek", year(date_released) == 2012) |> 
-  mutate(week_released = week(date_released))
-# pull up the new and old data again!
-# it looks like what happened in the old dataset is that the multiple weeks got summarized as the following week like if two for week 2 the second was counted as week 3. 
-b_2012 <- filter(eff_join, stream == "battle creek", year_released == 2012)
-
-```
-
-what about for knights landing?
-
-same situation where there are some issues summarizing when multiple trials per week
-
-```{r}
-eff_mismatch_release |> 
-  filter(site %in% c("knights landing")) |> 
-  group_by(site, year_released, week_released) |> 
-  tally()
-```
-
-```{r, include = F}
-# 51-54
-trap_location_check |> view()
-# 2014
-# There are lot of issues in 2014 so lets look at those data
-# All the number of released are the same!
-kl_2014_release_new <- filter(model_db_release, year(date_released) == 2014, trap_location_id %in% 51:54) |> 
-  mutate(week_released = week(date_released))
-kl_2014_release_old <- filter(release_for_josh, site == "knights landing", year(date_released) == 2014) |> 
-  mutate(week_released = week(date_released))
-# pull up the new and old data again!
-# the old data were summarized wrong again
-kl_2014 <- filter(eff_join, site == "knights landing", year_released == 2014)
-kl_new_2014 <- filter(weekly_efficiency, site == "knights landing", year_released == 2014)
-```
-
-### Recaptures mismatches
-
-The same issue related to summarizing for multiple trials within a week seems to be happening for recaptures too which makes sense. I checked both battle and butte creek and the underlying data look good so the issue is in the summarizing of the old data.
-
-```{r}
-eff_mismatch_recapture |> 
-  group_by(site) |> 
-  tally()
-```
-
-Similar to releases, battle and clear have a lot of issues so lets start there.
-
-**These are the weeks and years where issues are occurring**
-
-```{r}
-eff_mismatch_recapture |> 
-  filter(stream %in% c("battle creek", "clear creek")) |> 
-  group_by(site, year_released, week_released) |> 
-  tally()
-```
-
-```{r, include = F}
-# now we need to look into specific rows that are different to figure out why
-# This requires going back to the database data because i want to see the data by release id rather than summarized
-trap_location_check |> view()
-# 2005
-# There are lot of issues in 2005 so lets look at those data
-# All the number of released are the same!
-b_2005_recapture_new <- filter(model_db_recaptured_fish, year(date) == 2005, trap_location_id %in% 1:5) |> 
-  mutate(week_recap = week(date))
-b_2005_recapture_old <- filter(recapture_for_josh, stream == "battle creek", year(date_recaptured) == 2005) |> 
-  mutate(week_recap = week(date_recaptured))
-
-b_2005_recap_ck <- b_2005_recapture_new |> 
-  group_by(week_recap) |> 
-  summarize(number_recaptured_new = sum(count, na.rm = T)) |> 
-  full_join(b_2005_recapture_old |> 
-  group_by(week_recap) |> 
-  summarize(number_recaptured_old = sum(number_recaptured, na.rm = T)))
-# pull up the new and old data again!
-# it looks like what happened in the old dataset is that the multiple weeks got summarized as the following week like if two for week 2 the second was counted as week 3. 
-b_2005 <- filter(eff_join, stream == "battle creek", year_released == 2005)
-
-```
-
-```{r}
-eff_mismatch_recapture |> 
-  filter(stream %in% c("butte creek")) |> 
-  group_by(site, year_released, week_released) |> 
-  tally()
-```
-```{r, include = F}
-# now we need to look into specific rows that are different to figure out why
-# This requires going back to the database data because i want to see the data by release id rather than summarized
-trap_location_check |> view()
-# 2005
-# There are lot of issues in 2005 so lets look at those data
-# All the number of released are the same!
-b_2021_recapture_new <- filter(model_db_recaptured_fish, year(date) == 2021, trap_location_id %in% 6:10) |> 
-  mutate(week_recap = week(date))
-b_2021_recapture_old <- filter(recapture_for_josh, stream == "butte creek", year(date_recaptured) == 2021) |> 
-  mutate(week_recap = week(date_recaptured))
-```
-
 # Catch
 
-Concluded that despite the mismatches, the new version of weekly catch is correct.
+**Goal:** Compare new and old weekly catch data
+
+**Summary**
+
+- Concluded that despite the mismatches, the new version of weekly catch is correct.
 There must have been some issue with summarization for that version of the weekly
 catch that was sent to Josh.
+- Mostly catch for the new data product will be greater (by about 5%, though higher for 
+Feather River and Sacramento River), except for Clear Creek where catch will be lower
 
-I left off checking catch. We need to check weekly catch and also effort!
-We should also confirm that the final juvenile abundance table doesnt have any issues
-Then summarize what we found and send to Josh
-
-- 13,090 records in new
-- 58,755 records in old
-
-```{r}
-# grouped at subsite level
-weekly_catch_old |> glimpse()
-# grouped at site level, does not include run or adipose_clipped
-# TODO check that when Josh ran originally he didn't filter using run or adclip
-# TODO we need a way to handle adclip
-weekly_catch_new |> glimpse()
-```
-
-To compare the old and new catch need to summarize old by site: 13,657 records
-
-```{r}
+```{r, include = F}
 weekly_catch_old_format <- weekly_catch_old |> 
   filter(include_in_model == T) |> 
   group_by(week, year, stream, site_group, site, lifestage_for_model) |> 
@@ -486,101 +201,14 @@ weekly_catch_old_format <- weekly_catch_old |>
          count_old = count,
          mean_weight_old = mean_weight,
          mean_fork_length_old = mean_fork_length)
-```
-
-```{r}
 # just join on count
 catch_join <- weekly_catch_old_format |> 
   ungroup() |> 
   select(-c(mean_weight_old, mean_fork_length_old, site_group)) |> 
   full_join(weekly_catch_new |> 
               ungroup() |> 
-              select(-c(mean_fork_length, mean_weight, site_year_week, site_group)))
-# no matches at first because site_group was handled differently but then removed.
-filter(catch_join, !is.na(count), !is.na(count_old))
+              select(stream, site, week, year, life_stage, count))
 ```
-
-There are a lot of mismatches
-
-```{r}
-catch_mismatch <- catch_join |> 
-  filter(count_old != count)
-
-catch_old_only <- catch_join |> 
-  filter(is.na(count), !is.na(count_old))
-
-catch_new_only <- catch_join |> 
-  filter(is.na(count_old), !is.na(count))
-```
-
-Try to figure out what is causing the mismatches
-
-- Exist for every site, life_stage, year
-
-```{r, include = F}
-catch_mismatch |> 
-  group_by(site) |> 
-  tally()
-catch_mismatch |> 
-  group_by(life_stage) |> 
-  tally()
-catch_mismatch |> 
-  group_by(year) |> 
-  tally()
-```
-
-Pick a few to look at
-
-```{r}
-catch_mismatch |> 
-  filter(stream == "feather river", site == "herringer riffle") |> 
-  group_by(year, week) |> 
-  tally()
-```
- 
- Deer Creek: 2010, week 3
- 
- The new count is correct and matches with both the old and new daily data.
- 
-```{r}
-d_2010_new <- filter(rst_catch_query, stream == "deer creek", year(date) == 2010, week(date) == 3)
-d_2010_old <- filter(catch_for_josh, stream == "deer creek", year(date) == 2010, week(date) == 3)
-filter(catch_join, stream == "deer creek", year == 2010, week == 3)
-```
-
- Butte Creek: 2013, week 3
- 
-  The new count is correct and matches with both the old and new daily data.
- 
-```{r}
-b_2013_new <- filter(rst_catch_query, stream == "butte creek", year(date) == 2013, week(date) == 3)
-b_2013_old <- filter(catch_for_josh, stream == "butte creek", year(date) == 2013, week(date) == 3)
-b_2013_new |> 
-  summarize(count = sum(count))
-b_2013_new |> 
-  group_by(subsite) |> 
-  summarize(count = sum(count)) # check to see if subsite is reason why the count is less for old
-filter(catch_join, stream == "butte creek", year == 2013, week == 3)
-filter(weekly_catch_old, stream == "butte creek", year == 2013, week == 3)
-```
-
-Herringer Riffle: 2018, week 4
-
-  The new count is correct and matches with both the old and new daily data.
-
-```{r}
-hr_2018_new <- filter(rst_catch_query, site == "herringer riffle", year(date) == 2018, week(date) == 4)
-hr_2018_old <- filter(catch_for_josh, site == "herringer riffle", year(date) == 2018, week(date) == 4)
-hr_2018_new |> 
-  summarize(count = sum(count))
-filter(catch_join, site == "herringer riffle", year == 2018, week == 4)
-filter(updated_weekly_catch_unmarked, site == "herringer riffle", year == 2018, week == 4) # this more recently updated version of weekly catch is correct. there must have been an error that we corrected.
-```
-
-**Summary**
-
-Mostly catch for the new data product will be greater (by about 5%, though higher for 
-Feather River and Sacramento River), except for Clear Creek where catch will be lower
 
 ```{r}
 catch_join |>
@@ -594,22 +222,16 @@ catch_join |>
 
 # Effort
 
-Differences in the number of rows is just because the old was joined with catch.
-For this comparison we are just looking at hours fished.
+**Goal:** compare the new and old weekly effort/hours fished data
 
-- old: 58,755
-- new: 31,609
+**Summary**
 
-```{r}
-weekly_catch_effort |> glimpse() # week, year, stream, site, site_group, subsite, hours_fished
-unique(weekly_catch_effort$site)
-unique(weekly_catch_effort$subsite)
-weekly_catch_effort_new |> glimpse() # same format as above
-unique(weekly_catch_effort_new$subsite)
-unique(weekly_catch_effort_new$site)
-```
+- The trap data is pretty messy and is improving over time as issues are fixed.
+There are some differences based on what was provided previously. Mostly this results
+in a higher number of hours fished, except for Feather River where it is lower. 
+Some locations did not have big differences.
 
-```{r}
+```{r, include = F}
 # join on hours fished
 hours_fished_join <- weekly_catch_effort |> 
   ungroup() |> 
@@ -620,144 +242,7 @@ hours_fished_join <- weekly_catch_effort |>
   full_join(weekly_catch_effort_new |> 
               ungroup() |> 
               select(-c(site_group)))
-# no matches at first because site_group was handled differently but then removed.
-filter(hours_fished_join, !is.na(hours_fished), !is.na(hours_fished_old))
 ```
-
-There are a lot of mismatches
-
-```{r}
-hours_mismatch <- hours_fished_join |> 
-  filter(hours_fished_old != hours_fished)
-
-new_hours_only <- hours_fished_join |> 
-  filter(is.na(hours_fished_old), !is.na(hours_fished))
-
-old_hours_only <- hours_fished_join |> 
-  filter(is.na(hours_fished), !is.na(hours_fished_old))
-
-```
-
-Try to figure out what is causing the mismatches
-
-- Exist for every site, year
-
-```{r, include = F}
-hours_mismatch |> 
-  group_by(site) |> 
-  tally()
-
-hours_mismatch |> 
-  group_by(year) |> 
-  tally()
-```
-
-Pick a few to look at
-
-```{r}
-hours_mismatch |> 
-  filter(site == "ubc") |> 
-  group_by(year, week) |> 
-  tally()
-```
-
-```{r}
-# run trap_effort.Rmd and use hours_fished_combined object for comparison
-hours_fished_combined |> glimpse()
-effort_for_josh |> glimpse()
-
-daily_hours_join <- hours_fished_combined |> 
-  ungroup() |> 
-  select(-site_group) |> 
-  full_join(effort_for_josh |> 
-              ungroup() |> 
-              select(-site_group) |> 
-              rename(hours_fished_old = hours_fished))
-
-daily_hours_mismatch <- daily_hours_join |> 
-  filter(hours_fished_old != hours_fished)
-
-daily_hours_new <- daily_hours_join |> 
-  filter(is.na(hours_fished_old), !is.na(hours_fished))
-
-daily_hours_old <- daily_hours_join |> 
-  filter(is.na(hours_fished), !is.na(hours_fished_old))
-```
-
-Herringer Riffle: 2004, week 2
-
-Hours fished in the old daily data are NA and then filled in with 168 at the summary level
-
-```{r}
-filter(daily_hours_join, site == "herringer riffle", year(date) == 2004, week(date) == 2) |> ungroup() |> summarize(hours_fished = sum(hours_fished))
-
-
-filter(hours_fished_join, site == "herringer riffle", year == 2004, week == 2)
-```
-Hallwood: 2007, week 1
-
-New data is good.
-
-For the new data - it looks like the weekly hours fished is more than 168 so gets processed to be 168.
-
-The old daily data also adds up to 168.5 so unsure why the weekly is less
-
-```{r}
-filter(daily_hours_join, site == "hallwood", year(date) == 2007, week(date) == 1) |> group_by(subsite) |> summarize(hours_fished = sum(hours_fished_old))
-
-filter(hours_fished_join, site == "hallwood", year == 2007, week == 1)
-```
-
-Knights Landing: 2021, week 3
-
-New data looks really high for hours fished.
-
-Pulled the trap data in SRJPEdata for Knights and looks pretty messy in terms of what 
-seem like duplicate fields. This is coming from reading data from CAMP.
-
-```{r}
-filter(daily_hours_join, site == "knights landing", year(date) == 2021, week(date) == 3) |> group_by(subsite) |> summarize(hours_fished_old = sum(hours_fished_old), hours_fished = sum(hours_fished))
-
-filter(hours_fished_join,  site == "knights landing", year == 2021, week == 3)
-
-filter(SRJPEdata::rst_trap, site == "knights landing") %>% 
-  arrange(site, subsite, trap_stop_date, trap_stop_time) |> 
-  filter(year(trap_start_date) == 2021, week(trap_start_date) == 3) |>  view()
-
-filter(trap_for_josh, site == "knights landing", year(trap_start_date) == 2021, week(trap_start_date) == 3)
-```
-LCC: 2021, week 2
-
-Looking at the daily data these match exactly except for days when not fishing
-
-```{r}
-filter(daily_hours_join, site == "lcc", year(date) == 2021, week(date) == 2) |> group_by(subsite) |> summarize(hours_fished_old = sum(hours_fished_old), hours_fished = sum(hours_fished))
-
-filter(hours_fished_join,  site == "lcc", year == 2021, week == 2)
-```
-
-UBC: 2018, week 49
-
-In the daily data - the new data has one additional day
-
-```{r}
-filter(daily_hours_join, site == "ubc", year(date) == 2018, week(date) == 49) |> group_by(subsite) |> summarize(hours_fished_old = sum(hours_fished_old), hours_fished = sum(hours_fished))
-
-filter(hours_fished_join,  site == "ubc", year == 2018, week == 49)
-
-filter(SRJPEdata::rst_trap, site == "ubc") %>% 
-  arrange(site, subsite, trap_stop_date, trap_stop_time) |> 
-  filter(year(trap_start_date) == 2018, week(trap_start_date) == 49) |>  view()
-
-filter(trap_for_josh, site == "ubc", year(trap_start_date) == 2018, week(trap_start_date) == 49)
-```
-
-**Summary**
-
-The trap data is pretty messy and is improving over time as issues are fixed.
-There are some differences based on what was provided previously. Mostly this results
-in a higher number of hours fished, except for Feather River where it is lower.
-Some locations did not have big differences.
 
 ```{r}
 hours_fished_join |>
@@ -771,18 +256,9 @@ hours_fished_join |>
 
 # Flow
 
-Quick comparison to look at differences in the flow data provided
+**Goal:** compare the new and old flow data
 
-- Need to summarize the old flow data by week first
-
-There are very few differences in the flow data. The main issue is that we are missing
-a lot of data in the new flow data. This is because the old data was provided for
-all available flow data where as the new data was joined to the catch data.
-
-To check the above assumption to compared data using the new flow data before joined
-with catch. This resulted in a lot fewer situations where we didn't have new flow data.
-There are more mismatches. I am not concerned about these mismatches because the assumption
-is that the new flow data is better and there are so few mismatches.
+**Summary:** very few differences in the flow data
 
 ```{r, include = F}
 weekly_flow_old <- flow_old |> 
@@ -803,15 +279,10 @@ flow_mismatch <- flow_join |>
 ```
 
 ```{r}
-old_flow_only |> 
-  group_by(site) |> 
-  tally()
-
-flow_mismatch |> 
-  group_by(site) |> 
-  tally()
-```
-
-```{r}
-
+flow_join |>
+  mutate(perc_diff = ((flow_cfs - flow_old)/flow_old)*100) |> 
+  group_by(stream) |> 
+  summarize(mean_pdiff = mean(perc_diff, na.rm = T)) |> 
+  ggplot(aes(x = stream, y = mean_pdiff)) +
+  geom_col()
 ```
