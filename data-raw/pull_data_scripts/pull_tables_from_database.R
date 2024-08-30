@@ -50,6 +50,8 @@ try(if(nrow(rst_catch_query) <= nrow(SRJPEdata::rst_catch)) {
   warning(paste("No new rst catch datasets detected in the database. Maximum date of RST catch data is", max(SRJPEdata::rst_catch$date, na.rm = TRUE)))
 })
 
+# Removes NA sites that come from battle, will change logic after discussing EDI package udpates with battle team
+rst_catch <- rst_catch |> filter(!is.na(site))
 
 # Pull in Trap table 
 try(rst_trap_query <-  dbGetQuery(con, 

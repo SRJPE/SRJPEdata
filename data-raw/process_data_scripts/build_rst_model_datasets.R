@@ -229,7 +229,6 @@ if (month(Sys.Date()) %in% c(9:12, 1:5)) {
     filter(run_year < year(Sys.Date()))
 }
 
-# TODO add in additional check to ensure that we do not have partial seasons on last year
 tryCatch({
   site <- weekly_juvenile_abundance_model_data$site |> unique()
   check_for_full_season <- function(selected_site) {
