@@ -52,7 +52,7 @@ test_that("Always one non NA value in trap date variables", {
 test_that("RST release data coverage at the tributary level has not changed", {
   current_coverage <- release$stream |> unique() |> sort()
   
-  #TODO we seem to be missing mill and deer release data
+  #TODO we seem to be missing mill, deer, & yuba release data
   expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", 
                          "feather river", "mill creek", "sacramento river")
   expect_equal(current_coverage, expected_coverage)
