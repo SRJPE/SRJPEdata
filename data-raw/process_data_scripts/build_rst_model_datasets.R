@@ -247,5 +247,17 @@ tryCatch({
   purrr::map(site, check_for_full_season) |> reduce(append)
 })
 
+# Split up into 2 data objects, efficiency, and catch 
+# Catch 
+weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |> 
+  select(-c(number_released, number_recaptured, standardized_efficiency_flow))
+
+# Efficiency
+weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_data |> 
+  select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow) |> 
+  filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
+  distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
+
 # write to package 
-usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)
+usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE)
+usethis::use_data(weekly_juvenile_abundance_efficiency_data, overwrite = TRUE)

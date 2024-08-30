@@ -20,6 +20,7 @@ reference:
 - subtitle: Juvenile Datasets
   desc: Data used as inputs to juvenile bt-spas-x abundance model 
 - contents: 
+  - weekly_juvenile_abundance_catch_data
   - weekly_juvenile_abundance_model_data
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model 
