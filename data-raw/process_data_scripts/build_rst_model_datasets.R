@@ -131,9 +131,16 @@ weekly_temperature <- env_with_sites |>
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
-weekly_efficiency <- left_join(release, recaptures, by = c("release_id", "stream", "site", "site_group", "run", "life_stage")) |> 
-  group_by(stream, site, site_group, 
-           week_released = day(date_released), 
+weekly_efficiency <- 
+  left_join(release, 
+            recaptures |> # need to summarize first so you don't get duplicated release data when joining
+              group_by(release_id, stream, site, site_group) |> 
+              summarize(count = sum(count, na.rm = T)),
+            by = c("release_id", "stream", "site", "site_group")) |> 
+  group_by(stream, 
+           site, 
+           site_group, 
+           week_released = week(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
             number_recaptured = sum(count, na.rm = TRUE)) |> 

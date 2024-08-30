@@ -1,0 +1,288 @@
+---
+title: "Data checks"
+date: "2024-08-29"
+output: 
+  html_document:
+  theme: flatly
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+The goal of this document is to compare the datasets Josh Korman used to run BTSPAS-X
+initially for his report and the current data product. Data were shared with Josh
+through [OneDrive](https://netorg629193-my.sharepoint.com/:f:/g/personal/avizek_flowwest_com/ErfpkpIJGlxHn1prdMXjJTEBSORtWJfUnBYFPGQ-YwUZpw?e=sY32iI)
+
+The steps we use for data checking include:
+
+1. Identify differences in final datasets used (e.g. for efficiency this is the weekly_efficiency dataset)
+2. Where there are differences, next compare using the database queries (e.g. for the efficiency this is release and recapture tables)
+3. If there are differences here, then use the database seed data and if no differences then the issue is with the database
+4. If there are still differences, go back to raw data provided by stream team
+
+```{r, include = F}
+library(tidyverse)
+library(SRJPEdata)
+library(arsenal)
+library(googleCloudStorageR)
+library(DBI)
+gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
+gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
+
+# Final datasets provided to Josh
+weekly_catch_old <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_catch_unmarked.csv"))
+weekly_catch_effort <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_catch_effort.csv"))
+weekly_efficiency_old <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_efficiency.csv"))
+flow_old <- read_csv(here::here("data-raw", "data-checks","10-2-23", "standard_flow.csv"))
+# weekly_efficiency_old <- read_csv(here::here("data-raw", "data-checks", "10-2-23", "weekly_efficiency_from_josh.csv")) - check and this is the same as I pulled from cloud
+
+# check the version of weekly catch unmarked more recently updated
+gcs_get_object(object_name = "jpe-model-data/weekly_catch_unmarked.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = here::here("data-raw", "data-checks", "weekly_catch_unmarked.csv"),
+               overwrite = TRUE)
+updated_weekly_catch_unmarked <- read_csv(here::here("data-raw", "data-checks", "weekly_catch_unmarked.csv"))
+
+# Final datasets used in SRJPEdata
+# TODO make sure we actually pull in data objects from the package
+weekly_catch_effort_new <- SRJPEdata::weekly_hours_fished
+#weekly_efficiency_new <- SRJPEdata::weekly_efficiency
+#weekly_efficiency_new <- weekly_efficiency # reran manually within the build_rst_model_datasets.R
+#weekly_catch_new <- weekly_standard_catch
+weekly_catch_new <- weekly_juvenile_abundance_model_data
+weekly_efficiency_new <- model_data |> 
+  select(stream, site, week, year, number_released, number_recaptured) |> 
+  distinct()
+# database queries
+con <- DBI::dbConnect(drv = RPostgres::Postgres(),
+                      host = "jpe-db.postgres.database.azure.com",
+                      dbname = "jpedb-prod",
+                      user = Sys.getenv("jpe_db_user_id"),
+                      password = Sys.getenv("jpe_db_password"),
+                      port = 5432)
+DBI::dbListTables(con)
+
+release_query <- dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
+                                                tl.subsite, tl.site_group, rs.number_released, r.definition as run, 
+                                                ls.definition as life_stage, o.definition as origin
+                                                FROM release rs 
+                                                left join trap_location tl on rs.trap_location_id = tl.id 
+                                                left join run r on rs.run_id = r.id
+                                                left join lifestage ls on rs.lifestage_id = ls.id
+                                                left join origin o on rs.origin_id = o.id") |> 
+  mutate(week_released = week(date_released),
+         year_released = year(date_released))
+recaptures_query <- dbGetQuery(con, "SELECT rf.date, rf.count, rf.release_id, tl.stream, tl.site, tl.subsite, tl.site_group, rf.fork_length, rf.dead, 
+                                         rf.weight, r.definition as run, ls.definition as life_stage, rf.adipose_clipped
+                                         FROM recaptured_fish rf 
+                                         left join trap_location tl on rf.trap_location_id = tl.id 
+                                         left join run r on rf.run_id = r.id
+                                         left join lifestage ls on rf.lifestage_id = ls.id") |> 
+    mutate(week = week(date),
+         year = year(date)) 
+recaptures_query |> glimpse()
+  
+recaptures_check <- dbGetQuery(con, "SELECT * FROM recaptured_fish")
+trap_location_check <- dbGetQuery(con, "SELECT * FROM trap_location")
+catch_check <- dbGetQuery(con, "SELECT * FROM catch")
+
+rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.subsite, tl.site_group, 
+                                       c.count, r.definition as run, ls.definition as life_stage, 
+                                       c.adipose_clipped, c.dead, c.fork_length, c.weight, c.actual_count
+                                       FROM catch c 
+                                       left join trap_location tl on c.trap_location_id = tl.id 
+                                       left join run r on c.run_id = r.id
+                                       left join lifestage ls on c.lifestage_id = ls.id") |> 
+      mutate(species = "chinook")
+
+
+# seed data for db
+gcs_get_object(object_name = "model-db/release.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = here::here("data-raw", "data-checks", "model_db_release.csv"),
+               overwrite = TRUE)
+model_db_release <- read_csv(here::here("data-raw", "data-checks", "model_db_release.csv"))
+gcs_get_object(object_name =  "model-db/recaptured_fish.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = here::here("data-raw", "data-checks", "model_db_recaptured_fish.csv"),
+               overwrite = TRUE)
+model_db_recaptured_fish <- read_csv(here::here("data-raw", "data-checks", "model_db_recaptured_fish.csv"))
+
+# Datasets sent to Josh that are less processsed
+release_for_josh <- read_csv(here::here("data-raw", "data-checks", "10-2-23","release_summary.csv"))
+recapture_for_josh <- read_csv(here::here("data-raw", "data-checks", "10-2-23","recapture_summary.csv"))
+catch_for_josh <- read_csv(here::here("data-raw", "data-checks", "10-2-23","daily_catch_unmarked.csv"))
+effort_for_josh <- read_csv(here::here("data-raw", "data-checks", "10-2-23","daily_effort.csv"))
+trap_for_josh <- read_csv(here::here("data-raw", "data-checks", "10-2-23","daily_trap.csv"))
+# for the effort data checks - run the trap_effort.Rmd and use the hours_fished_combined object for comparisons because this is before summarized to weekly
+```
+
+# Efficiency
+
+**Goal:** Compare new and old weekly efficiency data
+
+**Summary:** I did a number of manual record by record checks and I am feeling confident that the new data are now good and the best version to use! Seems like there were some issues summarizing the old data by week. The biggest differences will be for Butte Creek and Sacramento River (where efficiency will be higher in some cases now). This is happening in 2.5% of the data or 158 cases out of 6,280.
+
+```{r, include = F}
+# eff_compare <- comparedf(weekly_efficiency, weekly_efficiency_new)
+# print(eff_compare)
+# summary(eff_compare)
+
+eff_join <- full_join(weekly_efficiency_old |> 
+                        select(-c(site_group, median_fork_length_released, flow_at_recapture_day1, origin_released, median_fork_length_recaptured)) |> 
+                                 rename(number_released_old = number_released,
+                                        number_recaptured_old = number_recaptured,
+                                        year = year_released,
+                                        week = week_released),
+                      weekly_efficiency_new |> 
+                        rename(number_released_new = number_released,
+                               number_recaptured_new = number_recaptured)) |> 
+  mutate(eff_old = number_recaptured_old/number_released_old,
+         eff_new = number_recaptured_new/number_released_new)
+
+eff_mismatch <- filter(eff_join, eff_old != eff_new)
+eff_mismatch_release <- filter(eff_join, number_released_old != number_released_new)
+eff_mismatch_recapture <- filter(eff_join, number_recaptured_old != number_recaptured_new)
+
+eff_new_only <- filter(eff_join, is.na(number_released_old), is.na(number_recaptured_old))
+
+eff_old_only <- filter(eff_join, is.na(number_released_new), is.na(number_recaptured_new))
+
+eff_mismatch_release |> 
+  group_by(site) |> 
+  tally()
+
+eff_mismatch_recapture |> 
+  group_by(site) |> 
+  tally()
+
+eff_new_only |> 
+  group_by(site) |> 
+  tally()
+
+eff_old_only |> 
+  group_by(site) |> 
+  tally()
+
+eff_old_check <- eff_old_only |> 
+  filter(!site %in% c("red bluff diversion", "upper feather hfc", "upper feather lfc","ubc","lcc","ucc"))
+```
+
+```{r}
+eff_join |>
+  mutate(perc_diff = ((eff_new - eff_old)/eff_old)*100) |> 
+  group_by(stream) |> 
+  summarize(mean_pdiff = mean(perc_diff, na.rm = T)) |> 
+  ggplot(aes(x = stream, y = mean_pdiff)) +
+  geom_col()
+
+```
+
+# Catch
+
+**Goal:** Compare new and old weekly catch data
+
+**Summary**
+
+- Concluded that despite the mismatches, the new version of weekly catch is correct.
+There must have been some issue with summarization for that version of the weekly
+catch that was sent to Josh.
+- Mostly catch for the new data product will be greater (by about 5%, though higher for 
+Feather River and Sacramento River), except for Clear Creek where catch will be lower
+
+```{r, include = F}
+weekly_catch_old_format <- weekly_catch_old |> 
+  filter(include_in_model == T) |> 
+  group_by(week, year, stream, site_group, site, lifestage_for_model) |> 
+  summarize(count = sum(count, na.rm = T),
+            mean_fork_length = mean(mean_fork_length, na.rm = T),
+            mean_weight = mean(mean_weight, na.rm = T)) |> 
+  rename(life_stage = lifestage_for_model,
+         count_old = count,
+         mean_weight_old = mean_weight,
+         mean_fork_length_old = mean_fork_length)
+# just join on count
+catch_join <- weekly_catch_old_format |> 
+  ungroup() |> 
+  select(-c(mean_weight_old, mean_fork_length_old, site_group)) |> 
+  full_join(weekly_catch_new |> 
+              ungroup() |> 
+              select(stream, site, week, year, life_stage, count))
+```
+
+```{r}
+catch_join |>
+  mutate(perc_diff = ((count - count_old)/count_old)*100) |> 
+  group_by(stream) |> 
+  summarize(mean_pdiff = mean(perc_diff, na.rm = T)) |> 
+  ggplot(aes(x = stream, y = mean_pdiff)) +
+  geom_col()
+
+```
+
+# Effort
+
+**Goal:** compare the new and old weekly effort/hours fished data
+
+**Summary**
+
+- The trap data is pretty messy and is improving over time as issues are fixed.
+There are some differences based on what was provided previously. Mostly this results
+in a higher number of hours fished, except for Feather River where it is lower. 
+Some locations did not have big differences.
+
+```{r, include = F}
+# join on hours fished
+hours_fished_join <- weekly_catch_effort |> 
+  ungroup() |> 
+  select(stream, site, subsite, week, year, hours_fished) |> 
+  rename(hours_fished_old = hours_fished) |> 
+  ungroup() |> 
+  distinct() |> 
+  full_join(weekly_catch_effort_new |> 
+              ungroup() |> 
+              select(-c(site_group)))
+```
+
+```{r}
+hours_fished_join |>
+  mutate(perc_diff = ((hours_fished - hours_fished_old)/hours_fished_old)*100) |> 
+  group_by(stream) |> 
+  summarize(mean_pdiff = mean(perc_diff, na.rm = T)) |> 
+  ggplot(aes(x = stream, y = mean_pdiff)) +
+  geom_col()
+
+```
+
+# Flow
+
+**Goal:** compare the new and old flow data
+
+**Summary:** very few differences in the flow data
+
+```{r, include = F}
+weekly_flow_old <- flow_old |> 
+  group_by(stream, site, week = week(date), year = year(date)) |> 
+  summarize(mean_flow = mean(flow_cfs, na.rm = T),
+            median_flow = median(flow_cfs, na.rm = T),
+            max_flow = max(flow_cfs, na.rm = T))
+
+flow_join <- weekly_flow_old |> 
+  select(stream, site, week, year, flow_old = mean_flow) |> 
+  full_join(weekly_flow |> 
+              select(stream, site, week, year, flow_cfs = mean_flow))
+
+old_flow_only <- filter(flow_join, is.na(flow_cfs))
+new_flow_only <- filter(flow_join, is.na(flow_old))
+flow_mismatch <- flow_join |> 
+  filter(abs(flow_old - flow_cfs) > 100)
+```
+
+```{r}
+flow_join |>
+  mutate(perc_diff = ((flow_cfs - flow_old)/flow_old)*100) |> 
+  group_by(stream) |> 
+  summarize(mean_pdiff = mean(perc_diff, na.rm = T)) |> 
+  ggplot(aes(x = stream, y = mean_pdiff)) +
+  geom_col()
+```
