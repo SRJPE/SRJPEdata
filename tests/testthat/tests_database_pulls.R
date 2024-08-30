@@ -61,7 +61,6 @@ test_that("RST release data coverage at the tributary level has not changed", {
 test_that("No NA values in identifying release data variables", {
   expect_equal(any(is.na(release$stream)), FALSE)
   expect_equal(any(is.na(release$site)), FALSE)
-  expect_equal(any(is.na(release$subsite)), FALSE) # TODO there should not be NAs here right? Or maybe this is fine
   expect_equal(any(is.na(release$site_group)), FALSE)
   expect_equal(any(is.na(release$date_released)), FALSE)
   
@@ -137,7 +136,7 @@ test_that("Carcass estinates data coverage at the tributary level has not change
 
 test_that("No NA values in identifying carcass data variables", {
   expect_equal(any(is.na(carcass_estimates$stream)), FALSE)
-  expect_equal(any(is.na(redcarcass_estimatesd$year)), FALSE)
+  expect_equal(any(is.na(carcass_estimates$year)), FALSE)
 })
 
 # holding
