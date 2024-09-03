@@ -16,7 +16,7 @@ test_that("RST catch data coverage at the tributary level has not changed", {
 test_that("No NA values in identifying catch data variables", {
   expect_equal(any(is.na(rst_catch$stream)), FALSE)
   expect_equal(any(is.na(rst_catch$site)), FALSE)
-  expect_equal(any(is.na(rst_catch$subsite)), FALSE)
+  expect_equal(any(is.na(rst_catch$subsite)), FALSE) 
   expect_equal(any(is.na(rst_catch$site_group)), FALSE)
   expect_equal(any(is.na(rst_catch$date)), FALSE)
 })

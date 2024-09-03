@@ -51,7 +51,8 @@ try(if(nrow(rst_catch_query) <= nrow(SRJPEdata::rst_catch)) {
 })
 
 # Removes NA sites that come from battle, will change logic after discussing EDI package udpates with battle team
-rst_catch <- rst_catch |> filter(!is.na(site))
+rst_catch <- rst_catch |> 
+  filter(!is.na(site), !is.na(date))
 
 # Pull in Trap table 
 try(rst_trap_query <-  dbGetQuery(con, 
