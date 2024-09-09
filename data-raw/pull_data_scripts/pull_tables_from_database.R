@@ -156,7 +156,7 @@ try(if(nrow(upstream_passage_query) <= nrow(SRJPEdata::upstream_passage)) {
 
 # Pull in passage estimates 
 # TODO fix query, not returning anything 
-try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.stream, sl.reach, p.passage_estimate, p.adipose_clipped,  
+try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.stream, p.passage_estimate, p.adipose_clipped,  
                                                          r.definition as run, p.upper_bound_estimate, p.lower_bound_estimate,
                                                          p.confidence_level
                                                          FROM passage_estimates p
