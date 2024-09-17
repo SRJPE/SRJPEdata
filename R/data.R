@@ -18,11 +18,31 @@
 'p2s_model_covariates_standard'
 
 
-#' @title Weekly BT-SPAS-X Model Data
-#' @name weekly_juvenile_abundance_model_data
+#' @title Weekly BT-SPAS-X Model Efficency Data
+#' @name weekly_juvenile_abundance_efficiency_data
+#' @description Weekly Rotary Screw Trap (RST) efficiency data and weekly standardized flow, 
+#' for spring run tributaries modeled in BT-SPAS-X.
+#' @format A tibble with 651 rows and 8 columns 
+#' \itemize{
+#'   \item \code{year}: year 
+#'   \week \code{week} : week 
+#'   \item \code{stream}: rst stream 
+#'   \item \code{site}: rst site 
+#'   \item \code{number_released}: Number of efficiency trial fish released
+#'   \item \code{number_recaptured}: Number of efficiency trial fish recaptured
+#'   \item \code{standardized_efficiency_flow}: Flow standardized across years and sites 
+#'   \item \code{run_year}: Run year 
+#'   }
+#' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
+#'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
+'weekly_juvenile_abundance_model_data'
+
+#' @title Weekly BT-SPAS-X Catch Data
+#' @name weekly_juvenile_abundance_catch_data
 #' @description Weekly Rotary Screw Trap (RST) catch summaries, weekly RST effort effort, and weekly standardized flow, 
 #' for spring run tributaries modeled in BT-SPAS-X.
-#' @format A tibble with 9,457 rows and 17 columns 
+#' @format A tibble with 10,890 rows and 14 columns 
 #' \itemize{
 #'   \item \code{year}: year 
 #'   \week \code{week} : week 
@@ -30,22 +50,19 @@
 #'   \item \code{site}: rst site 
 #'   \item \code{count}: weekly count of number of 
 #'   \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish 
-#'   \item \code{number_released}: Number of efficiency trial fish released
-#'   \item \code{number_recaptured}: Number of efficiency trial fish recaptured
 #'   \item \code{hours_fished}: Hours fished on a stream 
 #'   \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
 #'   \item \code{life_stage}: Life stage of juvenile fish 
-#'   \item \code{average_stream_effort}: Average hours fished on a given stream, used to standardize 
+#'   \item \code{average_stream_hours_fished}: Average hours fished on a given stream, used to standardize 
 #'   \item \code{standardized_flow}: Flow standardized across years and sites 
 #'   \item \code{run_year}: Run year 
 #'   \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week 
-#'   \item \code{standardized_efficiency}: Efficiency standardized across years 
 #'   \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search `?SRJPEdata::btspasx_special_priors_data`
 #'   }
 #' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
 #'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
 #'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
-'weekly_juvenile_abundance_model_data'
+'weekly_juvenile_abundance_catch_data'
 
 #' @title Special Priors for BT-SPAS-X Abundance Model 
 #' @name btspasx_special_priors_data
@@ -143,19 +160,6 @@
 #'   }
 'rst_trap'
 
-#' @title RST Efficiency Trial Individual Fish Release Data
-#' @name release_fish
-#' @description Dataset containing individual fish releases for efficiency monitoring data for all SR JPE tribuatary and mainstem monitoring programs
-#' @format Dataframe with __TODO EMPTY IN DATABASE CURRENTLY__ and 6 columns
-#' \itemize{
-#'   \item \code{release_id}: year 
-#'   \item \code{stream}: stream where efficiency trial conducted
-#'   \item \code{site}: site where efficiency trial conducted 
-#'   \item \code{subsite}: subsite where efficiency trial conducted
-#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
-#'   \item \code{fork_length}: fork length of released fish 
-#'   }
-'release_fish'
 
 #' @title RST efficiency trial recaptures
 #' @name recaptures

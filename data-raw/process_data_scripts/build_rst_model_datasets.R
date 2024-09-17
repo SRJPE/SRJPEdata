@@ -10,16 +10,19 @@ library(tidyverse)
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 SRJPEdata::rst_catch |> glimpse()
 updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
-chosen_site_years_to_model |> glimpse()
+chosen_site_years_to_model |> glimpse() 
+# Note: updated below years_to_include to chosen_site_years_to_model (this is more up to date version)
+# TODO however, years_to_include included a subsite (CONFIRM that we do not need subsite), after discussing, delete old version
 
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 
 ### ----------------------------------------------------------------------------
 
-# Filter to use includion criteria ---------------------------------------------
+# Filter to use inclusion criteria ---------------------------------------------
+# TODO this is the slowest block...
 catch_with_inclusion_criteria <- updated_standard_catch |> 
   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
-  left_join(years_to_include) |> 
+  left_join(chosen_site_years_to_model) |> 
   mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
          # if the year was not included in the list of years to include then should be FALSE
          include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
@@ -58,6 +61,8 @@ weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros,
                                    weekly_standard_catch_zeros) |> glimpse()
 
 # Add hatchery column 
+# Currently not included in josh model data but can be added by changing join on 
+# line 176 below
 hatch_per_week <- catch_with_inclusion_criteria |> 
   filter(adipose_clipped == TRUE) |> 
   mutate(week = week(date),
@@ -96,22 +101,10 @@ weekly_effort_by_site <- weekly_hours_fished |>
   summarize(hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
   ungroup()
 
-# Catch & Effort ----------------------------------------------------------
-
-# Join weekly effort data to weekly catch data
-# there are a handful of cases where hours fished is NA. 
-# weekly hours fished will be assumed to be 168 hours (24 hours * 7) as most
-# traps fish continuously. Ideally these data points would be filled in, however,
-# after extensive effort 54 still remain. It is unlikely that these datapoints
-# will have a huge effect in such a large data set.
-
-# TODO 
-weekly_catch_effort <- full_join(weekly_standard_catch_unmarked, weekly_hours_fished) |> 
-  mutate(hours_fished = ifelse(is.na(hours_fished), 168, hours_fished))
-
 # Environmental -----------------------------------------------------------
 env_with_sites <- environmental_data |> 
-  left_join(site_lookup)  |> glimpse()
+  left_join(site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
+  glimpse()
 
 weekly_flow <- env_with_sites |> 
   filter(parameter == "flow",
@@ -147,7 +140,6 @@ weekly_efficiency <-
   ungroup() |> 
   glimpse()
 
-weekly_standard_catch_unmarked  |> glimpse()
 weekly_efficiency |> glimpse()
 
 # reformat flow data and summarize weekly
@@ -161,10 +153,12 @@ flow_reformatted <- env_with_sites |>
   summarise(flow_cfs = mean(value, na.rm = T)) |> 
   glimpse()
 
+# Combine catch (weekly_standard_catch), weekly efficiency, and weekly effort by site 
 weekly_efficiency |> glimpse()
 
 weekly_effort_by_site |> glimpse()
 
+# TODO do we want to use the weekly_standard_catch_with_hatch_designation instead
 catch_reformatted <- weekly_standard_catch |>  glimpse()
 
 # Combine all 3 tables together 
@@ -235,7 +229,6 @@ if (month(Sys.Date()) %in% c(9:12, 1:5)) {
     filter(run_year < year(Sys.Date()))
 }
 
-# TODO add in additional check to ensure that we do not have partial seasons on last year
 tryCatch({
   site <- weekly_juvenile_abundance_model_data$site |> unique()
   check_for_full_season <- function(selected_site) {
@@ -254,5 +247,17 @@ tryCatch({
   purrr::map(site, check_for_full_season) |> reduce(append)
 })
 
+# Split up into 2 data objects, efficiency, and catch 
+# Catch 
+weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |> 
+  select(-c(number_released, number_recaptured, standardized_efficiency_flow))
+
+# Efficiency
+weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_data |> 
+  select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow) |> 
+  filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
+  distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
+
 # write to package 
-usethis::use_data(weekly_juvenile_abundance_model_data, overwrite = TRUE)
+usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE)
+usethis::use_data(weekly_juvenile_abundance_efficiency_data, overwrite = TRUE)

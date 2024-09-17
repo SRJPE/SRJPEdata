@@ -284,15 +284,17 @@ chosen_site_years_to_model <- include |>
             min_week = week(min_date),
             max_date = max(max_date),
             max_week = week(max_date)) |> 
+  ungroup() |> 
   # identified as excluded due to incomplete sampling
   mutate(exclude = case_when(monitoring_year == 2022 & stream == "battle creek" ~ T,
                              monitoring_year == 2005 & site == "yuba river" ~ T,
                              monitoring_year == 2008 & site == "yuba river" ~ T,
                              monitoring_year == 2007 & site == "sunset pumps" ~ T,
                              monitoring_year == 2009 & site == "sunset pumps" ~ T,
+                             monitoring_year == 2016 & site == "lbc" ~ T,
                              T ~ F),
-         site_group = case_when(site %in% lfc_sites ~ "feather river lfc",
-                                site %in% hfc_sites ~ "feather river hfc",
+         site_group = case_when(site %in% lfc_sites ~ "upper feather lfc",
+                                site %in% hfc_sites ~ "upper feather hfc",
                                 T ~ NA)) |> 
   filter(exclude == F) |> 
   select(monitoring_year, stream, site_group, site, min_date, min_week, max_date, max_week) |> 
@@ -301,9 +303,13 @@ chosen_site_years_to_model <- include |>
                                 stream == "mill creek" ~ "mill creek", 
                                 site == "knights landing" ~ "knights landing",
                                 site == "tisdale" ~ "tisdale", 
+                                site == "red bluff diversion dam" ~ "red bluff diversion dam",
                                 stream == "yuba river" ~ "yuba river",
                                 stream == "clear creek" ~ "clear creek", 
-                                stream == "battle creek" ~ "battle creek"))
+                                stream == "battle creek" ~ "battle creek",
+                                stream == "feather river" & site == "lower feather river" ~ "lower feather river", 
+                                stream == "feather river" ~ site_group)) |> 
+  filter(!is.na(monitoring_year))
 
 usethis::use_data(chosen_site_years_to_model, overwrite = TRUE)
 ```
