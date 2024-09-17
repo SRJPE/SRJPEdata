@@ -28,9 +28,9 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
                                         cr.fork_length,
                                         cr.weight,
                                         cr.num_fish_caught, 
+                                        em.release_id,
                                         cr.plus_count,
                                         pcm.definition as plus_count_methodology,
-                                        cr.release_id,
                                         mt.definition as mark_type,
                                         mc.definition as mark_color,
                                         bp.definition as mark_position,
@@ -56,7 +56,7 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
          count = num_fish_caught, 
          run = capture_run,
          species = tolower(species_common_name)) |> 
-    filter(is.na(mark_type)) |> # TODO this should be updated to be NONE instead on NA
+    filter(is.na(release_id)) |> 
     select(c("date", "stream", "site", "subsite", "site_group", "count", 
              "run", "life_stage", "adipose_clipped", "dead", "fork_length", 
              "weight", "species")))
@@ -123,8 +123,8 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
 
   
 # ENV variables we are missing 
-# -  "turbidity", velocity - mill and deer currently do not collect. 
-# also missing visit_type but we intentionally dont collect that
+# turbidity, velocity - mill and deer currently do not collect. 
+# also missing visit_type but we intentionally don't collect that
 
 try(if(!exists("rst_trap_query_pilot"))
   rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
@@ -133,29 +133,84 @@ try(if(!exists("rst_trap_query_pilot"))
 
 # Pull in efficiency data 
 # release table 
-try(release_query_pilot <- dbGetQuery(con, ""))
+# TODO this query only works for mill deer (release all hatchery, will need to be updated once we bring in other systems)
+dbGetQuery(con, "SELECT * from release") |> glimpse()
+try(release_query_pilot <- dbGetQuery(con, "SELECT 
+                                       r.id as release_id,
+                                       r.released_at as released_at, 
+                                       p.program_name as program_name, 
+                                       p.stream_name as stream,
+                                       rs.release_site_name as release_site,
+                                       rp.definition as release_purpose, 
+                                       r.total_hatchery_fish_released as number_released
+                                       FROM release r 
+                                       left join program p on (r.program_id = p.id)
+                                       left join release_site rs on (r.release_site_id = rs.id)
+                                       left join release_purpose rp on (r.release_purpose_id = rp.id)") |> 
+      mutate(date_released = as.Date(released_at), 
+             origin = "hatchery", 
+             stream = tolower(stream),
+             site = stream,
+             subsite = stream, 
+             site_group = stream, 
+             run = NA, 
+             life_stage = NA) |> 
+      select(c("date_released", "release_id", "stream", "site", "subsite", 
+               "site_group", "number_released", "run", "life_stage", "origin"
+      )))
+
 try(if(!exists("release_query_pilot"))
   release <- SRJPEdata::release |> filter(stream %in% c("mill creek", "deer creek"))
   else(release <- release_query_pilot))
 
-try(if(nrow(release_query_pilot) <= nrow(SRJPEdata::release)) {
-  release <- SRJPEdata::release |> filter(stream %in% c("mill creek", "deer creek"))
-  warning(paste("No new release datasets detected in the database. Release data not updated on", Sys.Date()))
-})
-
-# TODO release fish section
-# Pull in release fish info, Fork length for release trials 
-
-# glimpse(release_fish)
-
 # Pull Recaptures ---
-try(recaptures_query_pilot <- dbGetQuery(con, ""))
+try(recaptures_query_pilot <- dbGetQuery(con, "SELECT 
+                                        tv.trap_visit_time_start, 
+                                        tv.trap_visit_time_end, 
+                                        tl.trap_name as trap_name,
+                                        tl.site_name as site,
+                                        t.commonname as species_common_name,
+                                        r.definition as capture_run,
+                                        cr.adipose_clipped, 
+                                        cr.dead,
+                                        ls.definition as life_stage,
+                                        cr.fork_length,
+                                        cr.weight,
+                                        cr.num_fish_caught, 
+                                        cr.plus_count,
+                                        pcm.definition as plus_count_methodology,
+                                        em.release_id,
+                                        mt.definition as mark_type,
+                                        mc.definition as mark_color,
+                                        bp.definition as mark_position,
+                                        p.stream_name as stream
+                                        FROM catch_raw cr 
+                                        left join trap_visit tv on (cr.trap_visit_id = tv.id)
+                                        left join trap_locations tl on (tv.trap_location_id = tl.id) 
+                                        left join program p on (cr.program_id = p.id)
+                                        left join run r on (cr.capture_run_class = r.id)
+                                        left join taxon t on (cr.taxon_code = t.code)
+                                        left join life_stage ls on (cr.life_stage = ls.id)
+                                        left join plus_count_methodology pcm on (cr.plus_count_methodology = pcm.id)
+                                        left join existing_marks em on (cr.id = em.catch_raw_id)
+                                        left join mark_type mt on (em.mark_type_id = mt.id)
+                                        left join mark_color mc on (em.mark_color_id  = mc.id)
+                                        left join body_part bp on (em.mark_position_id  = bp.id)
+                                        where (tv.program_id = 1 or tv.program_id = 2)") |> 
+      mutate(date = as.Date(trap_visit_time_end),
+             stream = tolower(stream),
+             site = ifelse(tolower(site) == "mill creek rst", "mill creek", "deer creek"), # TODO update once queries are more complicated
+             subsite = ifelse(tolower(trap_name) == "mill creek rst", "mill creek", "deer creek"),
+             site_group = stream,
+             count = num_fish_caught, 
+             run = capture_run,
+             species = tolower(species_common_name)) |> 
+      filter(!is.na(release_id)) |> 
+      select(c("date", "stream", "site", "subsite", "site_group", "count", 
+               "run", "life_stage", "adipose_clipped", "dead", "fork_length", 
+               "weight", "species", "release_id")))
 
 try(if(!exists("recaptures_query_pilot"))
   recaptures <- SRJPEdata::recaptures |> filter(stream %in% c("mill creek", "deer creek"))
   else(recaptures <- recaptures_query_pilot))
 
-try(if(nrow(recaptures_query_pilot) <= nrow(SRJPEdata::recaptures)) {
-  recaptures <- SRJPEdata::recaptures |> filter(stream %in% c("mill creek", "deer creek"))
-  warning(paste("No new recaptures datasets detected in the database. Recaptures data not updated on", Sys.Date()))
-})
