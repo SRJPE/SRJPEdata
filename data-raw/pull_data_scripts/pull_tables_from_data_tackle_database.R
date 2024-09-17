@@ -56,9 +56,10 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
          count = num_fish_caught, 
          run = capture_run,
          species = tolower(species_common_name)) |> 
-  select(c("date", "stream", "site", "subsite", "site_group", "count", 
-           "run", "life_stage", "adipose_clipped", "dead", "fork_length", 
-           "weight", "species")))
+    filter(is.na(mark_type)) |> # TODO this should be updated to be NONE instead on NA
+    select(c("date", "stream", "site", "subsite", "site_group", "count", 
+             "run", "life_stage", "adipose_clipped", "dead", "fork_length", 
+             "weight", "species")))
 
 # Data Checks 
 rst_catch_query_pilot$adipose_clipped |> unique() #TODO I believe these should all be FALSE 
@@ -73,7 +74,9 @@ try(if(!exists("rst_catch_query_pilot"))
 try(rst_trap_query_pilot <-  dbGetQuery(con, 
                                   "SELECT 
                                    p.program_name as program_name, 
+                                   p.stream_name as stream,
                                    tl.trap_name as trap_name,
+                                   tl.site_name as site,
                                    t.is_paper_entry, 
                                    t.trap_visit_time_start, 
                                    t.trap_visit_time_end,
@@ -85,7 +88,11 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
                                    t.total_revolutions, 
                                    t.rpm_at_start, 
                                    t.rpm_at_end, 
-                                   t.debris_volume_liters 
+                                   t.debris_volume_liters, 
+                                   tve.measure_name, 
+                                   tve.measure_value_numeric,
+                                   tve.measure_value_text, 
+                                   tve.measure_unit
                                    FROM trap_visit t
                                    left join program p on (t.program_id = p.id)
                                    left join fish_processed fp on (t.fish_processed = fp.id)
@@ -93,23 +100,37 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
                                    left join trap_functionality tf on (t.trap_functioning = tf.id)
                                    left join trap_status_at_end tsae on (t.trap_status_at_end = tsae.id)
                                    left join trap_locations tl on (t.trap_location_id = tl.id) 
+                                   left join trap_visit_environmental tve on (t.id = tve.trap_visit_id)
                                    where (t.program_id = 1 or t.program_id = 2)") |> 
       mutate(trap_start_time = hms::as_hms(trap_visit_time_start),
              trap_start_date = as_date(trap_visit_time_start), 
              trap_stop_time = hms::as_hms(trap_visit_time_end),
-             trap_stop_date = as_date(trap_visit_time_end)
-      ))
-# TODO structure so that it matches with rst_trap
+             trap_stop_date = as_date(trap_visit_time_end),
+             stream = tolower(stream), 
+             site = ifelse(tolower(site) == "mill creek rst", "mill creek", "deer creek"), # TODO update once queries are more complicated
+             subsite = ifelse(tolower(trap_name) == "mill creek rst", "mill creek", "deer creek"),
+             site_group = stream,
+             rpm_start = rpm_at_start, 
+             rpm_end = rpm_at_end, 
+             debris_volume = debris_volume_liters) |> # TODO confirm units match up with rst_trap data 
+      pivot_wider(names_from = measure_name, values_from = measure_value_numeric) |> 
+      rename(discharge = `flow measure`,
+             water_temp = `water temperature`) |> 
+      select(c("trap_start_date", "trap_stop_date", "stream", 
+               "site", "subsite", "site_group", "trap_functioning",  
+               "fish_processed", "rpm_start", "rpm_end", "total_revolutions", 
+               "debris_volume", "discharge", "water_temp",  "trap_start_time", "trap_stop_time")) )
 
+  
+# ENV variables we are missing 
+# -  "turbidity", velocity - mill and deer currently do not collect. 
+# also missing visit_type but we intentionally dont collect that
 
 try(if(!exists("rst_trap_query_pilot"))
   rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
   else(rst_trap_pilot <- rst_trap_query_pilot))
 
-try(if(nrow(rst_trap_query_pilot) <= nrow(SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek")))) {
-  rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
-  warning(paste("No new rst trap datasets detected in the database. RST trap data not updated on", Sys.Date()))
-})
+
 # Pull in efficiency data 
 # release table 
 try(release_query_pilot <- dbGetQuery(con, ""))
