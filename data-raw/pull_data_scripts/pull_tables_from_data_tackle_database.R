@@ -7,7 +7,7 @@ library(SRJPEdata)
 # CONNECT TO DB & VIEW TABLES --------------------------------------------------
 # Use DBI - dbConnect to connect to database - keep user id and password sectret
 con <- DBI::dbConnect(drv = RPostgres::Postgres(),
-                      host = "rst-db-production.postgres.database.azure.com",
+                      host = "rst-db-production-datatackle.postgres.database.azure.com",
                       dbname = "postgres",
                       user = Sys.getenv("pilot_db_user_id"),
                       password = Sys.getenv("pilot_db_password"),
@@ -19,9 +19,9 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
                                         tv.trap_visit_time_start, 
                                         tv.trap_visit_time_end, 
                                         tl.trap_name as trap_name,
+                                        tl.site_name as site,
                                         t.commonname as species_common_name,
                                         r.definition as capture_run,
-                                        mt.definition as mark_type,
                                         cr.adipose_clipped, 
                                         cr.dead,
                                         ls.definition as life_stage,
@@ -33,7 +33,8 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
                                         cr.release_id,
                                         mt.definition as mark_type,
                                         mc.definition as mark_color,
-                                        bp.definition as mark_position
+                                        bp.definition as mark_position,
+                                        p.stream_name as stream
                                         FROM catch_raw cr 
                                         left join trap_visit tv on (cr.trap_visit_id = tv.id)
                                         left join trap_locations tl on (tv.trap_location_id = tl.id) 
@@ -46,18 +47,26 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
                                         left join mark_type mt on (em.mark_type_id = mt.id)
                                         left join mark_color mc on (em.mark_color_id  = mc.id)
                                         left join body_part bp on (em.mark_position_id  = bp.id)
-                                        where (tv.program_id = 1 or tv.program_id = 2)"))
-# TODO structure so that it matches with rst_trap
+                                        where (tv.program_id = 1 or tv.program_id = 2)") |> 
+  mutate(date = as.Date(trap_visit_time_end),
+         stream = tolower(stream),
+         site = ifelse(tolower(site) == "mill creek rst", "mill creek", "deer creek"), # TODO update once queries are more complicated
+         subsite = ifelse(tolower(trap_name) == "mill creek rst", "mill creek", "deer creek"),
+         site_group = stream,
+         count = num_fish_caught, 
+         run = capture_run,
+         species = tolower(species_common_name)) |> 
+  select(c("date", "stream", "site", "subsite", "site_group", "count", 
+           "run", "life_stage", "adipose_clipped", "dead", "fork_length", 
+           "weight", "species")))
 
+# Data Checks 
+rst_catch_query_pilot$adipose_clipped |> unique() #TODO I believe these should all be FALSE 
+rst_catch_query_pilot$dead |> unique() #TODO lets make sure we are defaulting to FALSE on pilot, not NA
 
 try(if(!exists("rst_catch_query_pilot"))
   rst_catch_pilot <- SRJPEdata::rst_catch |> filter(stream %in% c("mill creek", "deer creek"))
   else(rst_catch_pilot <- rst_catch_query_pilot))
-
-try(if(nrow(rst_catch_query_pilot) <= nrow(SRJPEdata::rst_catch |> filter(stream %in% c("mill creek", "deer creek")))) {
-  rst_catch_pilot <- SRJPEdata::rst_catch  |> filter(stream %in% c("mill creek", "deer creek"))
-  warning(paste("No new rst catch datasets detected in the database. RST catch data not updated on", Sys.Date()))
-})
 
 
 # Pull in Trap table 
@@ -95,7 +104,7 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
 
 try(if(!exists("rst_trap_query_pilot"))
   rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
-  else(rst_trap_pilot <- rst_trap_query))
+  else(rst_trap_pilot <- rst_trap_query_pilot))
 
 try(if(nrow(rst_trap_query_pilot) <= nrow(SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek")))) {
   rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
