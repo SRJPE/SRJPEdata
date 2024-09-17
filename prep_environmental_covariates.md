@@ -50,9 +50,9 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 | 1999|mill creek    |  24.350443|       0|     24.35|
 | 2000|butte creek   |  38.893518|       0|     38.89|
 | 2000|deer creek    | 191.700593|       0|    191.70|
-| 2000|feather river |  42.949757|       0|     42.95|
+| 2000|feather river |  52.729544|       0|     52.73|
 | 2000|mill creek    |  97.261574|       0|     97.26|
-| 2000|yuba river    | 431.797968|       0|    431.80|
+| 2000|yuba river    | 419.807661|       0|    419.81|
 | 2001|butte creek   |  70.303241|       0|     70.30|
 | 2001|clear creek   |  17.078134|       0|     17.08|
 
@@ -151,8 +151,8 @@ Both continuous environmental variables (flow and temperature) were standardized
 | 2000|battle creek |       1|   -0.0301580|         NA|    -0.6156258|                 1.2902904|
 | 2001|battle creek |       0|   -0.5956197|         NA|    -0.4282888|                -0.7262290|
 | 2002|battle creek |       0|   -0.9493780|         NA|     0.2018445|                 0.9800567|
-| 2003|battle creek |       1|    0.5146161| -0.7272993|     0.1961676|                 2.8414592|
-| 2004|battle creek |       0|   -0.4301187| -0.7493077|    -0.5475032|                 0.0493554|
+| 2003|battle creek |       1|    0.5146161| -0.5732839|     0.1961676|                 2.8414592|
+| 2004|battle creek |       0|   -0.4301187| -0.5860987|    -0.5475032|                 0.0493554|
 
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 
