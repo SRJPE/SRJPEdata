@@ -157,7 +157,7 @@ try(release_query_pilot <- dbGetQuery(con, "SELECT
              life_stage = NA) |> 
       select(c("date_released", "release_id", "stream", "site", "subsite", 
                "site_group", "number_released", "run", "life_stage", "origin"
-      )))
+      ) |> distinct()))
 
 # try(if(!exists("release_query_pilot"))
 #   release <- SRJPEdata::release |> filter(stream %in% c("mill creek", "deer creek"))
