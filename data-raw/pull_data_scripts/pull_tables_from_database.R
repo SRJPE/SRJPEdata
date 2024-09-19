@@ -106,11 +106,6 @@ try(if(nrow(recaptures_query) <= nrow(SRJPEdata::recaptures)) {
 })
 
 
-## SAVE TO DATA PACKAGE ---
-usethis::use_data(rst_catch, overwrite = TRUE)
-usethis::use_data(rst_trap, overwrite = TRUE)
-usethis::use_data(release, overwrite = TRUE)
-usethis::use_data(recaptures, overwrite = TRUE)
 
 # PULL IN ADULT DATA -------------------------------------------------------------
 # Pull in passage raw counts 
@@ -205,10 +200,4 @@ try(if(nrow(carcass_estimates_query) <= nrow(SRJPEdata::carcass_estimates)) {
   warning(paste("No new carcass estimates datasets detected in the database. Carcass estimate data not updated on", Sys.Date()))
 })
 
-## SAVE TO DATA PACKAGE ---
-usethis::use_data(upstream_passage, overwrite = TRUE)
-usethis::use_data(upstream_passage_estimates, overwrite = TRUE)
-usethis::use_data(holding, overwrite = TRUE)
-usethis::use_data(redd, overwrite = TRUE)
-usethis::use_data(carcass_estimates, overwrite = TRUE)
 

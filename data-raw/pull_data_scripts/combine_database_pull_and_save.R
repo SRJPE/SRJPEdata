@@ -1,0 +1,25 @@
+library(tidyverse)
+# Bind together tables from SRJPE data and data tackle 
+source("data-raw/pull_data_scripts/pull_tables_from_database.R")
+source("data-raw/pull_data_scripts/pull_tables_from_data_tackle_database.R")
+
+# Bind rows 
+rst_catch <- bind_rows(rst_catch, rst_catch_query_pilot) |> glimpse()
+rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot)  |> glimpse()
+release <- bind_rows(release, release_query_pilot |> mutate(release_id = as.character(release_id)))  |> glimpse()
+recaptures <- bind_rows(recaptures, recaptures_query_pilot |> mutate(release_id = as.character(release_id))) |> glimpse()
+
+## SAVE TO DATA PACKAGE ---
+usethis::use_data(rst_catch, overwrite = TRUE)
+usethis::use_data(rst_trap, overwrite = TRUE)
+usethis::use_data(release, overwrite = TRUE)
+usethis::use_data(recaptures, overwrite = TRUE)
+
+
+# Adult save as is, no adult data in datatackle so no need to combine 
+## SAVE TO DATA PACKAGE ---
+usethis::use_data(upstream_passage, overwrite = TRUE)
+usethis::use_data(upstream_passage_estimates, overwrite = TRUE)
+usethis::use_data(holding, overwrite = TRUE)
+usethis::use_data(redd, overwrite = TRUE)
+usethis::use_data(carcass_estimates, overwrite = TRUE)

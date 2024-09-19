@@ -65,9 +65,7 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
 rst_catch_query_pilot$adipose_clipped |> unique() #TODO I believe these should all be FALSE 
 rst_catch_query_pilot$dead |> unique() #TODO lets make sure we are defaulting to FALSE on pilot, not NA
 
-try(if(!exists("rst_catch_query_pilot"))
-  rst_catch_pilot <- SRJPEdata::rst_catch |> filter(stream %in% c("mill creek", "deer creek"))
-  else(rst_catch_pilot <- rst_catch_query_pilot))
+# TODO add tests 
 
 
 # Pull in Trap table 
@@ -126,15 +124,17 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
 # turbidity, velocity - mill and deer currently do not collect. 
 # also missing visit_type but we intentionally don't collect that
 
-try(if(!exists("rst_trap_query_pilot"))
-  rst_trap_pilot <- SRJPEdata::rst_trap |> filter(stream %in% c("mill creek", "deer creek"))
-  else(rst_trap_pilot <- rst_trap_query_pilot))
+# TODO update tests, needs a date component as well to make sure we are only taking datatackle 
+# try(if(!exists("rst_trap_query_pilot"))
+#   rst_trap_pilot <- SRJPEdata::rst_trap |> 
+#     filter(stream %in% c("mill creek", "deer creek")) 
+#   else(rst_trap_pilot <- rst_trap_query_pilot))
 
 
 # Pull in efficiency data 
 # release table 
 # TODO this query only works for mill deer (release all hatchery, will need to be updated once we bring in other systems)
-dbGetQuery(con, "SELECT * from release") |> glimpse()
+dbGetQuery(con, "SELECT * from release") 
 try(release_query_pilot <- dbGetQuery(con, "SELECT 
                                        r.id as release_id,
                                        r.released_at as released_at, 
@@ -159,9 +159,9 @@ try(release_query_pilot <- dbGetQuery(con, "SELECT
                "site_group", "number_released", "run", "life_stage", "origin"
       )))
 
-try(if(!exists("release_query_pilot"))
-  release <- SRJPEdata::release |> filter(stream %in% c("mill creek", "deer creek"))
-  else(release <- release_query_pilot))
+# try(if(!exists("release_query_pilot"))
+#   release <- SRJPEdata::release |> filter(stream %in% c("mill creek", "deer creek"))
+#   else(release <- release_query_pilot))
 
 # Pull Recaptures ---
 try(recaptures_query_pilot <- dbGetQuery(con, "SELECT 
@@ -210,7 +210,7 @@ try(recaptures_query_pilot <- dbGetQuery(con, "SELECT
                "run", "life_stage", "adipose_clipped", "dead", "fork_length", 
                "weight", "species", "release_id")))
 
-try(if(!exists("recaptures_query_pilot"))
-  recaptures <- SRJPEdata::recaptures |> filter(stream %in% c("mill creek", "deer creek"))
-  else(recaptures <- recaptures_query_pilot))
+# try(if(!exists("recaptures_query_pilot"))
+#   recaptures <- SRJPEdata::recaptures |> filter(stream %in% c("mill creek", "deer creek"))
+#   else(recaptures <- recaptures_query_pilot))
 
