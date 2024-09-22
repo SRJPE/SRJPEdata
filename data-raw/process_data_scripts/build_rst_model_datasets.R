@@ -4,6 +4,7 @@
 library(SRJPEdata)
 library(lubridate)
 library(tidyverse)
+library(data.table)
 
 # Catch Formatting --------------------------------------------------------------
 # Rewrite script from catch pulled from JPE database
@@ -20,15 +21,41 @@ chosen_site_years_to_model |> glimpse()
 
 # Filter to use inclusion criteria ---------------------------------------------
 # TODO this is the slowest block...
-catch_with_inclusion_criteria <- updated_standard_catch |> 
-  mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
-  left_join(chosen_site_years_to_model) |> 
-  mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
-         # if the year was not included in the list of years to include then should be FALSE
-         include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
-  filter(include_in_model) |> 
-  select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
-  glimpse()
+# catch_with_inclusion_criteria <- updated_standard_catch |> 
+#   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
+#   left_join(chosen_site_years_to_model) |> 
+#   mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
+#          # if the year was not included in the list of years to include then should be FALSE
+#          include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
+#   filter(include_in_model) |> 
+#   select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
+#   glimpse()
+
+# Converted to data.table for performance reasons
+# Convert your data.frames to data.tables (if not already in data.table format)
+updated_standard_catch <- as.data.table(updated_standard_catch)
+chosen_site_years_to_model <- as.data.table(chosen_site_years_to_model)
+
+# Step-by-step translation of the dplyr code
+catch_with_inclusion_criteria <- updated_standard_catch[
+  # Step 1: Create monitoring_year
+  , monitoring_year := ifelse(month(date) %in% 9:12, year(date) + 1, year(date))
+][
+  # Step 2: Perform the left join with chosen_site_years_to_model
+  chosen_site_years_to_model, on = .(monitoring_year, stream, site, site_group), nomatch = 0
+][
+  # Step 3: Mutate include_in_model column based on conditions
+  , include_in_model := ifelse(date >= min_date & date <= max_date, TRUE, FALSE)
+][
+  # Step 4: Adjust include_in_model for missing min_date
+  , include_in_model := ifelse(is.na(min_date), FALSE, include_in_model)
+][
+  # Step 5: Filter rows where include_in_model is TRUE
+  include_in_model == TRUE
+][
+  # Step 6: Select and remove columns (similar to select in dplyr)
+  , !c("monitoring_year", "min_date", "max_date", "year", "week", "include_in_model")
+]
 
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
@@ -105,23 +132,47 @@ weekly_effort_by_site <- weekly_hours_fished |>
 env_with_sites <- environmental_data |> 
   left_join(site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
   glimpse()
+# 
+# weekly_flow <- env_with_sites |> 
+#   filter(parameter == "flow",
+#          statistic == "mean") |> 
+#   mutate(week = week(date),
+#          year = year(date)) |> 
+#   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
+#   summarize(mean_flow = mean(value, na.rm = T)) |> glimpse()
 
-weekly_flow <- env_with_sites |> 
-  filter(parameter == "flow",
-         statistic == "mean") |> 
-  mutate(week = week(date),
-         year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
-  summarize(mean_flow = mean(value, na.rm = T)) |> glimpse()
+# Convert env_with_sites to a data.table (if not already one)
+env_with_sites <- as.data.table(env_with_sites)
 
-weekly_temperature <- env_with_sites |> 
-  filter(parameter == "temperature",
-         statistic == "mean")  |> 
-  mutate(week = week(date),
-         year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
-  summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
+# Filter, mutate, and summarize using data.table syntax
+weekly_flow <- env_with_sites[
+  # Step 1: Filter the data for "flow" and "mean"
+  parameter == "flow" & statistic == "mean",
+  
+  # Step 2: Create new columns for week and year
+  `:=`(week = week(date), year = year(date))
+][
+  # Step 3: Group by week, year, stream, site, site_group, gage_agency, gage_number
+  , .(mean_flow = mean(value, na.rm = TRUE)),
+  by = .(week, year, stream, site, site_group, gage_agency, gage_number)
+]
 
+
+# weekly_temperature <- env_with_sites |> 
+#   filter(parameter == "temperature",
+#          statistic == "mean")  |> 
+#   mutate(week = week(date),
+#          year = year(date)) |> 
+#   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
+#   summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
+
+weekly_temperature <- env_with_sites[
+  parameter == "temperature" & statistic == "mean",
+  `:=`(week = week(date), year = year(date))
+][
+  , .(mean_temperature = mean(value, na.rm = TRUE)),
+  by = .(week, year, stream, site, site_group, gage_agency, gage_number)
+]
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
 weekly_efficiency <- 
