@@ -34,7 +34,6 @@ reference:
 - contents: 
   - rst_catch
   - rst_trap
-  - release_fish
   - recaptures 
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
