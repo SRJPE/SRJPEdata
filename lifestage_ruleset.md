@@ -111,16 +111,16 @@ The first step in filling in these missing lifestages was to find the proportion
 
 | year| week|stream           |site                    | percent_fry| percent_smolt| percent_yearling|
 |----:|----:|:----------------|:-----------------------|-----------:|-------------:|----------------:|
-| 1992|   42|deer creek       |deer creek              |           0|             0|                1|
-| 1992|   44|deer creek       |deer creek              |           0|             0|                1|
-| 1992|   45|deer creek       |deer creek              |           0|             0|                1|
-| 1992|   46|deer creek       |deer creek              |           0|             0|                1|
-| 1992|   47|deer creek       |deer creek              |           0|             0|                1|
-| 1992|   48|deer creek       |deer creek              |           0|             0|                1|
-| 1992|   49|deer creek       |deer creek              |           0|             0|                1|
-| 1994|   29|sacramento river |red bluff diversion dam |           0|             1|                0|
-| 1994|   30|sacramento river |red bluff diversion dam |           0|             1|                0|
-| 1994|   31|sacramento river |red bluff diversion dam |           0|             1|                0|
+| 1992|   42|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   44|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   45|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   46|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   48|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1992|   49|deer creek       |deer creek              |         0.0|           0.0|                1|
+| 1994|   29|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
+| 1994|   30|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
+| 1994|   31|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
+| 1994|   32|sacramento river |red bluff diversion dam |         0.1|           0.9|                0|
 
 ### Determine general weekly lifestage proportions
 
@@ -133,18 +133,9 @@ For weeks that had no fork length data in a given week, we calculated a general 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
 
 
-|date       |stream     |site       |subsite    |site_group |run          |adipose_clipped |dead | fork_length| weight| week| year|model_lifestage_method   |life_stage | count| monitoring_year|
-|:----------|:----------|:----------|:----------|:----------|:------------|:---------------|:----|-----------:|------:|----:|----:|:------------------------|:----------|-----:|---------------:|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|            1993|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          94|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|            1993|
+```
+## Error in eval(expr, envir, enclos): object 'updated_standard_catch' not found
+```
 
 ### Generate rows for when no fish of a lifestage are caught
 
@@ -159,7 +150,3 @@ The following plot shows the general patten in the lifestage field where fry are
 **Battle Creek: 2011**
 
 ![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
-
-## Save resulting data to package
-
-

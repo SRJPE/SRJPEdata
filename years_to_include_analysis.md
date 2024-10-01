@@ -79,7 +79,7 @@ The table below shows a section of this table:
 
 | monitoring_year|stream           |site                    |subsite    |min_date   | min_week|max_date   | max_week|
 |---------------:|:----------------|:-----------------------|:----------|:----------|--------:|:----------|--------:|
-|            1994|sacramento river |red bluff diversion dam |gate 1     |1994-08-19 |       34|1994-08-31 |       35|
+|            1994|sacramento river |red bluff diversion dam |gate 1     |1994-08-19 |       33|1994-08-31 |       35|
 |            1994|sacramento river |red bluff diversion dam |gate 10    |1994-08-29 |       35|1994-08-31 |       35|
 |            1994|sacramento river |red bluff diversion dam |gate 11    |1994-07-18 |       29|1994-08-24 |       34|
 |            1995|deer creek       |deer creek              |deer creek |1994-10-03 |       40|1995-06-18 |       25|

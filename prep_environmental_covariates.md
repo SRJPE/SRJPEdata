@@ -114,16 +114,16 @@ Passage timing was considered; however, limited data reduced the sample size of 
 
 | year|stream       | median_passage_timing| mean_passage_timing| min_passage_timing|
 |----:|:------------|---------------------:|-------------------:|------------------:|
-| 1998|battle creek |                  24.5|            24.23333|                 22|
-| 1999|battle creek |                  25.0|            24.73529|                 22|
-| 2000|battle creek |                  28.0|            28.57895|                 21|
-| 2001|battle creek |                  21.5|            23.50000|                 19|
-| 2002|battle creek |                  27.0|            28.09091|                 22|
-| 2003|battle creek |                  34.0|            32.18103|                 25|
-| 2004|battle creek |                  24.0|            24.60870|                 23|
-| 2005|battle creek |                  24.0|            24.90698|                 21|
-| 2006|battle creek |                  26.0|            25.98750|                 25|
-| 2007|battle creek |                  22.0|            23.08021|                 19|
+| 1998|battle creek |                  23.5|            24.03333|                 22|
+| 1999|battle creek |                  25.0|            24.58824|                 21|
+| 2000|battle creek |                  28.0|            28.48684|                 21|
+| 2001|battle creek |                  21.5|            23.33784|                 19|
+| 2002|battle creek |                  27.0|            27.90909|                 21|
+| 2003|battle creek |                  33.0|            32.00000|                 25|
+| 2004|battle creek |                  24.0|            24.34783|                 22|
+| 2005|battle creek |                  24.0|            24.81395|                 21|
+| 2006|battle creek |                  25.5|            25.77500|                 24|
+| 2007|battle creek |                  22.0|            22.95187|                 19|
 
 The following plot is of median passage over time for all tributaries:
 

@@ -165,21 +165,21 @@ We grouped hours fished data by site, subsite, week, and year and summarized to 
 
 
 ```
-## # A tibble: 243 × 5
-## # Groups:   year, stream, site [41]
+## # A tibble: 244 × 5
+## # Groups:   year, stream, site [42]
 ##     year stream           site                    subsite     n
-##    <int> <chr>            <chr>                   <chr>   <int>
-##  1  1994 sacramento river red bluff diversion dam gate 1      5
+##    <dbl> <chr>            <chr>                   <chr>   <int>
+##  1  1994 sacramento river red bluff diversion dam gate 1      6
 ##  2  1994 sacramento river red bluff diversion dam gate 10     4
 ##  3  1994 sacramento river red bluff diversion dam gate 11     6
-##  4  1994 sacramento river red bluff diversion dam gate 3     12
-##  5  1994 sacramento river red bluff diversion dam gate 5     16
-##  6  1994 sacramento river red bluff diversion dam gate 7     11
+##  4  1994 sacramento river red bluff diversion dam gate 3     11
+##  5  1994 sacramento river red bluff diversion dam gate 5     15
+##  6  1994 sacramento river red bluff diversion dam gate 7     12
 ##  7  1994 sacramento river red bluff diversion dam gate 9     16
 ##  8  1995 sacramento river knights landing         8.3         3
 ##  9  1995 sacramento river knights landing         8.4         7
-## 10  1995 sacramento river red bluff diversion dam gate 1     33
-## # ℹ 233 more rows
+## 10  1995 sacramento river red bluff diversion dam gate 1     32
+## # ℹ 234 more rows
 ```
 
 ### QC
