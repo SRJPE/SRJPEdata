@@ -23,8 +23,7 @@ try(battle_creek_data_query <- dataRetrieval::readNWISdv(11376550, "00060", star
 battle_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11376550" & 
-           parameter == "flow" &  
-           date >= as.Date("1995-01-01")) 
+           parameter == "flow") 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("battle_creek_data_query")) 
@@ -145,8 +144,7 @@ try(clear_creek_data_query <- dataRetrieval::readNWISdv(11372000, "00060", start
 clear_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11372000" & 
-           parameter == "flow" &  
-           date >= as.Date("1995-01-01"))
+           parameter == "flow")
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("clear_creek_data_query")) 
@@ -222,8 +220,7 @@ try(deer_creek_data_query <- dataRetrieval::readNWISdv(11383500, "00060", startD
 deer_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11383500" & 
-           parameter == "flow" &  
-           date >= as.Date("1986-01-01"))
+           parameter == "flow")
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("deer_creek_data_query")) 
@@ -289,8 +286,7 @@ try(feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", du
 feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
            gage_number == "GRL" & 
-           parameter == "flow" &  
-           date >= as.Date("1997-01-01")) 
+           parameter == "flow") 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("feather_hfc_river_data_query")) 
@@ -483,8 +479,7 @@ try(mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060", startD
 mill_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11381500" & 
-           parameter == "flow" &  
-           date >= as.Date("1995-01-01")) 
+           parameter == "flow") 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("mill_creek_data_query")) 
@@ -549,8 +544,7 @@ try(sac_river_data_query <- dataRetrieval::readNWISdv(11390500, "00060", startDa
 sac_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11390500" & 
-           parameter == "flow" &  
-           date >= as.Date("1994-01-01")) 
+           parameter == "flow") 
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("sac_river_data_query")) 
@@ -578,8 +572,7 @@ try(sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", startDa
 sac_river_existing_temp <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" &
            gage_number == "11390500" &
-           parameter == "temperature" &  
-           date >= as.Date("1994-01-01")) 
+           parameter == "temperature") 
 # Confirm data pull did not error out, if does not exist - use existing temperature, 
 # if exists - reformat new data pull
 try(if(!exists("sac_river_temp_query")) 
@@ -611,8 +604,7 @@ try(yuba_river_data_query <- dataRetrieval::readNWISdv(11421000, "00060", startD
 yuba_river_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "USGS" & 
            gage_number == "11421000" & 
-           parameter == "flow" &  
-           date >= as.Date("1999-01-01"))
+           parameter == "flow")
 # Confirm data pull did not error out, if does not exist - use existing flow, 
 # if exists - reformat new data pull
 try(if(!exists("yuba_river_data_query")) 
