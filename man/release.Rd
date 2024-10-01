@@ -3,7 +3,6 @@
 \docType{data}
 \name{release}
 \alias{release}
-\alias{recaptures}
 \title{RST efficiency trial releases}
 \format{
 \itemize{
@@ -37,7 +36,7 @@ Raw datasets and original documentation of data processing and QC process can be
 }
 }
 \usage{
-recaptures
+release
 }
 \description{
 Dataset containing releases for efficiency monitoring

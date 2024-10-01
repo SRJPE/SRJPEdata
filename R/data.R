@@ -228,7 +228,7 @@
 #'          }
 #'   \item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
 #'   }
-'recaptures'
+'release'
 
 #' @title Adult Upstream passage monitoring estimates 
 #' @name upstream_passage_estimates
