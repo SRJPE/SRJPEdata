@@ -145,18 +145,7 @@ env_with_sites <- environmental_data |>
 env_with_sites <- as.data.table(env_with_sites)
 
 # Filter, mutate, and summarize using data.table syntax
-weekly_flow <- env_with_sites[
-  # Step 1: Filter the data for "flow" and "mean"
-  parameter == "flow" & statistic == "mean",
-  
-  # Step 2: Create new columns for week and year
-  `:=`(week = week(date), year = year(date))
-][
-  # Step 3: Group by week, year, stream, site, site_group, gage_agency, gage_number
-  , .(mean_flow = mean(value, na.rm = TRUE)),
-  by = .(week, year, stream, site, site_group, gage_agency, gage_number)
-]
-
+weekly_flow <- env_with_sites |> filter(parameter == "flow")
 
 # weekly_temperature <- env_with_sites |> 
 #   filter(parameter == "temperature",
@@ -166,13 +155,8 @@ weekly_flow <- env_with_sites[
 #   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
 #   summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
 
-weekly_temperature <- env_with_sites[
-  parameter == "temperature" & statistic == "mean",
-  `:=`(week = week(date), year = year(date))
-][
-  , .(mean_temperature = mean(value, na.rm = TRUE)),
-  by = .(week, year, stream, site, site_group, gage_agency, gage_number)
-]
+weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
+
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
 weekly_efficiency <- 
@@ -198,8 +182,6 @@ weekly_efficiency |> glimpse()
 flow_reformatted <- env_with_sites |> 
   filter(parameter == "flow",
          statistic == "mean") |> 
-  mutate(year = year(date),
-         week = week(date)) |> 
   group_by(year, week, site, stream, gage_agency, gage_number) |> 
   summarise(flow_cfs = mean(value, na.rm = T)) |> 
   glimpse()
@@ -291,7 +273,7 @@ tryCatch({
       pull(week) |> 
       max()
     if (max_week < 20) {
-      warning(paste("The data for", selected_site, "in", max_year, "only goes to", max_week, "and should not be used as a full season."))
+      warning(paste("The data for", selected_site, "in", max_year, "only goes to week", max_week, "and should not be used as a full season."))
     } 
   }
   # map through sites

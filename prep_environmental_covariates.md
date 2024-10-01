@@ -43,44 +43,57 @@ Several approaches were considered for summarizing temperature:
 Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. The resulting dataset is as follows (note that DD less than 0 are set to 0):
 
 
-| year|stream        |   gdd_trib| gdd_sac| gdd_total|
-|----:|:-------------|----------:|-------:|---------:|
-| 1999|butte creek   |   9.900463|       0|      9.90|
-| 1999|deer creek    |  79.307870|       0|     79.31|
-| 1999|mill creek    |  24.350443|       0|     24.35|
-| 2000|butte creek   |  38.893518|       0|     38.89|
-| 2000|deer creek    | 191.700593|       0|    191.70|
-| 2000|feather river |  52.729544|       0|     52.73|
-| 2000|mill creek    |  97.261574|       0|     97.26|
-| 2000|yuba river    | 419.807661|       0|    419.81|
-| 2001|butte creek   |  70.303241|       0|     70.30|
-| 2001|clear creek   |  17.078134|       0|     17.08|
+```
+## Error in `filter()`:
+## ℹ In argument: `month(date) %in% migratory_months`.
+## Caused by error in `as.POSIXlt.default()`:
+## ! do not know how to convert 'x' to class "POSIXlt"
+```
+
+```
+## Error in `filter()`:
+## ℹ In argument: `month(date) %in% holding_months`.
+## Caused by error in `as.POSIXlt.default()`:
+## ! do not know how to convert 'x' to class "POSIXlt"
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'gdd_trib' not found
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'gdd' not found
+```
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
+```
+## Error in eval(expr, envir, enclos): object 'gdd' not found
+```
 
 ### Flow 
 
 Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:
 
 
-|stream       | year| mean_flow| max_flow|
-|:------------|----:|---------:|--------:|
-|battle creek | 1995| 1002.4837|     6430|
-|battle creek | 1996|  608.5326|     2120|
-|battle creek | 1997|  373.1795|      540|
-|battle creek | 1998| 1075.1304|     3220|
-|battle creek | 1999|  595.3370|     1890|
-|battle creek | 2000|  489.3913|     1950|
-|battle creek | 2001|  312.9402|     1130|
-|battle creek | 2002|  357.4565|      617|
-|battle creek | 2003|  604.3207|     2740|
-|battle creek | 2004|  452.6250|     1370|
+```
+## Error in `filter()`:
+## ℹ In argument: `month(date) %in% migratory_and_holding_months`.
+## Caused by error in `as.POSIXlt.default()`:
+## ! do not know how to convert 'x' to class "POSIXlt"
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
 
 ### Water Year Type
 
@@ -91,8 +104,8 @@ We used the `waterYearType` package to pull water year assignments as a categori
 
 |Water Year Type | Count|
 |:---------------|-----:|
-|dry             |    63|
-|wet             |    53|
+|dry             |    60|
+|wet             |    52|
 
 ### Passage Timing
 
@@ -101,16 +114,16 @@ Passage timing was considered; however, limited data reduced the sample size of 
 
 | year|stream       | median_passage_timing| mean_passage_timing| min_passage_timing|
 |----:|:------------|---------------------:|-------------------:|------------------:|
-| 1998|battle creek |                  23.5|            24.03333|                 22|
-| 1999|battle creek |                  25.0|            24.58824|                 21|
-| 2000|battle creek |                  28.0|            28.48684|                 21|
-| 2001|battle creek |                  21.5|            23.33784|                 19|
-| 2002|battle creek |                  27.0|            27.90909|                 21|
-| 2003|battle creek |                  33.0|            32.00000|                 25|
-| 2004|battle creek |                  24.0|            24.34783|                 22|
-| 2005|battle creek |                  24.0|            24.81395|                 21|
-| 2006|battle creek |                  25.5|            25.77500|                 24|
-| 2007|battle creek |                  22.0|            22.95187|                 19|
+| 1998|battle creek |                  24.5|            24.23333|                 22|
+| 1999|battle creek |                  25.0|            24.73529|                 22|
+| 2000|battle creek |                  28.0|            28.57895|                 21|
+| 2001|battle creek |                  21.5|            23.50000|                 19|
+| 2002|battle creek |                  27.0|            28.09091|                 22|
+| 2003|battle creek |                  34.0|            32.18103|                 25|
+| 2004|battle creek |                  24.0|            24.60870|                 23|
+| 2005|battle creek |                  24.0|            24.90698|                 21|
+| 2006|battle creek |                  26.0|            25.98750|                 25|
+| 2007|battle creek |                  22.0|            23.08021|                 19|
 
 The following plot is of median passage over time for all tributaries:
 
@@ -139,6 +152,12 @@ We hypothesized that total annual passage might be an indicator of density becau
 ### Combine and Save Covariate Data 
 
 Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):
+
+
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
+
 
 
 | year|stream       | wy_type| max_flow_std|    gdd_std| passage_index| median_passage_timing_std|
