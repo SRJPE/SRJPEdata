@@ -6,7 +6,8 @@
 \title{Environmental Gage Data}
 \format{
 \itemize{
-\item \code{date}: Date associated with environmental measure
+\item \code{year}: Year associated with environmental measure
+\item \code{week}: Week associated with environmental measure
 \item \code{statistic}: Summary static used to summarize flow and temperature measures into a single daily reccord (min, mean, max)
 \item \code{value}: Flow or temperature measurements
 \item \code{stream}: Stream environmental data is collected on

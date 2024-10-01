@@ -197,6 +197,39 @@
 #'   }
 'recaptures'
 
+#' @title RST efficiency trial releases
+#' @name release
+#' @description Dataset containing releases for efficiency monitoring  
+#' @format 
+#' \itemize{
+#'   \item \code{date_released}: date 
+#'   \item \code{release_id}: id associated with release trial 
+#'   \item \code{stream}: Stream RST is located on  
+#'   \item \code{site}: Site RST is located on   
+#'   \item \code{subsite}: Specific trap site   
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+#'   \item \code{number_released}: Number of fish released 
+#'   \item \code{run}: Run of released fish   
+#'   \item \code{life_stage}: Life Stage of catch   
+#'   \item \code{origin}: Origin of catch   
+#'   }
+#' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. Data is combined \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/mark_recapture_standard_format.Rmd}{here}
+#'  \itemize{
+#'   \item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_mark_recapture_data.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte_mark_recapture.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Clear Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/clear-creek/clear_creek_mark_recapture.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Deer Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+#'   \item \strong{Feather River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.5}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/feather-river/feather_mark_recapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   \item \strong{Mill Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1}{Data on EDI}
+#'      \itemize{
+#'          \item{Knights Landing}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/knights_landing_mark_reacapture.R}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Tisdale}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1499.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/rst/lower-sac/tisdale_efficiency.Rmd}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'          \item{Delta Entry}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1503.1}{Data on EDI}.
+#'          }
+#'   \item \strong{Yuba River}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/yuba-river/yuba-river-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
+#'   }
+'recaptures'
+
 #' @title Adult Upstream passage monitoring estimates 
 #' @name upstream_passage_estimates
 #' @description Adult upstream passage estimates, Generalized Additive Model (GAM) 
@@ -395,7 +428,8 @@
 #' @description Environmental gage data for each tributary in the SR JPE.
 #' @format
 #' \itemize{
-#'   \item \code{date}: Date associated with environmental measure 
+#'   \item \code{year}: Year associated with environmental measure 
+#'   \item \code{week}: Week associated with environmental measure 
 #'   \item \code{statistic}: Summary static used to summarize flow and temperature measures into a single daily reccord (min, mean, max)
 #'   \item \code{value}: Flow or temperature measurements 
 #'   \item \code{stream}: Stream environmental data is collected on  
@@ -426,3 +460,54 @@
 #'   This data package queries tagging data from many studies using the ERDDAP data server.
 #'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
 'survival_model_inputs'
+
+#' @title Survival Model Data
+#' @name survival_model_inputs
+#' @description Acoustic tagging data used to model survival for the SR JPE 
+#' @format
+#' \itemize{
+#'   \item \code{fish_id}: Unique identifier associated with each released fish 
+#'   \item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected 
+#'   \item \code{study_id}: Unique identifier associated with each release group 
+#'   \item \code{fish_length}: Fork length of fish in mm 
+#'   \item \code{fish_weight}: Weight of fish in grams 
+#'   \item \code{fish_type}: Type of fish used in release trial, typically indicated where that fish came from and species of fish 
+#'   \item \code{fish_release_date}: Date of release 
+#'   \item \code{release_location}: Location of release 
+#'   \item \code{year}: Year of release 
+#'   }
+#'   @source Central Valley Enhanced Acoustic Tagging Project. 
+#'   This data package queries tagging data from many studies using the ERDDAP data server.
+#'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
+'survival_model_inputs'
+
+#' @title Survival Model Data
+#' @name survival_model_inputs
+#' @description Acoustic tagging data used to model survival for the SR JPE 
+#' @format
+#' \itemize{
+#'   \item \code{fish_id}: Unique identifier associated with each released fish 
+#'   \item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected 
+#'   \item \code{study_id}: Unique identifier associated with each release group 
+#'   \item \code{fish_length}: Fork length of fish in mm 
+#'   \item \code{fish_weight}: Weight of fish in grams 
+#'   \item \code{fish_type}: Type of fish used in release trial, typically indicated where that fish came from and species of fish 
+#'   \item \code{fish_release_date}: Date of release 
+#'   \item \code{release_location}: Location of release 
+#'   \item \code{year}: Year of release 
+#'   }
+#'   @source Central Valley Enhanced Acoustic Tagging Project. 
+#'   This data package queries tagging data from many studies using the ERDDAP data server.
+#'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
+'survival_model_inputs'
+
+#' @title Site Lookup
+#' @name site_lookup
+#' @description Site lookup table for linking subsite, sites, site_groups, and streams in the SR JPE 
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream RST is located on  
+#'   \item \code{site}: Site RST is located on   
+#'   \item \code{subsite}: Specific trap site   
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+'site_lookup'

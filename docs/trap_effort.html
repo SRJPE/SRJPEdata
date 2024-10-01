@@ -294,21 +294,21 @@
 <div class="section level2">
 <h2 id="summarized-by-week">Summarized by week<a class="anchor" aria-label="anchor" href="#summarized-by-week"></a></h2>
 <p>We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week. Before 2005 trap data is not available for Knights Landing, we assume 168 hours when trap data is missing.</p>
-<pre><code><span><span class="co">## # A tibble: 275 × 5</span></span>
-<span><span class="co">## # Groups:   year, stream, site [52]</span></span>
+<pre><code><span><span class="co">## # A tibble: 243 × 5</span></span>
+<span><span class="co">## # Groups:   year, stream, site [41]</span></span>
 <span><span class="co">##     year stream           site                    subsite     n</span></span>
-<span><span class="co">##    &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;                   &lt;chr&gt;   &lt;int&gt;</span></span>
-<span><span class="co">##  1  1994 sacramento river red bluff diversion dam gate 1      6</span></span>
+<span><span class="co">##    &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;                   &lt;chr&gt;   &lt;int&gt;</span></span>
+<span><span class="co">##  1  1994 sacramento river red bluff diversion dam gate 1      5</span></span>
 <span><span class="co">##  2  1994 sacramento river red bluff diversion dam gate 10     4</span></span>
 <span><span class="co">##  3  1994 sacramento river red bluff diversion dam gate 11     6</span></span>
-<span><span class="co">##  4  1994 sacramento river red bluff diversion dam gate 3     11</span></span>
-<span><span class="co">##  5  1994 sacramento river red bluff diversion dam gate 5     15</span></span>
-<span><span class="co">##  6  1994 sacramento river red bluff diversion dam gate 7     12</span></span>
+<span><span class="co">##  4  1994 sacramento river red bluff diversion dam gate 3     12</span></span>
+<span><span class="co">##  5  1994 sacramento river red bluff diversion dam gate 5     16</span></span>
+<span><span class="co">##  6  1994 sacramento river red bluff diversion dam gate 7     11</span></span>
 <span><span class="co">##  7  1994 sacramento river red bluff diversion dam gate 9     16</span></span>
 <span><span class="co">##  8  1995 sacramento river knights landing         8.3         3</span></span>
 <span><span class="co">##  9  1995 sacramento river knights landing         8.4         7</span></span>
-<span><span class="co">## 10  1995 sacramento river red bluff diversion dam gate 1     32</span></span>
-<span><span class="co">## # ℹ 265 more rows</span></span></code></pre>
+<span><span class="co">## 10  1995 sacramento river red bluff diversion dam gate 1     33</span></span>
+<span><span class="co">## # ℹ 233 more rows</span></span></code></pre>
 <div class="section level3">
 <h3 id="qc-2">QC<a class="anchor" aria-label="anchor" href="#qc-2"></a></h3>
 <p>The following plots provide visuals to show weekly hours fished for all tributaries. Note that this is for all years of data so there are multiple datapoints for a given week due to multiple years being represented.</p>

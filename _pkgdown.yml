@@ -32,8 +32,10 @@ reference:
 - subtitle: Juvenile Datasets
   desc: RST monitoring datasets
 - contents: 
+  - site_lookup
   - rst_catch
   - rst_trap
+  - release
   - recaptures 
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
