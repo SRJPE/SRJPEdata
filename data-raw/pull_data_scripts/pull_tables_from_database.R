@@ -126,8 +126,8 @@ try(if(nrow(recaptures_query) <= nrow(SRJPEdata::recaptures)) {
 
 
 ## SAVE TO DATA PACKAGE ---
-usethis::use_data(rst_catch, overwrite = TRUE)
-usethis::use_data(rst_trap, overwrite = TRUE)
+usethis::use_data(rst_catch, overwrite = TRUE, compress = "xz")
+usethis::use_data(rst_trap, overwrite = TRUE, compress = "xz")
 usethis::use_data(release, overwrite = TRUE)
 usethis::use_data(recaptures, overwrite = TRUE)
 

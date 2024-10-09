@@ -1,6 +1,6 @@
 Package: SRJPEdata
 Title: Stores Monitoring Data to Be Used in the Spring Run Juvenile Production Estimate Model 
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: c(person("Ashley", "Vizek", , "avizek@flowwest.com", role = c("aut", "cre")),
              person("Erin", "Cain", , "ecain@flowwest.com", role = c("aut")),
              person("Liz", "Stebbins", , "lstebbins@flowwest.com", role = c("aut")))
@@ -8,7 +8,7 @@ Description: This data package pulls in data from the SR JPE database and format
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
     R (>= 2.10)
 LazyData: true

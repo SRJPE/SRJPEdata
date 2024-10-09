@@ -360,3 +360,10 @@ updated_standard_catch |>
        fill = "") +
   theme_minimal()
 ```
+
+## Save resulting data to package
+
+```{r}
+# Save to package
+usethis::use_data(updated_standard_catch, overwrite = TRUE, compress = "bzip2")
+```

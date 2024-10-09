@@ -36,7 +36,7 @@
 #' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
 #'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
 #'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
-'weekly_juvenile_abundance_model_data'
+'weekly_juvenile_abundance_efficiency_data'
 
 #' @title Weekly BT-SPAS-X Catch Data
 #' @name weekly_juvenile_abundance_catch_data

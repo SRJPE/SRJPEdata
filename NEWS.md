@@ -1,3 +1,8 @@
+# SRJPEdata 0.0.3
+
+Updates included in this patch:
+- Fixes issues with the efficiency data
+
 # SRJPEdata 0.0.2
 
 Updates included in this patch:
