@@ -56,7 +56,8 @@ try(rst_catch_query_pilot <- dbGetQuery(con, "SELECT
          count = num_fish_caught, 
          run = capture_run,
          species = tolower(species_common_name)) |> 
-    filter(is.na(release_id)) |> 
+    filter(is.na(release_id),
+           species == "chinook salmon") |> 
     select(c("date", "stream", "site", "subsite", "site_group", "count", 
              "run", "life_stage", "adipose_clipped", "dead", "fork_length", 
              "weight", "species")))
