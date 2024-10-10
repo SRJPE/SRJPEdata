@@ -86,7 +86,7 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
                                    t.total_revolutions, 
                                    t.rpm_at_start, 
                                    t.rpm_at_end, 
-                                   t.debris_volume_liters, 
+                                   t.debris_volume_gal, 
                                    tve.measure_name, 
                                    tve.measure_value_numeric,
                                    tve.measure_value_text, 
@@ -110,7 +110,7 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
              site_group = stream,
              rpm_start = rpm_at_start, 
              rpm_end = rpm_at_end, 
-             debris_volume = debris_volume_liters) |> # TODO confirm units match up with rst_trap data 
+             debris_volume = debris_volume_gal) |> # TODO confirm units match up with rst_trap data 
       pivot_wider(names_from = measure_name, values_from = measure_value_numeric) |> 
       rename(discharge = `flow measure`,
              water_temp = `water temperature`) |> 
@@ -134,7 +134,7 @@ try(rst_trap_query_pilot <-  dbGetQuery(con,
 # Pull in efficiency data 
 # release table 
 # TODO this query only works for mill deer (release all hatchery, will need to be updated once we bring in other systems)
-dbGetQuery(con, "SELECT * from release") 
+# dbGetQuery(con, "SELECT * from release") 
 try(release_query_pilot <- dbGetQuery(con, "SELECT 
                                        r.id as release_id,
                                        r.released_at as released_at, 
@@ -156,8 +156,8 @@ try(release_query_pilot <- dbGetQuery(con, "SELECT
              run = NA, 
              life_stage = NA) |> 
       select(c("date_released", "release_id", "stream", "site", "subsite", 
-               "site_group", "number_released", "run", "life_stage", "origin"
-      ) |> distinct()))
+               "site_group", "number_released", "run", "life_stage", "origin")) 
+             |> distinct())
 
 # try(if(!exists("release_query_pilot"))
 #   release <- SRJPEdata::release |> filter(stream %in% c("mill creek", "deer creek"))
