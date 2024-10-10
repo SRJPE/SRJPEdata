@@ -179,15 +179,6 @@ weekly_efficiency |> glimpse()
 
 # reformat flow data and summarize weekly
 # TODO 32 NAs, fill in somehow  
-<<<<<<< HEAD
-flow_reformatted <- env_with_sites |> 
-  filter(parameter == "flow",
-         statistic == "mean") |> 
-  group_by(year, week, site, stream, gage_agency, gage_number) |> 
-  summarise(flow_cfs = mean(value, na.rm = T)) |> 
-  glimpse()
-
-=======
 # flow_reformatted <- env_with_sites |> 
 #   filter(parameter == "flow",
 #          statistic == "mean") |> 
@@ -203,7 +194,6 @@ flow_reformatted <- env_with_sites[
   , .(flow_cfs = mean(value, na.rm = TRUE)),
   by = .(week, year, stream, site, site_group, gage_agency, gage_number)
 ]
->>>>>>> c0bf754 (reduce file size and rebuild)
 # Combine catch (weekly_standard_catch), weekly efficiency, and weekly effort by site 
 weekly_efficiency |> glimpse()
 
