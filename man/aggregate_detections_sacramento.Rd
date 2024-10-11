@@ -8,11 +8,12 @@ aggregate_detections_sacramento(
   detections,
   receiever_metadata,
   replace_dict = list(replace_with = list(c("Releasepoint"), c("WoodsonBridge"),
-    c("Sacramento"), c("Endpoint")), replace_list = list(c("BattleCk_CNFH_Rel",
-    "RBDD_Rel", "RBDD_Rel_Rec", "Altube Island", "Abv_Altube1", "MillCk_RST_Rel",
-    "MillCk2_Rel", "DeerCk_RST_Rel"), c("Mill_Ck_Conf", "Abv_WoodsonBr", "Blw_Woodson"),
-    c("TowerBridge", "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"), c("BeniciaE",
-    "BeniciaW", "ChippsE", "ChippsW")))
+    c("ButteBridge"), c("Sacramento"), c("Endpoint")), replace_list =
+    list(c("BattleCk_CNFH_Rel", "RBDD_Rel", "RBDD_Rel_Rec", "Altube Island",
+    "Abv_Altube1", "MillCk_RST_Rel", "MillCk2_Rel", "DeerCk_RST_Rel"), c("Mill_Ck_Conf",
+    "Abv_WoodsonBr", "Blw_Woodson"), c("ButteBr", "BlwButteBr"), c("TowerBridge",
+    "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"), c("BeniciaE", "BeniciaW", "ChippsE",
+    "ChippsW")))
 )
 }
 \arguments{
@@ -35,12 +36,14 @@ This function replaces specified receiver locations in the detections dataframe 
 # Define replace dictionary
 replace_dict <- list(replace_with = list(c("Releasepoint"),
                                          c("WoodsonBridge"),
+                                         c("ButteBridge"),
                                          c("Sacramento"),
                                          c("Endpoint")),
                     replace_list = list(c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec",
                                           "Altube Island","Abv_Altube1",
                                           "MillCk_RST_Rel","MillCk2_Rel","DeerCk_RST_Rel"),
                                         c("Mill_Ck_Conf","Abv_WoodsonBr","Blw_Woodson"),
+                                        c("ButteBr","BlwButteBr"),
                                         c("TowerBridge","I80-50_Br",
                                           "ToeDrainBase","Hwy84Ferry"),
                                         c("BeniciaE","BeniciaW",

@@ -1,6 +1,6 @@
 Package: SRJPEdata
 Title: Stores Monitoring Data to Be Used in the Spring Run Juvenile Production Estimate Model 
-Version: 0.0.0.9000
+Version: 0.0.2
 Authors@R: c(person("Ashley", "Vizek", , "avizek@flowwest.com", role = c("aut", "cre")),
              person("Erin", "Cain", , "ecain@flowwest.com", role = c("aut")),
              person("Liz", "Stebbins", , "lstebbins@flowwest.com", role = c("aut")))

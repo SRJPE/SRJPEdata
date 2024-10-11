@@ -10,6 +10,9 @@
     <loc>https://SRJPE.github.io/SRJPEdata/articles/index.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/lifestage_ruleset.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/articles/prep_environmental_covariates.html</loc>
   </url>
   <url>
@@ -17,6 +20,9 @@
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/articles/summary_of_data_for_modeling.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/articles/temp_regression.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/articles/temperature_data_pull.html</loc>
@@ -35,6 +41,12 @@
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/index.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/lifestage_ruleset.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/news/index.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/prep_environmental_covariates.html</loc>
@@ -127,7 +139,16 @@
     <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_hours_fished.html</loc>
   </url>
   <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_catch_data.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_efficiency_data.html</loc>
+  </url>
+  <url>
     <loc>https://SRJPE.github.io/SRJPEdata/reference/weekly_juvenile_abundance_model_data.html</loc>
+  </url>
+  <url>
+    <loc>https://SRJPE.github.io/SRJPEdata/temp_regression.html</loc>
   </url>
   <url>
     <loc>https://SRJPE.github.io/SRJPEdata/trap_effort.html</loc>

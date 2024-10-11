@@ -8,12 +8,28 @@ library(SRJPEdata)
 # Use DBI - dbConnect to connect to database - keep user id and password sectret
 con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       host = "jpe-db.postgres.database.azure.com",
-                      dbname = "postgres",
+                      dbname = "jpedb-prod",
                       user = Sys.getenv("jpe_db_user_id"),
                       password = Sys.getenv("jpe_db_password"),
                       port = 5432)
  DBI::dbListTables(con)
 
+# PULL IN HELPER TABLES 
+ try(trap_location_query <- dbGetQuery(con, "SELECT *
+                                       FROM trap_location"))
+ 
+ try(if(!exists("trap_location_query"))
+   rst_trap_locations <- SRJPEdata::rst_trap_locations
+   else(rst_trap_locations <- trap_location_query))
+ 
+ try(if(nrow(trap_location_query) <= nrow(SRJPEdata::rst_trap_locations)) {
+   rst_trap_locations <- SRJPEdata::rst_trap_locations
+   warning(paste("No new rst locations added to the database."))
+ })
+ 
+ usethis::use_data(rst_trap_locations, overwrite = TRUE)
+ 
+ 
 # PULL IN RST DATA -------------------------------------------------------------
 # Pull in Catch table
 try(rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.subsite, tl.site_group, 
@@ -31,9 +47,12 @@ try(if(!exists("rst_catch_query"))
 
 try(if(nrow(rst_catch_query) <= nrow(SRJPEdata::rst_catch)) {
   rst_catch <- SRJPEdata::rst_catch
-  warning(paste("No new rst catch datasets detected in the database. RST catch data not updated on", Sys.Date()))
+  warning(paste("No new rst catch datasets detected in the database. Maximum date of RST catch data is", max(SRJPEdata::rst_catch$date, na.rm = TRUE)))
 })
 
+# Removes NA sites that come from battle, will change logic after discussing EDI package udpates with battle team
+rst_catch <- rst_catch |> 
+  filter(!is.na(site), !is.na(date))
 
 # Pull in Trap table 
 try(rst_trap_query <-  dbGetQuery(con, 
@@ -58,7 +77,7 @@ try(if(!exists("rst_trap_query"))
 
 try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
   rst_trap <- SRJPEdata::rst_trap
-  warning(paste("No new rst trap datasets detected in the database. RST trap data not updated on", Sys.Date()))
+  warning(paste("No new rst trap datasets detected in the database. Maximum date of RST trap data is", max(SRJPEdata::rst_trap$trap_stop_date, na.rm = TRUE)))
 })
 # Pull in efficiency data 
 # release table 
@@ -76,7 +95,7 @@ try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
  
  try(if(nrow(release_query) <= nrow(SRJPEdata::release)) {
    release <- SRJPEdata::release
-   warning(paste("No new release datasets detected in the database. Release data not updated on", Sys.Date()))
+   warning(paste("No new release datasets detected in the database. Maximum date of release datais", max(SRJPEdata::release$date_released, na.rm = TRUE)))
  })
 
 
@@ -102,7 +121,7 @@ try(if(!exists("recaptures_query"))
 
 try(if(nrow(recaptures_query) <= nrow(SRJPEdata::recaptures)) {
   recaptures <- SRJPEdata::recaptures
-  warning(paste("No new recaptures datasets detected in the database. Recaptures data not updated on", Sys.Date()))
+  warning(paste("No new recaptures datasets detected in the database. Maximum date of recaptures data is", max(SRJPEdata::recaptures$date, na.rm = TRUE)))
 })
 
 
@@ -127,11 +146,12 @@ try(if(!exists("upstream_passage_query"))
 
 try(if(nrow(upstream_passage_query) <= nrow(SRJPEdata::upstream_passage)) {
   upstream_passage <- SRJPEdata::upstream_passage
-  warning(paste("No new upstream passage datasets detected in the database. Upstream passage data not updated on", Sys.Date()))
+  warning(paste("No new upstream passage datasets detected in the database. Maximum year of upstream passage data is", max(SRJPEdata::upstream_passage$date, na.rm = TRUE)))
 })
 
 # Pull in passage estimates 
-try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.stream, sl.reach, p.passage_estimate, p.adipose_clipped,  
+# TODO fix query, not returning anything 
+try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.stream, p.passage_estimate, p.adipose_clipped,  
                                                          r.definition as run, p.upper_bound_estimate, p.lower_bound_estimate,
                                                          p.confidence_level
                                                          FROM passage_estimates p
@@ -145,7 +165,7 @@ try(if(!exists("upstream_passage_estimates_query"))
 
 try(if(nrow(upstream_passage_estimates_query) <= nrow(SRJPEdata::upstream_passage_estimates)) {
   upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
-  warning(paste("No new upstream passage estimates datasets detected in the database. Upstream passage estimates data not updated on", Sys.Date()))
+  warning(paste("No new upstream passage estimates datasets detected in the database. Maximum date of upstream passage estimates data is", max(SRJPEdata::upstream_passage_estimates$year, na.rm = TRUE)))
 })
 
 # pull in holding data
@@ -161,7 +181,7 @@ try(if(!exists("holding_query"))
 
 try(if(nrow(holding_query) <= nrow(SRJPEdata::holding)) {
   holding <- SRJPEdata::holding
-  warning(paste("No new holding datasets detected in the database. Holding data not updated on", Sys.Date()))
+  warning(paste("No new holding datasets detected in the database. Holding data  is", Sys.Date()))
 })
 
 # Pull in redd data (just daily)
@@ -178,7 +198,7 @@ try(if(!exists("redd_query"))
 
 try(if(nrow(redd_query) <= nrow(SRJPEdata::redd)) {
   redd <- SRJPEdata::redd
-  warning(paste("No new redd datasets detected in the database. Redd data not updated on", Sys.Date()))
+  warning(paste("No new redd datasets detected in the database. Maximum date of redd data is", max(SRJPEdata::redd$date, na.rm = TRUE)))
 })
 
 # Pull in raw carcass data 
@@ -197,7 +217,9 @@ try(if(!exists("carcass_estimates_query"))
 
 try(if(nrow(carcass_estimates_query) <= nrow(SRJPEdata::carcass_estimates)) {
   carcass_estimates <- SRJPEdata::carcass_estimates
-  warning(paste("No new carcass estimates datasets detected in the database. Carcass estimate data not updated on", Sys.Date()))
+  warning(paste("No new carcass estimates datasets detected in the database. Maximum date of carcass estimate data is", max(SRJPEdata::carcass_estimates$year, na.rm = TRUE)))
 })
+
+
 
 

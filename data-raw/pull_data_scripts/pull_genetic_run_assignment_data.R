@@ -1,12 +1,21 @@
-# script to pull genetics data from the run-id-database
+# Pull data from Azure Database 
+library(DBI)
+library(tidyverse)
+library(lubridate)
+library(SRJPEdata)
 
-# remotes::install_github("SRJPE/grunID")
-library(grunID) 
+# CONNECT TO DB & VIEW TABLES --------------------------------------------------
+# Use DBI - dbConnect to connect to database - keep user id and password sectret
+con <- DBI::dbConnect(drv = RPostgres::Postgres(),
+                      host = "run-id-database.postgres.database.azure.com",
+                      dbname = "runiddb-prod",
+                      user = Sys.getenv("runid_db_user"),
+                      password = Sys.getenv("runid_db_password"),
+                      port = 5432)
 
-con <- gr_db_connect()
-
+# NOTE: missing field sheet data & 2023 data, should revisit after this is added to confirm that everything looks good
 completed_genetic_samples <- DBI::dbGetQuery(con, 
-                                            "SELECT s.id AS sample_id, s.datetime_collected, se.first_sample_date, s.fork_length_mm, 
+                                             "SELECT s.id AS sample_id, s.datetime_collected, se.first_sample_date, s.fork_length_mm, 
                                             rt.run_name AS sherlock_run_assignment, rt2.run_name AS field_run_assignment,
                                             sl.stream_name
                                             FROM sample AS s
@@ -19,4 +28,7 @@ completed_genetic_samples <- DBI::dbGetQuery(con,
                                             LEFT JOIN sample_location AS sl ON se.sample_location_id = sl.id
                                             WHERE ss.status_code_id = 11;")
 
+
 usethis::use_data(completed_genetic_samples, overwrite = TRUE)
+
+

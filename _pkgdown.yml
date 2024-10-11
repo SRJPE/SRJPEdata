@@ -1,8 +1,8 @@
 title: SRJPEdata
 url: https://SRJPE.github.io/SRJPEdata/
 template:
-  params:
-    bootswatch: flatly
+  bootswatch: flatly
+
     
 home:
   links:
@@ -20,6 +20,7 @@ reference:
 - subtitle: Juvenile Datasets
   desc: Data used as inputs to juvenile bt-spas-x abundance model 
 - contents: 
+  - weekly_juvenile_abundance_catch_data
   - weekly_juvenile_abundance_model_data
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model 
@@ -31,10 +32,10 @@ reference:
 - subtitle: Juvenile Datasets
   desc: RST monitoring datasets
 - contents: 
+  - site_lookup
   - rst_catch
   - rst_trap
-  - efficiency_summary
-  - release_fish
+  - release
   - recaptures 
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
@@ -80,8 +81,8 @@ navbar:
     href: reference/index.html
   - text: 'Articles'
     menu: 
-      - text: 'Yearling Analysis'
-        href: articles/yearling_ruleset.html
+      - text: 'Lifestage Rulesets'
+        href: articles/lifestage_ruleset.html
       - text: 'Hours Fished Analysis'
         href: articles/trap_effort.html
       - text: 'Monitoring Years to Include'
@@ -90,8 +91,12 @@ navbar:
         href: articles/prep_environmental_covariates.html
       - text: 'Stock Recruit Model Covariate Prep'
         href: articles/sr_covariates.html
+      - text: 'Filling Temperature Data Gaps'
+        href: articles/temp_regression.html
       - text: 'Summary of Data for Modeling '
         href: articles/summary_of_data_for_modeling.html
+  - text: 'News'
+    href: news/index.html
         
 repo:
  url:

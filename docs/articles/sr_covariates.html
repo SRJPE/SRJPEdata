@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stock Recruit Covariates • SRJPEdata</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
       </span>
     </div>
 
@@ -51,7 +51,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/yearling_ruleset.html">Yearling Analysis</a>
+      <a href="../articles/lifestage_ruleset.html">Lifestage Rulesets</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
@@ -66,9 +66,15 @@
       <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
     </li>
     <li>
+      <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
+    </li>
+    <li>
       <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -102,18 +108,24 @@
 
     
     
-<div class="section level2">
-<h2 id="selecting-stock-recruit-sr-environmental-covariates">Selecting Stock Recruit (SR) Environmental Covariates<a class="anchor" aria-label="anchor" href="#selecting-stock-recruit-sr-environmental-covariates"></a>
-</h2>
+<p>There are multiple covariates used in SR JPE modeling that were
+developed through separate but related processes. There are currently
+two documents describing covariate selction and processing for different
+models: (1) Stock Recruit Covariates (this document) and (2) Adult Model
+Covariates.</p>
 <p>The goal of this document is to process covariates for use in SR JPE
-stock recruitment modeling. FlowWest conducted initial literature review
-and planning to outline covariates that are expected to be important
-based on past research. This work can be found <a href="https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0" class="external-link">here</a>.
-FlowWest reviewed covariates with the modeling advisory team to generate
-the following environmental covariates table to test within the SR
-model.</p>
+stock recruitment modeling.</p>
+<div class="section level2">
+<h2 id="selecting-stock-recruit-environmental-covariates">Selecting Stock Recruit Environmental Covariates<a class="anchor" aria-label="anchor" href="#selecting-stock-recruit-environmental-covariates"></a>
+</h2>
+<p>FlowWest conducted initial literature review and planning to outline
+covariates that are expected to be important based on past research.
+This work can be found <a href="https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0" class="external-link">here</a>.
+FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to
+generate the following environmental covariates table to test within the
+SR model.</p>
 <p><em>Table 1. Summary of covariates to include in stock recruit
-modeling based on preliminary literature review</em></p>
+modeling based on preliminary literature review.</em></p>
 <table class="table  lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; margin-left: auto; margin-right: auto;'>
 <thead><tr>
 <th style="text-align:left;">
@@ -294,15 +306,15 @@ NA
 <div class="section level2">
 <h2 id="preparing-covariates">Preparing Covariates<a class="anchor" aria-label="anchor" href="#preparing-covariates"></a>
 </h2>
-<p>This document focus on preparing flow and temperature covariates for
-initial testing in stock recruit.</p>
+<p>This document focuses on preparing flow and temperature covariates
+for use in stock recruit modeling and exploratory analysis.</p>
 <div class="section level3">
 <h3 id="temperature">Temperature<a class="anchor" aria-label="anchor" href="#temperature"></a>
 </h3>
 <p>Temperature has been found to influence spawning and rearing.
 Therefore it is expected to affect the translation from stock to
-recruit. Temperature can be included in multiple different formats
-including:</p>
+recruit. Temperature can be included in multiple different formats which
+target different lifestages including:</p>
 <ul>
 <li>Number of degree days</li>
 <li>Day of year when 7DADM is above 13 C</li>
@@ -313,10 +325,13 @@ spawning date)</em></li>
 <div class="section level4">
 <h4 id="number-of-degree-days">Number of degree days<a class="anchor" aria-label="anchor" href="#number-of-degree-days"></a>
 </h4>
-<p>Sum of the daily mean temperatures between August and December
-(spawning time period) by year and stream.</p>
+<p>Degree days is defined here as the sum of the daily mean temperatures
+between August and December (spawning time period) by year and
+stream.</p>
 <p><em>Note that for streams with multiple locations the max daily mean
-was selected.</em></p>
+was selected. Clear Creek 2020 value is low which may be due to a few
+missing data points in December. This approach is vulnerable to missing
+data.</em></p>
 <p><img src="sr_covariates_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
 <p><em>Figure 1. Annual sum of daily mean temperatures during spawning
 and incubation time period (Aug - Dec)</em></p>
@@ -324,7 +339,8 @@ and incubation time period (Aug - Dec)</em></p>
 <div class="section level4">
 <h4 id="day-of-year-when-7dadm-drops-abovebelow-13-c">Day of year when 7DADM drops above/below 13 C<a class="anchor" aria-label="anchor" href="#day-of-year-when-7dadm-drops-abovebelow-13-c"></a>
 </h4>
-<p>Day of the year and week when the 7DADM is above 13C</p>
+<p>This covariate is defined as the day of the year and week when the
+7DADM is above 13C</p>
 <ul>
 <li>Data are not filtered to the spawning time period (Aug-Dec) as this
 threshold is typically met before August</li>
@@ -332,11 +348,12 @@ threshold is typically met before August</li>
 impact on salmon. Temperatures are rarely below 13C during the spawning
 time period and if they are, unlikely to be significantly cold enough to
 have an impact</li>
-<li>Note, We currently do not have max daily temperatures for the
-Sacramento so mainstem is not included</li>
+<li>Note, we currently do not have max daily temperatures for the
+Sacramento so mainstem is not included. There are a few datapoints based
+on the plot below that are worth further investigation.</li>
 </ul>
-<p><strong>Plot of week where threshold is met (above or below 13) for
-all years and streams</strong></p>
+<p><strong>Plot of week where threshold is met (above 13 C) for all
+years and streams</strong></p>
 <p><img src="sr_covariates_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
 <p><em>Figure 2. Plot of week where threshold is met (above or below 13)
 for all years and streams</em></p>
@@ -344,11 +361,14 @@ for all years and streams</em></p>
 <div class="section level4">
 <h4 id="max-temperature">Max temperature<a class="anchor" aria-label="anchor" href="#max-temperature"></a>
 </h4>
+<p>This covariate is defined as the summarized annual weekly max
+temperature.</p>
 <ul>
 <li>Summarizes the weekly maximum temperature for each stream (meaning
-it finds the max across all sites/subsites) across years. Note that the
-Sacramento River temperature data does not currently include a daily
-maximum so the weekly max is the max of the daily mean.</li>
+it finds the max across all sites/subsites) across years within the
+spawning period. Note that the Sacramento River temperature data does
+not currently include a daily maximum so the weekly max is the max of
+the daily mean.</li>
 <li>Summarize the weekly max for each stream and year by finding the
 mean, median, and max.</li>
 </ul>
@@ -377,10 +397,15 @@ and Murray (1990)</a></p>
 <p>Precipitation and streamflow have been found to influence spawning
 and rearing. Therefore it is expected to affect the translation from
 stock to recruit. Streamflow can be included in multiple different
-formats including: - Mean, median, max precipitation (or streamflow)</p>
+formats including:</p>
+<ul>
+<li>Mean, median, max precipitation (or streamflow)</li>
+</ul>
 <div class="section level4">
 <h4 id="mean-median-max-flow">Mean, median, max flow<a class="anchor" aria-label="anchor" href="#mean-median-max-flow"></a>
 </h4>
+<p>These covariates summarize daily max flows as annual
+mean/median/max/min within the spawning and rearing time period.</p>
 <p><img src="sr_covariates_files/figure-html/unnamed-chunk-13-1.png" width="768"></p>
 <p><em>Figure 4. Plot of annual summarized (mean, median, max, min) max
 flows during the spawning and incubation time period (Aug -
@@ -402,15 +427,15 @@ covariates for each site and year.</p>
 are shown below.</p>
 <table class="table">
 <colgroup>
-<col width="2%">
+<col width="3%">
 <col width="8%">
-<col width="7%">
-<col width="7%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="16%">
 <col width="10%">
-<col width="14%">
-<col width="8%">
-<col width="18%">
-<col width="13%">
+<col width="16%">
+<col width="15%">
 <col width="7%">
 </colgroup>
 <thead><tr class="header">
@@ -427,6 +452,54 @@ are shown below.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">CDEC</td>
+<td align="left">BCK</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">butte creek butte creek</td>
+<td align="left">gdd_spawn</td>
+<td align="right">1031.28945</td>
+</tr>
+<tr class="even">
+<td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">CDEC</td>
+<td align="left">BCK</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">butte creek butte creek</td>
+<td align="left">weekly_max_temp_max</td>
+<td align="right">21.66667</td>
+</tr>
+<tr class="odd">
+<td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">CDEC</td>
+<td align="left">BCK</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">butte creek butte creek</td>
+<td align="left">weekly_max_temp_mean</td>
+<td align="right">12.41176</td>
+</tr>
+<tr class="even">
+<td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">CDEC</td>
+<td align="left">BCK</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">butte creek butte creek</td>
+<td align="left">weekly_max_temp_median</td>
+<td align="right">10.88889</td>
+</tr>
+<tr class="odd">
 <td align="right">1999</td>
 <td align="left">deer creek</td>
 <td align="left">CDEC</td>
@@ -436,7 +509,7 @@ are shown below.</p>
 <td align="left">temperature</td>
 <td align="left">deer creek deer creek</td>
 <td align="left">gdd_spawn</td>
-<td align="right">2081.758418</td>
+<td align="right">2081.75842</td>
 </tr>
 <tr class="even">
 <td align="right">1999</td>
@@ -448,7 +521,7 @@ are shown below.</p>
 <td align="left">temperature</td>
 <td align="left">deer creek deer creek</td>
 <td align="left">weekly_max_temp_max</td>
-<td align="right">23.500000</td>
+<td align="right">23.50000</td>
 </tr>
 <tr class="odd">
 <td align="right">1999</td>
@@ -460,7 +533,7 @@ are shown below.</p>
 <td align="left">temperature</td>
 <td align="left">deer creek deer creek</td>
 <td align="left">weekly_max_temp_mean</td>
-<td align="right">15.038647</td>
+<td align="right">15.03865</td>
 </tr>
 <tr class="even">
 <td align="right">1999</td>
@@ -472,79 +545,31 @@ are shown below.</p>
 <td align="left">temperature</td>
 <td align="left">deer creek deer creek</td>
 <td align="left">weekly_max_temp_median</td>
-<td align="right">14.277778</td>
+<td align="right">14.27778</td>
 </tr>
 <tr class="odd">
 <td align="right">1999</td>
-<td align="left">feather river</td>
-<td align="left">interpolated</td>
-<td align="left">interpolated</td>
-<td align="left">upper feather hfc</td>
+<td align="left">mill creek</td>
+<td align="left">CDEC</td>
+<td align="left">MLM</td>
+<td align="left">mill creek</td>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
-<td align="left">feather river upper feather hfc</td>
+<td align="left">mill creek mill creek</td>
 <td align="left">gdd_spawn</td>
-<td align="right">10.542370</td>
+<td align="right">1965.18097</td>
 </tr>
 <tr class="even">
 <td align="right">1999</td>
-<td align="left">feather river</td>
-<td align="left">interpolated</td>
-<td align="left">interpolated</td>
-<td align="left">upper feather hfc</td>
+<td align="left">mill creek</td>
+<td align="left">CDEC</td>
+<td align="left">MLM</td>
+<td align="left">mill creek</td>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
-<td align="left">feather river upper feather hfc</td>
+<td align="left">mill creek mill creek</td>
 <td align="left">weekly_max_temp_max</td>
-<td align="right">11.228642</td>
-</tr>
-<tr class="odd">
-<td align="right">1999</td>
-<td align="left">feather river</td>
-<td align="left">interpolated</td>
-<td align="left">interpolated</td>
-<td align="left">upper feather hfc</td>
-<td align="left">spawning and incubation</td>
-<td align="left">temperature</td>
-<td align="left">feather river upper feather hfc</td>
-<td align="left">weekly_max_temp_mean</td>
-<td align="right">11.228642</td>
-</tr>
-<tr class="even">
-<td align="right">1999</td>
-<td align="left">feather river</td>
-<td align="left">interpolated</td>
-<td align="left">interpolated</td>
-<td align="left">upper feather hfc</td>
-<td align="left">spawning and incubation</td>
-<td align="left">temperature</td>
-<td align="left">feather river upper feather hfc</td>
-<td align="left">weekly_max_temp_median</td>
-<td align="right">11.228642</td>
-</tr>
-<tr class="odd">
-<td align="right">1999</td>
-<td align="left">feather river</td>
-<td align="left">interpolated</td>
-<td align="left">interpolated</td>
-<td align="left">upper feather hfc</td>
-<td align="left">spawning and incubation</td>
-<td align="left">temperature</td>
-<td align="left">feather river upper feather lfc</td>
-<td align="left">gdd_spawn</td>
-<td align="right">10.542370</td>
-</tr>
-<tr class="even">
-<td align="right">1999</td>
-<td align="left">feather river</td>
-<td align="left">interpolated</td>
-<td align="left">interpolated</td>
-<td align="left">upper feather hfc</td>
-<td align="left">spawning and incubation</td>
-<td align="left">temperature</td>
-<td align="left">feather river upper feather lfc</td>
-<td align="left">weekly_max_temp_max</td>
-<td align="right">5.189872</td>
+<td align="right">23.38889</td>
 </tr>
 </tbody>
 </table>

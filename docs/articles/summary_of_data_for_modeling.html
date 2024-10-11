@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Draft Summary of Data Used in JPE • SRJPEdata</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
       </span>
     </div>
 
@@ -51,7 +51,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/yearling_ruleset.html">Yearling Analysis</a>
+      <a href="../articles/lifestage_ruleset.html">Lifestage Rulesets</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
@@ -66,9 +66,15 @@
       <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
     </li>
     <li>
+      <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
+    </li>
+    <li>
       <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="../news/index.html">News</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -104,9 +110,9 @@
 <div class="section level4">
 <h4 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h4>
-<p>The spring run juvenile production estimate (SR JPE) contains many
-submodels that rely on different data sets. This document is currently
-focused on chinook monitoring data that will be used to train the stock
+<p>The spring run juvenile production estimate (SR JPE) contains a suite
+of submodels that rely on different datasets. This document is currently
+focused on Chinook monitoring data that will be used to fit the stock
 recruit model.</p>
 <p>Additional sections will be added to highlight survival, genetics,
 and covariate data.</p>
@@ -114,14 +120,15 @@ and covariate data.</p>
 <div class="section level2">
 <h2 id="stock-recruit-modeling-data-selection">Stock Recruit Modeling Data Selection<a class="anchor" aria-label="anchor" href="#stock-recruit-modeling-data-selection"></a>
 </h2>
-<p>Collecting and selecting spring run chinook monitoring data to use in
-the spring run juvenile production estimate (SR JPE) was a multistep and
-iterative process. We acquired datasets, hosted a workshop to define a
-ruleset for evaluating years to exclude based on missing data (<a href="https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html" class="external-link">see
+<p>Gathering and identifying spring run Chinook monitoring data to use
+in the spring run juvenile production estimate (SR JPE) was an
+iterative, multistep process. We acquired, processed and described
+monitoring data, hosted workshops to define a ruleset for evaluating
+years to exclude based on missing data (<a href="https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html" class="external-link">see
 years to include vignette for an in depth overview of this process</a>),
-selected data where there was both adult and juvenile data overlap, and
-finally selected a single adult dataset to use for each year and stream.
-The diagram below visualizes this process and shows how many total
+selected data where there was both adult and juvenile data, and finally
+selected a single adult dataset to use for each year and stream. The
+diagram below visualizes this process and shows the total number of
 datasets we retained along the way.</p>
 <p><img src="images/data_selection_diagram.png" style="width:108.0%"></p>
 <p><em>Distinct annual datasets are identified by looking at distinct
@@ -129,31 +136,34 @@ year, stream, and monitoring types</em></p>
 <div class="section level3">
 <h3 id="monitoring-data-overview">Monitoring Data Overview<a class="anchor" aria-label="anchor" href="#monitoring-data-overview"></a>
 </h3>
-<p>Extensive spring run chinook monitoring is conducted throughout the
+<p>Extensive spring run Chinook monitoring is conducted throughout the
 Central Valley. Monitoring programs have been collecting data since the
 1990s and monitoring has increased through time to expand monitoring
-types and data collection coverage across seven tributaries and the
-Sacramento river mainstem.</p>
+types and data collection coverage across the seven tributaries and
+mainstem Sacramento River (identified as the geographic scope for the SR
+JPE).</p>
 <p>The plot below shows all monitoring coverage of rotary screw trap,
 adult upstream passage, adult holding, adult redd, and adult carcass
 survey data.</p>
 <p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
 <p><em>Plot does not include Sacramento River mainstem monitoring. This
-data may also be utilized by the JPE but will not be included in the
-Stock Recruit models</em></p>
+data may also be utilized in the SR JPE but will not be included in the
+stock recruit models. For some monitoring types data is collected
+annually or monthly communicated through gaps in the colored
+lines.</em></p>
 <div class="section level4">
 <h4 id="filtering-data-to-years-that-contain-both-juvinile-and-adult-monitoring">Filtering data to years that contain both juvinile and adult
 monitoring<a class="anchor" aria-label="anchor" href="#filtering-data-to-years-that-contain-both-juvinile-and-adult-monitoring"></a>
 </h4>
-<p>In order to utilize data for the spring run chinook juvenile
-production estimate, we need both juvenile data inputs (RST data) and
-adult data inputs (adults) for each year. The plot below shows the time
-windows where there is overlapping juvenile and adult monitoring on each
-tributary. While this limits the total monitoring used for the JPE, it
-still gives us a few large windows for most monitoring programs.</p>
+<p>In order to utilize data for the stock recruit models, we need both
+juvenile data inputs (RST data) and adult data inputs (adults) for each
+year. The plot below shows the time windows where there is overlapping
+juvenile and adult monitoring on each tributary. While this limits the
+amount of data, it still provides a few large windows for most
+monitoring programs.</p>
 <p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
-<p><em>Gray boxes indicate that monitoring occurred but that data is not
-being utalized for the stock recruit since a year does not have both
+<p><em>Gray boxes indicate that monitoring occurred but data is not
+being utilized for the stock recruit since a year does not have both
 adult and juvenile data</em></p>
 </div>
 </div>
@@ -162,24 +172,24 @@ adult and juvenile data</em></p>
 </h3>
 <p>Although the SR JPE aims to utilize all available data, there are
 some years where data is sparse and is excluded from analysis. This
-decision process is documented in depth in the <a href="https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html" class="external-link">Years
+decision process is documented in the <a href="https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html" class="external-link">Years
 to Include Analysis</a>.</p>
-<p>After filtering the RST and Adult data to remove incomplete or
-inconsistent years. We are left with the following windows avaliable for
-the SR JPE. Gray boxes indicate that monitoring occurred but that data
-is not being utilized for the JPE. See years to exclude tables for
-additional information on why a year might be excluded.</p>
+<p>After filtering the RST and adult data to remove incomplete or
+inconsistent years, we are left with the following windows for the SR
+JPE. Gray boxes indicate that monitoring occurred but data is not being
+utilized for modeling. See years to exclude tables for additional
+information on why a year might be excluded.</p>
 <p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
-<p><em>Gray boxes indicate that monitoring occurred but that data is not
-being utalized for the stock recruit. Data may be excluded because there
+<p><em>Gray boxes indicate that monitoring occurred but data is not
+being utilized for the stock recruit. Data may be excluded because there
 is not adult and juvenile annual overlap or because the data was
 considered incomplete for a given monitoring type and year.</em></p>
 </div>
 <div class="section level3">
-<h3 id="summary-table-years-to-use-for-model">Summary Table, Years to use for model<a class="anchor" aria-label="anchor" href="#summary-table-years-to-use-for-model"></a>
+<h3 id="summary-table-of-years-to-use-for-stock-recruit">Summary Table of Years to Use for Stock Recruit<a class="anchor" aria-label="anchor" href="#summary-table-of-years-to-use-for-stock-recruit"></a>
 </h3>
-<p>The summary table below states which years we have overlapping RST
-and Adult data. This table accounts for years excluded based on data
+<p>The summary table below describes which years have overlapping RST
+and adult data. This table accounts for years excluded based on data
 quality and completeness considerations.</p>
 <table class="table">
 <colgroup>
@@ -238,25 +248,27 @@ for developing the SR JPE stock recruit model.</p>
 <div class="section level3">
 <h3 id="selecting-adult-data-type-to-use">Selecting Adult Data Type to Use<a class="anchor" aria-label="anchor" href="#selecting-adult-data-type-to-use"></a>
 </h3>
-<p>There are 35 year, stream combinations where there are multiple adult
+<p>There are 35 stream year combinations where there are multiple adult
 data types to pick from. These occur for: “butte creek”, “battle creek”,
 “clear creek”, and “feather river.”</p>
-<p>We used the following logic to select the data to use in these
-cases:</p>
+<p>The process of determining the appropriate adult data to use in stock
+recruit modeling for the SR JPE is currently ongoing. This information
+will be updated as the Modeling Team evaluates the tradeoffs associated
+with various data types in more detail.</p>
+<p>We used the following logic to select data to use in these cases:</p>
 <ul>
 <li>if <code>stream = "butte creek"</code> we used carcass estimate data
 (carcass estimate methods include mark recapture)</li>
 <li>if <code>stream = "battle creek"</code> we used…TODO</li>
 <li>if <code>stream = "clear creek"</code> we used…TODO</li>
-<li>if <code>stream = "feather river"</code> we used carcass estimate
-(carcass estimate methods include mark recapture)</li>
+<li>if <code>stream = "feather river"</code> we used…TODO</li>
 </ul>
 <table class="table">
 <colgroup>
-<col width="3%">
-<col width="8%">
-<col width="71%">
-<col width="16%">
+<col width="4%">
+<col width="11%">
+<col width="62%">
+<col width="21%">
 </colgroup>
 <thead><tr class="header">
 <th align="right">Year</th>
@@ -267,73 +279,74 @@ cases:</p>
 <tbody>
 <tr class="odd">
 <td align="right">2001</td>
+<td align="left">battle creek</td>
+<td align="left">rst , redd , holding , upstream passage</td>
+<td align="left">TBD</td>
+</tr>
+<tr class="even">
+<td align="right">2001</td>
 <td align="left">butte creek</td>
-<td align="left">rst , carcass estimate, holding</td>
+<td align="left">rst , carcass, holding</td>
+<td align="left">carcass estimate</td>
+</tr>
+<tr class="odd">
+<td align="right">2001</td>
+<td align="left">clear creek</td>
+<td align="left">rst , redd , upstream passage</td>
+<td align="left">TBD</td>
+</tr>
+<tr class="even">
+<td align="right">2002</td>
+<td align="left">battle creek</td>
+<td align="left">rst , redd , holding , upstream passage</td>
+<td align="left">TBD</td>
+</tr>
+<tr class="odd">
+<td align="right">2002</td>
+<td align="left">butte creek</td>
+<td align="left">rst , carcass, holding</td>
 <td align="left">carcass estimate</td>
 </tr>
 <tr class="even">
 <td align="right">2002</td>
-<td align="left">butte creek</td>
-<td align="left">rst , carcass estimate, holding</td>
-<td align="left">carcass estimate</td>
+<td align="left">clear creek</td>
+<td align="left">rst , redd , upstream passage</td>
+<td align="left">TBD</td>
 </tr>
 <tr class="odd">
 <td align="right">2003</td>
 <td align="left">butte creek</td>
-<td align="left">rst , carcass estimate, holding</td>
+<td align="left">rst , carcass, holding</td>
 <td align="left">carcass estimate</td>
+</tr>
+<tr class="even">
+<td align="right">2003</td>
+<td align="left">clear creek</td>
+<td align="left">rst , redd , upstream passage</td>
+<td align="left">TBD</td>
+</tr>
+<tr class="odd">
+<td align="right">2004</td>
+<td align="left">battle creek</td>
+<td align="left">rst , holding , upstream passage</td>
+<td align="left">TBD</td>
 </tr>
 <tr class="even">
 <td align="right">2004</td>
 <td align="left">butte creek</td>
-<td align="left">rst , carcass estimate, holding</td>
+<td align="left">rst , carcass, holding</td>
 <td align="left">carcass estimate</td>
-</tr>
-<tr class="odd">
-<td align="right">2005</td>
-<td align="left">battle creek</td>
-<td align="left">rst , redd , holding , upstream passage estimate</td>
-<td align="left">TBD</td>
-</tr>
-<tr class="even">
-<td align="right">2006</td>
-<td align="left">battle creek</td>
-<td align="left">rst , redd , holding , upstream passage estimate</td>
-<td align="left">TBD</td>
-</tr>
-<tr class="odd">
-<td align="right">2007</td>
-<td align="left">butte creek</td>
-<td align="left">rst , carcass estimate, holding</td>
-<td align="left">carcass estimate</td>
-</tr>
-<tr class="even">
-<td align="right">2008</td>
-<td align="left">butte creek</td>
-<td align="left">rst , carcass estimate, holding</td>
-<td align="left">carcass estimate</td>
-</tr>
-<tr class="odd">
-<td align="right">2008</td>
-<td align="left">clear creek</td>
-<td align="left">rst , holding , upstream passage estimate</td>
-<td align="left">TBD</td>
-</tr>
-<tr class="even">
-<td align="right">2009</td>
-<td align="left">battle creek</td>
-<td align="left">rst , redd , holding , upstream passage estimate</td>
-<td align="left">TBD</td>
 </tr>
 </tbody>
 </table>
-<p><em>… with 22 more rows</em></p>
+<p><em>… with 42 more rows</em></p>
 </div>
 <div class="section level3">
 <h3 id="proposed-data-to-use-in-sr-jpe">Proposed Data to Use in SR JPE<a class="anchor" aria-label="anchor" href="#proposed-data-to-use-in-sr-jpe"></a>
 </h3>
 <p>The table below compiles all the filtering above to provide a summary
-of the data utalized by the JPE for each stream and year.</p>
+of the data utilized for the stock recruit models for each stream and
+year.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="right">Year</th>
@@ -361,50 +374,50 @@ of the data utalized by the JPE for each stream and year.</p>
 <td align="left">holding</td>
 </tr>
 <tr class="even">
+<td align="right">1998</td>
+<td align="left">battle creek</td>
+<td align="left">rst</td>
+<td align="left">upstream passage</td>
+</tr>
+<tr class="odd">
+<td align="right">1998</td>
+<td align="left">clear creek</td>
+<td align="left">rst</td>
+<td align="left">upstream passage</td>
+</tr>
+<tr class="even">
+<td align="right">1999</td>
+<td align="left">battle creek</td>
+<td align="left">rst</td>
+<td align="left">upstream passage</td>
+</tr>
+<tr class="odd">
+<td align="right">1999</td>
+<td align="left">clear creek</td>
+<td align="left">rst</td>
+<td align="left">upstream passage</td>
+</tr>
+<tr class="even">
 <td align="right">2000</td>
-<td align="left">deer creek</td>
+<td align="left">battle creek</td>
 <td align="left">rst</td>
-<td align="left">holding</td>
+<td align="left">upstream passage</td>
 </tr>
 <tr class="odd">
 <td align="right">2000</td>
-<td align="left">mill creek</td>
+<td align="left">clear creek</td>
 <td align="left">rst</td>
-<td align="left">redd</td>
+<td align="left">upstream passage</td>
 </tr>
 <tr class="even">
-<td align="right">2001</td>
-<td align="left">butte creek</td>
-<td align="left">rst</td>
-<td align="left">TBD</td>
-</tr>
-<tr class="odd">
-<td align="right">2001</td>
-<td align="left">deer creek</td>
-<td align="left">rst</td>
-<td align="left">holding</td>
-</tr>
-<tr class="even">
-<td align="right">2001</td>
-<td align="left">mill creek</td>
-<td align="left">rst</td>
-<td align="left">redd</td>
-</tr>
-<tr class="odd">
-<td align="right">2002</td>
-<td align="left">butte creek</td>
-<td align="left">rst</td>
-<td align="left">TBD</td>
-</tr>
-<tr class="even">
-<td align="right">2002</td>
+<td align="right">2000</td>
 <td align="left">deer creek</td>
 <td align="left">rst</td>
 <td align="left">holding</td>
 </tr>
 </tbody>
 </table>
-<p><em>… with 59 more rows</em></p>
+<p><em>… with 88 more rows</em></p>
 </div>
 </div>
   </div>

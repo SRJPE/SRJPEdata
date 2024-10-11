@@ -6,7 +6,6 @@
 .Renviron
 *config.json
 *.xlsx
-*.csv
 *.xls
 *.mdb
 *.DS_Store
