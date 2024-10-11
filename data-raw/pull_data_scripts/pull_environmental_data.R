@@ -751,4 +751,4 @@ longer_updated_environmental_data <- updated_environmental_data |>
 environmental_data <- bind_rows(SRJPEdata::environmental_data, longer_updated_environmental_data)
 
 #Save package
-usethis::use_data(environmental_data, overwrite = TRUE, compress = "xz")
+usethis::use_data(environmental_data, overwrite = TRUE)

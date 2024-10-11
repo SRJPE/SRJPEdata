@@ -3,6 +3,7 @@
 \docType{data}
 \name{weekly_juvenile_abundance_efficiency_data}
 \alias{weekly_juvenile_abundance_efficiency_data}
+\alias{weekly_juvenile_abundance_model_data}
 \title{Weekly BT-SPAS-X Model Efficency Data}
 \format{
 A tibble with 651 rows and 8 columns
@@ -23,7 +24,7 @@ environmental_data (see \code{?SRJPEdata::environmental_data}), hours fished inf
 (see \verb{?SRJPEdata::weekly_hours_fished for more information}), and btspasx special priors (see \code{?SRJPEdata::btspasx_special_priors_data} for more information).
 }
 \usage{
-weekly_juvenile_abundance_efficiency_data
+weekly_juvenile_abundance_model_data
 }
 \description{
 Weekly Rotary Screw Trap (RST) efficiency data and weekly standardized flow,

@@ -48,7 +48,7 @@ FlowWest took the daily cutoff line (shown in plot above) and used it as a thres
 The following code is applied in the `weekly_data_summary` script. 
 
 
-``` r
+```r
 # Note this is not the final dataset as lifestage is added below
 standard_catch_unmarked_w_yearling <- rst_catch |> 
   filter(species == "chinook") |>  # filter for only chinook
