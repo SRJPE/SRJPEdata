@@ -322,7 +322,7 @@ no_catch <- standard_catch_unmarked |>
 # expected to be larger than original because add lifestage rows
 updated_standard_catch_raw <- bind_rows(combined_rst_wo_na_fl, na_filled_lifestage, no_catch, weeks_wo_lifestage) 
 
-knitr::kable(head(updated_standard_catch, 10))
+knitr::kable(head(updated_standard_catch_raw, 10))
 ```
 
 ### Generate rows for when no fish of a lifestage are caught
@@ -359,11 +359,4 @@ updated_standard_catch |>
        y = "count",
        fill = "") +
   theme_minimal()
-```
-
-## Save resulting data to package
-
-```{r}
-# Save to package
-usethis::use_data(updated_standard_catch, overwrite = TRUE)
 ```

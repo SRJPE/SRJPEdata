@@ -133,18 +133,9 @@ For weeks that had no fork length data in a given week, we calculated a general 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
 
 
-|date       |stream     |site       |subsite    |site_group |run          |adipose_clipped |dead | fork_length| weight| week| year|model_lifestage_method   |life_stage | count|
-|:----------|:----------|:----------|:----------|:----------|:------------|:---------------|:----|-----------:|------:|----:|----:|:------------------------|:----------|-----:|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          79|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          87|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |smolt      |     0|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          93|     NA|   42| 1992|assigned from fl cutoffs |yearling   |     1|
-|1992-10-14 |deer creek |deer creek |deer creek |deer creek |not recorded |FALSE           |NA   |          94|     NA|   42| 1992|assigned from fl cutoffs |fry        |     0|
+```
+## Error in eval(expr, envir, enclos): object 'updated_standard_catch' not found
+```
 
 ### Generate rows for when no fish of a lifestage are caught
 
@@ -159,7 +150,3 @@ The following plot shows the general patten in the lifestage field where fry are
 **Battle Creek: 2011**
 
 ![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
-
-## Save resulting data to package
-
-
