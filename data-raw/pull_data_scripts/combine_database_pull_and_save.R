@@ -2,12 +2,12 @@ library(tidyverse)
 # Bind together tables from SRJPE data and data tackle 
 source("data-raw/pull_data_scripts/pull_tables_from_database.R")
 source("data-raw/pull_data_scripts/pull_tables_from_data_tackle_database.R")
-
+source("data-raw/pull_data_scripts/TEMP_pull_from_edi.R") # remove after data get added to db
 # Bind rows 
-rst_catch <- bind_rows(rst_catch, rst_catch_query_pilot) |> glimpse()
-rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot)  |> glimpse()
-release <- bind_rows(release, release_query_pilot |> mutate(release_id = as.character(release_id)))  |> glimpse()
-recaptures <- bind_rows(recaptures, recaptures_query_pilot |> mutate(release_id = as.character(release_id))) |> glimpse()
+rst_catch <- bind_rows(rst_catch, rst_catch_query_pilot, temp_catch) |> glimpse()
+rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot, temp_trap)  |> glimpse()
+release <- bind_rows(release, release_query_pilot |> mutate(release_id = as.character(release_id)), temp_release)  |> glimpse()
+recaptures <- bind_rows(recaptures, recaptures_query_pilot |> mutate(release_id = as.character(release_id)), temp_recapture) |> glimpse()
 
 ## SAVE TO DATA PACKAGE ---
 usethis::use_data(rst_catch, overwrite = TRUE)
