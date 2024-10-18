@@ -526,6 +526,100 @@ knights_release_edi <- release_edi |>
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, run, life_stage, origin)
 
+# Tisdale ---------------------------------------------------------
+res <- read_data_entity_names(packageId = "edi.1499.4")
+raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[1])
+catch_edi <- read_csv(file = raw)
+raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[3])
+recapture_edi <- read_csv(file = raw)
+raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[4])
+release_edi <- read_csv(file = raw)
+raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[2])
+trap_edi <- read_csv(file = raw)
+
+tisdale_catch_edi <- catch_edi |> 
+  mutate(commonName = tolower(commonName)) |> 
+  filter(commonName == "chinook salmon") |> 
+  mutate(stream = "sacramento river",
+         site = "tisdale",
+         adipose_clipped = case_when(fishOrigin == "Natural" ~ F,
+                                     fishOrigin == "Hatchery" ~ T,
+                                     T ~ NA),
+         dead = NA,
+         weight = NA,
+         species = "chinook",
+         site_group = "tisdale",
+         actual_count = NA_character_,
+         subsite = as.character(subSiteName)) |> 
+  rename(date = visitTime,
+         count = n,
+         life_stage = lifeStage,
+         fork_length = forkLength,
+         run = finalRun) |> 
+  left_join(dates) |> 
+  filter(date > max & year(date)) |> 
+  select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
+         dead, fork_length, weight, actual_count, species)
+
+tisdale_recapture_edi <- recapture_edi |> 
+  mutate(stream = "sacramento river",
+         site = "tisdale",
+         adipose_clipped = case_when(fishOrigin == "Natural" ~ F,
+                                     fishOrigin == "Hatchery" ~ T,
+                                     T ~ NA),
+         dead = NA,
+         species = "chinook",
+         site_group = "tisdale",
+         weight = NA,
+         subsite = as.character(subSiteName),
+         release_id = as.character(releaseID)) |> 
+  rename(date = visitTime,
+         count = n,
+         life_stage = lifeStage,
+         fork_length = forkLength,
+         run = finalRun) |> 
+  left_join(dates) |> 
+  filter(date > max & year(date)) |> 
+  select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
+         dead, fork_length, weight, species)
+
+tisdale_trap_edi <- trap_edi |> 
+  mutate(stream = "sacramento river",
+         site = "tisdale",
+         site_group = "tisdale",
+         subsite = as.character(subSiteName)) |> 
+  rename(visit_type = visitType,
+         trap_functioning = trapFunctioning,
+         fish_processed = fishProcessed,
+         total_revolutions = counterAtEnd,
+         rpm_start = rpmRevolutionsAtStart,
+         rpm_end = rpmRevolutionsAtEnd,
+         include = includeCatch,
+         water_temp = waterTemp,
+         water_velocity = waterVel,
+         trap_stop_date = trap_end_date) |> 
+  left_join(dates) |> 
+  filter(trap_stop_date > max & year(trap_stop_date)) |> 
+  select(trap_start_date, visit_type, trap_stop_date, stream, site, subsite,
+         site_group, trap_functioning, fish_processed, rpm_start, rpm_end,
+         total_revolutions, water_temp, water_velocity, discharge, turbidity, include)
+
+tisdale_release_edi <- release_edi |> 
+  mutate(stream = "sacramento river",
+         site = "tisdale",
+         site_group = "tisdale",
+         subsite = NA,
+         release_id = as.character(releaseID)) |> 
+  rename(date_released = releaseTime,
+         number_released = nReleased,
+         run = markedRun,
+         origin = markedFishOrigin,
+         life_stage = markedLifeStage) |> 
+  left_join(dates) |> 
+  filter(date_released > max & year(date_released)) |> 
+  select(date_released, release_id, stream, site, subsite, site_group,
+         number_released, run, life_stage, origin)
+
 
 # Join all temp data ------------------------------------------------------
 
@@ -533,20 +627,24 @@ temp_catch <- bind_rows(battle_clear_catch_edi,
                         butte_catch_edi,
                         feather_catch_edi,
                         yuba_catch_edi,
-                        knights_catch_edi)
+                        knights_catch_edi,
+                        tisdale_catch_edi)
 temp_recapture <- bind_rows(battle_clear_recapture_edi,
                             butte_recapture_edi,
                             feather_recapture_edi,
                             yuba_recapture_edi,
-                            knights_recapture_edi)
+                            knights_recapture_edi,
+                            tisdale_recapture_edi)
 temp_release <- bind_rows(battle_clear_release_edi,
                           butte_release_edi,
                           feather_release_edi,
                           yuba_release_edi,
-                          knights_release_edi)
+                          knights_release_edi,
+                          tisdale_release_edi)
 temp_trap <- bind_rows(battle_clear_trap_edi,
                        butte_trap_edi,
                        feather_trap_edi,
                        yuba_trap_edi,
-                       knights_trap_edi) |> 
+                       knights_trap_edi,
+                       tisdale_trap_edi) |> 
   mutate(include = ifelse(include == "Yes", T, F))

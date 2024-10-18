@@ -92,7 +92,7 @@ The table below shows a section of this table:
 
 
 
-*... with 477 more rows*
+*... with 487 more rows*
 
 ## Adult Data - Years to Include in Model
 

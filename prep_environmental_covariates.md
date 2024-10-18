@@ -45,16 +45,16 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 
 | year|stream        |   gdd_trib| gdd_sac| gdd_total|
 |----:|:-------------|----------:|-------:|---------:|
-| 1999|butte creek   |   9.900463|       0|      9.90|
-| 1999|deer creek    |  79.307870|       0|     79.31|
-| 1999|mill creek    |  24.350443|       0|     24.35|
-| 2000|butte creek   |  38.893518|       0|     38.89|
-| 2000|deer creek    | 191.700593|       0|    191.70|
-| 2000|feather river |  48.671632|       0|     48.67|
-| 2000|mill creek    |  97.261574|       0|     97.26|
-| 2000|yuba river    | 292.482965|       0|    292.48|
-| 2001|butte creek   |  70.303241|       0|     70.30|
+| 2000|feather river |  42.509566|       0|     42.51|
+| 2000|yuba river    | 274.358130|       0|    274.36|
 | 2001|clear creek   |  17.078134|       0|     17.08|
+| 2001|feather river |  48.726433|       0|     48.73|
+| 2001|yuba river    | 312.092106|       0|    312.09|
+| 2002|clear creek   |  22.628449|       0|     22.63|
+| 2002|feather river |  71.238409|       0|     71.24|
+| 2002|yuba river    | 313.502719|       0|    313.50|
+| 2003|battle creek  |   1.101875|       0|      1.10|
+| 2003|clear creek   |  10.009113|       0|     10.01|
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
@@ -63,6 +63,15 @@ The following plot is of the growing degree days above the 20 degree threshold o
 ### Flow 
 
 Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:
+
+
+```
+## Error in `filter()`:
+## ℹ In argument: `month(date) %in% migratory_and_holding_months`.
+## Caused by error in `as.Date.default()`:
+## ! do not know how to convert 'x' to class "Date"
+```
+
 
 
 |stream      | year| mean_flow| max_flow|

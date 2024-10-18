@@ -94,7 +94,7 @@ The first step was to apply a lifestage cutoff to catch records that had fork le
 
 ### Determine year specific lifestage proportions
 
-There are 68780 entries with missing lifestage due to missing fork length data. 
+There are 68865 entries with missing lifestage due to missing fork length data. 
 
 
 |date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight|

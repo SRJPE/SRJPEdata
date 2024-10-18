@@ -103,56 +103,56 @@
 <th align="right">gdd_trib</th>
 <th align="right">gdd_sac</th>
 <th align="right">gdd_total</th>
-</tr></thead><tbody><tr class="odd"><td align="right">1999</td>
-<td align="left">butte creek</td>
-<td align="right">9.900463</td>
-<td align="right">0</td>
-<td align="right">9.90</td>
-</tr><tr class="even"><td align="right">1999</td>
-<td align="left">deer creek</td>
-<td align="right">79.307870</td>
-<td align="right">0</td>
-<td align="right">79.31</td>
-</tr><tr class="odd"><td align="right">1999</td>
-<td align="left">mill creek</td>
-<td align="right">24.350443</td>
-<td align="right">0</td>
-<td align="right">24.35</td>
-</tr><tr class="even"><td align="right">2000</td>
-<td align="left">butte creek</td>
-<td align="right">38.893518</td>
-<td align="right">0</td>
-<td align="right">38.89</td>
-</tr><tr class="odd"><td align="right">2000</td>
-<td align="left">deer creek</td>
-<td align="right">191.700593</td>
-<td align="right">0</td>
-<td align="right">191.70</td>
-</tr><tr class="even"><td align="right">2000</td>
+</tr></thead><tbody><tr class="odd"><td align="right">2000</td>
 <td align="left">feather river</td>
-<td align="right">48.671632</td>
+<td align="right">42.509566</td>
 <td align="right">0</td>
-<td align="right">48.67</td>
-</tr><tr class="odd"><td align="right">2000</td>
-<td align="left">mill creek</td>
-<td align="right">97.261574</td>
-<td align="right">0</td>
-<td align="right">97.26</td>
+<td align="right">42.51</td>
 </tr><tr class="even"><td align="right">2000</td>
 <td align="left">yuba river</td>
-<td align="right">292.482965</td>
+<td align="right">274.358130</td>
 <td align="right">0</td>
-<td align="right">292.48</td>
+<td align="right">274.36</td>
 </tr><tr class="odd"><td align="right">2001</td>
-<td align="left">butte creek</td>
-<td align="right">70.303241</td>
-<td align="right">0</td>
-<td align="right">70.30</td>
-</tr><tr class="even"><td align="right">2001</td>
 <td align="left">clear creek</td>
 <td align="right">17.078134</td>
 <td align="right">0</td>
 <td align="right">17.08</td>
+</tr><tr class="even"><td align="right">2001</td>
+<td align="left">feather river</td>
+<td align="right">48.726433</td>
+<td align="right">0</td>
+<td align="right">48.73</td>
+</tr><tr class="odd"><td align="right">2001</td>
+<td align="left">yuba river</td>
+<td align="right">312.092106</td>
+<td align="right">0</td>
+<td align="right">312.09</td>
+</tr><tr class="even"><td align="right">2002</td>
+<td align="left">clear creek</td>
+<td align="right">22.628449</td>
+<td align="right">0</td>
+<td align="right">22.63</td>
+</tr><tr class="odd"><td align="right">2002</td>
+<td align="left">feather river</td>
+<td align="right">71.238409</td>
+<td align="right">0</td>
+<td align="right">71.24</td>
+</tr><tr class="even"><td align="right">2002</td>
+<td align="left">yuba river</td>
+<td align="right">313.502719</td>
+<td align="right">0</td>
+<td align="right">313.50</td>
+</tr><tr class="odd"><td align="right">2003</td>
+<td align="left">battle creek</td>
+<td align="right">1.101875</td>
+<td align="right">0</td>
+<td align="right">1.10</td>
+</tr><tr class="even"><td align="right">2003</td>
+<td align="left">clear creek</td>
+<td align="right">10.009113</td>
+<td align="right">0</td>
+<td align="right">10.01</td>
 </tr></tbody></table><p>The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:</p>
 <div class="float">
 <img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><div class="figcaption">plot of chunk unnamed-chunk-3</div>
@@ -161,6 +161,10 @@
 <div class="section level3">
 <h3 id="flow">Flow<a class="anchor" aria-label="anchor" href="#flow"></a></h3>
 <p>Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:</p>
+<pre><code><span><span class="co">## Error in `filter()`:</span></span>
+<span><span class="co">## ℹ In argument: `month(date) %in% migratory_and_holding_months`.</span></span>
+<span><span class="co">## Caused by error in `as.Date.default()`:</span></span>
+<span><span class="co">## ! do not know how to convert 'x' to class "Date"</span></span></code></pre>
 <table class="table"><thead><tr class="header"><th align="left">stream</th>
 <th align="right">year</th>
 <th align="right">mean_flow</th>
