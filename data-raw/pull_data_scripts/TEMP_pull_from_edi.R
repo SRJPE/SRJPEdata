@@ -6,10 +6,10 @@ library(tidyverse)
 library(EDIutils)
 
 # Find max dates in SRJPEdata
-dates <- SRJPEdata::rst_catch |> 
+dates <- rst_catch |> 
   group_by(stream, site) |> 
-  summarize(min = min(date),
-            max = max(date))
+  summarize(min = min(date, na.rm = T),
+            max = max(date, na.rm = T))
 
 # Butte -------------------------------------------------------------------
 res <- read_data_entity_names(packageId = "edi.1497.14")
@@ -148,7 +148,7 @@ battle_clear_catch_edi <- catch_edi |>
                           station_code == "lower clear creek" ~ "lcc",
                           station_code == "upper clear creek" ~ "ucc"),
          subsite = site,
-         actual_count = NA) |> 
+         actual_count = NA_character_) |> 
   rename(date = sample_date,
          run = fws_run) |> 
   left_join(dates) |> 
@@ -457,7 +457,7 @@ knights_catch_edi <- catch_edi |>
          dead = NA,
          species = "chinook",
          site_group = "knights landing",
-         actual_count = NA,
+         actual_count = NA_character_,
          subsite = as.character(subSiteName)) |> 
   rename(date = visitTime,
          count = n,
@@ -548,4 +548,5 @@ temp_trap <- bind_rows(battle_clear_trap_edi,
                        butte_trap_edi,
                        feather_trap_edi,
                        yuba_trap_edi,
-                       knights_trap_edi)
+                       knights_trap_edi) |> 
+  mutate(include = ifelse(include == "Yes", T, F))

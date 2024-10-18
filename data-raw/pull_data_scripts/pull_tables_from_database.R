@@ -22,10 +22,10 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
    rst_trap_locations <- SRJPEdata::rst_trap_locations
    else(rst_trap_locations <- trap_location_query))
  
- try(if(nrow(trap_location_query) <= nrow(SRJPEdata::rst_trap_locations)) {
-   rst_trap_locations <- SRJPEdata::rst_trap_locations
-   warning(paste("No new rst locations added to the database."))
- })
+ # try(if(nrow(trap_location_query) <= nrow(SRJPEdata::rst_trap_locations)) {
+ #   rst_trap_locations <- SRJPEdata::rst_trap_locations
+ #   warning(paste("No new rst locations added to the database."))
+ # })
  
  usethis::use_data(rst_trap_locations, overwrite = TRUE)
  
@@ -45,10 +45,10 @@ try(if(!exists("rst_catch_query"))
   rst_catch <- SRJPEdata::rst_catch
   else(rst_catch <- rst_catch_query))
 
-try(if(nrow(rst_catch_query) <= nrow(SRJPEdata::rst_catch)) {
-  rst_catch <- SRJPEdata::rst_catch
-  warning(paste("No new rst catch datasets detected in the database. Maximum date of RST catch data is", max(SRJPEdata::rst_catch$date, na.rm = TRUE)))
-})
+# try(if(nrow(rst_catch_query) <= nrow(SRJPEdata::rst_catch)) {
+#   rst_catch <- SRJPEdata::rst_catch
+#   warning(paste("No new rst catch datasets detected in the database. Maximum date of RST catch data is", max(SRJPEdata::rst_catch$date, na.rm = TRUE)))
+# })
 
 # Removes NA sites that come from battle, will change logic after discussing EDI package udpates with battle team
 rst_catch <- rst_catch |> 
@@ -75,10 +75,10 @@ try(if(!exists("rst_trap_query"))
   rst_trap <- SRJPEdata::rst_trap
   else(rst_trap <- rst_trap_query))
 
-try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
-  rst_trap <- SRJPEdata::rst_trap
-  warning(paste("No new rst trap datasets detected in the database. Maximum date of RST trap data is", max(SRJPEdata::rst_trap$trap_stop_date, na.rm = TRUE)))
-})
+# try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
+#   rst_trap <- SRJPEdata::rst_trap
+#   warning(paste("No new rst trap datasets detected in the database. Maximum date of RST trap data is", max(SRJPEdata::rst_trap$trap_stop_date, na.rm = TRUE)))
+# })
 # Pull in efficiency data 
 # release table 
  try(release_query <- dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
@@ -93,10 +93,10 @@ try(if(nrow(rst_trap_query) <= nrow(SRJPEdata::rst_trap)) {
    release <- SRJPEdata::release
    else(release <- release_query))
  
- try(if(nrow(release_query) <= nrow(SRJPEdata::release)) {
-   release <- SRJPEdata::release
-   warning(paste("No new release datasets detected in the database. Maximum date of release datais", max(SRJPEdata::release$date_released, na.rm = TRUE)))
- })
+ # try(if(nrow(release_query) <= nrow(SRJPEdata::release)) {
+ #   release <- SRJPEdata::release
+ #   warning(paste("No new release datasets detected in the database. Maximum date of release datais", max(SRJPEdata::release$date_released, na.rm = TRUE)))
+ # })
 
 
 # Pull in release fish info, Fork length for release trials 
@@ -119,10 +119,10 @@ try(if(!exists("recaptures_query"))
   recaptures <- SRJPEdata::recaptures
   else(recaptures <- recaptures_query))
 
-try(if(nrow(recaptures_query) <= nrow(SRJPEdata::recaptures)) {
-  recaptures <- SRJPEdata::recaptures
-  warning(paste("No new recaptures datasets detected in the database. Maximum date of recaptures data is", max(SRJPEdata::recaptures$date, na.rm = TRUE)))
-})
+# try(if(nrow(recaptures_query) <= nrow(SRJPEdata::recaptures)) {
+#   recaptures <- SRJPEdata::recaptures
+#   warning(paste("No new recaptures datasets detected in the database. Maximum date of recaptures data is", max(SRJPEdata::recaptures$date, na.rm = TRUE)))
+# })
 
 
 
