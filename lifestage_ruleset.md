@@ -32,7 +32,7 @@ The plot below shows the updated cutoff values with linear interpolation of week
 
 **Note: You can view all code used to generate plots and tables in this markdown [here.](https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd)**
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
 
 
 
@@ -51,7 +51,7 @@ The following code is applied in the `weekly_data_summary` script.
 ``` r
 # Note this is not the final dataset as lifestage is added below
 standard_catch_unmarked_w_yearling <- rst_catch |> 
-  filter(species == "chinook") |>  # filter for only chinook
+  filter(species %in% c("chinook", "chinook salmon")) |>  # filter for only chinook
   mutate(month = month(date), 
          day = day(date)) |> 
   left_join(daily_yearling_ruleset) |> 
@@ -94,7 +94,7 @@ The first step was to apply a lifestage cutoff to catch records that had fork le
 
 ### Determine year specific lifestage proportions
 
-There are 68865 entries with missing lifestage due to missing fork length data. 
+There are 68905 entries with missing lifestage due to missing fork length data. 
 
 
 |date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight|
@@ -158,4 +158,4 @@ The following plot shows the general patten in the lifestage field where fry are
 
 **Battle Creek: 2011**
 
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
