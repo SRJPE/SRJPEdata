@@ -166,7 +166,7 @@ The following code is applied in the `weekly_data_summary` script.
 ```{r, include = TRUE, echo = TRUE}
 # Note this is not the final dataset as lifestage is added below
 standard_catch_unmarked_w_yearling <- rst_catch |> 
-  filter(species == "chinook") |>  # filter for only chinook
+  filter(species %in% c("chinook", "chinook salmon")) |>  # filter for only chinook
   mutate(month = month(date), 
          day = day(date)) |> 
   left_join(daily_yearling_ruleset) |> 
@@ -196,7 +196,7 @@ The first step was to apply a lifestage cutoff to catch records that had fork le
 ```{r, echo = F}
 # create lifestage field based on fork length
 standard_catch_unmarked <- standard_catch_unmarked_w_yearling |> 
-  filter(species == "chinook") |>  # filter for only chinook
+  filter(species %in% c("chinook", "chinook salmon")) |>  # filter for only chinook
   mutate(month = month(date), # add to join with lad and yearling
          day = day(date)) |> 
   left_join(daily_yearling_ruleset) |> 

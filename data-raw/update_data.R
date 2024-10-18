@@ -1,6 +1,6 @@
 # First source script that pulls rst, adult data from SRJPE database and rst from datatackle database
 # Need DB permissions set
-source("data-raw/pull_data_scripts/combine_database_pull_and_save.R.R")
+source("data-raw/pull_data_scripts/combine_database_pull_and_save.R")
 
 # temp regression vignette needs to come before the environmental data
 knitr::knit("vignettes/temp_regression.Rmd")

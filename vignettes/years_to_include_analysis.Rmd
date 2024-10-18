@@ -166,7 +166,8 @@ For ongoing data collection and more recent seasons, we applied an automatic che
 We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.
 
 ```{r, echo = FALSE}
-years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data
+years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data |> 
+  filter(!(stream == "yuba river" & year == 2008))
 
 # Bind in new rows from recent data 
 if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 

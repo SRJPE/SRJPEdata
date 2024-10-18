@@ -259,7 +259,7 @@ weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
 # filter to only include complete season data 
 if (month(Sys.Date()) %in% c(9:12, 1:5)) {
   weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data |> 
-    filter(run_year < year(Sys.Date()))
+    filter(run_year <= year(Sys.Date()))
 }
 
 tryCatch({

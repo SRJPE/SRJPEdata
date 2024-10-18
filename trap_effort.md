@@ -29,7 +29,7 @@ Below is the code for each of the methods described above:
 1) If the start and stop date/time of the sampling period are available, simply subtract the difference in time.
 
 
-```r
+``` r
 # calculating hours fished when have start and stop datetime
 hours_fished <- function(dat){
   dat %>%
@@ -44,7 +44,7 @@ hours_fished <- function(dat){
 take the average cone RPMs and divide `total_revolutions`/average RMP/60 to get total hours fished.
 
 
-```r
+``` r
 # calculating hours fished when have start and stop datetime
 revolution_calculated_hours_fished <- function(dat){
   dat %>%
@@ -61,7 +61,7 @@ revolution_calculated_hours_fished <- function(dat){
 3) If only one date is available, assume that the end date is the date sampled on the following day.
 
 
-```r
+``` r
 # calculating hours fished when have only date and time
 hours_fished_one_date <- function(dat) {
   dat %>%
@@ -158,6 +158,11 @@ fished. We therefore assume 24 hours fished for every day with data.
 We combined all methods to create one table with daily hours fished for each trap. We added rows with 0 effort for days that where there is no trapping data. 
 
 
+```
+## Error: The specified interval is invalid for the datetime variable.
+##   Not all original observation are in the padding.
+##   If you want to pad at this interval, aggregate the data first with thicken.
+```
 
 ## Summarized by week
 
@@ -165,21 +170,19 @@ We grouped hours fished data by site, subsite, week, and year and summarized to 
 
 
 ```
-## # A tibble: 244 × 5
-## # Groups:   year, stream, site [42]
-##     year stream           site                    subsite     n
-##    <dbl> <chr>            <chr>                   <chr>   <int>
-##  1  1994 sacramento river red bluff diversion dam gate 1      6
-##  2  1994 sacramento river red bluff diversion dam gate 10     4
-##  3  1994 sacramento river red bluff diversion dam gate 11     6
-##  4  1994 sacramento river red bluff diversion dam gate 3     11
-##  5  1994 sacramento river red bluff diversion dam gate 5     15
-##  6  1994 sacramento river red bluff diversion dam gate 7     12
-##  7  1994 sacramento river red bluff diversion dam gate 9     16
-##  8  1995 sacramento river knights landing         8.3         3
-##  9  1995 sacramento river knights landing         8.4         7
-## 10  1995 sacramento river red bluff diversion dam gate 1     32
-## # ℹ 234 more rows
+## Error in eval(expr, envir, enclos): object 'hours_fished_combined' not found
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'weekly_hours_fished_raw' not found
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'weeks_with_missing_trap_data' not found
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'weekly_hours_fished_raw' not found
 ```
 
 ### QC
