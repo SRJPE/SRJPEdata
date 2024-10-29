@@ -32,7 +32,7 @@ The Spring Run Juvenile Production Estimate uses historical rotary screw trap an
 
 ## RST Data - Years to Include in Model
 
-The modeling team hosted a modeling windows workshop where we discussed approaches to defining the time window that should be included in the juvenile abundance model. At the workshop we decided to use the full sampling season of data for each tributary and year but to exclude years where we were concerned about data completeness. We came up with the following approach to determine excluded years:
+The modeling team hosted a modeling windows workshop where we discussed approaches to defining the time window that should be included in the juvenile abundance model. At the workshop we decided to use the full sampling season of data for each tributary, site, and year but to exclude years where we were concerned about data completeness. We came up with the following approach to determine excluded years:
 
 1)  First exclude years with lots of missing data from cumulative catch curves. See `data-raw/years_to_exclude.csv` (exclusion_type = "really low sampling").
 2)  Exclude yearlings from cumulative catch curves.
@@ -148,7 +148,7 @@ heat_map <- ggplot(plot_data, aes(x = fake_date, y = wy, fill = n_streams, text 
   theme_minimal() + 
   ylab('water year') +
   xlab("") + 
-  #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  # scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(heat_map) 
 
@@ -158,17 +158,16 @@ plotly::ggplotly(heat_map)
 
 We utilized the above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling. See a section of the "years to exclude" table below.
 
-For ongoing data collection and more recent seasons, we applied an automatic check to determine if a year should be excluded. We use the following criteria to asses if a recent RST season should be excluded from analysis: 
+For ongoing data collection and more recent seasons, we applied an automatic check as a first pass to determine if a year should be excluded. Any automatic exclusion records will be reviewed manually before being excluded from data. We use the following criteria to asses if a recent RST season should be excluded from analysis: 
 
-* Missing 4 consecutive weeks in the critical window, OR 
 * If 25% of the weeks are missing (this test is used in place of the original criteria of "exclude years with lots of missing data from cumulative catch curves")
 
 We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.
 
-```{r, echo = FALSE}
-years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data |> 
-  filter(!(stream == "yuba river" & year == 2008))
+#### Years to Exclude Table 
 
+```{r, echo = FALSE}
+years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data 
 # Bind in new rows from recent data 
 if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 
   max_old_year <- max(years_to_exclude_rst_data$year)
@@ -188,7 +187,7 @@ if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at 
            exclusion_type = "automatic", 
            reason_for_exclusion = "less than 75% of weeks sampled") |> 
     filter(exclude) |> 
-    select(stream, year = monitoring_year, exclusion_type, reason_for_exclusion) 
+    select(stream, site, year = monitoring_year, exclusion_type, reason_for_exclusion) 
   years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
 }  
 
@@ -196,6 +195,7 @@ if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at 
 
 usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
 years_exclude_nice_names <- years_to_exclude_rst_data |> select("Stream" = stream, 
+                                                                "Site" = site, 
                                                     "Year" = year, 
                                                     "Exclusion Type" = exclusion_type,
                                                     "Notes" = reason_for_exclusion)
