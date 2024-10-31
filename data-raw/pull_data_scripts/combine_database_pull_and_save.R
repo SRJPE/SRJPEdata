@@ -8,7 +8,10 @@ rst_catch <- bind_rows(rst_catch, rst_catch_query_pilot, temp_catch) |>
   mutate(fork_length = ifelse(fork_length == 0, NA, fork_length)) |> # looks like there were some cases where fork length is 0. this should be handled more upstream but fixing it here for now
   glimpse()
 rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot, temp_trap)  |> glimpse()
-release <- bind_rows(release, release_query_pilot |> mutate(release_id = as.character(release_id)), temp_release)  |> glimpse()
+release <- bind_rows(release, release_query_pilot |> 
+                       mutate(release_id = as.character(release_id)), temp_release)  |> 
+  filter(!is.na(number_released)) |> # there should not be any NAs
+  glimpse()
 recaptures <- bind_rows(recaptures, recaptures_query_pilot |> mutate(release_id = as.character(release_id)), temp_recapture) |> glimpse()
 
 ## SAVE TO DATA PACKAGE ---

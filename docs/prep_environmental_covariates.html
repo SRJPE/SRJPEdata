@@ -105,14 +105,14 @@
 <th align="right">gdd_total</th>
 </tr></thead><tbody><tr class="odd"><td align="right">2000</td>
 <td align="left">feather river</td>
-<td align="right">42.509566</td>
+<td align="right">43.314121</td>
 <td align="right">0</td>
-<td align="right">42.51</td>
+<td align="right">43.31</td>
 </tr><tr class="even"><td align="right">2000</td>
 <td align="left">yuba river</td>
-<td align="right">274.358130</td>
+<td align="right">230.115585</td>
 <td align="right">0</td>
-<td align="right">274.36</td>
+<td align="right">230.12</td>
 </tr><tr class="odd"><td align="right">2001</td>
 <td align="left">clear creek</td>
 <td align="right">17.078134</td>
@@ -120,14 +120,14 @@
 <td align="right">17.08</td>
 </tr><tr class="even"><td align="right">2001</td>
 <td align="left">feather river</td>
-<td align="right">48.726433</td>
+<td align="right">50.163877</td>
 <td align="right">0</td>
-<td align="right">48.73</td>
+<td align="right">50.16</td>
 </tr><tr class="odd"><td align="right">2001</td>
 <td align="left">yuba river</td>
-<td align="right">312.092106</td>
+<td align="right">266.940893</td>
 <td align="right">0</td>
-<td align="right">312.09</td>
+<td align="right">266.94</td>
 </tr><tr class="even"><td align="right">2002</td>
 <td align="left">clear creek</td>
 <td align="right">22.628449</td>
@@ -135,14 +135,14 @@
 <td align="right">22.63</td>
 </tr><tr class="odd"><td align="right">2002</td>
 <td align="left">feather river</td>
-<td align="right">71.238409</td>
+<td align="right">73.178135</td>
 <td align="right">0</td>
-<td align="right">71.24</td>
+<td align="right">73.18</td>
 </tr><tr class="even"><td align="right">2002</td>
 <td align="left">yuba river</td>
-<td align="right">313.502719</td>
+<td align="right">273.687136</td>
 <td align="right">0</td>
-<td align="right">313.50</td>
+<td align="right">273.69</td>
 </tr><tr class="odd"><td align="right">2003</td>
 <td align="left">battle creek</td>
 <td align="right">1.101875</td>
@@ -165,54 +165,9 @@
 <span><span class="co">## ℹ In argument: `month(date) %in% migratory_and_holding_months`.</span></span>
 <span><span class="co">## Caused by error in `as.Date.default()`:</span></span>
 <span><span class="co">## ! do not know how to convert 'x' to class "Date"</span></span></code></pre>
-<table class="table"><thead><tr class="header"><th align="left">stream</th>
-<th align="right">year</th>
-<th align="right">mean_flow</th>
-<th align="right">max_flow</th>
-</tr></thead><tbody><tr class="odd"><td align="left">butte creek</td>
-<td align="right">1997</td>
-<td align="right">NaN</td>
-<td align="right">Inf</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="right">1998</td>
-<td align="right">NaN</td>
-<td align="right">Inf</td>
-</tr><tr class="odd"><td align="left">butte creek</td>
-<td align="right">1999</td>
-<td align="right">500.3782</td>
-<td align="right">7177</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="right">2000</td>
-<td align="right">477.5862</td>
-<td align="right">7592</td>
-</tr><tr class="odd"><td align="left">butte creek</td>
-<td align="right">2001</td>
-<td align="right">288.0755</td>
-<td align="right">1844</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="right">2002</td>
-<td align="right">286.3508</td>
-<td align="right">6129</td>
-</tr><tr class="odd"><td align="left">butte creek</td>
-<td align="right">2003</td>
-<td align="right">604.8511</td>
-<td align="right">4420</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="right">2004</td>
-<td align="right">395.5383</td>
-<td align="right">4730</td>
-</tr><tr class="odd"><td align="left">butte creek</td>
-<td align="right">2005</td>
-<td align="right">542.8965</td>
-<td align="right">21900</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="right">2006</td>
-<td align="right">1032.4894</td>
-<td align="right">29600</td>
-</tr></tbody></table><p>The following plot is of max flow (cfs) over time for all tributaries:</p>
-<div class="float">
-<img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"><div class="figcaption">plot of chunk unnamed-chunk-5</div>
-</div>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'flow_metrics' not found</span></span></code></pre>
+<p>The following plot is of max flow (cfs) over time for all tributaries:</p>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'flow_metrics' not found</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="water-year-type">Water Year Type<a class="anchor" aria-label="anchor" href="#water-year-type"></a></h3>
@@ -331,6 +286,7 @@
 <div class="section level3">
 <h3 id="combine-and-save-covariate-data">Combine and Save Covariate Data<a class="anchor" aria-label="anchor" href="#combine-and-save-covariate-data"></a></h3>
 <p>Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as <code>1</code> for wet (wet, above normal) and <code>0</code> for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):</p>
+<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'flow_metrics' not found</span></span></code></pre>
 <table style="width:100%;" class="table"><colgroup><col width="5%"><col width="14%"><col width="8%"><col width="14%"><col width="12%"><col width="15%"><col width="28%"></colgroup><thead><tr class="header"><th align="right">year</th>
 <th align="left">stream</th>
 <th align="right">wy_type</th>

@@ -90,7 +90,7 @@
 <p>The plot below shows the updated cutoff values with linear interpolation of weekly cutoffs for Deer Creek.</p>
 <p><strong>Note: You can view all code used to generate plots and tables in this markdown <a href="https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd" class="external-link">here.</a></strong></p>
 <div class="float">
-<img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><div class="figcaption">plot of chunk unnamed-chunk-3</div>
+<img src="figure/unnamed-chunk-2-1.png" alt="plot of chunk unnamed-chunk-2"><div class="figcaption">plot of chunk unnamed-chunk-2</div>
 </div>
 </div>
 <div class="section level3">
@@ -126,7 +126,7 @@
 </ol><div class="section level3">
 <h3 id="create-lifestage-variable">Create lifestage variable<a class="anchor" aria-label="anchor" href="#create-lifestage-variable"></a></h3>
 <p>The first step was to apply a lifestage cutoff to catch records that had fork lengths recorded. These cutoffs are <code>fork_length &lt; 45 = fry</code>, <code>fork_length &gt; 45 = smolt</code>, <code>fork_length &gt; yearling_cutoff = yearling</code>.</p>
-<table class="table"><colgroup><col width="9%"><col width="11%"><col width="4%"><col width="7%"><col width="11%"><col width="5%"><col width="4%"><col width="9%"><col width="14%"><col width="4%"><col width="10%"><col width="6%"></colgroup><thead><tr class="header"><th align="left">date</th>
+<table class="table"><colgroup><col width="7%"><col width="11%"><col width="16%"><col width="6%"><col width="16%"><col width="4%"><col width="4%"><col width="7%"><col width="10%"><col width="4%"><col width="8%"><col width="4%"></colgroup><thead><tr class="header"><th align="left">date</th>
 <th align="left">stream</th>
 <th align="left">site</th>
 <th align="left">subsite</th>
@@ -138,126 +138,126 @@
 <th align="left">dead</th>
 <th align="right">fork_length</th>
 <th align="right">weight</th>
-</tr></thead><tbody><tr class="odd"><td align="left">1999-01-19</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
+</tr></thead><tbody><tr class="odd"><td align="left">1998-11-22</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 11</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
 <td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">40</td>
-<td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-19</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">17100</td>
-<td align="left">fall</td>
-<td align="left">NA</td>
 <td align="left">FALSE</td>
-<td align="left">NA</td>
+<td align="right">54</td>
 <td align="right">NA</td>
-<td align="right">0</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">35</td>
-<td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">3</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">38</td>
-<td align="right">0</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">6</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">37</td>
-<td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">5</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">38</td>
-<td align="right">0</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">34</td>
-<td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">5</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">36</td>
-<td align="right">0</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">4</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">36</td>
-<td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
+</tr><tr class="even"><td align="left">2005-07-17</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 2</td>
+<td align="left">red bluff diversion dam</td>
 <td align="right">2</td>
 <td align="left">fall</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">78</td>
+<td align="right">NA</td>
+</tr><tr class="odd"><td align="left">2011-09-24</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 6</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
 <td align="left">fry</td>
 <td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">37</td>
-<td align="right">0</td>
+<td align="left">FALSE</td>
+<td align="right">32</td>
+<td align="right">NA</td>
+</tr><tr class="even"><td align="left">2003-10-26</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 4</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
+<td align="left">fry</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">40</td>
+<td align="right">NA</td>
+</tr><tr class="odd"><td align="left">2002-07-09</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 6 w</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">1</td>
+<td align="left">fall</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">73</td>
+<td align="right">NA</td>
+</tr><tr class="even"><td align="left">2009-02-01</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 8</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">18</td>
+<td align="left">fall</td>
+<td align="left">fry</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">36</td>
+<td align="right">NA</td>
+</tr><tr class="odd"><td align="left">2009-10-27</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 7</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">3</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">58</td>
+<td align="right">NA</td>
+</tr><tr class="even"><td align="left">2009-12-17</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 7</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">1</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">63</td>
+<td align="right">NA</td>
+</tr><tr class="odd"><td align="left">2010-11-12</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 7</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">54</td>
+<td align="right">NA</td>
+</tr><tr class="even"><td align="left">2003-04-14</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 3</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">1</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">145</td>
+<td align="right">NA</td>
 </tr></tbody></table></div>
 <div class="section level3">
 <h3 id="determine-year-specific-lifestage-proportions">Determine year specific lifestage proportions<a class="anchor" aria-label="anchor" href="#determine-year-specific-lifestage-proportions"></a></h3>
@@ -274,23 +274,11 @@
 <th align="left">dead</th>
 <th align="right">fork_length</th>
 <th align="right">weight</th>
-</tr></thead><tbody><tr class="odd"><td align="left">1999-01-19</td>
+</tr></thead><tbody><tr class="odd"><td align="left">2002-03-13</td>
 <td align="left">clear creek</td>
 <td align="left">lcc</td>
 <td align="left">lcc</td>
 <td align="left">clear creek</td>
-<td align="right">17100</td>
-<td align="left">fall</td>
-<td align="left">NA</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
 <td align="right">1</td>
 <td align="left">fall</td>
 <td align="left">NA</td>
@@ -298,49 +286,61 @@
 <td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">0</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">6631</td>
-<td align="left">fall</td>
-<td align="left">NA</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">NA</td>
-<td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
+</tr><tr class="even"><td align="left">2002-01-01</td>
 <td align="left">battle creek</td>
 <td align="left">lbc</td>
 <td align="left">lbc</td>
 <td align="left">battle creek</td>
-<td align="right">3147</td>
+<td align="right">7</td>
 <td align="left">fall</td>
 <td align="left">NA</td>
 <td align="left">FALSE</td>
 <td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">0</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
+</tr><tr class="odd"><td align="left">2002-01-01</td>
 <td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="left">ubc</td>
+<td align="left">lbc</td>
+<td align="left">lbc</td>
 <td align="left">battle creek</td>
-<td align="right">1295</td>
+<td align="right">3</td>
 <td align="left">fall</td>
 <td align="left">NA</td>
 <td align="left">FALSE</td>
 <td align="left">NA</td>
 <td align="right">NA</td>
 <td align="right">0</td>
-</tr><tr class="even"><td align="left">1999-01-21</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">5163</td>
+</tr><tr class="even"><td align="left">2002-01-01</td>
+<td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="left">lbc</td>
+<td align="left">battle creek</td>
+<td align="right">6</td>
 <td align="left">fall</td>
+<td align="left">NA</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+</tr><tr class="odd"><td align="left">2002-01-06</td>
+<td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="left">lbc</td>
+<td align="left">battle creek</td>
+<td align="right">1</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="left">FALSE</td>
+<td align="left">NA</td>
+<td align="right">NA</td>
+<td align="right">0</td>
+</tr><tr class="even"><td align="left">2002-01-06</td>
+<td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="left">lbc</td>
+<td align="left">battle creek</td>
+<td align="right">1</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 <td align="left">FALSE</td>
 <td align="left">NA</td>
@@ -432,7 +432,7 @@
 <div class="section level3">
 <h3 id="apply-proportions-to-fill-in-missing-values">Apply proportions to fill in missing values<a class="anchor" aria-label="anchor" href="#apply-proportions-to-fill-in-missing-values"></a></h3>
 <p>We used these proportions to fill in missing lifestage values. See the final lifestage designations below.</p>
-<table class="table"><colgroup><col width="7%"><col width="8%"><col width="3%"><col width="5%"><col width="8%"><col width="4%"><col width="3%"><col width="7%"><col width="10%"><col width="3%"><col width="8%"><col width="4%"><col width="3%"><col width="3%"><col width="17%"></colgroup><thead><tr class="header"><th align="left">date</th>
+<table style="width:100%;" class="table"><colgroup><col width="5%"><col width="9%"><col width="12%"><col width="4%"><col width="12%"><col width="3%"><col width="3%"><col width="5%"><col width="8%"><col width="3%"><col width="6%"><col width="3%"><col width="2%"><col width="2%"><col width="13%"></colgroup><thead><tr class="header"><th align="left">date</th>
 <th align="left">stream</th>
 <th align="left">site</th>
 <th align="left">subsite</th>
@@ -447,155 +447,155 @@
 <th align="right">week</th>
 <th align="right">year</th>
 <th align="left">model_lifestage_method</th>
-</tr></thead><tbody><tr class="odd"><td align="left">1999-01-19</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
+</tr></thead><tbody><tr class="odd"><td align="left">1998-11-22</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 11</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
 <td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">40</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
 <td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">35</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
+<td align="right">54</td>
+<td align="right">NA</td>
+<td align="right">47</td>
+<td align="right">1998</td>
 <td align="left">assigned from fl cutoffs</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">3</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">38</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">6</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">37</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">5</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">38</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">1</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">34</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="left">lcc</td>
-<td align="left">clear creek</td>
-<td align="right">5</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">36</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
-<td align="right">4</td>
-<td align="left">fall</td>
-<td align="left">fry</td>
-<td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">36</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
-<td align="left">assigned from fl cutoffs</td>
-</tr><tr class="odd"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="left">lbc</td>
-<td align="left">battle creek</td>
+</tr><tr class="even"><td align="left">2005-07-17</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 2</td>
+<td align="left">red bluff diversion dam</td>
 <td align="right">2</td>
 <td align="left">fall</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">78</td>
+<td align="right">NA</td>
+<td align="right">29</td>
+<td align="right">2005</td>
+<td align="left">assigned from fl cutoffs</td>
+</tr><tr class="odd"><td align="left">2011-09-24</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 6</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
 <td align="left">fry</td>
 <td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">37</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1999</td>
+<td align="left">FALSE</td>
+<td align="right">32</td>
+<td align="right">NA</td>
+<td align="right">39</td>
+<td align="right">2011</td>
 <td align="left">assigned from fl cutoffs</td>
-</tr><tr class="even"><td align="left">1999-01-20</td>
-<td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="left">ubc</td>
-<td align="left">battle creek</td>
+</tr><tr class="even"><td align="left">2003-10-26</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 4</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
+<td align="left">fry</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">40</td>
+<td align="right">NA</td>
+<td align="right">43</td>
+<td align="right">2003</td>
+<td align="left">assigned from fl cutoffs</td>
+</tr><tr class="odd"><td align="left">2002-07-09</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 6 w</td>
+<td align="left">red bluff diversion dam</td>
 <td align="right">1</td>
+<td align="left">fall</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">73</td>
+<td align="right">NA</td>
+<td align="right">28</td>
+<td align="right">2002</td>
+<td align="left">assigned from fl cutoffs</td>
+</tr><tr class="even"><td align="left">2009-02-01</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 8</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">18</td>
 <td align="left">fall</td>
 <td align="left">fry</td>
 <td align="left">FALSE</td>
-<td align="left">NA</td>
-<td align="right">38</td>
-<td align="right">0</td>
+<td align="left">FALSE</td>
+<td align="right">36</td>
+<td align="right">NA</td>
+<td align="right">5</td>
+<td align="right">2009</td>
+<td align="left">assigned from fl cutoffs</td>
+</tr><tr class="odd"><td align="left">2009-10-27</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 7</td>
+<td align="left">red bluff diversion dam</td>
 <td align="right">3</td>
-<td align="right">1999</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">58</td>
+<td align="right">NA</td>
+<td align="right">43</td>
+<td align="right">2009</td>
+<td align="left">assigned from fl cutoffs</td>
+</tr><tr class="even"><td align="left">2009-12-17</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 7</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">1</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">63</td>
+<td align="right">NA</td>
+<td align="right">51</td>
+<td align="right">2009</td>
+<td align="left">assigned from fl cutoffs</td>
+</tr><tr class="odd"><td align="left">2010-11-12</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 7</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">54</td>
+<td align="right">NA</td>
+<td align="right">46</td>
+<td align="right">2010</td>
+<td align="left">assigned from fl cutoffs</td>
+</tr><tr class="even"><td align="left">2003-04-14</td>
+<td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="left">gate 3</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">1</td>
+<td align="left">winter</td>
+<td align="left">smolt</td>
+<td align="left">FALSE</td>
+<td align="left">FALSE</td>
+<td align="right">145</td>
+<td align="right">NA</td>
+<td align="right">15</td>
+<td align="right">2003</td>
 <td align="left">assigned from fl cutoffs</td>
 </tr></tbody></table></div>
 <div class="section level3">
@@ -607,7 +607,7 @@
 <p>The following plot shows the general patten in the lifestage field where fry are caught earlier in the year and smolt are caught later in the year.</p>
 <p><strong>Battle Creek: 2011</strong></p>
 <div class="float">
-<img src="figure/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"><div class="figcaption">plot of chunk unnamed-chunk-12</div>
+<img src="figure/unnamed-chunk-11-1.png" alt="plot of chunk unnamed-chunk-11"><div class="figcaption">plot of chunk unnamed-chunk-11</div>
 </div>
 </div>
 </div>
