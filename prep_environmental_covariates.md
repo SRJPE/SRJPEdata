@@ -45,14 +45,14 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 
 | year|stream        |   gdd_trib| gdd_sac| gdd_total|
 |----:|:-------------|----------:|-------:|---------:|
-| 2000|feather river |  42.509566|       0|     42.51|
-| 2000|yuba river    | 274.358130|       0|    274.36|
+| 2000|feather river |  41.885165|       0|     41.89|
+| 2000|yuba river    | 249.939364|       0|    249.94|
 | 2001|clear creek   |  17.078134|       0|     17.08|
-| 2001|feather river |  48.726433|       0|     48.73|
-| 2001|yuba river    | 312.092106|       0|    312.09|
+| 2001|feather river |  48.791240|       0|     48.79|
+| 2001|yuba river    | 288.172479|       0|    288.17|
 | 2002|clear creek   |  22.628449|       0|     22.63|
-| 2002|feather river |  71.238409|       0|     71.24|
-| 2002|yuba river    | 313.502719|       0|    313.50|
+| 2002|feather river |  71.997050|       0|     72.00|
+| 2002|yuba river    | 293.178716|       0|    293.18|
 | 2003|battle creek  |   1.101875|       0|      1.10|
 | 2003|clear creek   |  10.009113|       0|     10.01|
 
@@ -68,28 +68,20 @@ Maximum flow more effectively captures the high flow events that support migrati
 ```
 ## Error in `filter()`:
 ## ℹ In argument: `month(date) %in% migratory_and_holding_months`.
-## Caused by error in `as.Date.default()`:
-## ! do not know how to convert 'x' to class "Date"
+## Caused by error in `as.POSIXlt.default()`:
+## ! do not know how to convert 'x' to class "POSIXlt"
 ```
 
-
-
-|stream      | year| mean_flow| max_flow|
-|:-----------|----:|---------:|--------:|
-|butte creek | 1997|       NaN|      Inf|
-|butte creek | 1998|       NaN|      Inf|
-|butte creek | 1999|  500.3782|     7177|
-|butte creek | 2000|  477.5862|     7592|
-|butte creek | 2001|  288.0755|     1844|
-|butte creek | 2002|  286.3508|     6129|
-|butte creek | 2003|  604.8511|     4420|
-|butte creek | 2004|  395.5383|     4730|
-|butte creek | 2005|  542.8965|    21900|
-|butte creek | 2006| 1032.4894|    29600|
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
 
 ### Water Year Type
 
@@ -148,6 +140,12 @@ We hypothesized that total annual passage might be an indicator of density becau
 ### Combine and Save Covariate Data 
 
 Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):
+
+
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
+
 
 
 | year|stream       | wy_type| max_flow_std|    gdd_std| passage_index| median_passage_timing_std|
