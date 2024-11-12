@@ -80,7 +80,10 @@ Maximum flow more effectively captures the high flow events that support migrati
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
 
 ### Water Year Type
 
@@ -139,6 +142,12 @@ We hypothesized that total annual passage might be an indicator of density becau
 ### Combine and Save Covariate Data 
 
 Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):
+
+
+```
+## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
+```
+
 
 
 | year|stream       | wy_type| max_flow_std|    gdd_std| passage_index| median_passage_timing_std|
