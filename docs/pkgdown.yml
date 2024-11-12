@@ -9,18 +9,7 @@ articles:
   temp_regression: temp_regression.html
   trap_effort: trap_effort.html
   years_to_include_analysis: years_to_include_analysis.html
-<<<<<<< HEAD
-<<<<<<< HEAD
-last_built: 2024-11-01T16:55Z
-=======
-last_built: 2024-10-31T15:34Z
->>>>>>> da9b4d5 (update data to remove the NA releases)
-=======
-last_built: 2024-10-31T15:34Z
-=======
-last_built: 2024-11-01T16:55Z
->>>>>>> 1be929d (updates data package and documentation after exclusion table updates)
->>>>>>> 7378e93 (reruns update data, adds month back into summary for env data)
+last_built: 2024-11-12T15:53Z
 urls:
   reference: https://SRJPE.github.io/SRJPEdata/reference
   article: https://SRJPE.github.io/SRJPEdata/articles
