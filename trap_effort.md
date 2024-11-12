@@ -29,7 +29,7 @@ Below is the code for each of the methods described above:
 1) If the start and stop date/time of the sampling period are available, simply subtract the difference in time.
 
 
-``` r
+```r
 # calculating hours fished when have start and stop datetime
 hours_fished <- function(dat){
   dat %>%
@@ -44,7 +44,7 @@ hours_fished <- function(dat){
 take the average cone RPMs and divide `total_revolutions`/average RMP/60 to get total hours fished.
 
 
-``` r
+```r
 # calculating hours fished when have start and stop datetime
 revolution_calculated_hours_fished <- function(dat){
   dat %>%
@@ -61,7 +61,7 @@ revolution_calculated_hours_fished <- function(dat){
 3) If only one date is available, assume that the end date is the date sampled on the following day.
 
 
-``` r
+```r
 # calculating hours fished when have only date and time
 hours_fished_one_date <- function(dat) {
   dat %>%

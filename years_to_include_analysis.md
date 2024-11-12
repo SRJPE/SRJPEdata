@@ -13,7 +13,7 @@ The Spring Run Juvenile Production Estimate uses historical rotary screw trap an
 
 ## RST Data - Years to Include in Model
 
-The modeling team hosted a modeling windows workshop where we discussed approaches to defining the time window that should be included in the juvenile abundance model. At the workshop we decided to use the full sampling season of data for each tributary and year but to exclude years where we were concerned about data completeness. We came up with the following approach to determine excluded years:
+The modeling team hosted a modeling windows workshop where we discussed approaches to defining the time window that should be included in the juvenile abundance model. At the workshop we decided to use the full sampling season of data for each tributary, site, and year but to exclude years where we were concerned about data completeness. We came up with the following approach to determine excluded years:
 
 1)  First exclude years with lots of missing data from cumulative catch curves. See `data-raw/years_to_exclude.csv` (exclusion_type = "really low sampling").
 2)  Exclude yearlings from cumulative catch curves.
@@ -42,31 +42,32 @@ The heat map below shows when sampling occurs for all streams. It shows that sam
 
 We utilized the above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling. See a section of the "years to exclude" table below.
 
-For ongoing data collection and more recent seasons, we applied an automatic check to determine if a year should be excluded. We use the following criteria to asses if a recent RST season should be excluded from analysis: 
+For ongoing data collection and more recent seasons, we applied an automatic check as a first pass to determine if a year should be excluded. Any automatic exclusion records will be reviewed manually before being excluded from data. We use the following criteria to asses if a recent RST season should be excluded from analysis: 
 
-* Missing 4 consecutive weeks in the critical window, OR 
 * If 25% of the weeks are missing (this test is used in place of the original criteria of "exclude years with lots of missing data from cumulative catch curves")
 
 We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.
 
-
-
-|Stream       | Year|Exclusion Type                                    |Notes                    |
-|:------------|----:|:-------------------------------------------------|:------------------------|
-|battle creek | 2003|really low sampling                               |only a few weeks of data |
-|battle creek | 2007|really low sampling                               |only 12 week of data     |
-|battle creek | 2015|missing four consecutive weeks in critical window |NA                       |
-|butte creek  | 2019|really low sampling                               |only 10 weeks of data    |
-|butte creek  | 2005|really low sampling                               |only 6 weeks of data     |
-|butte creek  | 1997|missing four consecutive weeks in critical window |NA                       |
-|butte creek  | 2006|missing four consecutive weeks in critical window |NA                       |
-|butte creek  | 1998|missing four consecutive weeks in critical window |NA                       |
-|deer creek   | 1993|really low sampling                               |only 6 weeks of data     |
-|deer creek   | 1994|really low sampling                               |only 6 weeks of data     |
+#### Years to Exclude Table 
 
 
 
-*... with 19 more rows*
+|Stream       |Site      | Year|Exclusion Type                                    |Notes                          |
+|:------------|:---------|----:|:-------------------------------------------------|:------------------------------|
+|battle creek |lbc       | 1998|automatic                                         |less than 75% of weeks sampled |
+|battle creek |lbc       | 2006|automatic                                         |less than 75% of weeks sampled |
+|battle creek |lbc       | 2016|automatic                                         |less than 75% of weeks sampled |
+|battle creek |ubc       | 2007|really low sampling                               |only 12 week of data           |
+|battle creek |ubc       | 2003|really low sampling                               |NA                             |
+|battle creek |ubc       | 2015|missing four consecutive weeks in critical window |NA                             |
+|butte creek  |adams dam | 1997|automatic                                         |less than 75% of weeks sampled |
+|butte creek  |adams dam | 1998|automatic                                         |less than 75% of weeks sampled |
+|butte creek  |okie dam  | 2019|really low sampling                               |only 10 weeks of data          |
+|butte creek  |okie dam  | 2005|really low sampling                               |only 6 weeks of data           |
+
+
+
+*... with 41 more rows*
 
 
 ### Applying to Modeling Datasets
@@ -92,7 +93,7 @@ The table below shows a section of this table:
 
 
 
-*... with 487 more rows*
+*... with 488 more rows*
 
 ## Adult Data - Years to Include in Model
 

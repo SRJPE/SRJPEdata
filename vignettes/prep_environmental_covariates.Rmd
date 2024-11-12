@@ -22,7 +22,6 @@ library(SRJPEdata)
 
 colors_small <-  c("#9A8822", "#74A089", #Royal 2
                             "#899DA4", "#C93312", "#DC863B")
-source("../data-raw/pull_data_scripts/pull_environmental_data.R")
 ```
 
 There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selction and processing for different models: (1) Stock Recruit Covariates and (2) Adult Model Covariates (this document).
@@ -61,30 +60,28 @@ migratory_months <- 3:5
 holding_months <- 5:8
 
 # read in temperature data pull (database-tables does not have the mean column)
-standard_temperature <- temp |> 
+standard_temperature <- SRJPEdata::environmental_data |> 
   filter(parameter == "temperature")
 
 # calculate sum of days above the thresholds
 gdd_sac <- standard_temperature |> 
-  filter(month(date) %in% migratory_months, 
+  filter(month %in% migratory_months, 
          stream == "sacramento river",
          statistic == "mean") |> 
   mutate(gdd_sac = value - gdd_base_sac,
          gdd_sac = ifelse(gdd_sac < 0, 0, gdd_sac)) |>
-  group_by(year(date)) |>
+  group_by(year) |>
   summarise(gdd_sac = sum(gdd_sac, na.rm = T)) |>
-  rename(year = `year(date)`) |>
   ungroup()
 
 gdd_trib <- standard_temperature |>
-  filter(month(date) %in% holding_months, 
+  filter(month %in% holding_months, 
         stream != "sacramento river",
         statistic == "mean") |>
   mutate(gdd_trib = value - gdd_base_trib,
          gdd_trib = ifelse(gdd_trib < 0, 0, gdd_trib)) |>
-  group_by(year(date), stream) |>
+  group_by(year, stream) |>
   summarise(gdd_trib = sum(gdd_trib, na.rm = T)) |>
-  rename(year = `year(date)`) |>
   ungroup()
 
 gdd <- left_join(gdd_trib, gdd_sac,
@@ -115,10 +112,10 @@ Maximum flow more effectively captures the high flow events that support migrati
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 migratory_and_holding_months <- 3:8
 
+flow <- SRJPEdata::environmental_data |> filter(parameter == "flow")
+
 flow_metrics <- flow |> 
-  filter(parameter == "flow") |> 
-  filter(month(date) %in% migratory_and_holding_months) |>
-  mutate(year = year(date)) |>
+  filter(month %in% migratory_and_holding_months) |>
   group_by(stream, year) |>
   summarise(mean_flow = mean(value, na.rm = T),
             max_flow = max(value, na.rm = T)) |> 

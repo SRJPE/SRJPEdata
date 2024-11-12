@@ -65,8 +65,8 @@ Temperature has been found to influence spawning and rearing. Therefore it is ex
 
 ```{r, include=F}
 # pull in standard temp from env data
-standard_temperature <- SRJPEdata::environmental_data |> 
-  filter(parameter == "temperature")
+source("data-raw/pull_data_scripts/pull_environmental_data.R")
+standard_temperature <- temp
 ```
 
 #### Number of degree days
@@ -270,7 +270,8 @@ Precipitation and streamflow have been found to influence spawning and rearing. 
 - Mean, median, max precipitation (or streamflow)
 
 ```{r}
-standard_flow <- SRJPEdata::environmental_data |> filter(parameter == "flow")
+#TODO update once we 
+standard_flow <- flow
 ```
 
 #### Mean, median, max flow

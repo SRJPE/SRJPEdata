@@ -45,16 +45,16 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 
 | year|stream        |   gdd_trib| gdd_sac| gdd_total|
 |----:|:-------------|----------:|-------:|---------:|
-| 2000|feather river |  43.314121|       0|     43.31|
-| 2000|yuba river    | 230.115585|       0|    230.12|
+| 1999|butte creek   |   9.900463|       0|      9.90|
+| 1999|deer creek    |  79.307870|       0|     79.31|
+| 1999|mill creek    |  24.350443|       0|     24.35|
+| 2000|butte creek   |  38.893518|       0|     38.89|
+| 2000|deer creek    | 191.700593|       0|    191.70|
+| 2000|feather river |  46.404626|       0|     46.40|
+| 2000|mill creek    |  97.261574|       0|     97.26|
+| 2000|yuba river    | 184.947921|       0|    184.95|
+| 2001|butte creek   |  70.303241|       0|     70.30|
 | 2001|clear creek   |  17.078134|       0|     17.08|
-| 2001|feather river |  50.163877|       0|     50.16|
-| 2001|yuba river    | 266.940893|       0|    266.94|
-| 2002|clear creek   |  22.628449|       0|     22.63|
-| 2002|feather river |  73.178135|       0|     73.18|
-| 2002|yuba river    | 273.687136|       0|    273.69|
-| 2003|battle creek  |   1.101875|       0|      1.10|
-| 2003|clear creek   |  10.009113|       0|     10.01|
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
@@ -65,16 +65,18 @@ The following plot is of the growing degree days above the 20 degree threshold o
 Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:
 
 
-```
-## Error in `filter()`:
-## ℹ In argument: `month(date) %in% migratory_and_holding_months`.
-## Caused by error in `as.Date.default()`:
-## ! do not know how to convert 'x' to class "Date"
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'flow_metrics' not found
-```
+|stream       | year| mean_flow| max_flow|
+|:------------|----:|---------:|--------:|
+|battle creek | 1995| 1002.4837|     6430|
+|battle creek | 1996|  608.5326|     2120|
+|battle creek | 1997|  373.1795|      540|
+|battle creek | 1998| 1075.1304|     3220|
+|battle creek | 1999|  595.3370|     1890|
+|battle creek | 2000|  489.3913|     1950|
+|battle creek | 2001|  312.9402|     1130|
+|battle creek | 2002|  357.4565|      617|
+|battle creek | 2003|  604.3207|     2740|
+|battle creek | 2004|  452.6250|     1370|
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
@@ -150,16 +152,16 @@ Both continuous environmental variables (flow and temperature) were standardized
 
 | year|stream       | wy_type| max_flow_std|    gdd_std| passage_index| median_passage_timing_std|
 |----:|:------------|-------:|------------:|----------:|-------------:|-------------------------:|
-| 1995|battle creek |      NA|           NA|         NA|    -0.6837483|                        NA|
-| 1996|battle creek |      NA|           NA|         NA|    -0.8597315|                        NA|
-| 1997|battle creek |      NA|           NA|         NA|    -0.4509963|                        NA|
-| 1998|battle creek |       1|           NA|         NA|    -0.0479381|                 0.1381146|
-| 1999|battle creek |       1|           NA|         NA|    -0.6440101|                 0.2900407|
-| 2000|battle creek |       1|           NA|         NA|    -0.6156258|                 1.2015972|
-| 2001|battle creek |       0|           NA|         NA|    -0.4282888|                -0.7734419|
-| 2002|battle creek |       0|           NA|         NA|     0.2018445|                 0.8977450|
-| 2003|battle creek |       1|           NA| -0.7069247|     0.1961676|                 3.0247102|
-| 2004|battle creek |       0|           NA| -0.7400252|    -0.5475032|                -0.0138115|
+| 1995|battle creek |       1|    3.0591938|         NA|    -0.6837483|                        NA|
+| 1996|battle creek |       1|    0.0870719|         NA|    -0.8597315|                        NA|
+| 1997|battle creek |       1|   -1.0024763|         NA|    -0.4509963|                        NA|
+| 1998|battle creek |       1|    0.8456181|         NA|    -0.0479381|                 0.1381146|
+| 1999|battle creek |       1|   -0.0715332|         NA|    -0.6440101|                 0.2900407|
+| 2000|battle creek |       1|   -0.0301580|         NA|    -0.6156258|                 1.2015972|
+| 2001|battle creek |       0|   -0.5956197|         NA|    -0.4282888|                -0.7734419|
+| 2002|battle creek |       0|   -0.9493780|         NA|     0.2018445|                 0.8977450|
+| 2003|battle creek |       1|    0.5146161| -0.7955857|     0.1961676|                 3.0247102|
+| 2004|battle creek |       0|   -0.4301187| -0.8283538|    -0.5475032|                -0.0138115|
 
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 

@@ -730,6 +730,7 @@ updated_environmental_data <- reshaped_data[
       mean = mean(mean, na.rm = TRUE), 
       min = min(min, na.rm = TRUE)),
   by = .(week = week(date), 
+         month = month(date),
          year = year(date), 
          stream, 
          gage_number, 
