@@ -79,32 +79,32 @@ In addition to differentiating between yearling and YOY it is important for the 
 The first step was to apply a lifestage cutoff to catch records that had fork lengths recorded. These cutoffs are `fork_length < 45 = fry`, `fork_length > 45 = smolt`, `fork_length > yearling_cutoff = yearling`.
 
 
-|date       |stream           |site                    |subsite  |site_group              | count|run    |life_stage |adipose_clipped |dead  | fork_length| weight|
-|:----------|:----------------|:-----------------------|:--------|:-----------------------|-----:|:------|:----------|:---------------|:-----|-----------:|------:|
-|1998-11-22 |sacramento river |red bluff diversion dam |gate 11  |red bluff diversion dam |     2|winter |smolt      |FALSE           |FALSE |          54|     NA|
-|2005-07-17 |sacramento river |red bluff diversion dam |gate 2   |red bluff diversion dam |     2|fall   |smolt      |FALSE           |FALSE |          78|     NA|
-|2011-09-24 |sacramento river |red bluff diversion dam |gate 6   |red bluff diversion dam |     2|winter |fry        |FALSE           |FALSE |          32|     NA|
-|2003-10-26 |sacramento river |red bluff diversion dam |gate 4   |red bluff diversion dam |     2|winter |fry        |FALSE           |FALSE |          40|     NA|
-|2002-07-09 |sacramento river |red bluff diversion dam |gate 6 w |red bluff diversion dam |     1|fall   |smolt      |FALSE           |FALSE |          73|     NA|
-|2009-02-01 |sacramento river |red bluff diversion dam |gate 8   |red bluff diversion dam |    18|fall   |fry        |FALSE           |FALSE |          36|     NA|
-|2009-10-27 |sacramento river |red bluff diversion dam |gate 7   |red bluff diversion dam |     3|winter |smolt      |FALSE           |FALSE |          58|     NA|
-|2009-12-17 |sacramento river |red bluff diversion dam |gate 7   |red bluff diversion dam |     1|winter |smolt      |FALSE           |FALSE |          63|     NA|
-|2010-11-12 |sacramento river |red bluff diversion dam |gate 7   |red bluff diversion dam |     2|winter |smolt      |FALSE           |FALSE |          54|     NA|
-|2003-04-14 |sacramento river |red bluff diversion dam |gate 3   |red bluff diversion dam |     1|winter |smolt      |FALSE           |FALSE |         145|     NA|
+|date       |stream           |site    |subsite |site_group | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight|
+|:----------|:----------------|:-------|:-------|:----------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|
+|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|
+|2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          45|     NA|
+|2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          74|     NA|
+|2019-11-26 |sacramento river |tisdale |rl      |tisdale    |     1|late fall |smolt      |FALSE           |TRUE  |          97|     NA|
+|2019-12-05 |sacramento river |tisdale |rl      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          80|     NA|
+|2019-12-05 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          79|     NA|
+|2019-12-05 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          80|     NA|
+|2019-12-05 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |TRUE  |          80|     NA|
+|2019-12-06 |sacramento river |tisdale |rl      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          75|     NA|
+|2019-12-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          48|     NA|
 
 ### Determine year specific lifestage proportions
 
 There are 68905 entries with missing lifestage due to missing fork length data. 
 
 
-|date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight|
-|:----------|:------------|:----|:-------|:------------|-----:|:----|:----------|:---------------|:----|-----------:|------:|
-|2002-03-13 |clear creek  |lcc  |lcc     |clear creek  |     1|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     7|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     3|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-01 |battle creek |lbc  |lbc     |battle creek |     6|fall |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|
-|2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|
+|date       |stream        |site                |subsite |site_group          | count|run    |life_stage |adipose_clipped |dead  | fork_length| weight|
+|:----------|:-------------|:-------------------|:-------|:-------------------|-----:|:------|:----------|:---------------|:-----|-----------:|------:|
+|2022-02-20 |feather river |lower feather river |rr      |lower feather river |     6|fall   |NA         |FALSE           |FALSE |          NA|     NA|
+|2022-03-31 |feather river |lower feather river |rl      |lower feather river |    14|fall   |NA         |FALSE           |FALSE |          NA|     NA|
+|2022-03-31 |feather river |lower feather river |rl      |lower feather river |     6|spring |NA         |TRUE            |FALSE |          NA|     NA|
+|2022-03-31 |feather river |lower feather river |rr      |lower feather river |   117|fall   |NA         |FALSE           |FALSE |          NA|     NA|
+|2022-03-31 |feather river |lower feather river |rr      |lower feather river |    91|spring |NA         |TRUE            |FALSE |          NA|     NA|
+|2022-06-01 |feather river |lower feather river |rl      |lower feather river |     1|fall   |NA         |FALSE           |FALSE |          NA|     NA|
 
 The first step in filling in these missing lifestages was to find the proportion for each lifestage category for a given stream, site, week, and year. This information could then be used to fill in the lifestage for missing rows within a week.
 
@@ -133,18 +133,18 @@ For weeks that had no fork length data in a given week, we calculated a general 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
 
 
-|date       |stream           |site                    |subsite  |site_group              | count|run    |life_stage |adipose_clipped |dead  | fork_length| weight| week| year|model_lifestage_method   |
-|:----------|:----------------|:-----------------------|:--------|:-----------------------|-----:|:------|:----------|:---------------|:-----|-----------:|------:|----:|----:|:------------------------|
-|1998-11-22 |sacramento river |red bluff diversion dam |gate 11  |red bluff diversion dam |     2|winter |smolt      |FALSE           |FALSE |          54|     NA|   47| 1998|assigned from fl cutoffs |
-|2005-07-17 |sacramento river |red bluff diversion dam |gate 2   |red bluff diversion dam |     2|fall   |smolt      |FALSE           |FALSE |          78|     NA|   29| 2005|assigned from fl cutoffs |
-|2011-09-24 |sacramento river |red bluff diversion dam |gate 6   |red bluff diversion dam |     2|winter |fry        |FALSE           |FALSE |          32|     NA|   39| 2011|assigned from fl cutoffs |
-|2003-10-26 |sacramento river |red bluff diversion dam |gate 4   |red bluff diversion dam |     2|winter |fry        |FALSE           |FALSE |          40|     NA|   43| 2003|assigned from fl cutoffs |
-|2002-07-09 |sacramento river |red bluff diversion dam |gate 6 w |red bluff diversion dam |     1|fall   |smolt      |FALSE           |FALSE |          73|     NA|   28| 2002|assigned from fl cutoffs |
-|2009-02-01 |sacramento river |red bluff diversion dam |gate 8   |red bluff diversion dam |    18|fall   |fry        |FALSE           |FALSE |          36|     NA|    5| 2009|assigned from fl cutoffs |
-|2009-10-27 |sacramento river |red bluff diversion dam |gate 7   |red bluff diversion dam |     3|winter |smolt      |FALSE           |FALSE |          58|     NA|   43| 2009|assigned from fl cutoffs |
-|2009-12-17 |sacramento river |red bluff diversion dam |gate 7   |red bluff diversion dam |     1|winter |smolt      |FALSE           |FALSE |          63|     NA|   51| 2009|assigned from fl cutoffs |
-|2010-11-12 |sacramento river |red bluff diversion dam |gate 7   |red bluff diversion dam |     2|winter |smolt      |FALSE           |FALSE |          54|     NA|   46| 2010|assigned from fl cutoffs |
-|2003-04-14 |sacramento river |red bluff diversion dam |gate 3   |red bluff diversion dam |     1|winter |smolt      |FALSE           |FALSE |         145|     NA|   15| 2003|assigned from fl cutoffs |
+|date       |stream           |site    |subsite |site_group | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight| week| year|model_lifestage_method   |
+|:----------|:----------------|:-------|:-------|:----------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|----:|----:|:------------------------|
+|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|   45| 2019|assigned from fl cutoffs |
+|2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          45|     NA|   45| 2019|assigned from fl cutoffs |
+|2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          74|     NA|   45| 2019|assigned from fl cutoffs |
+|2019-11-26 |sacramento river |tisdale |rl      |tisdale    |     1|late fall |smolt      |FALSE           |TRUE  |          97|     NA|   48| 2019|assigned from fl cutoffs |
+|2019-12-05 |sacramento river |tisdale |rl      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          80|     NA|   49| 2019|assigned from fl cutoffs |
+|2019-12-05 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          79|     NA|   49| 2019|assigned from fl cutoffs |
+|2019-12-05 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          80|     NA|   49| 2019|assigned from fl cutoffs |
+|2019-12-05 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |TRUE  |          80|     NA|   49| 2019|assigned from fl cutoffs |
+|2019-12-06 |sacramento river |tisdale |rl      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          75|     NA|   49| 2019|assigned from fl cutoffs |
+|2019-12-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          48|     NA|   49| 2019|assigned from fl cutoffs |
 
 ### Generate rows for when no fish of a lifestage are caught
 

@@ -46,6 +46,7 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 | year|stream        |   gdd_trib| gdd_sac| gdd_total|
 |----:|:-------------|----------:|-------:|---------:|
 <<<<<<< HEAD
+<<<<<<< HEAD
 | 2000|feather river |  41.885165|       0|     41.89|
 | 2000|yuba river    | 249.939364|       0|    249.94|
 | 2001|clear creek   |  17.078134|       0|     17.08|
@@ -57,13 +58,22 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 =======
 | 2000|feather river |  43.314121|       0|     43.31|
 | 2000|yuba river    | 230.115585|       0|    230.12|
+=======
+| 2000|feather river |  48.711243|       0|     48.71|
+| 2000|yuba river    | 206.826474|       0|    206.83|
+>>>>>>> 7378e93 (reruns update data, adds month back into summary for env data)
 | 2001|clear creek   |  17.078134|       0|     17.08|
-| 2001|feather river |  50.163877|       0|     50.16|
-| 2001|yuba river    | 266.940893|       0|    266.94|
+| 2001|feather river |  53.558895|       0|     53.56|
+| 2001|yuba river    | 242.413361|       0|    242.41|
 | 2002|clear creek   |  22.628449|       0|     22.63|
+<<<<<<< HEAD
 | 2002|feather river |  73.178135|       0|     73.18|
 | 2002|yuba river    | 273.687136|       0|    273.69|
 >>>>>>> da9b4d5 (update data to remove the NA releases)
+=======
+| 2002|feather river |  73.775228|       0|     73.78|
+| 2002|yuba river    | 252.577039|       0|    252.58|
+>>>>>>> 7378e93 (reruns update data, adds month back into summary for env data)
 | 2003|battle creek  |   1.101875|       0|      1.10|
 | 2003|clear creek   |  10.009113|       0|     10.01|
 
