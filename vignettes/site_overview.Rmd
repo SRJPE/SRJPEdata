@@ -1,0 +1,101 @@
+---
+title: "Draft of RST Sites Used in JPE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Draft of RST Sites Used in JPE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.width=8, fig.height=6
+)
+```
+
+```{r setup, echo = FALSE}
+library(SRJPEdata)
+# source(here::here("data-raw", "pull_tables_from_database.R"))
+
+colors_small <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                            "#899DA4", "#C93312", "#DC863B" # royal 1 (- 3)
+)
+colors_full <-  c("#9986A5", "#C18748", #Royal 2
+                  "#899DA4", "#9A8822", # Grand Budapest 1 (-4)
+                  "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87", # Isle of dogs 2 altered slightly
+                  "#AC9765", "#b67c3b", "#175149", "#AF4E24", "#CEB175",
+                  "#E54E21", "#6C8645", "#C18748", "#FBA72A", "#D3D4D8", "#CB7A5C", "#5785C1")
+
+```
+
+### Overview
+
+The spring run juvenile production estimate (SR JPE) contains a suite of submodels that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to fit the stock recruit model. 
+
+## Stock Recruit Rotary Screw Trap Site Selection Overview
+
+The Spring Run JPE model considers data from 7 tributaries and the mainstem Sacramento river, including: 
+
+* Battle Creek 
+* Butte Creek 
+* Clear Creek
+* Deer Creek 
+* Feather River 
+* Mill Creek 
+* Yuba River
+
+Each of these tributaries has a unique monitoring setup and number of Rotary Screw Traps that we can use in the SR JPE model. This vignette describes the trapping sites that we use for each tributary. 
+
+### Map
+```{r}
+
+```
+
+
+## Choosing Sites 
+
+### Battle Creek 
+Use UBC (LBC older site, has not been fished for a long time) 
+
+
+### Butte Creek 
+
+
+### Clear Creek
+Clear Site Decision  
+Use LCC for total JPE - captures total spawning ground 
+Use UCC for supplementary analysis  
+Use for understanding of run & potential survival between traps  
+While model is still in development compare UCC (all spring) to LCC PLAD results  
+If results surprising, consider using both traps  
+IF for some reason LCC (SR based on plad) and UCC counts do not align, we can reassess our decision and do an adult data analysis to come up with an adult scaling factor (what % of redds are below the UCC trap)  
+
+### Deer Creek 
+Only one site. 
+
+### Feather River 
+Feather Site Decision  
+Use a similar approach as clear  
+Use lower trap for total JPE (HFC) - captures total spawning ground 
+Use LFC for supplementary analysis  
+First round do analysis to compare if we need to use LFC as well 
+
+### Mill Creek 
+Only one site. 
+
+### Yuba River
+Yuba Site Decision  
+Use hallwood, site that they are currently trapping, site with most historical data, and lowest site in system  
+
+
+
+
+
+
+
