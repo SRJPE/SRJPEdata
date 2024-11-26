@@ -25,7 +25,7 @@ detect_summary <- aggregate(list(fish_count = joined_detections$fish_id),
                                       latitude = joined_detections$receiver_general_latitude, 
                                       longitude = joined_detections$receiver_general_longitude), function(x){length(unique(x))}) |> 
   mutate(latitude = as.numeric(latitude), 
-        longitude = as.numeric(longitude)) 
+         longitude = as.numeric(longitude)) 
 
 library(ggplot2)
 library(mapdata)
@@ -47,8 +47,9 @@ library(ggrepel)
 #   coord_fixed(1.3, xlim = xlim, ylim = ylim) +
 #   ggtitle("Location of study detections w/ count of unique fish visits")
 
-## USE FLORA LOGIC TO FORMAT CH ---- she groups fish into 4 detection sites,
-# use floras functions to generate table with CH 
+## USE FLORA LOGIC TO FORMAT CH ------------------------------------------------
+# she groups fish into 4 detection sites
+
 
 # Select columns that we want
 all_detections <- joined_detections |> 
@@ -61,28 +62,33 @@ all_detections <- joined_detections |>
 # Get list of all receiver GEN
 # reach.meta <- get_receiver_GEN(all_detections)
 reach_metadata <- get_receiver_sites_metadata(all_detections)
-# Manually select receiver locations to use and combine for Sac River study
+
+# Manually select receiver locations to use and combine for Sac River study ----
 # Will need to go back in and remap if we want new 
+# TODO add mapping to show/add new sites (including the butte sites bsased on what Flora put) 
 region_mapped_reach_metadata <- reach_metadata %>%
   filter(receiver_general_location %in% c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec","Altube Island","MillCk_RST_Rel",
-                    "MillCk2_Rel","DeerCk_RST_Rel","Mill_Ck_Conf",
-                    "Abv_WoodsonBr","Blw_Woodson", "ButteBr","BlwButteBr",
-                    "I80-50_Br","TowerBridge",
-                    "ToeDrainBase","Hwy84Ferry",
-                    "BeniciaE","BeniciaW","ChippsE","ChippsW"))%>%
+                                          "MillCk2_Rel","DeerCk_RST_Rel","Mill_Ck_Conf",
+                                          "Abv_WoodsonBr","Blw_Woodson", "ButteBr","BlwButteBr",
+                                          "I80-50_Br","TowerBridge",
+                                          "ToeDrainBase","Hwy84Ferry",
+                                          "BeniciaE","BeniciaW","ChippsE","ChippsW"))%>%
   mutate(receiver_region = case_when(receiver_region == 'Battle Ck' ~ 'Release',
-                            receiver_region == 'DeerCk' ~ 'Release',
-                            receiver_region == 'Mill Ck' ~ 'Release',
-                            receiver_general_location == 'RBDD_Rel'& receiver_region == 'Upper Sac R' ~ 'Release',
-                            receiver_general_location == 'RBDD_Rel_Rec'& receiver_region == 'Upper Sac R' ~ 'Release',
-                            receiver_region == 'Yolo Bypass' ~ 'Lower Sac R',
-                            receiver_region == 'North Delta' ~ 'Lower Sac R',
-                            receiver_region == 'West Delta' ~ 'End',
-                            receiver_region == 'Carquinez Strait' ~ 'End',
-                            TRUE ~ receiver_region))
+                                     receiver_region == 'DeerCk' ~ 'Release',
+                                     receiver_region == 'Mill Ck' ~ 'Release',
+                                     receiver_general_location == 'RBDD_Rel'& receiver_region == 'Upper Sac R' ~ 'Release',
+                                     receiver_general_location == 'RBDD_Rel_Rec'& receiver_region == 'Upper Sac R' ~ 'Release',
+                                     receiver_region == 'Yolo Bypass' ~ 'Lower Sac R',
+                                     receiver_region == 'North Delta' ~ 'Lower Sac R',
+                                     receiver_region == 'West Delta' ~ 'End',
+                                     receiver_region == 'Carquinez Strait' ~ 'End',
+                                     TRUE ~ receiver_region))
 
-# Aggregate receiver locations and detections
-# TODO - THIS LOGIC WILL VARY BASED ON SITE... WE ALSO HAVE ONE FOR BUTTE BUT CAN WE MAKE A MORE GENERALIZED ONE
+
+
+# Aggregate receiver locations and detections ----------------------------------
+# TODO - Split dataset into 2 (butte and sac)
+# TODO - Use aggregate detections butte like we are using aggregate detections sac below 
 aggregate <- aggregate_detections_sacramento(detections = all_detections, 
                                              receiever_metadata = region_mapped_reach_metadata)
 all_aggregated <- aggregate$detections
@@ -119,7 +125,7 @@ surv_model_inputs_with_fish_information <- all_encounter_history %>%
   left_join(fish_data %>% 
               filter(study_id %in% jpe_ids) |> 
               select(fish_id, study_id, fish_length, fish_weight, fish_type,fish_release_date,
-                                   release_location), by = c("fish_id" = "fish_id")) |> 
+                     release_location), by = c("fish_id" = "fish_id")) |> 
   mutate(year = year(as.Date(fish_release_date, format="%m/%d/%Y"))) 
 
 survival_model_inputs <- surv_model_inputs_with_fish_information
@@ -136,5 +142,8 @@ fish_summary <- surv_model_inputs_with_fish_information %>%
             recaptured_site_1 = sum(str_split(ch, "")[[1]][2] == "1"),
             recaptured_site_2 = sum(str_split(ch, "")[[1]][3] == "1"),
             recaptured_site_3 = sum(str_split(ch, "")[[1]][3] == "1")) 
+
+# TODO ADD DISTANCE FROM RECIEVER LOCATION FROM Floras new PrepData.R Script
+# Also add water year
 
 
