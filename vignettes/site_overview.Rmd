@@ -52,9 +52,49 @@ The Spring Run JPE model considers data from 7 tributaries and the mainstem Sacr
 
 Each of these tributaries has a unique monitoring setup and number of Rotary Screw Traps that we can use in the SR JPE model. This vignette describes the trapping sites that we use for each tributary. 
 
+## Classifying RST site usage
+
+Primary site selected for SRJPE stock recruit: When a stream has multiple tributaries, we selected one primary site to use for the SRJPE stock recruit model. Primary sites typically have the longest period of trapping and include the largest extent of spawners on a tributary.  
+
+Secondary site selected used for supplementary analysis and abundance estimate: 
+
+* Any trap not selected for the SR JPE stock recruit model will still be used in juvenile abundance modeling. The BTSPAS-X juvenile abundace model is a hierarchical basin abundance model that can borrow information from one site when there is no information available at a different site. 
+
+* Some sites not selected for the SR JPE stock recruit model may also be used for supplementary analysis. These analysis could include analyzing run proportions by looking at abundance numbers above and below a weir or looking at survival rates of juveniles between RST sites.  
+
 ### Map
 ```{r}
+library(leaflet)
+library(rgdal)
+library(sf)
+library(leaflet.extras2)
 
+salmonid_extents <- readOGR("data-raw/helper-tables/habitat_extents/salmonid_habitat_extents.shp", 
+                            stringsAsFactors = FALSE, verbose = FALSE) %>%
+  spTransform(CRS("+proj=longlat +datum=WGS84 +no_defs"))
+
+srjpe_systems <- c("Battle Creek", "Butte Creek", "Clear Creek", "Mill Creek", "Deer Creek", "Feather River", "Yuba River", "Upper Sacramento River", "Upper-mid Sacramento River", "Lower-mid Sacramento River", "Lower Sacramento River")
+
+sprjpe <- subset(salmonid_extents, Species == 'Spring Run Chinook' & River %in% srjpe_systems)
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+make_label <- function(data) {
+  labels <- sprintf("<strong>%s</strong> <br/> %s: %s miles",
+                  data$River, 
+                  data$Habitat,
+                  round(data$miles, 1)) %>% lapply(htmltools::HTML)
+}
+
+hab_map <- leaflet() %>% 
+      # addProviderTiles(providers$Esri.WorldTopoMap, group = "Map") %>% 
+      # addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+      addProviderTiles(providers$CartoDB.Positron) |> 
+      addPolylines(data = sprjpe, group = 'Spring Run Extent', label = make_label(sprjpe),
+                   color = '#517ba8', opacity = .8, weight = 3) %>% 
+      setView(lat = 38.85, lng = -121.49, zoom = 7.5) 
+
+hab_map
 ```
 
 
