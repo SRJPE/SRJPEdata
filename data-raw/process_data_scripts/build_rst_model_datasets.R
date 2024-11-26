@@ -213,7 +213,9 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
          standardized_flow = as.vector(scale(flow_cfs))) |> # standardizes and centers see ?scale
   ungroup() |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year),
-         catch_standardized_by_hours_fished = ifelse(is.na(hours_fished), count, round(count * average_stream_hours_fished / hours_fished, 0))) |> 
+         catch_standardized_by_hours_fished = ifelse(is.na(hours_fished), count, round(count * average_stream_hours_fished / hours_fished, 0)),
+         hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)) & count > 0, average_stream_hours_fished, hours_fished)
+         ) |> # add logic for situations where trap data is missing
   glimpse()
 
 # Add in standardized efficiency flows 

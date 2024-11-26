@@ -6,7 +6,8 @@ source("data-raw/pull_data_scripts/TEMP_pull_from_edi.R") # remove after data ge
 # Bind rows 
 rst_catch <- bind_rows(rst_catch, rst_catch_query_pilot, temp_catch) |> 
   mutate(fork_length = ifelse(fork_length == 0, NA, fork_length), # looks like there were some cases where fork length is 0. this should be handled more upstream but fixing it here for now
-         julian_week = week(date)) |> # adding week for noble
+         julian_week = week(date),
+         julian_year = year(date)) |> # adding week for noble
   glimpse()
 rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot, temp_trap)  |> glimpse()
 release <- bind_rows(release, release_query_pilot |> 
