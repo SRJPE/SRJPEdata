@@ -158,11 +158,6 @@ fished. We therefore assume 24 hours fished for every day with data.
 We combined all methods to create one table with daily hours fished for each trap. We added rows with 0 effort for days that where there is no trapping data. 
 
 
-```
-## Error: The specified interval is invalid for the datetime variable.
-##   Not all original observation are in the padding.
-##   If you want to pad at this interval, aggregate the data first with thicken.
-```
 
 ## Summarized by week
 
@@ -170,19 +165,21 @@ We grouped hours fished data by site, subsite, week, and year and summarized to 
 
 
 ```
-## Error in eval(expr, envir, enclos): object 'hours_fished_combined' not found
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'weekly_hours_fished_raw' not found
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'weeks_with_missing_trap_data' not found
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'weekly_hours_fished_raw' not found
+## # A tibble: 288 × 5
+## # Groups:   year, stream, site [69]
+##     year stream           site                    subsite     n
+##    <int> <chr>            <chr>                   <chr>   <int>
+##  1  1994 sacramento river red bluff diversion dam gate 1      5
+##  2  1994 sacramento river red bluff diversion dam gate 10     4
+##  3  1994 sacramento river red bluff diversion dam gate 11     6
+##  4  1994 sacramento river red bluff diversion dam gate 3     12
+##  5  1994 sacramento river red bluff diversion dam gate 5     16
+##  6  1994 sacramento river red bluff diversion dam gate 7     11
+##  7  1994 sacramento river red bluff diversion dam gate 9     16
+##  8  1995 sacramento river knights landing         8.3         3
+##  9  1995 sacramento river knights landing         8.4         7
+## 10  1995 sacramento river red bluff diversion dam gate 1     33
+## # ℹ 278 more rows
 ```
 
 ### QC
