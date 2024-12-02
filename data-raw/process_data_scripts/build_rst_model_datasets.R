@@ -20,16 +20,6 @@ chosen_site_years_to_model |> glimpse()
 ### ----------------------------------------------------------------------------
 
 # Filter to use inclusion criteria ---------------------------------------------
-# TODO this is the slowest block...
-# catch_with_inclusion_criteria <- updated_standard_catch |> 
-#   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
-#   left_join(chosen_site_years_to_model) |> 
-#   mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
-#          # if the year was not included in the list of years to include then should be FALSE
-#          include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
-#   filter(include_in_model) |> 
-#   select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
-#   glimpse()
 
 # Converted to data.table for performance reasons
 # Convert your data.frames to data.tables (if not already in data.table format)
@@ -159,6 +149,7 @@ weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
+# this dataset will be saved separately to retain the fork length and origin variables
 weekly_efficiency <- 
   left_join(release, 
             recaptures |> # need to summarize first so you don't get duplicated release data when joining
@@ -168,11 +159,14 @@ weekly_efficiency <-
   group_by(stream, 
            site, 
            site_group, 
+           origin,
+           median_fork_length_released, # we add origin and fork length for figures
            week_released = week(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
             number_recaptured = sum(count, na.rm = TRUE)) |> 
   ungroup() |> 
+  rename(origin_released = origin) |> 
   glimpse()
 
 weekly_efficiency |> glimpse()
@@ -198,7 +192,10 @@ catch_reformatted <- weekly_standard_catch |>  glimpse()
 weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
   left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site")) |> 
   # Join efficnecy data to catch data
-  left_join(weekly_efficiency, 
+  left_join(weekly_efficiency |> 
+              group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
+              summarize(number_released = sum(number_released),
+                        number_recaptured = sum(number_recaptured)), 
             by = c("week" = "week_released",
                    "year" = "year_released", "stream", 
                    "site")) |> 
@@ -206,7 +203,8 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
   left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
   # select columns that josh uses 
   select(year, week, stream, site, count, mean_fork_length, 
-         number_released, number_recaptured, hours_fished, 
+         number_released, number_recaptured,
+         hours_fished, 
          flow_cfs, life_stage) |> 
   group_by(stream) |> 
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE),
@@ -296,3 +294,4 @@ weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_dat
 # write to package 
 usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE)
 usethis::use_data(weekly_juvenile_abundance_efficiency_data, overwrite = TRUE)
+usethis::use_data(weekly_efficiency, overwrite = TRUE)
