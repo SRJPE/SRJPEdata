@@ -20,16 +20,6 @@ chosen_site_years_to_model |> glimpse()
 ### ----------------------------------------------------------------------------
 
 # Filter to use inclusion criteria ---------------------------------------------
-# TODO this is the slowest block...
-# catch_with_inclusion_criteria <- updated_standard_catch |> 
-#   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
-#   left_join(chosen_site_years_to_model) |> 
-#   mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
-#          # if the year was not included in the list of years to include then should be FALSE
-#          include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
-#   filter(include_in_model) |> 
-#   select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
-#   glimpse()
 
 # Converted to data.table for performance reasons
 # Convert your data.frames to data.tables (if not already in data.table format)
@@ -168,11 +158,14 @@ weekly_efficiency <-
   group_by(stream, 
            site, 
            site_group, 
+           origin,
+           median_fork_length_released,
            week_released = week(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
             number_recaptured = sum(count, na.rm = TRUE)) |> 
   ungroup() |> 
+  rename(origin_released = origin) |> 
   glimpse()
 
 weekly_efficiency |> glimpse()
@@ -206,7 +199,8 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
   left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
   # select columns that josh uses 
   select(year, week, stream, site, count, mean_fork_length, 
-         number_released, number_recaptured, hours_fished, 
+         number_released, number_recaptured, origin_released, median_fork_length_released,
+         hours_fished, 
          flow_cfs, life_stage) |> 
   group_by(stream) |> 
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE),
@@ -289,7 +283,8 @@ weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |>
 
 # Efficiency
 weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_data |> 
-  select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow) |> 
+  select(year, run_year, week, stream, site, number_released, number_recaptured, 
+         origin_released, median_fork_length_released, standardized_efficiency_flow) |> 
   filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
 
