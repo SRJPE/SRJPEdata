@@ -50,9 +50,9 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 | 1999|mill creek    |  15.38095|       0|     15.38|
 | 2000|butte creek   |  51.00827|       0|     51.01|
 | 2000|deer creek    | 208.02467|       0|    208.02|
-| 2000|feather river |  53.34990|       0|     53.35|
+| 2000|feather river |  53.96182|       0|     53.96|
 | 2000|mill creek    | 110.07655|       0|    110.08|
-| 2000|yuba river    | 193.30733|       0|    193.31|
+| 2000|yuba river    | 192.43458|       0|    192.43|
 | 2001|butte creek   |  65.73032|       0|     65.73|
 | 2001|clear creek   |  15.73606|       0|     15.74|
 
