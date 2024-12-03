@@ -287,7 +287,7 @@ weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |>
 
 # Efficiency
 weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_data |> 
-  select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow) |> 
+  select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow, flow_cfs) |> 
   filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
 
