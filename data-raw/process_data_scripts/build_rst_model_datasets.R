@@ -32,7 +32,8 @@ rst_all_weeks <- rst_catch |>
   mutate(week = week(date),
          year = year(date)) |> 
   distinct(stream, site, year, week) |> 
-  cross_join(tibble(life_stage = c("fry","smolt","yearling")))
+  cross_join(tibble(life_stage = c("fry","smolt","yearling"))) |> 
+  mutate(run_year = ifelse(week >= 45, year + 1, year))
 
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 ### ----------------------------------------------------------------------------
@@ -269,11 +270,28 @@ btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", 
 
 # JOIN special priors with weekly model data
 # first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
-weekly_juvenile_abundance_model_data2 <- weekly_model_data_with_eff_flows |>
+weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
   select(-special_prior) |> 
   full_join(rst_all_weeks)
+
+# when we join rst_all_weeks we end up with some run years that have all NA sampling
+# these should be removed
+remove_run_year <- weekly_juvenile_abundance_model_data |> 
+  mutate(count2 = ifelse(is.na(count), 0, 1)) |> 
+  group_by(run_year, stream, site, count2) |> 
+  tally() |> 
+  pivot_wider(names_from = count2, values_from = n) |> 
+  filter(`0` > 0 & is.na(`1`)) |> # filter for run_years where count is only NA
+  select(-c(`0`,`1`)) |> 
+  mutate(remove = T)
+
+weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data_raw |> 
+  left_join(remove_run_year) |> 
+  mutate(remove = ifelse(is.na(remove), F, remove)) |> 
+  filter(remove == F)
+  
 
 # filter to only include complete season data 
 if (month(Sys.Date()) %in% c(9:12, 1:5)) {
