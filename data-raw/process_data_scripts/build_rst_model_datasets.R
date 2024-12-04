@@ -15,15 +15,33 @@ chosen_site_years_to_model |> glimpse()
 # Note: updated below years_to_include to chosen_site_years_to_model (this is more up to date version)
 # TODO however, years_to_include included a subsite (CONFIRM that we do not need subsite), after discussing, delete old version
 
-# Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
+# For the BTSPAS model we need to include all weeks that were not sampled. The code
+# below sets up a table of all weeks (based on min sampling year and max sampling year)
+# This is joined at the end
+# TODO we may want to refine this lookup with another "model_week" variable if needed
+rst_all_weeks <- rst_catch |> 
+  group_by(stream, site, subsite) |> 
+  summarise(min = min(date),
+            max = max(date)) |> 
+  mutate(min = paste0(year(min),"-01-01"),
+         max = paste0(year(max),"-12-31")) |> 
+  pivot_longer(cols = c(min, max), values_to = "date") |> 
+  mutate(date = as_date(date)) |> 
+  select(-name) |> 
+  padr::pad(interval = "day", group = c("stream", "site")) |> 
+  mutate(week = week(date),
+         year = year(date)) |> 
+  distinct(stream, site, year, week) |> 
+  cross_join(tibble(life_stage = c("fry","smolt","yearling")))
 
+# Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 ### ----------------------------------------------------------------------------
 
 # Filter to use inclusion criteria ---------------------------------------------
 
 # Converted to data.table for performance reasons
 # Convert your data.frames to data.tables (if not already in data.table format)
-updated_standard_catch <- as.data.table(updated_standard_catch)
+updated_standard_catch <- as.data.table(updated_standard_catch) 
 chosen_site_years_to_model <- as.data.table(chosen_site_years_to_model)
 
 # Step-by-step translation of the dplyr code
@@ -251,10 +269,11 @@ btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", 
 
 # JOIN special priors with weekly model data
 # first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
-weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
+weekly_juvenile_abundance_model_data2 <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
-  select(-special_prior)
+  select(-special_prior) |> 
+  full_join(rst_all_weeks)
 
 # filter to only include complete season data 
 if (month(Sys.Date()) %in% c(9:12, 1:5)) {
