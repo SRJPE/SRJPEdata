@@ -164,6 +164,7 @@ weekly_flow <- env_with_sites |> filter(parameter == "flow")
 #   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
 #   summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
 
+# Note I don't think we are currently using temperature
 weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
 
 # Efficiency Formatting ---------------------------------------------------------
@@ -192,12 +193,13 @@ weekly_efficiency |> glimpse()
 
 # reformat flow data and summarize weekly
 # TODO 32 NAs, fill in somehow  
-flow_reformatted <- env_with_sites |> 
+flow_reformatted <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
+  left_join(
+  env_with_sites |> 
   filter(parameter == "flow",
          statistic == "mean") |> 
   group_by(year, week, site, stream, gage_agency, gage_number) |> 
-  summarise(flow_cfs = mean(value, na.rm = T)) |> 
-  glimpse()
+  summarise(flow_cfs = mean(value, na.rm = T)))
 
 # Combine catch (weekly_standard_catch), weekly efficiency, and weekly effort by site 
 weekly_efficiency |> glimpse()
@@ -218,8 +220,8 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
             by = c("week" = "week_released",
                    "year" = "year_released", "stream", 
                    "site")) |> 
-  # join flow data to dataset
-  left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
+  # join flow data to dataset, full_join because we want to keep flow even for missing weeks
+  full_join(flow_reformatted, by = c("week", "year", "site", "stream", "life_stage")) |> 
   # select columns that josh uses 
   select(year, week, stream, site, count, mean_fork_length, 
          number_released, number_recaptured,
@@ -290,7 +292,8 @@ remove_run_year <- weekly_juvenile_abundance_model_data |>
 weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data_raw |> 
   left_join(remove_run_year) |> 
   mutate(remove = ifelse(is.na(remove), F, remove)) |> 
-  filter(remove == F)
+  filter(remove == F) |> 
+  select(-remove)
   
 
 # filter to only include complete season data 
