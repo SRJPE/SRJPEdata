@@ -280,7 +280,7 @@ weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
 
 # when we join rst_all_weeks we end up with some run years that have all NA sampling
 # these should be removed
-remove_run_year <- weekly_juvenile_abundance_model_data |> 
+remove_run_year <- weekly_juvenile_abundance_model_data_raw |> 
   mutate(count2 = ifelse(is.na(count), 0, 1)) |> 
   group_by(run_year, stream, site, count2) |> 
   tally() |> 
