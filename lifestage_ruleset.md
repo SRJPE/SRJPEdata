@@ -81,7 +81,7 @@ The first step was to apply a lifestage cutoff to catch records that had fork le
 
 |date       |stream           |site    |subsite |site_group | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight| julian_week| julian_year|
 |:----------|:----------------|:-------|:-------|:----------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|-----------:|-----------:|
-|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          45|        2019|
+|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          44|        2019|
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          45|     NA|          45|        2019|
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          74|     NA|          45|        2019|
 |2019-11-26 |sacramento river |tisdale |rl      |tisdale    |     1|late fall |smolt      |FALSE           |TRUE  |          97|     NA|          48|        2019|
@@ -135,7 +135,7 @@ We used these proportions to fill in missing lifestage values. See the final lif
 
 |date       |stream           |site    |subsite |site_group | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight| julian_week| julian_year| week| year|model_lifestage_method   |
 |:----------|:----------------|:-------|:-------|:----------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|-----------:|-----------:|----:|----:|:------------------------|
-|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          45|        2019|   45| 2019|assigned from fl cutoffs |
+|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          44|        2019|   45| 2019|assigned from fl cutoffs |
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          45|     NA|          45|        2019|   45| 2019|assigned from fl cutoffs |
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          74|     NA|          45|        2019|   45| 2019|assigned from fl cutoffs |
 |2019-11-26 |sacramento river |tisdale |rl      |tisdale    |     1|late fall |smolt      |FALSE           |TRUE  |          97|     NA|          48|        2019|   48| 2019|assigned from fl cutoffs |
