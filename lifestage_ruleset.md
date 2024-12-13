@@ -81,7 +81,7 @@ The first step was to apply a lifestage cutoff to catch records that had fork le
 
 |date       |stream           |site    |subsite |site_group | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight| julian_week| julian_year|
 |:----------|:----------------|:-------|:-------|:----------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|-----------:|-----------:|
-|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          44|        2019|
+|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          45|        2019|
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          45|     NA|          45|        2019|
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          74|     NA|          45|        2019|
 |2019-11-26 |sacramento river |tisdale |rl      |tisdale    |     1|late fall |smolt      |FALSE           |TRUE  |          97|     NA|          48|        2019|
@@ -111,16 +111,16 @@ The first step in filling in these missing lifestages was to find the proportion
 
 | year| week|stream           |site                    | percent_fry| percent_smolt| percent_yearling|
 |----:|----:|:----------------|:-----------------------|-----------:|-------------:|----------------:|
-| 1992|   42|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   44|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   45|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   46|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   48|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1992|   49|deer creek       |deer creek              |         0.0|           0.0|                1|
-| 1994|   29|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
-| 1994|   30|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
-| 1994|   31|sacramento river |red bluff diversion dam |         0.0|           1.0|                0|
-| 1994|   32|sacramento river |red bluff diversion dam |         0.1|           0.9|                0|
+| 1992|   42|deer creek       |deer creek              |           0|             0|                1|
+| 1992|   44|deer creek       |deer creek              |           0|             0|                1|
+| 1992|   45|deer creek       |deer creek              |           0|             0|                1|
+| 1992|   46|deer creek       |deer creek              |           0|             0|                1|
+| 1992|   47|deer creek       |deer creek              |           0|             0|                1|
+| 1992|   48|deer creek       |deer creek              |           0|             0|                1|
+| 1992|   49|deer creek       |deer creek              |           0|             0|                1|
+| 1994|   29|sacramento river |red bluff diversion dam |           0|             1|                0|
+| 1994|   30|sacramento river |red bluff diversion dam |           0|             1|                0|
+| 1994|   31|sacramento river |red bluff diversion dam |           0|             1|                0|
 
 ### Determine general weekly lifestage proportions
 
@@ -135,7 +135,7 @@ We used these proportions to fill in missing lifestage values. See the final lif
 
 |date       |stream           |site    |subsite |site_group | count|run       |life_stage |adipose_clipped |dead  | fork_length| weight| julian_week| julian_year| week| year|model_lifestage_method   |
 |:----------|:----------------|:-------|:-------|:----------|-----:|:---------|:----------|:---------------|:-----|-----------:|------:|-----------:|-----------:|----:|----:|:------------------------|
-|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          44|        2019|   44| 2019|assigned from fl cutoffs |
+|2019-11-04 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          40|     NA|          45|        2019|   45| 2019|assigned from fl cutoffs |
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |fry        |FALSE           |FALSE |          45|     NA|          45|        2019|   45| 2019|assigned from fl cutoffs |
 |2019-11-06 |sacramento river |tisdale |rr      |tisdale    |     1|winter    |smolt      |FALSE           |FALSE |          74|     NA|          45|        2019|   45| 2019|assigned from fl cutoffs |
 |2019-11-26 |sacramento river |tisdale |rl      |tisdale    |     1|late fall |smolt      |FALSE           |TRUE  |          97|     NA|          48|        2019|   48| 2019|assigned from fl cutoffs |
