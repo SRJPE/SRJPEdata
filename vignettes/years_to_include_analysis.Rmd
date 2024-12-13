@@ -240,18 +240,18 @@ rb <- filter(SRJPEdata::rst_catch, site == "red bluff diversion dam")
 # 2017 - missing a lot of winter months
 # 2019 - missing first two weeks of march
 # 2020 - no data collection after march
-exclude <- tibble(stream = c(rep("battle creek",3), rep("butte creek", 5), rep("deer creek", 8),
+exclude <- tibble(stream = c(rep("battle creek",3), rep("butte creek", 5), rep("deer creek", 9),
                              rep("feather river", 2), rep("mill creek", 5), "sacramento river"),
-                  monitoring_year = c(2003, 2007, 2015, 
+                  monitoring_year = c(1998, 2007, 2015, 
                                       2019, 2005, 1997, 2006, 1998, 
-                                      1993, 1994, 1997, 1998, 2008, 1999, 2004, 2006, 
+                                      1992, 1993, 1994, 1997, 1998, 1999, 2006, 2008, 2022,
                                       2021, 2017, 
                                       1997, 1998, 1999, 2004, 2009, 
                                       2013),
-                  exclude = rep("yes", 24))
+                  exclude = rep("yes", 25))
 
 min_max_week <- SRJPEdata::rst_catch |> 
-  mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
+  mutate(monitoring_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
   group_by(monitoring_year, stream, site, subsite) |> 
   summarize(min_date = min(date),
             min_week = week(min_date),
@@ -287,29 +287,22 @@ chosen_site_years_to_model <- include |>
             max_week = week(max_date)) |> 
   ungroup() |> 
   # identified as excluded due to incomplete sampling
-  mutate(exclude = case_when(monitoring_year == 2022 & stream == "battle creek" ~ T,
+  mutate(exclude = case_when(
+                             monitoring_year == 1998 & site == "ubc" ~ T, 
+                             monitoring_year == 2003 & site == "ucc" ~ T,
+                             monitoring_year == 2003 & site == "yuba river" ~ T,
                              monitoring_year == 2005 & site == "yuba river" ~ T,
                              monitoring_year == 2008 & site == "yuba river" ~ T,
                              monitoring_year == 2007 & site == "sunset pumps" ~ T,
                              monitoring_year == 2009 & site == "sunset pumps" ~ T,
                              monitoring_year == 2016 & site == "lbc" ~ T,
+                             monitoring_year == 2002 & site == "knights landing" ~ T,
                              T ~ F),
          site_group = case_when(site %in% lfc_sites ~ "upper feather lfc",
                                 site %in% hfc_sites ~ "upper feather hfc",
                                 T ~ NA)) |> 
   filter(exclude == F) |> 
-  select(monitoring_year, stream, site_group, site, min_date, min_week, max_date, max_week) |> 
-  mutate(site_group = case_when(stream == "deer creek" ~ "deer creek",
-                                stream == "butte creek" ~ "butte creek", 
-                                stream == "mill creek" ~ "mill creek", 
-                                site == "knights landing" ~ "knights landing",
-                                site == "tisdale" ~ "tisdale", 
-                                site == "red bluff diversion dam" ~ "red bluff diversion dam",
-                                stream == "yuba river" ~ "yuba river",
-                                stream == "clear creek" ~ "clear creek", 
-                                stream == "battle creek" ~ "battle creek",
-                                stream == "feather river" & site == "lower feather river" ~ "lower feather river", 
-                                stream == "feather river" ~ site_group)) |> 
+  select(monitoring_year, stream, site, min_date, min_week, max_date, max_week) |> 
   filter(!is.na(monitoring_year))
 
 usethis::use_data(chosen_site_years_to_model, overwrite = TRUE)
