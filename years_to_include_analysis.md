@@ -80,20 +80,20 @@ The table below shows a section of this table:
 
 | monitoring_year|stream           |site                    |subsite    |min_date   | min_week|max_date   | max_week|
 |---------------:|:----------------|:-----------------------|:----------|:----------|--------:|:----------|--------:|
-|            1994|sacramento river |red bluff diversion dam |gate 1     |1994-08-19 |       34|1994-08-31 |       35|
-|            1994|sacramento river |red bluff diversion dam |gate 10    |1994-08-29 |       35|1994-08-31 |       35|
+|            1994|sacramento river |red bluff diversion dam |gate 1     |1994-08-19 |       34|1994-09-19 |       38|
+|            1994|sacramento river |red bluff diversion dam |gate 10    |1994-08-29 |       35|1994-09-22 |       38|
 |            1994|sacramento river |red bluff diversion dam |gate 11    |1994-07-18 |       29|1994-08-24 |       34|
-|            1995|deer creek       |deer creek              |deer creek |1994-10-03 |       40|1995-06-18 |       25|
-|            1995|sacramento river |red bluff diversion dam |gate 1     |1994-09-01 |       35|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 10    |1994-09-01 |       35|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 11    |1995-03-03 |        9|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 2     |1995-01-25 |        4|1995-05-04 |       18|
-|            1995|sacramento river |red bluff diversion dam |gate 3     |1994-10-18 |       42|1995-08-31 |       35|
-|            1995|sacramento river |red bluff diversion dam |gate 5     |1994-09-22 |       38|1995-04-27 |       17|
+|            1994|sacramento river |red bluff diversion dam |gate 3     |1994-10-18 |       42|1994-11-03 |       44|
+|            1994|sacramento river |red bluff diversion dam |gate 5     |1994-09-22 |       38|1994-11-03 |       44|
+|            1994|sacramento river |red bluff diversion dam |gate 7     |1994-10-14 |       42|1994-11-03 |       44|
+|            1994|sacramento river |red bluff diversion dam |gate 9     |1994-09-22 |       38|1994-11-03 |       44|
+|            1995|deer creek       |deer creek              |deer creek |1994-11-04 |       45|1995-06-18 |       25|
+|            1995|sacramento river |red bluff diversion dam |gate 1     |1995-01-23 |        4|1995-09-19 |       38|
+|            1995|sacramento river |red bluff diversion dam |gate 10    |1995-05-17 |       20|1995-09-19 |       38|
 
 
 
-*... with 488 more rows*
+*... with 494 more rows*
 
 ## Adult Data - Years to Include in Model
 
