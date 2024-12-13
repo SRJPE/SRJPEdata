@@ -33,7 +33,13 @@ rst_all_weeks <- rst_catch |>
          year = year(date)) |> 
   distinct(stream, site, year, week) |> 
   cross_join(tibble(life_stage = c("fry","smolt","yearling"))) |> 
-  mutate(run_year = ifelse(week >= 45, year + 1, year))
+  mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
+  left_join(chosen_site_years_to_model |> # need to make sure to filter out years that have been excluded
+              select(monitoring_year, stream, site) |> 
+              rename(run_year = monitoring_year) |> 
+              mutate(include = T)) |> 
+  filter(include == T) |> 
+  select(-include)
 
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 ### ----------------------------------------------------------------------------
@@ -48,10 +54,10 @@ chosen_site_years_to_model <- as.data.table(chosen_site_years_to_model)
 # Step-by-step translation of the dplyr code
 catch_with_inclusion_criteria <- updated_standard_catch[
   # Step 1: Create monitoring_year
-  , monitoring_year := ifelse(month(date) %in% 9:12, year(date) + 1, year(date))
+  , monitoring_year := ifelse(week(date) >= 45, year(date) + 1, year(date))
 ][
   # Step 2: Perform the left join with chosen_site_years_to_model
-  chosen_site_years_to_model, on = .(monitoring_year, stream, site, site_group), nomatch = 0
+  chosen_site_years_to_model, on = .(monitoring_year, stream, site), nomatch = 0
 ][
   # Step 3: Mutate include_in_model column based on conditions
   , include_in_model := ifelse(date >= min_date & date <= max_date, TRUE, FALSE)
@@ -66,6 +72,7 @@ catch_with_inclusion_criteria <- updated_standard_catch[
   , !c("monitoring_year", "min_date", "max_date", "year", "week", "include_in_model")
 ]
 
+
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
 weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |> 
@@ -79,8 +86,6 @@ weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |>
   mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
   ungroup() |> glimpse()
 
-catch_site_year_weeks <- unique(weekly_standard_catch_no_zeros$site_year_week)
-
 weekly_standard_catch_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
@@ -90,7 +95,6 @@ weekly_standard_catch_zeros <- catch_with_inclusion_criteria |>
             count = sum(count, na.rm = T))  |>  
   filter(count == 0) |> 
   mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
-  filter(!site_year_week %in% catch_site_year_weeks) |> 
   glimpse()
 
 weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros, 
@@ -232,8 +236,8 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
          standardized_flow = as.vector(scale(flow_cfs))) |> # standardizes and centers see ?scale
   ungroup() |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year),
-         catch_standardized_by_hours_fished = ifelse(is.na(hours_fished), count, round(count * average_stream_hours_fished / hours_fished, 0)),
-         hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)) & count > 0, average_stream_hours_fished, hours_fished)
+         catch_standardized_by_hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)), count, round(count * average_stream_hours_fished / hours_fished, 0)),
+         hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)) & count >= 0, average_stream_hours_fished, hours_fished)
          ) |> # add logic for situations where trap data is missing
   glimpse()
 
@@ -316,8 +320,7 @@ tryCatch({
       warning(paste("The data for", selected_site, "in", max_year, "only goes to week", max_week, "and should not be used as a full season."))
     } 
   }
-  # map through sites
-  purrr::map(site, check_for_full_season) |> reduce(append)
+  # map through sites purrr::map(site, check_for_full_season) |> reduce(append)
 })
 
 # Split up into 2 data objects, efficiency, and catch 
