@@ -152,7 +152,7 @@ The SRJPE modeling team selected Okie Dam as the primary site to use for the sto
 
 ***Secondary site*****:**
 
-Additional Yuba River efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis.
+Additional Adams Dam efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis.
 
 ### Clear Creek
 
