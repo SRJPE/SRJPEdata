@@ -64,6 +64,8 @@ Each of these tributaries has a unique monitoring setup and number of Rotary Scr
 
 ### Map
 
+The map below shows the location of existing Rotary Screw trapping sites.
+
 ```{r, echo = FALSE}
 library(leaflet)
 library(rgdal)
