@@ -164,7 +164,7 @@ The SRJPE modeling team selected Lower Clear Creek as the primary site to use fo
 
 ***Secondary site*****:**
 
-Upper Clear Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis. There is a separation weir on Clear Creek that ensures that only spring run Chinook are caught in the UCC trap. This may prove very helpful for supplementary analysis that look at run identification including:
+Upper Clear Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis. There is a separation weir on Clear Creek that ensures that only spring run Chinook are caught in the UCC trap. This may prove helpful for potential supplementary analysis focused run identification including:
 
 -   Use for understanding of run & potential survival between traps\
 -   Comparison UCC (all spring) to LCC PLAD results
