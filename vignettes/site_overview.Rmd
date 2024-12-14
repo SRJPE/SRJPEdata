@@ -169,7 +169,7 @@ Upper Clear Creek efficiency or catch data may be used in fitting the juvenile a
 -   Use for understanding of run & potential survival between traps
 -   Comparison UCC (all spring) to LCC PLAD results
 
-IF for some reason LCC (SR based on plad) and UCC counts do not align, we can reassess our decision to use LCC as our primary trap. In this case, we will have to do an spawning adult data analysis to come up with an adult scaling factor to ensure that we are scaling up our UCC estimates to account for downstream spawerns that we are missing.
+If for some reason LCC (SR based on plad) and UCC counts do not align, we can reassess our decision to use LCC as our primary trap. In this case, we will have to do an spawning adult data analysis to come up with an adult scaling factor to ensure that we are scaling up our UCC estimates to account for downstream spawerns that we are missing.
 
 ### Deer Creek
 
