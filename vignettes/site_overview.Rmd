@@ -173,7 +173,7 @@ If for some reason LCC (SR based on plad) and UCC counts do not align, we can re
 
 ### Deer Creek
 
-There is only one RST operated on Deer Creek. This trap will be used in the Stock Rectuit.
+There is only one RST operated on Deer Creek. This trap will be used in the Stock Recruit.
 
 ### Feather River
 
@@ -185,7 +185,7 @@ The SRJPE modeling team selected Herringer Riffle as the primary site to use for
 
 ***Secondary site*****:**
 
-Eye Riffle efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis. After initial analysis, we will reassess site decision to see how to best incoperate Eye Riffle data in modeling.
+Eye Riffle efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis. After initial analysis, we will reassess site decision to see how to best incorporate Eye Riffle data in modeling.
 
 *Additional considerations for Feather River*
 
