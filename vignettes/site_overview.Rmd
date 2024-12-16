@@ -36,7 +36,7 @@ colors_full <-  c("#9986A5", "#C18748", #Royal 2
 
 ### Overview
 
-The spring run juvenile production estimate (SR JPE) contains a suite of submodels that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to fit the stock recruit model.
+The spring run juvenile production estimate (SR JPE) contains a suite of submodels that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to fit the Stock Recruit model.
 
 ## Stock Recruit Rotary Screw Trap Site Selection Overview
 
@@ -54,13 +54,13 @@ Each of these tributaries has a unique monitoring setup and number of Rotary Scr
 
 ## Classifying RST site usage
 
-**Primary site selected for SRJPE stock recruit:** When a stream has multiple tributaries, we selected one primary site to use for the SRJPE stock recruit model. Primary sites typically have the longest period of trapping and include the largest extent of spawners on a tributary.
+**Primary site selected for SR JPE Stock Recruit:** When a stream has multiple tributaries, we selected one primary site to use for the SR JPE Stock Recruit model. Primary sites typically have the longest period of trapping and include the largest extent of spawners on a tributary.
 
 **Secondary site selected used for supplementary analysis and abundance estimate:**
 
--   Any trap not selected for the SR JPE stock recruit model will still be used in juvenile abundance modeling. The BTSPAS-X juvenile abundace model is a hierarchical basin abundance model that can borrow information from one site when there is no information available at a different site.
+-   Any trap not selected for the SR JPE Stock Recruit model will still be used in juvenile abundance modeling. The BTSPAS-X juvenile abundance model is a hierarchical basin abundance model that can borrow information from one site when there is no information available at a different site.
 
--   Some sites not selected for the SR JPE stock recruit model may also be used for supplementary analysis. These analysis could include analyzing run proportions by looking at abundance numbers above and below a weir or looking at survival rates of juveniles between RST sites.
+-   Some sites not selected for the SR JPE Stock Recruit model may also be used for supplementary analysis. These analysis could include analyzing run proportions by looking at abundance numbers above and below a weir or looking at survival rates of juveniles between RST sites.
 
 ### Map
 
@@ -102,12 +102,12 @@ sprjpe <- subset(salmonid_extents, Species == 'Spring Run Chinook' & River %in% 
 
 ## Table of RST sites 
 
-The table below summarized site selection for the SR JPE stock recruit model. If a site has multiple subsites fishing on the same day these will be added together to get total catch or efficiency data for a day.
+The table below summarized site selection for the SR JPE Stock Recruit model. If a site has multiple subsites fishing on the same day these will be added together to get total catch or efficiency data for a day.
 
 See sections below on each tributary to understand why sites were recommended as primary sites for stock recruit.
 
 +------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| **Stream**       | **Site Group**           | **Site**                                                                                                          | **Subsite**                                                                                                                                                                                                                                                                                                                            | **Recccomended Primary Site for Stock Recruit** |
+| **Stream**       | **Site Group**           | **Site**                                                                                                          | **Subsite**                                                                                                                                                                                                                                                                                                                            | **Recommended Primary Site for Stock Recruit** |
 +------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
 | battle creek     |                          | ubc                                                                                                               | ubc                                                                                                                                                                                                                                                                                                                                    | ubc                                             |
 +------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
@@ -136,11 +136,11 @@ On Battle Creek there are 2 rotary screw trapping sites.
 
 ***Primary site selected: Upper Battle Creek.***
 
-The SRJPE modeling team selected Upper Battle Creek as the primary site to use for the stock recruit because it has a longer period of record and is still an ongoing monitoring site.
+The SR JPE modeling team selected Upper Battle Creek as the primary site to use for the Stock Recruit because it has a longer period of record and is still an ongoing monitoring site.
 
 ***Secondary site*****:**
 
-Lower Battle Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis. If the Battle Creek monitoring team adds LBC RST back into ongoing monitoring, this site may be used in combination with UBC for the stock recruit.
+Lower Battle Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. If the Battle Creek monitoring team adds LBC RST back into ongoing monitoring, this site may be used in combination with UBC for the Stock Recruit.
 
 ### Butte Creek
 
@@ -148,11 +148,11 @@ Historically, multiple rotary screw trapping sites have operated on the Yuba Riv
 
 ***Primary site selected: Okie Dam***
 
-The SRJPE modeling team selected Okie Dam as the primary site to use for the stock recruit because it is the site with the most historical data and has ongoing monitoring. The Okie Dam site has a rotary screw trap and a fyke trap in operation during the monitoring season.
+The SR JPE modeling team selected Okie Dam as the primary site to use for the Stock Recruit because it is the site with the most historical data and has ongoing monitoring. The Okie Dam site has a rotary screw trap and a fyke trap in operation during the monitoring season.
 
 ***Secondary site*****:**
 
-Additional Adams Dam efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis.
+Additional Adams Dam efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis.
 
 ### Clear Creek
 
@@ -160,16 +160,16 @@ On Clear Creek there are 2 rotary screw trapping sites.
 
 ***Primary site selected: Lower Clear Creek.***
 
-The SRJPE modeling team selected Lower Clear Creek as the primary site to use for the stock recruit because it captures the full extent of spawning ground for spring run Chinook.
+The SR JPE modeling team selected Lower Clear Creek as the primary site to use for the Stock Recruit because it captures the full extent of spawning ground for spring run Chinook.
 
 ***Secondary site*****:**
 
-Upper Clear Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis. There is a separation weir on Clear Creek that ensures that only spring run Chinook are caught in the UCC trap. This may prove helpful for potential supplementary analysis focused run identification including:
+Upper Clear Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. There is a separation weir on Clear Creek that ensures that only spring run Chinook are caught in the UCC trap. This may prove helpful for potential supplementary analysis focused run identification including:
 
 -   Use for understanding of run & potential survival between traps
 -   Comparison UCC (all spring) to LCC PLAD results
 
-If for some reason LCC (SR based on plad) and UCC counts do not align, we can reassess our decision to use LCC as our primary trap. In this case, we will have to do an spawning adult data analysis to come up with an adult scaling factor to ensure that we are scaling up our UCC estimates to account for downstream spawerns that we are missing.
+If for some reason LCC (SR based on plad) and UCC counts do not align, we can reassess our decision to use LCC as our primary trap. In this case, we will have to do an spawning adult data analysis to come up with an adult scaling factor to ensure that we are scaling up our UCC estimates to account for downstream spawners that we are missing.
 
 ### Deer Creek
 
@@ -181,19 +181,19 @@ On Feather River there are many rotary screw trapping sites. Consistently, a Low
 
 ***Primary site selected: Herringer Riffle (High Flow Channel)***
 
-The SRJPE modeling team selected Herringer Riffle as the primary site to use for the stock recruit because it has the most consistent monitoring in the high flow channel, it is still an ongoing monitoring site, and it captures the full extent of spring run spawners. Additional sites will be used to fill data gaps on the HFC if Herringer is not fishing in a given year.
+The SR JPE modeling team selected Herringer Riffle as the primary site to use for the Stock Recruit because it has the most consistent monitoring in the high flow channel, it is still an ongoing monitoring site, and it captures the full extent of spring run spawners. Additional sites will be used to fill data gaps on the HFC if Herringer is not fishing in a given year.
 
 ***Secondary site*****:**
 
-Eye Riffle efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis. After initial analysis, we will reassess site decision to see how to best incorporate Eye Riffle data in modeling.
+Eye Riffle efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. After initial analysis, we will reassess site decision to see how to best incorporate Eye Riffle data in modeling.
 
 *Additional considerations for Feather River*
 
-The Lower Feather River site will be used in the Spring Run JPE modeling but will not be used directly to fit a stock recruit in a tributary specific model. This could be used in as part of a mainstem model or to do a joint Feather and Yuba river model.
+The Lower Feather River site will be used in the Spring Run JPE modeling but will not be used directly to fit a Stock Recruit in a tributary specific model. This could be used in as part of a mainstem model or to do a joint Feather and Yuba river model.
 
 ### Mill Creek
 
-There is only one RST operated on Deer Creek. This trap will be used in the Stock Rectuit.
+There is only one RST operated on Deer Creek. This trap will be used in the Stock Recruit.
 
 ### Yuba River
 
@@ -201,8 +201,8 @@ Historically, multiple rotary screw trapping sites have operated on the Yuba Riv
 
 ***Primary site selected: Hallwood***
 
-The SRJPE modeling team selected Hallwood as the primary site to use for the stock recruit because it is the site with the most historical data, it is the lowest in the system, and ongoing monitoring at this site restarted in 2023 (TODO check year on this).
+The SR JPE modeling team selected Hallwood as the primary site to use for the Stock Recruit because it is the site with the most historical data, it is the lowest in the system, and ongoing monitoring at this site restarted in 2023 (TODO check year on this).
 
 ***Secondary site:***
 
-Additional Yuba River efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS) and for supplementary analysis.
+Additional Yuba River efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis.
