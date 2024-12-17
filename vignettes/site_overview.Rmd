@@ -104,7 +104,7 @@ sprjpe <- subset(salmonid_extents, Species == 'Spring Run Chinook' & River %in% 
 
 The table below summarized site selection for the SR JPE Stock Recruit model. If a site has multiple subsites fishing on the same day these will be added together to get total catch or efficiency data for a day.
 
-See sections below on each tributary to understand why sites were recommended as primary sites for stock recruit.
+See sections below on each tributary to understand why sites were recommended as primary sites for Stock Recruit.
 
 +------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
 | **Stream**       | **Site Group**           | **Site**                                                                                                          | **Subsite**                                                                                                                                                                                                                                                                                                                            | **Recommended Primary Site for Stock Recruit** |
