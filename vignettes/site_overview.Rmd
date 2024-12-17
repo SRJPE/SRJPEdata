@@ -1,0 +1,210 @@
+---
+title: "RST Sites Used in JPE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Draft of RST Sites Used in JPE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  fig.width=8, fig.height=6
+)
+```
+
+```{r setup, echo = FALSE}
+library(SRJPEdata)
+# source(here::here("data-raw", "pull_tables_from_database.R"))
+
+colors_small <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                            "#899DA4", "#C93312", "#DC863B" # royal 1 (- 3)
+)
+colors_full <-  c("#9986A5", "#C18748", #Royal 2
+                  "#899DA4", "#9A8822", # Grand Budapest 1 (-4)
+                  "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87", # Isle of dogs 2 altered slightly
+                  "#AC9765", "#b67c3b", "#175149", "#AF4E24", "#CEB175",
+                  "#E54E21", "#6C8645", "#C18748", "#FBA72A", "#D3D4D8", "#CB7A5C", "#5785C1")
+
+```
+
+### Overview
+
+The spring run juvenile production estimate (SR JPE) contains a suite of submodels that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to fit the Stock Recruit model. The Within Season model is in development and is currently not considered here.
+
+## Stock Recruit Rotary Screw Trap Site Selection Overview
+
+The Spring Run JPE model considers data from 7 tributaries and the mainstem Sacramento river, including:
+
+-   Battle Creek
+-   Butte Creek
+-   Clear Creek
+-   Deer Creek
+-   Feather River
+-   Mill Creek
+-   Yuba River
+
+Each of these tributaries has a unique monitoring setup and number of rotary screw traps (RSTs) that we can use in the SR JPE model. Data for the SR JPE is organized by stream, site, and subsite. `stream` represents the creek or river where the trapping sites are located. `site` represents a unique trapping location whereas `subsite` represents the RST positioning within the `site`. `site group` is used as a helper to group sites that may be more similar than others. For instance, on the Feather River there are multiple sites that have been used over time. It is assumed that sites within the Low Flow Channel are more similar to each other than the sites in the High Flow Channel and vice versa. Some streams only have one site and some sites only have one RST. The important difference is that catch from different subsites within the same site can be added together, whereas catch from different sites cannot be added together as this would be double counting. 
+
+This vignette describes the trapping sites that we use for each tributary.
+
+## Classifying RST site usage
+
+**Primary site selected for SR JPE Stock Recruit:** When a stream has multiple tributaries, we selected one primary site to use for the SR JPE Stock Recruit model. Primary sites typically have the longest period of trapping and include the largest extent of spawners on a tributary.
+
+**Secondary site selected used for supplementary analysis and abundance estimate:**
+
+-   Any trap not selected for the SR JPE Stock Recruit model will still be used in juvenile abundance modeling. The BTSPAS-X juvenile abundance model is a hierarchical basin abundance model that can borrow information from one site when there is no information available at a different site.
+
+-   Some sites not selected for the SR JPE Stock Recruit model may also be used for supplementary analysis. These analysis could include analyzing run proportions by looking at abundance numbers above and below a weir or looking at survival rates of juveniles between RST sites.
+
+### Map
+
+The map below shows the location of existing RST sites.
+
+```{r, echo = FALSE}
+library(leaflet)
+library(rgdal)
+library(sf)
+library(leaflet.extras2)
+
+# salmonid_extents <- readOGR("data-raw/helper-tables/habitat_extents/salmonid_habitat_extents.shp", 
+#                             stringsAsFactors = FALSE, verbose = FALSE) %>%
+#   spTransform(CRS("+proj=longlat +datum=WGS84 +no_defs"))
+# 
+# srjpe_systems <- c("Battle Creek", "Butte Creek", "Clear Creek", "Mill Creek", "Deer Creek", "Feather River", "Yuba River", "Upper Sacramento River", "Upper-mid Sacramento River", "Lower-mid Sacramento River", "Lower Sacramento River")
+# 
+# sprjpe <- subset(salmonid_extents, Species == 'Spring Run Chinook' & River %in% srjpe_systems)
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# make_label <- function(data) {
+#   labels <- data$River
+# }
+# 
+# hab_map <- leaflet() %>% 
+#       # addProviderTiles(providers$Esri.WorldTopoMap, group = "Map") %>% 
+#       # addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+#       addProviderTiles(providers$CartoDB.Positron) |> 
+#       addPolylines(data = sprjpe, group = 'Spring Run Extent', label = make_label(sprjpe),
+#                    color = '#517ba8', opacity = .8, weight = 3) %>% 
+#       setView(lat = 38.85, lng = -121.49, zoom = 7.5) 
+# 
+# hab_map
+
+```
+
+![Map of Rotary Screw Trap Monitoring Locations](images/rst_map.png){width=108%}
+
+## Table of RST sites 
+
+The table below is a summary of site selection for the SR JPE Stock Recruit model. If a site has multiple subsites fishing on the same day these will be added together to get total catch or efficiency data for a day.
+
+See sections below on each tributary to understand why sites were recommended as primary sites for Stock Recruit.
+
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| **Stream**       | **Site Group**           | **Site**                                                                                                          | **Subsite**                                                                                                                                                                                                                                                                                                                            | **Recommended Primary Site for Stock Recruit** |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| battle creek     |  battle creek            | ubc                                                                                                               | ubc                                                                                                                                                                                                                                                                                                                                    | ubc                                             |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| butte creek      |  butte creek             | adams dam,                                                                                                        | adams dam, okie dam 1, okie dam 2, okie dam fyke, okie dam rst                                                                                                                                                                                                                                                                         | okie dam                                        |
+|                  |                          |                                                                                                                   |                                                                                                                                                                                                                                                                                                                                        |                                                 |
+|                  |                          | okie dam                                                                                                          |                                                                                                                                                                                                                                                                                                                                        |                                                 |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| clear creek      |  clear creek             | lcc, ucc                                                                                                          | lcc, ucc                                                                                                                                                                                                                                                                                                                               | lcc                                             |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| deer creek       |  deer creek              | deer creek                                                                                                        | deer creek                                                                                                                                                                                                                                                                                                                             | deer creek                                      |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| feather river    | feather river lfc, feather river hfc | eye riffle, gateway riffle, steep riffle, herringer riffle, live oak, shawns beach, sunset pumps, lower feather\* | eye riffle_north, eye riffle_side channel, gateway main 400' up river, gateway_main1, gateway_rootball, gateway_rootball_river_left, #steep riffle_rst, steep riffle_10' ext, steep side channel, herringer_east, herringer_upper_west, herringer_west, live oak, shawns_east, shawns_west, sunset east bank, sunset west bank, rr, rl | feather hfc - herringer riffle                  |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| mill creek       |  mill creek              | mill creek                                                                                                        | mill creek                                                                                                                                                                                                                                                                                                                             | mill creek                                      |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| sacramento river |  knights landing, tisdale | tisdale, knights landing, delta entry\*                                                                           | rr, rl, 8.3, 8.4                                                                                                                                                                                                                                                                                                                       | knights landing                                 |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| yuba river       |  yuba river                        | hallwood, yuba river                                                                                              | yub, hal, hal2, hal3                                                                                                                                                                                                                                                                                                                   | hallwood                                        |
++------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+
+## Choosing Sites
+
+### Battle Creek
+
+On Battle Creek there are 2 rotary screw trapping sites.
+
+***Primary site selected: Upper Battle Creek.***
+
+The SR JPE modeling team selected Upper Battle Creek as the primary site to use for the Stock Recruit because it has a longer period of record and is still an ongoing monitoring site.
+
+***Secondary site*****:**
+
+Lower Battle Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. If the Battle Creek monitoring team adds LBC RST back into ongoing monitoring, this site may be used in combination with UBC for the Stock Recruit.
+
+### Butte Creek
+
+Historically, multiple rotary screw trapping sites have operated on Butte Creek. Currently, only 1 site is in operation, the Okie Dam site, also referred to as Parrott-Phalen Diversion Dam.
+
+***Primary site selected: Okie Dam***
+
+The SR JPE modeling team selected Okie Dam as the primary site to use for the Stock Recruit because it is the site with the most historical data and has ongoing monitoring. The Okie Dam site has a rotary screw trap and a fyke trap in operation during the monitoring season. Currently, data is considered complete only when the RST is operating. This means that the few records where only the fyke trap was operating are not currently used in juvenile abundance modelling. In the future, these data may be integrated, though this would require an approach to understand the portion of the river sampled by the fyke trap to better represent effort.
+
+***Secondary site*****:**
+
+Additional Adams Dam efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis.
+
+### Clear Creek
+
+On Clear Creek there are 2 rotary screw trapping sites.
+
+***Primary site selected: Lower Clear Creek.***
+
+The SR JPE modeling team selected Lower Clear Creek (LCC) as the primary site to use for the Stock Recruit because it captures the full extent of spawning ground for spring run Chinook. Additionally, genetics samples for PLAD model development are being taken from the LCC site.
+
+***Secondary site*****:**
+
+Upper Clear Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. There is a separation weir on Clear Creek that ensures that only spring run Chinook are caught in the UCC trap. This may prove helpful for potential supplementary analysis focused run identification including:
+
+-   Use for understanding of run & potential survival between traps
+-   Comparison UCC (all spring) to LCC PLAD results
+
+If for some reason LCC (SR based on PLAD) and UCC counts do not align, we can reassess our decision to use LCC as our primary trap. In this case, we will have to do an spawning adult data analysis to come up with an adult scaling factor to ensure that we are scaling up our UCC estimates to account for downstream spawners that we are missing.
+
+### Deer Creek
+
+There is only one RST operated on Deer Creek. This trap will be used in the Stock Recruit.
+
+### Feather River
+
+On Feather River there are many rotary screw trapping sites. Consistently, a Low Flow Channel site (between Orville Dam and the Thermalito after bay) and a High Flow Channel site (after Thermalito after bay) are monitored each year. In 2022, a new RST program started on the Lower Feather River below the confluence with the Yuba River. This RST captures juveniles from both Yuba and Feather rivers. 
+
+***Primary site selected: Herringer Riffle (High Flow Channel)***
+
+The SR JPE modeling team selected Herringer Riffle as the primary site to use for the Stock Recruit because it has the most consistent monitoring in the High Flow Channel, it is still an ongoing monitoring site, and it captures the full extent of spring run spawners. Additional sites will be used to fill data gaps on the HFC if Herringer is not fishing in a given year.
+
+***Secondary site*****:**
+
+Eye Riffle efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. After initial analysis, we will reassess site decision to see how to best incorporate Eye Riffle data in modeling.
+
+*Additional considerations for Feather River*
+
+The Lower Feather River site will be used in the SR JPE modeling but will not be used directly to fit a Stock Recruit in a tributary specific model. This could be used in as part of a mainstem model or to do a joint Feather and Yuba river model.
+
+### Mill Creek
+
+There is only one RST operated on Mill Creek. This trap will be used in the Stock Recruit.
+
+### Yuba River
+
+Historically, multiple rotary screw trapping sites have operated on the Yuba River. Currently, only 1 site is in operation, the Hallwood site.
+
+***Primary site selected: Hallwood***
+
+The SR JPE modeling team selected Hallwood as the primary site to use for the Stock Recruit because it is the site with the most historical data, it is the lowest in the system, and ongoing monitoring at this site restarted in 2022.
+
+***Secondary site:***
+
+Additional Yuba River efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis.
