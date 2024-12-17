@@ -15,34 +15,49 @@ chosen_site_years_to_model |> glimpse()
 # Note: updated below years_to_include to chosen_site_years_to_model (this is more up to date version)
 # TODO however, years_to_include included a subsite (CONFIRM that we do not need subsite), after discussing, delete old version
 
-# Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
+# For the BTSPAS model we need to include all weeks that were not sampled. The code
+# below sets up a table of all weeks (based on min sampling year and max sampling year)
+# This is joined at the end
+# TODO we may want to refine this lookup with another "model_week" variable if needed
+rst_all_weeks <- rst_catch |> 
+  group_by(stream, site, subsite) |> 
+  summarise(min = min(date),
+            max = max(date)) |> 
+  mutate(min = paste0(year(min),"-01-01"),
+         max = paste0(year(max),"-12-31")) |> 
+  pivot_longer(cols = c(min, max), values_to = "date") |> 
+  mutate(date = as_date(date)) |> 
+  select(-name) |> 
+  padr::pad(interval = "day", group = c("stream", "site")) |> 
+  mutate(week = week(date),
+         year = year(date)) |> 
+  distinct(stream, site, year, week) |> 
+  cross_join(tibble(life_stage = c("fry","smolt","yearling"))) |> 
+  mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
+  left_join(chosen_site_years_to_model |> # need to make sure to filter out years that have been excluded
+              select(monitoring_year, stream, site) |> 
+              rename(run_year = monitoring_year) |> 
+              mutate(include = T)) |> 
+  filter(include == T) |> 
+  select(-include)
 
+# Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 ### ----------------------------------------------------------------------------
 
 # Filter to use inclusion criteria ---------------------------------------------
-# TODO this is the slowest block...
-# catch_with_inclusion_criteria <- updated_standard_catch |> 
-#   mutate(monitoring_year = ifelse(month(date) %in% 9:12, year(date) + 1, year(date))) |> 
-#   left_join(chosen_site_years_to_model) |> 
-#   mutate(include_in_model = ifelse(date >= min_date & date <= max_date, TRUE, FALSE),
-#          # if the year was not included in the list of years to include then should be FALSE
-#          include_in_model = ifelse(is.na(min_date), FALSE, include_in_model)) |> 
-#   filter(include_in_model) |> 
-#   select(-c(monitoring_year, min_date, max_date, year, week, include_in_model)) |>
-#   glimpse()
 
 # Converted to data.table for performance reasons
 # Convert your data.frames to data.tables (if not already in data.table format)
-updated_standard_catch <- as.data.table(updated_standard_catch)
+updated_standard_catch <- as.data.table(updated_standard_catch) 
 chosen_site_years_to_model <- as.data.table(chosen_site_years_to_model)
 
 # Step-by-step translation of the dplyr code
 catch_with_inclusion_criteria <- updated_standard_catch[
   # Step 1: Create monitoring_year
-  , monitoring_year := ifelse(month(date) %in% 9:12, year(date) + 1, year(date))
+  , monitoring_year := ifelse(week(date) >= 45, year(date) + 1, year(date))
 ][
   # Step 2: Perform the left join with chosen_site_years_to_model
-  chosen_site_years_to_model, on = .(monitoring_year, stream, site, site_group), nomatch = 0
+  chosen_site_years_to_model, on = .(monitoring_year, stream, site), nomatch = 0
 ][
   # Step 3: Mutate include_in_model column based on conditions
   , include_in_model := ifelse(date >= min_date & date <= max_date, TRUE, FALSE)
@@ -57,6 +72,7 @@ catch_with_inclusion_criteria <- updated_standard_catch[
   , !c("monitoring_year", "min_date", "max_date", "year", "week", "include_in_model")
 ]
 
+
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
 weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |> 
@@ -70,8 +86,6 @@ weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |>
   mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
   ungroup() |> glimpse()
 
-catch_site_year_weeks <- unique(weekly_standard_catch_no_zeros$site_year_week)
-
 weekly_standard_catch_zeros <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
@@ -81,7 +95,6 @@ weekly_standard_catch_zeros <- catch_with_inclusion_criteria |>
             count = sum(count, na.rm = T))  |>  
   filter(count == 0) |> 
   mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
-  filter(!site_year_week %in% catch_site_year_weeks) |> 
   glimpse()
 
 weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros, 
@@ -155,10 +168,12 @@ weekly_flow <- env_with_sites |> filter(parameter == "flow")
 #   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
 #   summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
 
+# Note I don't think we are currently using temperature
 weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
+# this dataset will be saved separately to retain the fork length and origin variables
 weekly_efficiency <- 
   left_join(release, 
             recaptures |> # need to summarize first so you don't get duplicated release data when joining
@@ -168,23 +183,27 @@ weekly_efficiency <-
   group_by(stream, 
            site, 
            site_group, 
+           origin,
+           median_fork_length_released, # we add origin and fork length for figures
            week_released = week(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
             number_recaptured = sum(count, na.rm = TRUE)) |> 
   ungroup() |> 
+  rename(origin_released = origin) |> 
   glimpse()
 
 weekly_efficiency |> glimpse()
 
 # reformat flow data and summarize weekly
 # TODO 32 NAs, fill in somehow  
-flow_reformatted <- env_with_sites |> 
+flow_reformatted <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
+  left_join(
+  env_with_sites |> 
   filter(parameter == "flow",
          statistic == "mean") |> 
   group_by(year, week, site, stream, gage_agency, gage_number) |> 
-  summarise(flow_cfs = mean(value, na.rm = T)) |> 
-  glimpse()
+  summarise(flow_cfs = mean(value, na.rm = T)))
 
 # Combine catch (weekly_standard_catch), weekly efficiency, and weekly effort by site 
 weekly_efficiency |> glimpse()
@@ -198,22 +217,28 @@ catch_reformatted <- weekly_standard_catch |>  glimpse()
 weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
   left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site")) |> 
   # Join efficnecy data to catch data
-  left_join(weekly_efficiency, 
+  left_join(weekly_efficiency |> 
+              group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
+              summarize(number_released = sum(number_released),
+                        number_recaptured = sum(number_recaptured)), 
             by = c("week" = "week_released",
                    "year" = "year_released", "stream", 
                    "site")) |> 
-  # join flow data to dataset
-  left_join(flow_reformatted, by = c("week", "year", "site", "stream")) |> 
+  # join flow data to dataset, full_join because we want to keep flow even for missing weeks
+  full_join(flow_reformatted, by = c("week", "year", "site", "stream", "life_stage")) |> 
   # select columns that josh uses 
   select(year, week, stream, site, count, mean_fork_length, 
-         number_released, number_recaptured, hours_fished, 
+         number_released, number_recaptured,
+         hours_fished, 
          flow_cfs, life_stage) |> 
   group_by(stream) |> 
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE),
          standardized_flow = as.vector(scale(flow_cfs))) |> # standardizes and centers see ?scale
   ungroup() |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year),
-         catch_standardized_by_hours_fished = ifelse(is.na(hours_fished), count, round(count * average_stream_hours_fished / hours_fished, 0))) |> 
+         catch_standardized_by_hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)), count, round(count * average_stream_hours_fished / hours_fished, 0)),
+         hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)) & count >= 0, average_stream_hours_fished, hours_fished)
+         ) |> # add logic for situations where trap data is missing
   glimpse()
 
 # Add in standardized efficiency flows 
@@ -251,10 +276,29 @@ btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", 
 
 # JOIN special priors with weekly model data
 # first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
-weekly_juvenile_abundance_model_data <- weekly_model_data_with_eff_flows |>
+weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
   left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
   mutate(lgN_prior = ifelse(!is.na(special_prior), special_prior, log(((count / 1000) + 1) / 0.025))) |> # maximum possible value for log N across strata
-  select(-special_prior)
+  select(-special_prior) |> 
+  full_join(rst_all_weeks)
+
+# when we join rst_all_weeks we end up with some run years that have all NA sampling
+# these should be removed
+remove_run_year <- weekly_juvenile_abundance_model_data_raw |> 
+  mutate(count2 = ifelse(is.na(count), 0, 1)) |> 
+  group_by(run_year, stream, site, count2) |> 
+  tally() |> 
+  pivot_wider(names_from = count2, values_from = n) |> 
+  filter(`0` > 0 & is.na(`1`)) |> # filter for run_years where count is only NA
+  select(-c(`0`,`1`)) |> 
+  mutate(remove = T)
+
+weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data_raw |> 
+  left_join(remove_run_year) |> 
+  mutate(remove = ifelse(is.na(remove), F, remove)) |> 
+  filter(remove == F) |> 
+  select(-remove)
+  
 
 # filter to only include complete season data 
 if (month(Sys.Date()) %in% c(9:12, 1:5)) {
@@ -276,8 +320,7 @@ tryCatch({
       warning(paste("The data for", selected_site, "in", max_year, "only goes to week", max_week, "and should not be used as a full season."))
     } 
   }
-  # map through sites
-  purrr::map(site, check_for_full_season) |> reduce(append)
+  # map through sites purrr::map(site, check_for_full_season) |> reduce(append)
 })
 
 # Split up into 2 data objects, efficiency, and catch 
@@ -287,10 +330,11 @@ weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |>
 
 # Efficiency
 weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_data |> 
-  select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow) |> 
+  select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow, flow_cfs) |> 
   filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
 
 # write to package 
 usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE)
 usethis::use_data(weekly_juvenile_abundance_efficiency_data, overwrite = TRUE)
+usethis::use_data(weekly_efficiency, overwrite = TRUE)

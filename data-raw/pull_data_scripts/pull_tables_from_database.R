@@ -83,6 +83,7 @@ try(if(!exists("rst_trap_query"))
 # release table 
  try(release_query <- dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
                                                 tl.subsite, tl.site_group, rs.number_released, r.definition as run, 
+                                                rs.median_fork_length_released,
                                                 ls.definition as life_stage, o.definition as origin
                                                 FROM release rs 
                                                 left join trap_location tl on rs.trap_location_id = tl.id 
@@ -97,7 +98,6 @@ try(if(!exists("rst_trap_query"))
  #   release <- SRJPEdata::release
  #   warning(paste("No new release datasets detected in the database. Maximum date of release datais", max(SRJPEdata::release$date_released, na.rm = TRUE)))
  # })
-
 
 # Pull in release fish info, Fork length for release trials 
 # TODO Update if we get data in release fish 

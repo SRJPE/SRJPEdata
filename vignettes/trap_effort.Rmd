@@ -261,9 +261,10 @@ hours_fished_combined <- bind_rows(method_one,
   # if hours fished NA assumed 24 hours
   mutate(hours_fished = ifelse(is.na(hours_fished), 24, hours_fished)) %>% 
   rename(date = trap_stop_date) %>% 
+  mutate(date = as_date(date)) |> 
   group_by(stream, site, subsite, site_group, date) %>% 
   summarise(hours_fished = sum(hours_fished)) |> 
-  padr::pad(interval = "day") |> # pad to create days when there are gaps 
+  padr::pad(interval = "day", group = c("stream", "site", "subsite", "site_group")) |> # pad to create days when there are gaps 
   mutate(hours_fished = ifelse(is.na(hours_fished), 0, hours_fished)) # fill these gaps with 0 effort 
 ```
 
