@@ -78,10 +78,37 @@ test_that("there is no missing values (hours fished...ect) when there is catch d
                nas)
 })
 # check that there is data for each site week combo
+rst_all_weeks <- rst_catch |> 
+  group_by(stream, site, subsite) |> 
+  summarise(min = min(date),
+            max = max(date)) |> 
+  mutate(min = paste0(year(min),"-01-01"),
+         max = paste0(year(max),"-12-31")) |> 
+  pivot_longer(cols = c(min, max), values_to = "date") |> 
+  mutate(date = as_date(date)) |> 
+  select(-name) |> 
+  padr::pad(interval = "day", group = c("stream", "site")) |> 
+  mutate(week = week(date),
+         year = year(date)) |> 
+  distinct(stream, site, year, week) |> 
+  mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
+  left_join(chosen_site_years_to_model |> # need to make sure to filter out years that have been excluded
+              select(monitoring_year, stream, site) |> 
+              rename(run_year = monitoring_year) |> 
+              mutate(include = T)) |> 
+  filter(include == T) |> 
+  select(-include)
 
 
-
-
+test_that("test that there is data for each site week combo", {
+  catch <- weekly_juvenile_abundance_catch_data |> 
+    select(stream, site, year, week, run_year) |> distinct()
+  
+  all_weeks_n_rows <- nrow(rst_all_weeks)
+  catch_n_rows <- nrow(catch)
+  expect_equal(all_weeks_n_rows, 
+               catch_n_rows)
+})
 # test_join <- current_site_year_raw |> 
 #   rename(current_site_year = site_year) |> 
 #   full_join(chosen_site_year_raw)
