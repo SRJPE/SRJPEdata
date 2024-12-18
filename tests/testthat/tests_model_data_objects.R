@@ -36,6 +36,52 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
   expect_equal(current_site_year, chosen_site_year)
 })
 
+# no missing values when there is catch data (even if catch is 0)
+# Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
+test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
+  catch <- weekly_juvenile_abundance_catch_data |> 
+    filter(count >= 0) 
+  stream_na = anyNA(catch$stream)
+  site_na = anyNA(catch$site)
+  flow_na = anyNA(catch$flow_cfs)
+  std_flow_na = anyNA(catch$standardized_flow)
+  fl_na = anyNA(catch$mean_fork_length)
+  ls_na = anyNA(catch$life_stage)
+  hf_na = anyNA(catch$hours_fished)
+  as_hf_na = anyNA(catch$average_stream_hours_fished)
+  ry_na = anyNA(catch$run_year)
+  cshf_na = anyNA(catch$catch_standardized_by_hours_fished)
+  
+  nas = c(stream_na, site_na, flow_na, 
+          fl_na, ls_na, hf_na, as_hf_na, 
+          ry_na, cshf_na)
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+               nas)
+})
+
+
+# check no -INf 
+# no missing values when there is catch data (even if catch is 0)
+# # when there are missing sampling weeks we should still include hours_fished and flow variables (these should not be missing)
+# Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
+test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
+  catch <- weekly_juvenile_abundance_catch_data 
+  flow_na = any(catch$flow_cfs  == -Inf)
+  std_flow_na = any(catch$standardized_flow == -Inf)
+  hf_na = any(catch$hours_fished == -Inf)
+  as_hf_na = any(catch$average_stream_hours_fished == -Inf)
+  cshf_na = any(catch$catch_standardized_by_hours_fished == -Inf)
+  
+  nas = c(flow_na, std_flow_na, 
+          hf_na, as_hf_na, cshf_na)
+  expect_equal(c(NA, NA, NA, FALSE, NA), 
+               nas)
+})
+# check that there is data for each site week combo
+
+
+
+
 # test_join <- current_site_year_raw |> 
 #   rename(current_site_year = site_year) |> 
 #   full_join(chosen_site_year_raw)
