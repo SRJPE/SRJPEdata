@@ -88,7 +88,7 @@ test_that("still have flow and hours fished even if no catch", {
 # check no -INf 
 # no missing values when there is catch data (even if catch is 0)
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
-test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
+test_that("there is no -Inf values (hours fished...ect) when there is catch data (even if catch is 0)", {
   catch <- SRJPEdata::weekly_juvenile_abundance_catch_data 
   flow_na = any(catch$flow_cfs  == -Inf)
   std_flow_na = any(catch$standardized_flow == -Inf)
@@ -98,7 +98,7 @@ test_that("there is no missing values (hours fished...ect) when there is catch d
   
   nas = c(flow_na, std_flow_na, 
           hf_na, as_hf_na, cshf_na)
-  expect_equal(c(NA, NA, NA, FALSE, NA), 
+  expect_equal(c(NA, NA, FALSE, FALSE, NA), 
                nas)
 })
 
