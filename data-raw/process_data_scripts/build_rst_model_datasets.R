@@ -13,7 +13,6 @@ SRJPEdata::rst_catch |> glimpse()
 updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
 chosen_site_years_to_model |> glimpse() 
 # Note: updated below years_to_include to chosen_site_years_to_model (this is more up to date version)
-# TODO however, years_to_include included a subsite (CONFIRM that we do not need subsite), after discussing, delete old version
 
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
@@ -337,7 +336,7 @@ weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_dat
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
 
 # write to package 
-usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE) # ADDED IN, Not sure why this wasn't here...is there a reason I am missing
+usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE) 
 usethis::use_data(weekly_juvenile_abundance_efficiency_data, overwrite = TRUE)
-usethis::use_data(weekly_efficiency, overwrite = TRUE) #TODO confirm we do not want to get rid of this one
+usethis::use_data(weekly_efficiency, overwrite = TRUE) 
 
