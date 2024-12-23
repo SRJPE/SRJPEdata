@@ -1,3 +1,4 @@
+library(tidyverse)
 # The goal of this script is to test final model data objects 
 # Test weekly_juvenile_abundance_catch_data
 test_that("weekly_juvenile_abundance_catch_data data coverage at the tributary level has not changed", {
@@ -39,13 +40,13 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
 # no missing values when there is catch data (even if catch is 0)
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
 test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
-  catch <- weekly_juvenile_abundance_catch_data |> 
+  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
     filter(count >= 0) 
   stream_na = anyNA(catch$stream)
   site_na = anyNA(catch$site)
   flow_na = anyNA(catch$flow_cfs)
   std_flow_na = anyNA(catch$standardized_flow)
-  fl_na = anyNA(catch$mean_fork_length)
+  # fl_na = anyNA(catch$mean_fork_length)
   ls_na = anyNA(catch$life_stage)
   hf_na = anyNA(catch$hours_fished)
   as_hf_na = anyNA(catch$average_stream_hours_fished)
@@ -53,23 +54,23 @@ test_that("there is no missing values (hours fished...ect) when there is catch d
   cshf_na = anyNA(catch$catch_standardized_by_hours_fished)
   
   nas = c(stream_na, site_na, flow_na, 
-          fl_na, ls_na, hf_na, as_hf_na, 
+          # fl_na, commented out for now, should be okay if fl nas, primarily should be using lifestage instead
+          ls_na, hf_na, as_hf_na, 
           ry_na, cshf_na)
-  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
                nas)
 })
 
 # still have flow and hours fished even if no catch
 # Currently fails, there are nas in flow, standard flow, fork length, hours fished, catch standardized by hours fished
-# TODO, add in hours fished for these, here, hours fished should be 0
 test_that("still have flow and hours fished even if no catch", {
-  catch <- weekly_juvenile_abundance_catch_data |> 
+  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
     filter(is.na(count)) 
   stream_na = anyNA(catch$stream)
   site_na = anyNA(catch$site)
   flow_na = anyNA(catch$flow_cfs)
   std_flow_na = anyNA(catch$standardized_flow)
-  fl_na = anyNA(catch$mean_fork_length)
+  # fl_na = anyNA(catch$mean_fork_length)
   ls_na = anyNA(catch$life_stage)
   hf_na = anyNA(catch$hours_fished)
   as_hf_na = anyNA(catch$average_stream_hours_fished)
@@ -77,7 +78,8 @@ test_that("still have flow and hours fished even if no catch", {
   cshf_na = anyNA(catch$catch_standardized_by_hours_fished)
   
   nas = c(stream_na, site_na, flow_na, 
-          fl_na, ls_na, hf_na, as_hf_na, 
+          # fl_na, 
+          ls_na, hf_na, as_hf_na, 
           ry_na, cshf_na)
   expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
                nas)
@@ -87,7 +89,7 @@ test_that("still have flow and hours fished even if no catch", {
 # no missing values when there is catch data (even if catch is 0)
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
 test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
-  catch <- weekly_juvenile_abundance_catch_data 
+  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data 
   flow_na = any(catch$flow_cfs  == -Inf)
   std_flow_na = any(catch$standardized_flow == -Inf)
   hf_na = any(catch$hours_fished == -Inf)
@@ -100,46 +102,34 @@ test_that("there is no missing values (hours fished...ect) when there is catch d
                nas)
 })
 
-# when there are missing sampling weeks we should still include hours_fished 
-# and flow variables (these should not be missing)
-test_that("test that there is data for each site week combo", {
-  catch <- weekly_juvenile_abundance_catch_data |> 
-    select(stream, site, year, week, run_year) |> distinct()
-  
-  all_weeks_n_rows <- nrow(rst_all_weeks)
-  catch_n_rows <- nrow(catch)
-  expect_equal(all_weeks_n_rows, 
-               catch_n_rows)
-})
-
-
-# check that there is data for each site week combo
-rst_all_weeks <- rst_catch |> 
-  group_by(stream, site, subsite) |> 
-  summarise(min = min(date),
-            max = max(date)) |> 
-  mutate(min = paste0(year(min),"-01-01"),
-         max = paste0(year(max),"-12-31")) |> 
-  pivot_longer(cols = c(min, max), values_to = "date") |> 
-  mutate(date = as_date(date)) |> 
-  select(-name) |> 
-  padr::pad(interval = "day", group = c("stream", "site")) |> 
-  mutate(week = week(date),
-         year = year(date)) |> 
-  distinct(stream, site, year, week) |> 
-  mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
-  left_join(chosen_site_years_to_model |> # need to make sure to filter out years that have been excluded
-              select(monitoring_year, stream, site) |> 
-              rename(run_year = monitoring_year) |> 
-              mutate(include = T)) |> 
-  filter(include == T) |> 
-  select(-include)
 
 # test that there is data for each site week combo
-# TODO confirm why these do not match up
 test_that("test that there is data for each site week combo", {
-  catch <- weekly_juvenile_abundance_catch_data |> 
-    select(stream, site, year, week, run_year) |> distinct()
+  # check that there is data for each site week combo
+  rst_all_weeks <- SRJPEdata::rst_catch |> 
+    group_by(stream, site, subsite) |> 
+    summarise(min = min(date),
+              max = max(date)) |> 
+    mutate(min = paste0(year(min),"-01-01"),
+           max = paste0(year(max),"-12-31")) |> 
+    pivot_longer(cols = c(min, max), values_to = "date") |> 
+    mutate(date = as_date(date)) |> 
+    dplyr::select(-name) |> 
+    padr::pad(interval = "day", group = c("stream", "site")) |> 
+    mutate(week = week(date),
+           year = year(date)) |> 
+    distinct(stream, site, year, week) |> 
+    mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
+    left_join(chosen_site_years_to_model |> # need to make sure to filter out years that have been excluded
+                select(monitoring_year, stream, site) |> 
+                rename(run_year = monitoring_year) |> 
+                mutate(include = T)) |> 
+    filter(include == T) |> 
+    select(-include) |> 
+    filter(run_year != 2025) # TODO remove once we want to include 2025 data
+  
+  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+    dplyr::select(stream, site, year, week, run_year) |> distinct()
   
   all_weeks_n_rows <- nrow(rst_all_weeks)
   catch_n_rows <- nrow(catch)

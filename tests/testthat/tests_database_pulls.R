@@ -1,4 +1,5 @@
 library(SRJPEdata)
+library(tidyverse)
 context('RST data')
 
 # RST tests --------------------------------------------------------------------
