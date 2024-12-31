@@ -29,17 +29,11 @@ study_ids <- pull_study_ids_from_ERDDAP()
 # ids_with_spring <- which(str_detect(study_ids, "Spring"))
 # spring_ids <- study_ids[ids_with_spring]
 # Cannot download all at once so just pull jpe ids for now
-jpe_ids <- c("SacRiverSpringJPE_2022",
-             "BattleCk_Wild_2014", "CNFH_FMR_2019", "CNFH_FMR_2020", 
-             "CNFH_FMR_2021", "ColemanFall_2013",
-             "ColemanFall_2016", "ColemanFall_2017", 
-             "DeerCk_Wild_CHK_2017", "DeerCk_Wild_CHK_2018", 
-             "DeerCk_Wild_CHK_2019", "DeerCk_Wild_CHK_2020",
-             "MillCk_Wild_CHK_2013", "MillCk_Wild_CHK_2014", 
-             "MillCk_Wild_CHK_2015", "MillCk_Wild_CHK_2016", 
-             "MillCk_Wild_CHK_2017", "MillCk_Wild_CHK_2018", 
-             "MillCk_Wild_CHK_2019", "MillCk_Wild_CHK_2022",
-             "RBDD_2017", "RBDD_2018")
+floras_sac_ids <- read_csv("data-raw/archive/floras_data_prep/data/SacInp.csv") |> pull(StudyID) |> unique()
+floras_feather_butte_ids <- read_csv("data-raw/archive/floras_data_prep/data/FeatherButteInp.csv") |> pull(StudyID) |> unique()
+jpe_ids_sac <- floras_sac_ids
+jpe_ids_feather_butte <- floras_feather_butte_ids
+jpe_ids <- c(floras_sac_ids, floras_feather_butte_ids)
 
 jpe_detections <- purrr::map(jpe_ids, pull_detections_data_from_ERDDAP) |> 
   reduce(bind_rows) |> 
