@@ -45,16 +45,16 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 
 | year|stream        |  gdd_trib| gdd_sac| gdd_total|
 |----:|:-------------|---------:|-------:|---------:|
-| 1999|butte creek   |   3.12500|       0|      3.12|
-| 1999|deer creek    |  60.99441|       0|     60.99|
-| 1999|mill creek    |  12.81746|       0|     12.82|
-| 2000|butte creek   |  42.50689|       0|     42.51|
-| 2000|deer creek    | 173.35389|       0|    173.35|
-| 2000|feather river |  43.10133|       0|     43.10|
-| 2000|mill creek    |  91.73046|       0|     91.73|
-| 2000|yuba river    | 168.79931|       0|    168.80|
-| 2001|butte creek   |  54.77527|       0|     54.78|
-| 2001|clear creek   |  13.11338|       0|     13.11|
+| 1999|butte creek   |   3.75000|       0|      3.75|
+| 1999|deer creek    |  73.19329|       0|     73.19|
+| 1999|mill creek    |  15.38095|       0|     15.38|
+| 2000|butte creek   |  51.00827|       0|     51.01|
+| 2000|deer creek    | 208.02467|       0|    208.02|
+| 2000|feather river |  53.34990|       0|     53.35|
+| 2000|mill creek    | 110.07655|       0|    110.08|
+| 2000|yuba river    | 193.30733|       0|    193.31|
+| 2001|butte creek   |  65.73032|       0|     65.73|
+| 2001|clear creek   |  15.73606|       0|     15.74|
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
@@ -151,8 +151,8 @@ Both continuous environmental variables (flow and temperature) were standardized
 | 2000|battle creek |       1|   -0.0187405|         NA|    -0.6156258|                 1.2015972|
 | 2001|battle creek |       0|   -0.6155609|         NA|    -0.4282888|                -0.7734419|
 | 2002|battle creek |       0|   -0.8162630|         NA|     0.2018445|                 0.8977450|
-| 2003|battle creek |       1|   -0.0164556| -0.6963507|     0.1961676|                 3.0247102|
-| 2004|battle creek |       0|    0.0477623| -0.7356336|    -0.5475032|                -0.0138115|
+| 2003|battle creek |       1|   -0.0164556| -0.6931611|     0.1961676|                 3.0247102|
+| 2004|battle creek |       0|    0.0477623| -0.7325204|    -0.5475032|                -0.0138115|
 
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 

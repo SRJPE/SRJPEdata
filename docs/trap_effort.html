@@ -294,16 +294,24 @@
 <div id="combine-data" class="section level1">
 
 <p>We combined all methods to create one table with daily hours fished for each trap. We added rows with 0 effort for days that where there is no trapping data.</p>
-<pre><code><span><span class="co">## Error: The specified interval is invalid for the datetime variable.</span></span>
-<span><span class="co">##   Not all original observation are in the padding.</span></span>
-<span><span class="co">##   If you want to pad at this interval, aggregate the data first with thicken.</span></span></code></pre>
 <div class="section level2">
 <h2 id="summarized-by-week">Summarized by week<a class="anchor" aria-label="anchor" href="#summarized-by-week"></a></h2>
 <p>We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week. Before 2005 trap data is not available for Knights Landing, we assume 168 hours when trap data is missing.</p>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'hours_fished_combined' not found</span></span></code></pre>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'weekly_hours_fished_raw' not found</span></span></code></pre>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'weeks_with_missing_trap_data' not found</span></span></code></pre>
-<pre><code><span><span class="co">## Error in eval(expr, envir, enclos): object 'weekly_hours_fished_raw' not found</span></span></code></pre>
+<pre><code><span><span class="co">## # A tibble: 288 × 5</span></span>
+<span><span class="co">## # Groups:   year, stream, site [69]</span></span>
+<span><span class="co">##     year stream           site                    subsite     n</span></span>
+<span><span class="co">##    &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;                   &lt;chr&gt;   &lt;int&gt;</span></span>
+<span><span class="co">##  1  1994 sacramento river red bluff diversion dam gate 1      5</span></span>
+<span><span class="co">##  2  1994 sacramento river red bluff diversion dam gate 10     4</span></span>
+<span><span class="co">##  3  1994 sacramento river red bluff diversion dam gate 11     6</span></span>
+<span><span class="co">##  4  1994 sacramento river red bluff diversion dam gate 3     12</span></span>
+<span><span class="co">##  5  1994 sacramento river red bluff diversion dam gate 5     16</span></span>
+<span><span class="co">##  6  1994 sacramento river red bluff diversion dam gate 7     11</span></span>
+<span><span class="co">##  7  1994 sacramento river red bluff diversion dam gate 9     16</span></span>
+<span><span class="co">##  8  1995 sacramento river knights landing         8.3         3</span></span>
+<span><span class="co">##  9  1995 sacramento river knights landing         8.4         7</span></span>
+<span><span class="co">## 10  1995 sacramento river red bluff diversion dam gate 1     33</span></span>
+<span><span class="co">## # ℹ 278 more rows</span></span></code></pre>
 <div class="section level3">
 <h3 id="qc-2">QC<a class="anchor" aria-label="anchor" href="#qc-2"></a></h3>
 <p>The following plots provide visuals to show weekly hours fished for all tributaries. Note that this is for all years of data so there are multiple datapoints for a given week due to multiple years being represented.</p>

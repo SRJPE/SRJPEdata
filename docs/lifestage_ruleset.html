@@ -129,7 +129,7 @@
 </ol><div class="section level3">
 <h3 id="create-lifestage-variable">Create lifestage variable<a class="anchor" aria-label="anchor" href="#create-lifestage-variable"></a></h3>
 <p>The first step was to apply a lifestage cutoff to catch records that had fork lengths recorded. These cutoffs are <code>fork_length &lt; 45 = fry</code>, <code>fork_length &gt; 45 = smolt</code>, <code>fork_length &gt; yearling_cutoff = yearling</code>.</p>
-<table style="width:100%;" class="table"><colgroup><col width="8%"><col width="12%"><col width="5%"><col width="5%"><col width="8%"><col width="4%"><col width="7%"><col width="8%"><col width="11%"><col width="4%"><col width="8%"><col width="5%"><col width="8%"></colgroup><thead><tr class="header"><th align="left">date</th>
+<table class="table"><colgroup><col width="7%"><col width="11%"><col width="5%"><col width="5%"><col width="7%"><col width="4%"><col width="6%"><col width="7%"><col width="10%"><col width="4%"><col width="8%"><col width="4%"><col width="8%"><col width="8%"></colgroup><thead><tr class="header"><th align="left">date</th>
 <th align="left">stream</th>
 <th align="left">site</th>
 <th align="left">subsite</th>
@@ -142,6 +142,7 @@
 <th align="right">fork_length</th>
 <th align="right">weight</th>
 <th align="right">julian_week</th>
+<th align="right">julian_year</th>
 </tr></thead><tbody><tr class="odd"><td align="left">2019-11-04</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -154,7 +155,8 @@
 <td align="left">FALSE</td>
 <td align="right">40</td>
 <td align="right">NA</td>
-<td align="right">44</td>
+<td align="right">45</td>
+<td align="right">2019</td>
 </tr><tr class="even"><td align="left">2019-11-06</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -168,6 +170,7 @@
 <td align="right">45</td>
 <td align="right">NA</td>
 <td align="right">45</td>
+<td align="right">2019</td>
 </tr><tr class="odd"><td align="left">2019-11-06</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -181,6 +184,7 @@
 <td align="right">74</td>
 <td align="right">NA</td>
 <td align="right">45</td>
+<td align="right">2019</td>
 </tr><tr class="even"><td align="left">2019-11-26</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -194,6 +198,7 @@
 <td align="right">97</td>
 <td align="right">NA</td>
 <td align="right">48</td>
+<td align="right">2019</td>
 </tr><tr class="odd"><td align="left">2019-12-05</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -207,6 +212,7 @@
 <td align="right">80</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 </tr><tr class="even"><td align="left">2019-12-05</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -220,6 +226,7 @@
 <td align="right">79</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 </tr><tr class="odd"><td align="left">2019-12-05</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -233,6 +240,7 @@
 <td align="right">80</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 </tr><tr class="even"><td align="left">2019-12-05</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -246,6 +254,7 @@
 <td align="right">80</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 </tr><tr class="odd"><td align="left">2019-12-06</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -259,6 +268,7 @@
 <td align="right">75</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 </tr><tr class="even"><td align="left">2019-12-06</td>
 <td align="left">sacramento river</td>
 <td align="left">tisdale</td>
@@ -272,11 +282,12 @@
 <td align="right">48</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 </tr></tbody></table></div>
 <div class="section level3">
 <h3 id="determine-year-specific-lifestage-proportions">Determine year specific lifestage proportions<a class="anchor" aria-label="anchor" href="#determine-year-specific-lifestage-proportions"></a></h3>
 <p>There are 68905 entries with missing lifestage due to missing fork length data.</p>
-<table class="table"><colgroup><col width="7%"><col width="9%"><col width="13%"><col width="5%"><col width="13%"><col width="4%"><col width="4%"><col width="7%"><col width="10%"><col width="4%"><col width="8%"><col width="4%"><col width="8%"></colgroup><thead><tr class="header"><th align="left">date</th>
+<table style="width:100%;" class="table"><colgroup><col width="6%"><col width="8%"><col width="12%"><col width="4%"><col width="12%"><col width="3%"><col width="4%"><col width="6%"><col width="9%"><col width="3%"><col width="7%"><col width="4%"><col width="7%"><col width="7%"></colgroup><thead><tr class="header"><th align="left">date</th>
 <th align="left">stream</th>
 <th align="left">site</th>
 <th align="left">subsite</th>
@@ -289,6 +300,7 @@
 <th align="right">fork_length</th>
 <th align="right">weight</th>
 <th align="right">julian_week</th>
+<th align="right">julian_year</th>
 </tr></thead><tbody><tr class="odd"><td align="left">2022-02-20</td>
 <td align="left">feather river</td>
 <td align="left">lower feather river</td>
@@ -302,6 +314,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">8</td>
+<td align="right">2022</td>
 </tr><tr class="even"><td align="left">2022-03-31</td>
 <td align="left">feather river</td>
 <td align="left">lower feather river</td>
@@ -315,6 +328,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">13</td>
+<td align="right">2022</td>
 </tr><tr class="odd"><td align="left">2022-03-31</td>
 <td align="left">feather river</td>
 <td align="left">lower feather river</td>
@@ -328,6 +342,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">13</td>
+<td align="right">2022</td>
 </tr><tr class="even"><td align="left">2022-03-31</td>
 <td align="left">feather river</td>
 <td align="left">lower feather river</td>
@@ -341,6 +356,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">13</td>
+<td align="right">2022</td>
 </tr><tr class="odd"><td align="left">2022-03-31</td>
 <td align="left">feather river</td>
 <td align="left">lower feather river</td>
@@ -354,6 +370,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">13</td>
+<td align="right">2022</td>
 </tr><tr class="even"><td align="left">2022-06-01</td>
 <td align="left">feather river</td>
 <td align="left">lower feather river</td>
@@ -367,6 +384,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">22</td>
+<td align="right">2022</td>
 </tr></tbody></table><p>The first step in filling in these missing lifestages was to find the proportion for each lifestage category for a given stream, site, week, and year. This information could then be used to fill in the lifestage for missing rows within a week.</p>
 <table class="table"><colgroup><col width="5%"><col width="5%"><col width="18%"><col width="25%"><col width="12%"><col width="14%"><col width="18%"></colgroup><thead><tr class="header"><th align="right">year</th>
 <th align="right">week</th>
@@ -453,7 +471,7 @@
 <div class="section level3">
 <h3 id="apply-proportions-to-fill-in-missing-values">Apply proportions to fill in missing values<a class="anchor" aria-label="anchor" href="#apply-proportions-to-fill-in-missing-values"></a></h3>
 <p>We used these proportions to fill in missing lifestage values. See the final lifestage designations below.</p>
-<table style="width:100%;" class="table"><colgroup><col width="6%"><col width="10%"><col width="4%"><col width="4%"><col width="6%"><col width="3%"><col width="5%"><col width="6%"><col width="9%"><col width="3%"><col width="7%"><col width="4%"><col width="7%"><col width="2%"><col width="2%"><col width="14%"></colgroup><thead><tr class="header"><th align="left">date</th>
+<table class="table"><colgroup><col width="6%"><col width="9%"><col width="4%"><col width="4%"><col width="6%"><col width="3%"><col width="5%"><col width="6%"><col width="8%"><col width="3%"><col width="6%"><col width="3%"><col width="6%"><col width="6%"><col width="2%"><col width="2%"><col width="13%"></colgroup><thead><tr class="header"><th align="left">date</th>
 <th align="left">stream</th>
 <th align="left">site</th>
 <th align="left">subsite</th>
@@ -466,6 +484,7 @@
 <th align="right">fork_length</th>
 <th align="right">weight</th>
 <th align="right">julian_week</th>
+<th align="right">julian_year</th>
 <th align="right">week</th>
 <th align="right">year</th>
 <th align="left">model_lifestage_method</th>
@@ -481,7 +500,8 @@
 <td align="left">FALSE</td>
 <td align="right">40</td>
 <td align="right">NA</td>
-<td align="right">44</td>
+<td align="right">45</td>
+<td align="right">2019</td>
 <td align="right">45</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -498,6 +518,7 @@
 <td align="right">45</td>
 <td align="right">NA</td>
 <td align="right">45</td>
+<td align="right">2019</td>
 <td align="right">45</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -514,6 +535,7 @@
 <td align="right">74</td>
 <td align="right">NA</td>
 <td align="right">45</td>
+<td align="right">2019</td>
 <td align="right">45</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -530,6 +552,7 @@
 <td align="right">97</td>
 <td align="right">NA</td>
 <td align="right">48</td>
+<td align="right">2019</td>
 <td align="right">48</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -546,6 +569,7 @@
 <td align="right">80</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 <td align="right">49</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -562,6 +586,7 @@
 <td align="right">79</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 <td align="right">49</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -578,6 +603,7 @@
 <td align="right">80</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 <td align="right">49</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -594,6 +620,7 @@
 <td align="right">80</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 <td align="right">49</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -610,6 +637,7 @@
 <td align="right">75</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 <td align="right">49</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
@@ -626,6 +654,7 @@
 <td align="right">48</td>
 <td align="right">NA</td>
 <td align="right">49</td>
+<td align="right">2019</td>
 <td align="right">49</td>
 <td align="right">2019</td>
 <td align="left">assigned from fl cutoffs</td>
