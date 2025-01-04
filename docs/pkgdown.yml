@@ -12,6 +12,7 @@ articles:
   years_to_include_analysis: years_to_include_analysis.html
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 last_built: 2025-01-04T21:39Z
 =======
 last_built: 2024-12-02T22:20Z
@@ -19,6 +20,9 @@ last_built: 2024-12-02T22:20Z
 =======
 last_built: 2024-12-03T20:16Z
 >>>>>>> b2c3b65 (rebuilds package with new eff data)
+=======
+last_built: 2024-12-04T15:46Z
+>>>>>>> e27af4e (update package with padded juvenile abundance data)
 urls:
   reference: https://SRJPE.github.io/SRJPEdata/reference
   article: https://SRJPE.github.io/SRJPEdata/articles

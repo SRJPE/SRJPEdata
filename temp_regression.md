@@ -84,24 +84,24 @@ We built 3 regression models for Feather River LFC - one each for mean, min, and
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -4.8819 -0.8089  0.0252  0.7648  5.9459 
+## -4.8640 -0.8223  0.0144  0.7714  5.9203 
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) -5.127e+00  9.034e-01  -5.676 1.61e-08 ***
-## date         6.609e-04  4.787e-05  13.806  < 2e-16 ***
-## butte_temp   4.163e-01  5.720e-03  72.773  < 2e-16 ***
+## (Intercept) -5.140e+00  9.327e-01  -5.512 4.07e-08 ***
+## date         6.620e-04  4.932e-05  13.422  < 2e-16 ***
+## butte_temp   4.180e-01  5.781e-03  72.301  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 1.322 on 1796 degrees of freedom
+## Residual standard error: 1.349 on 1796 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.7601,	Adjusted R-squared:  0.7598 
-## F-statistic:  2845 on 2 and 1796 DF,  p-value: < 2.2e-16
+## Multiple R-squared:  0.7557,	Adjusted R-squared:  0.7554 
+## F-statistic:  2778 on 2 and 1796 DF,  p-value: < 2.2e-16
 ```
 
 ```
-## [1] 0.08440423
+## [1] 0.0808124
 ```
 
 
@@ -112,24 +112,24 @@ We built 3 regression models for Feather River LFC - one each for mean, min, and
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -4.7059 -0.7895  0.0227  0.7677  6.2023 
+## -4.6606 -0.8001  0.0336  0.7509  6.1965 
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) -3.5715061  0.8930078  -3.999 6.61e-05 ***
-## date         0.0005770  0.0000473  12.199  < 2e-16 ***
-## butte_temp   0.3924113  0.0061489  63.818  < 2e-16 ***
+## (Intercept) -4.150e+00  9.101e-01   -4.56 5.46e-06 ***
+## date         6.119e-04  4.818e-05   12.70  < 2e-16 ***
+## butte_temp   3.866e-01  6.181e-03   62.54  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 1.297 on 1796 degrees of freedom
+## Residual standard error: 1.318 on 1796 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.7086,	Adjusted R-squared:  0.7082 
-## F-statistic:  2183 on 2 and 1796 DF,  p-value: < 2.2e-16
+## Multiple R-squared:  0.7006,	Adjusted R-squared:  0.7003 
+## F-statistic:  2102 on 2 and 1796 DF,  p-value: < 2.2e-16
 ```
 
 ```
-## [1] 0.08201752
+## [1] 0.08134112
 ```
   
 
@@ -140,24 +140,24 @@ We built 3 regression models for Feather River LFC - one each for mean, min, and
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -5.3869 -0.7790  0.0191  0.8187  6.0898 
+## -5.3918 -0.7663  0.0141  0.8327  5.9306 
 ## 
 ## Coefficients:
 ##               Estimate Std. Error t value Pr(>|t|)    
-## (Intercept) -6.385e+00  9.747e-01  -6.551 7.46e-11 ***
-## date         7.229e-04  5.157e-05  14.018  < 2e-16 ***
-## butte_temp   4.389e-01  5.518e-03  79.548  < 2e-16 ***
+## (Intercept) -6.485e+00  9.626e-01  -6.737 2.16e-11 ***
+## date         7.297e-04  5.083e-05  14.356  < 2e-16 ***
+## butte_temp   4.380e-01  5.405e-03  81.046  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 1.416 on 1796 degrees of freedom
+## Residual standard error: 1.396 on 1796 degrees of freedom
 ##   (1 observation deleted due to missingness)
-## Multiple R-squared:  0.7885,	Adjusted R-squared:  0.7883 
-## F-statistic:  3348 on 2 and 1796 DF,  p-value: < 2.2e-16
+## Multiple R-squared:  0.7935,	Adjusted R-squared:  0.7933 
+## F-statistic:  3451 on 2 and 1796 DF,  p-value: < 2.2e-16
 ```
 
 ```
-## [1] 0.07586108
+## [1] 0.07973062
 ```
 
 #### Predictions
@@ -182,16 +182,16 @@ The plot below shows how the mean, min, and max temperatures for the Feather Riv
 
 
 ```
-## Rows: 27,231
+## Rows: 27,234
 ## Columns: 7
-## Groups: stream, date, statistic, gage_agency, gage_number, site_group [27,231]
-## $ date        [3m[38;5;246m<date>[39m[23m 1999-12-31, 1999-12-31, 1999-12-31, 2000-01-01, 2000-01-01, 2000-01-01, 2000-01-02, 2000-01-02, 2000-01-02, 2000-01-03, 2000-01-03, 2000-01-03, …
-## $ stream      [3m[38;5;246m<chr>[39m[23m "feather river", "feather river", "feather river", "feather river", "feather river", "feather river", "feather river", "feather river", "feather …
-## $ site_group  [3m[38;5;246m<chr>[39m[23m "upper feather lfc", "upper feather lfc", "upper feather lfc", "upper feather lfc", "upper feather lfc", "upper feather lfc", "upper feather lfc"…
-## $ gage_agency [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "…
-## $ gage_number [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "…
-## $ statistic   [3m[38;5;246m<chr>[39m[23m "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max"…
-## $ value       [3m[38;5;246m<dbl>[39m[23m 4.112176, 3.642291, 4.633964, 4.182221, 4.081957, 4.438335, 3.915755, 3.775420, 4.046501, 4.046510, 4.039509, 4.125560, 4.168592, 4.215809, 4.400…
+## Groups: stream, date, statistic, gage_agency, gage_number, site_group [27,234]
+## $ date        [3m[38;5;246m<date>[39m[23m 1999-12-31, 1999-12-31, 1999-12-31, 2000-01-01, 2000-01-01, 2000-01-01, 2000-01-02, 2000-0…
+## $ stream      [3m[38;5;246m<chr>[39m[23m "feather river", "feather river", "feather river", "feather river", "feather river", "feath…
+## $ site_group  [3m[38;5;246m<chr>[39m[23m "upper feather lfc", "upper feather lfc", "upper feather lfc", "upper feather lfc", "upper …
+## $ gage_agency [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolat…
+## $ gage_number [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolat…
+## $ statistic   [3m[38;5;246m<chr>[39m[23m "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "me…
+## $ value       [3m[38;5;246m<dbl>[39m[23m 4.118824, 3.611773, 4.410097, 4.189151, 4.050536, 4.217432, 3.921601, 3.744643, 3.831491, 4…
 ```
 
 ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
@@ -247,16 +247,16 @@ The plot below shows how the mean, min, and max temperatures for the Feather Riv
 
 
 ```
-## Rows: 27,267
+## Rows: 27,270
 ## Columns: 7
-## Groups: stream, date, statistic, gage_agency, gage_number, site_group [27,267]
-## $ date        [3m[38;5;246m<date>[39m[23m 1999-12-31, 1999-12-31, 1999-12-31, 2000-01-01, 2000-01-01, 2000-01-01, 2000-01-02, 2000-01-02, 2000-01-02, 2000-01-03, 2000-01-03, 2000-01-03, …
-## $ stream      [3m[38;5;246m<chr>[39m[23m "feather river", "feather river", "feather river", "feather river", "feather river", "feather river", "feather river", "feather river", "feather …
-## $ site_group  [3m[38;5;246m<chr>[39m[23m "upper feather hfc", "upper feather hfc", "upper feather hfc", "upper feather hfc", "upper feather hfc", "upper feather hfc", "upper feather hfc"…
-## $ gage_agency [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "…
-## $ gage_number [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "…
-## $ statistic   [3m[38;5;246m<chr>[39m[23m "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max"…
-## $ value       [3m[38;5;246m<dbl>[39m[23m 10.701021, 11.276316, 10.096666, 10.808365, 11.884655, 9.755171, 10.391006, 11.457259, 9.072848, 10.593012, 11.821895, 9.208513, 10.781496, 12.06…
+## Groups: stream, date, statistic, gage_agency, gage_number, site_group [27,270]
+## $ date        [3m[38;5;246m<date>[39m[23m 1999-12-31, 1999-12-31, 1999-12-31, 2000-01-01, 2000-01-01, 2000-01-01, 2000-01-02, 2000-0…
+## $ stream      [3m[38;5;246m<chr>[39m[23m "feather river", "feather river", "feather river", "feather river", "feather river", "feath…
+## $ site_group  [3m[38;5;246m<chr>[39m[23m "upper feather hfc", "upper feather hfc", "upper feather hfc", "upper feather hfc", "upper …
+## $ gage_agency [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolat…
+## $ gage_number [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolat…
+## $ statistic   [3m[38;5;246m<chr>[39m[23m "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "me…
+## $ value       [3m[38;5;246m<dbl>[39m[23m 10.371886, 11.401863, 9.934680, 10.482009, 11.995978, 9.572779, 10.054523, 11.578530, 8.849…
 ```
 
 ![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
@@ -329,15 +329,15 @@ The plot below shows how the mean, min, and max temperatures for the Yuba River 
   
 
 ```
-## Rows: 27,231
+## Rows: 27,234
 ## Columns: 6
-## Groups: stream, date, statistic, gage_agency, gage_number [27,231]
-## $ date        [3m[38;5;246m<date>[39m[23m 1999-12-31, 1999-12-31, 1999-12-31, 2000-01-01, 2000-01-01, 2000-01-01, 2000-01-02, 2000-01-02, 2000-01-02, 2000-01-03, 2000-01-03, 2000-01-03, …
-## $ stream      [3m[38;5;246m<chr>[39m[23m "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba…
-## $ gage_agency [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "…
-## $ gage_number [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "…
-## $ statistic   [3m[38;5;246m<chr>[39m[23m "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max"…
-## $ value       [3m[38;5;246m<dbl>[39m[23m 13.13013, 12.25659, 13.49635, 13.22758, 12.88818, 13.22966, 12.85000, 12.44547, 12.69687, 13.03315, 12.82428, 12.80274, 13.20405, 13.07670, 13.17…
+## Groups: stream, date, statistic, gage_agency, gage_number [27,234]
+## $ date        [3m[38;5;246m<date>[39m[23m 1999-12-31, 1999-12-31, 1999-12-31, 2000-01-01, 2000-01-01, 2000-01-01, 2000-01-02, 2000-0…
+## $ stream      [3m[38;5;246m<chr>[39m[23m "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba river", "yuba r…
+## $ gage_agency [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolat…
+## $ gage_number [3m[38;5;246m<chr>[39m[23m "interpolated", "interpolated", "interpolated", "interpolated", "interpolated", "interpolat…
+## $ statistic   [3m[38;5;246m<chr>[39m[23m "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "mean", "max", "min", "me…
+## $ value       [3m[38;5;246m<dbl>[39m[23m 13.20042, 12.02592, 12.92991, 13.29825, 12.66047, 12.65977, 12.91914, 12.21573, 12.12001, 1…
 ```
 
 ![plot of chunk unnamed-chunk-33](figure/unnamed-chunk-33-1.png)
