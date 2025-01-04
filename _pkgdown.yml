@@ -83,6 +83,8 @@ navbar:
     menu: 
       - text: 'Lifestage Rulesets'
         href: articles/lifestage_ruleset.html
+      - text: 'Site Selection for Stock Recruit Modeling'
+        href: articles/site_overview.html
       - text: 'Hours Fished Analysis'
         href: articles/trap_effort.html
       - text: 'Monitoring Years to Include'
