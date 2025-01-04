@@ -39,8 +39,11 @@ source("data-raw/process_data_scripts/build_survival_model_datasets.R")
 # add updated version number and description of updates into NEWS.md file, see
 # https://docs.google.com/document/d/1HgDlOpBMK5BVcrNnuB3CbZWsO6PyYbpJZdfM5C6NfRQ/edit for our versioning procedures 
 
+# RUN IF DOCS UPDATE
 devtools::document()
 pkgdown::build_site()
+#### DOCS html and .yml will be in gitignore. 
+#### Make sure to update anyways if you have rebuilt the documentation site
 
 # TODO Probably want to add some checks here to make sure no data is turning up empty
 # or something 
