@@ -95,6 +95,23 @@ observed_adult_input <- full_join(upstream_passage_estimates |>
                values_to = "count",
                names_to = "data_type") |>
   filter(!is.na(count)) |>
+  # TODO when this gets updated in database we need to remove
+  add_row(year = 2022,
+          stream = "clear creek",
+          data_type = "redd_count",
+          count = 6) |> 
+  add_row(year = 2023,
+          stream = "clear creek",
+          data_type = "redd_count",
+          count = 0) |> 
+  add_row(year = 2022,
+          stream = "clear creek",
+          data_type = "upstream_estimate",
+          count = 195) |> 
+  add_row(year = 2023,
+          stream = "clear creek",
+          data_type = "upstream_estimate",
+          count = 0) |> 
   arrange(stream, year) |>
   glimpse()
 
