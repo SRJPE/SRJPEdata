@@ -78,6 +78,14 @@ carcass_estimates <- SRJPEdata::carcass_estimates |>
 
 # join all together for raw input table for P2S (will be joined to environmental variables) -------------------------------
 # previously titled "adult_model_input_raw"
+
+# exclude years that have been identified as not representative
+exclude_adult <- SRJPEdata::years_to_exclude_adult |> 
+  select(stream, year, data_type, reason_for_exclusion) |> 
+  mutate(data_type = case_when(data_type == "upstream passage" ~ "upstream_estimate",
+                               data_type == "carcass" ~ "carcass_estimate",
+                               data_type == "holding" ~ "holding_count",
+                               data_type == "redd" ~ "redd_count"))
 observed_adult_input <- full_join(upstream_passage_estimates |>
                                      select(year, stream,
                                             upstream_estimate = passage_estimate),
@@ -113,6 +121,9 @@ observed_adult_input <- full_join(upstream_passage_estimates |>
           data_type = "upstream_estimate",
           count = 0) |> 
   arrange(stream, year) |>
-  glimpse()
+  left_join(exclude_adult) |> 
+  filter(is.na(reason_for_exclusion)) |> 
+  select-c(run, adipose_clipped, reach, reason_for_exclusion)
+  
 
 usethis::use_data(observed_adult_input, overwrite = TRUE)

@@ -4,12 +4,14 @@ library(tidyverse)
 # Create lookup table of years with adult data and rst data by stream
 # To match up the juvenile and adult data: add 1 to the adult year
 # sr_year, adult_year, run_year, site, rst (T/F), redd (T/F), carcass (T/F), holding (T/F), passage (T/F)
+
+# rst years to exclude are already applied
 rst_data <- weekly_juvenile_abundance_catch_data |> 
   filter(!is.na(count)) |> 
   distinct(run_year, stream) |> 
   mutate(year = run_year,
          rst = T)
-
+# adults years to exclude already applied
 adult_data <- observed_adult_input |> 
   select(year, stream, data_type, count) |> 
   pivot_wider(id_cols = c(year, stream), names_from = "data_type", values_from = "count") |> 
@@ -21,12 +23,12 @@ adult_data <- observed_adult_input |>
   rename(adult_year = year) |> 
   mutate(year =  adult_year + 1)
 
-sr_year_lookup <- full_join(rst_data, adult_data) 
-
+stock_recruit_year_lookup <- full_join(rst_data, adult_data) 
+usethis::use_data(stock_recruit_year_lookup, overwrite = TRUE)
 # Combine the adult data and sr covariates
 
 # Todo - fill in recent years for battle and clear
-sr_model_inputs <- stock_recruit_covariates |> 
+stock_recruit_model_inputs <- stock_recruit_covariates |> 
   ungroup() |> 
   select(-stream_site) |> # this isn't doing anything and is confusing so remove
   mutate(site_group = case_when(gage_number %in% c("UBC","UCC","LCC","LBC") ~ tolower(gage_number), # for some clear/battle the upper/lower being noted in gage_agency
@@ -48,4 +50,4 @@ sr_model_inputs <- stock_recruit_covariates |>
          carcass = carcass_estimate,
          redd = redd_count)
 
-
+usethis::use_data(stock_recruit_model_inputs, overwrite = TRUE)
