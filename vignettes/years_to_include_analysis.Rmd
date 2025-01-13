@@ -497,7 +497,12 @@ plotly::ggplotly(redd_heat_map)
 We utilized above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling for adult data. See a section of the "years to exclude" table below.
 
 ```{r, echo = FALSE}
-years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv"))
+years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
+  select(-TODOS) |> 
+  add_row(stream = "battle creek",
+          year = 2023,
+          data_type = "redd",
+          reason_for_exclusion = "Missing all reaches except one reach")
 usethis::use_data(years_to_exclude_adult, overwrite = TRUE)
 years_exclude_nice_names_adult <- years_to_exclude_adult |> select("Stream" = stream, 
                                                     "Year" = year, 
