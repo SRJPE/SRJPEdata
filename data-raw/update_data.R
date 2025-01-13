@@ -28,7 +28,7 @@ devtools::load_all()
 # Source prep data scripts 
 source("data-raw/process_data_scripts/build_adult_model_datasets.R")
 source("data-raw/process_data_scripts/build_rst_model_datasets.R")
-
+source("data-raw/process_data_scripts/build_sr_model_datasets.R")
 # Then pull acoustic tagging data
 # Note: We only pull specific JPE studies now, if we want to add more in, we must specify survey_id name in pull script
 source("data-raw/pull_data_scripts/pull_acoustic_tagging_data.R")

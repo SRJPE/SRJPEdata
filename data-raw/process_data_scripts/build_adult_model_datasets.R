@@ -123,7 +123,7 @@ observed_adult_input <- full_join(upstream_passage_estimates |>
   arrange(stream, year) |>
   left_join(exclude_adult) |> 
   filter(is.na(reason_for_exclusion)) |> 
-  select-c(run, adipose_clipped, reach, reason_for_exclusion)
+  select(-c(run, adipose_clipped, reach, reason_for_exclusion))
   
 
 usethis::use_data(observed_adult_input, overwrite = TRUE)
