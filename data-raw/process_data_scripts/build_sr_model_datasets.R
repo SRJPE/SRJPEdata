@@ -8,7 +8,7 @@ library(tidyverse)
 # rst years to exclude are already applied
 rst_data <- weekly_juvenile_abundance_catch_data |> 
   filter(!is.na(count)) |> 
-  distinct(run_year, stream) |> 
+  distinct(run_year, stream, site) |> 
   mutate(year = run_year,
          rst = T)
 # adults years to exclude already applied
@@ -23,8 +23,45 @@ adult_data <- observed_adult_input |>
   rename(adult_year = year) |> 
   mutate(year =  adult_year + 1)
 
-stock_recruit_year_lookup <- full_join(rst_data, adult_data) 
+stock_recruit_year_lookup <- full_join(rst_data, adult_data) |> 
+  rowwise() |> 
+  mutate(rst = ifelse(is.na(rst), FALSE, rst),
+         adult = ifelse(is.na(adult_year), FALSE, TRUE), 
+         sr_possible = ifelse((isTRUE(rst) & isTRUE(adult)), TRUE, FALSE)) |> 
+  filter(sr_possible) |> 
+  select(-sr_possible) |> # SHOULD REMOVE ALL OF SACRAMENTO
+  # BATTLE CREEK
+  filter(site != "lbc") |> # LBC not used in SR filter to only ubc, see site_overview vignette for why
+  # BUTTE CREEK
+  filter(site != "adams dam") |> # okie should be used in SR, see site_overview vignette for why
+  # CLEAR CREEK
+  filter(site != "ucc") |> # lcc should be used in SR, see site_overview vignette for why
+  # FEATHER RIVER
+  filter(site != "steep riffle", 
+         site != "lower feather river", 
+         site != "gateway riffle", 
+         site != "eye riffle") |> # herringer riffle should be used all years in SR except in 2011 we use sunset pumps, filter all else out, see site_overview vignette for why
+  # YUBA RIVER
+  filter(site != "yuba river") |> 
+  mutate(recommended_adult_data = case_when(stream %in% c("battle creek", "clear creek", "mill creek") ~ "redd", 
+                                           stream == "deer creek" ~ "holding", 
+                                           stream %in% c("butte creek", "feather river") ~ "carcass", 
+                                           stream == "yuba river" ~ "passage")) |> 
+  mutate(have_recommended_adult_data = case_when(stream %in% c("battle creek", "clear creek", "mill creek") & redd ~ TRUE, 
+                                                 stream == "deer creek" & holding ~ TRUE, 
+                                                 stream %in% c("butte creek", "feather river") & carcass ~ TRUE, 
+                                                 stream == "yuba river" &  passage ~ TRUE,
+                                                 TRUE ~ FALSE)) |> 
+  glimpse()
+
+# TODO update with site selections from markdown
+
+View(stock_recruit_year_lookup)
+
+
 usethis::use_data(stock_recruit_year_lookup, overwrite = TRUE)
+
+
 # Combine the adult data and sr covariates
 
 # Todo - fill in recent years for battle and clear

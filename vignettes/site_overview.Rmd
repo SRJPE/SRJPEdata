@@ -32,6 +32,7 @@ colors_full <-  c("#9986A5", "#C18748", #Royal 2
                   "#AC9765", "#b67c3b", "#175149", "#AF4E24", "#CEB175",
                   "#E54E21", "#6C8645", "#C18748", "#FBA72A", "#D3D4D8", "#CB7A5C", "#5785C1")
 
+stock_recruit_site_table <- SRJPEdata::stock_recruit_year_lookup 
 ```
 
 ### Overview
@@ -50,7 +51,7 @@ The Spring Run JPE model considers data from 7 tributaries and the mainstem Sacr
 -   Mill Creek
 -   Yuba River
 
-Each of these tributaries has a unique monitoring setup and number of rotary screw traps (RSTs) that we can use in the SR JPE model. Data for the SR JPE is organized by stream, site, and subsite. `stream` represents the creek or river where the trapping sites are located. `site` represents a unique trapping location whereas `subsite` represents the RST positioning within the `site`. `site group` is used as a helper to group sites that may be more similar than others. For instance, on the Feather River there are multiple sites that have been used over time. It is assumed that sites within the Low Flow Channel are more similar to each other than the sites in the High Flow Channel and vice versa. Some streams only have one site and some sites only have one RST. The important difference is that catch from different subsites within the same site can be added together, whereas catch from different sites cannot be added together as this would be double counting. 
+Each of these tributaries has a unique monitoring setup and number of rotary screw traps (RSTs) that we can use in the SR JPE model. Data for the SR JPE is organized by stream, site, and subsite. `stream` represents the creek or river where the trapping sites are located. `site` represents a unique trapping location whereas `subsite` represents the RST positioning within the `site`. `site group` is used as a helper to group sites that may be more similar than others. For instance, on the Feather River there are multiple sites that have been used over time. It is assumed that sites within the Low Flow Channel are more similar to each other than the sites in the High Flow Channel and vice versa. Some streams only have one site and some sites only have one RST. The important difference is that catch from different subsites within the same site can be added together, whereas catch from different sites cannot be added together as this would be double counting.
 
 This vignette describes the trapping sites that we use for each tributary.
 
@@ -100,35 +101,35 @@ library(leaflet.extras2)
 
 ```
 
-![Map of Rotary Screw Trap Monitoring Locations](images/rst_map.png){width=108%}
+![Map of Rotary Screw Trap Monitoring Locations](images/rst_map.png){width="108%"}
 
-## Table of RST sites 
+## Table of RST sites
 
 The table below is a summary of site selection for the SR JPE Stock Recruit model. If a site has multiple subsites fishing on the same day these will be added together to get total catch or efficiency data for a day.
 
 See sections below on each tributary to understand why sites were recommended as primary sites for Stock Recruit.
 
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| **Stream**       | **Site Group**           | **Site**                                                                                                          | **Subsite**                                                                                                                                                                                                                                                                                                                            | **Recommended Primary Site for Stock Recruit** |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| battle creek     |  battle creek            | ubc                                                                                                               | ubc                                                                                                                                                                                                                                                                                                                                    | ubc                                             |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| butte creek      |  butte creek             | adams dam,                                                                                                        | adams dam, okie dam 1, okie dam 2, okie dam fyke, okie dam rst                                                                                                                                                                                                                                                                         | okie dam                                        |
-|                  |                          |                                                                                                                   |                                                                                                                                                                                                                                                                                                                                        |                                                 |
-|                  |                          | okie dam                                                                                                          |                                                                                                                                                                                                                                                                                                                                        |                                                 |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| clear creek      |  clear creek             | lcc, ucc                                                                                                          | lcc, ucc                                                                                                                                                                                                                                                                                                                               | lcc                                             |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| deer creek       |  deer creek              | deer creek                                                                                                        | deer creek                                                                                                                                                                                                                                                                                                                             | deer creek                                      |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| feather river    | feather river lfc, feather river hfc | eye riffle, gateway riffle, steep riffle, herringer riffle, live oak, shawns beach, sunset pumps, lower feather\* | eye riffle_north, eye riffle_side channel, gateway main 400' up river, gateway_main1, gateway_rootball, gateway_rootball_river_left, #steep riffle_rst, steep riffle_10' ext, steep side channel, herringer_east, herringer_upper_west, herringer_west, live oak, shawns_east, shawns_west, sunset east bank, sunset west bank, rr, rl | feather hfc - herringer riffle                  |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| mill creek       |  mill creek              | mill creek                                                                                                        | mill creek                                                                                                                                                                                                                                                                                                                             | mill creek                                      |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| sacramento river |  knights landing, tisdale | tisdale, knights landing, delta entry\*                                                                           | rr, rl, 8.3, 8.4                                                                                                                                                                                                                                                                                                                       | knights landing                                 |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
-| yuba river       |  yuba river                        | hallwood, yuba river                                                                                              | yub, hal, hal2, hal3                                                                                                                                                                                                                                                                                                                   | hallwood                                        |
-+------------------+--------------------------+-------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| **Stream**       | **Site Group**                          | **Site**                                                                                                         | **Subsite**                                                                                                                                                                                                                                                                                                                             | **Recommended Primary Site for Stock Recruit**  |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| battle creek     | battle creek                            | ubc                                                                                                              | ubc                                                                                                                                                                                                                                                                                                                                     | ubc                                             |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| butte creek      | butte creek                             | adams dam,                                                                                                       | adams dam, okie dam 1, okie dam 2, okie dam fyke, okie dam rst                                                                                                                                                                                                                                                                          | okie dam                                        |
+|                  |                                         |                                                                                                                  |                                                                                                                                                                                                                                                                                                                                         |                                                 |
+|                  |                                         | okie dam                                                                                                         |                                                                                                                                                                                                                                                                                                                                         |                                                 |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| clear creek      | clear creek                             | lcc, ucc                                                                                                         | lcc, ucc                                                                                                                                                                                                                                                                                                                                | lcc                                             |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| deer creek       | deer creek                              | deer creek                                                                                                       | deer creek                                                                                                                                                                                                                                                                                                                              | deer creek                                      |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| feather river    | feather river lfc, feather river hfc    | eye riffle, gateway riffle, steep riffle, herringer riffle, live oak, shawns beach, sunset pumps, lower feather  | eye riffle_north, eye riffle_side channel, gateway main 400' up river, gateway_main1, gateway_rootball, gateway_rootball_river_left, #steep riffle_rst, steep riffle_10' ext, steep side channel, herringer_east, herringer_upper_west, herringer_west, live oak, shawns_east, shawns_west, sunset east bank, sunset west bank, rr, rl  | feather hfc - herringer riffle                  |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| mill creek       | mill creek                              | mill creek                                                                                                       | mill creek                                                                                                                                                                                                                                                                                                                              | mill creek                                      |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| sacramento river | knights landing, tisdale                | tisdale, knights landing, delta entry                                                                            | rr, rl, 8.3, 8.4                                                                                                                                                                                                                                                                                                                        | knights landing                                 |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
+| yuba river       | yuba river                              | hallwood, yuba river                                                                                             | yub, hal, hal2, hal3                                                                                                                                                                                                                                                                                                                    | hallwood                                        |
++------------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------+
 
 ## Choosing Sites
 
@@ -144,6 +145,16 @@ The SR JPE modeling team selected Upper Battle Creek as the primary site to use 
 
 Lower Battle Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. If the Battle Creek monitoring team adds LBC RST back into ongoing monitoring, this site may be used in combination with UBC for the Stock Recruit.
 
+**Table of Year, Stream, and Site for Stock Recruit**
+
+```{r, echo = FALSE}
+battle_sr <- stock_recruit_site_table |>  
+  filter(stream == "battle creek") |> 
+  select(year, stream, site, run_year, rst, adult_year, adult)
+
+knitr::kable(battle_sr) 
+```
+
 ### Butte Creek
 
 Historically, multiple rotary screw trapping sites have operated on Butte Creek. Currently, only 1 site is in operation, the Okie Dam site, also referred to as Parrott-Phalen Diversion Dam.
@@ -155,6 +166,18 @@ The SR JPE modeling team selected Okie Dam as the primary site to use for the St
 ***Secondary site*****:**
 
 Additional Adams Dam efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis.
+
+**Table of Year, Stream, and Site for Stock Recruit**
+
+```{r, echo = FALSE}
+butte_sr <- stock_recruit_site_table |>  
+  filter(stream == "butte creek") |> 
+  select(year, stream, site, run_year, rst, adult_year, adult)
+
+knitr::kable(butte_sr) 
+```
+
+###  
 
 ### Clear Creek
 
@@ -173,13 +196,37 @@ Upper Clear Creek efficiency or catch data may be used in fitting the juvenile a
 
 If for some reason LCC (SR based on PLAD) and UCC counts do not align, we can reassess our decision to use LCC as our primary trap. In this case, we will have to do an spawning adult data analysis to come up with an adult scaling factor to ensure that we are scaling up our UCC estimates to account for downstream spawners that we are missing.
 
+**Table of Year, Stream, and Site for Stock Recruit**
+
+```{r, echo = FALSE}
+clear_sr <- stock_recruit_site_table |>  
+  filter(stream == "clear creek") |> 
+  select(year, stream, site, run_year, rst, adult_year, adult)
+
+knitr::kable(clear_sr) 
+```
+
+### 
+
 ### Deer Creek
 
 There is only one RST operated on Deer Creek. This trap will be used in the Stock Recruit.
 
+**Table of Year, Stream, and Site for Stock Recruit**
+
+```{r, echo = FALSE}
+deer_sr <- stock_recruit_site_table |>  
+  filter(stream == "deer creek") |> 
+  select(year, stream, site, run_year, rst, adult_year, adult)
+
+knitr::kable(deer_sr) 
+```
+
+### 
+
 ### Feather River
 
-On Feather River there are many rotary screw trapping sites. Consistently, a Low Flow Channel site (between Orville Dam and the Thermalito after bay) and a High Flow Channel site (after Thermalito after bay) are monitored each year. In 2022, a new RST program started on the Lower Feather River below the confluence with the Yuba River. This RST captures juveniles from both Yuba and Feather rivers. 
+On Feather River there are many rotary screw trapping sites. Consistently, a Low Flow Channel site (between Orville Dam and the Thermalito after bay) and a High Flow Channel site (after Thermalito after bay) are monitored each year. In 2022, a new RST program started on the Lower Feather River below the confluence with the Yuba River. This RST captures juveniles from both Yuba and Feather rivers.
 
 ***Primary site selected: Herringer Riffle (High Flow Channel)***
 
@@ -193,9 +240,33 @@ Eye Riffle efficiency or catch data may be used in fitting the juvenile abundanc
 
 The Lower Feather River site will be used in the SR JPE modeling but will not be used directly to fit a Stock Recruit in a tributary specific model. This could be used in as part of a mainstem model or to do a joint Feather and Yuba river model.
 
+**Table of Year, Stream, and Site for Stock Recruit**
+
+```{r, echo = FALSE}
+feather_sr <- stock_recruit_site_table |>  
+  filter(stream == "feather river") |> 
+  select(year, stream, site, run_year, rst, adult_year, adult)
+
+knitr::kable(feather_sr) 
+```
+
+### 
+
 ### Mill Creek
 
 There is only one RST operated on Mill Creek. This trap will be used in the Stock Recruit.
+
+**Table of Year, Stream, and Site for Stock Recruit**
+
+```{r, echo = FALSE}
+mill_sr <- stock_recruit_site_table |>  
+  filter(stream == "mill creek") |> 
+  select(year, stream, site, run_year, rst, adult_year, adult)
+
+knitr::kable(mill_sr)
+```
+
+### 
 
 ### Yuba River
 
@@ -208,3 +279,15 @@ The SR JPE modeling team selected Hallwood as the primary site to use for the St
 ***Secondary site:***
 
 Additional Yuba River efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis.
+
+**Table of Year, Stream, and Site for Stock Recruit**
+
+```{r, echo = FALSE}
+yuba_sr <- stock_recruit_site_table |>  
+  filter(stream == "yuba river") |> 
+  select(year, stream, site, run_year, rst, adult_year, adult)
+
+knitr::kable(yuba_sr)
+```
+
+### 
