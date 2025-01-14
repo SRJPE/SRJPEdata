@@ -420,7 +420,7 @@ upstream_summary <- standard_upstream %>%
   group_by(stream, week, year) %>%
   tally()
 
-upstream_weekly <- upstream_summary %>% glimpse()
+upstream_weekly <- upstream_summary %>% 
   # add catch_date_week to make sure all weeks are included in the data
   right_join(select(upstream_date_week, week) %>% 
                distinct()) %>% 
