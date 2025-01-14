@@ -120,6 +120,27 @@ observed_adult_input <- full_join(upstream_passage_estimates |>
           stream = "clear creek",
           data_type = "upstream_estimate",
           count = 0) |> 
+  # source of below data is e-mail chain from ashley / sam provins / gabby week of 1/14/2025
+  add_row(year = 2022,
+          stream = "battle creek",
+          data_type = "upstream_estimate",
+          count = 152) |> 
+  add_row(year = 2023,
+          stream = "battle creek",
+          data_type = "upstream_estimate",
+          count = 7) |> # one of these was a feather river spring run
+  add_row(year = 2024,
+          stream = "battle creek",
+          data_type = "upstream_estimate",
+          count = 30) |> 
+  add_row(year = 2024,
+          stream = "clear creek",
+          data_type = "upstream_estimate",
+          count = 6) |> 
+  add_row(year = 2024,
+          stream = "clear creek",
+          data_type = "redd_count",
+          count = 4) |> 
   arrange(stream, year) |>
   left_join(exclude_adult) |> 
   filter(is.na(reason_for_exclusion)) |> 
