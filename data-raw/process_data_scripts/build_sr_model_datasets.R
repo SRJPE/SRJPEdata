@@ -9,7 +9,7 @@ library(tidyverse)
 rst_data <- weekly_juvenile_abundance_catch_data |> 
   filter(!is.na(count)) |> 
   distinct(run_year, stream, site) |> 
-  mutate(year = run_year,
+  mutate(brood_year = run_year - 1,
          rst = T)
 # adults years to exclude already applied
 adult_data <- observed_adult_input |> 
@@ -20,13 +20,12 @@ adult_data <- observed_adult_input |>
          holding = ifelse(holding_count == "NULL", F, T),
          carcass = ifelse(carcass_estimate == "NULL", F, T)) |> 
   select(year, stream, passage, redd, holding, carcass) |> 
-  rename(adult_year = year) |> 
-  mutate(year =  adult_year + 1)
+  rename(brood_year = year)
 
 stock_recruit_year_lookup <- full_join(rst_data, adult_data) |> 
   rowwise() |> 
   mutate(rst = ifelse(is.na(rst), FALSE, rst),
-         adult = ifelse(is.na(adult_year), FALSE, TRUE), 
+         adult = ifelse((is.na(carcass) & is.na(passage) & is.na(redd) & is.na(holding)), FALSE, TRUE), 
          sr_possible = ifelse((isTRUE(rst) & isTRUE(adult)), TRUE, FALSE)) |> 
   filter(sr_possible) |> 
   select(-sr_possible) |> # SHOULD REMOVE ALL OF SACRAMENTO
