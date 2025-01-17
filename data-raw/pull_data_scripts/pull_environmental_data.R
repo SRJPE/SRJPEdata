@@ -74,6 +74,32 @@ battle_creek_daily_temp <- ubc_temp_raw |>
 ### Flow Data Pull Tests
 try(butte_creek_data_query <- CDECRetrieve::cdec_query(station = "BCK", dur_code = "H", sensor_num = "20", start_date = "1995-01-01"))
 # Filter existing data to use as a back up 
+# Add data to fill pre 1997 - only need to do once
+
+# BCK_USGS <- readNWISdv(11390000, "00060")
+# BCK_daily_flows <- BCK_USGS %>%
+#   select(Date, flow_cfs =  X_00060_00003) %>%
+#   filter(lubridate::year(Date) == 1996) %>%
+#   as_tibble() %>% 
+#   rename(date = Date) |> 
+#   mutate(parameter_value = ifelse(flow_cfs < 0, NA_real_, flow_cfs)) |> 
+#   mutate(stream = "butte creek",
+#          site_group = "butte creek",
+#          gage_agency = "USGS",
+#          gage_number = "BCK",
+#          parameter = "flow") |> 
+#   group_by(week = week(date), 
+#            month = month(date),
+#            year = year(date), 
+#            stream, 
+#            gage_number, 
+#            gage_agency, 
+#            site_group, 
+#            parameter) |> 
+#   summarize(mean = mean(parameter_value, na.rm = TRUE),
+#             max = max(parameter_value, na.rm = TRUE),
+#             min = min(parameter_value, na.rm = TRUE)) |> 
+#   pivot_longer(mean:min, names_to = "statistic", values_to = "value")
 butte_creek_existing_flow  <- SRJPEdata::environmental_data |> 
   filter(gage_agency == "CDEC" & 
            gage_number == "BCK" & 
@@ -749,7 +775,7 @@ longer_updated_environmental_data <- updated_environmental_data |>
   pivot_longer(max:min, names_to = "statistic", values_to = "value") |> glimpse()
   
 # environmental_data <- longer_updated_environmental_data
-environmental_data <- bind_rows(SRJPEdata::environmental_data, longer_updated_environmental_data)
+environmental_data <- bind_rows(SRJPEdata::environmental_data, longer_updated_environmental_data) |> bind_rows(BCK_daily_flows)
 
 #Save package
 usethis::use_data(environmental_data, overwrite = TRUE)
