@@ -390,6 +390,7 @@ The heat map below shows when video monitoring occurs for all streams. Some vide
 
 ```{r, echo = FALSE}
 #TODO strange that max is 4.5
+#TODO upstream passage is still empty! Need to fix 
 standard_upstream <- SRJPEdata::upstream_passage
 upstream_date_week <- standard_upstream %>% 
   mutate(day = day(date),
@@ -497,7 +498,8 @@ plotly::ggplotly(redd_heat_map)
 We utilized above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling for adult data. See a section of the "years to exclude" table below.
 
 ```{r, echo = FALSE}
-years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv"))
+years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
+  select(-TODOS) 
 usethis::use_data(years_to_exclude_adult, overwrite = TRUE)
 years_exclude_nice_names_adult <- years_to_exclude_adult |> select("Stream" = stream, 
                                                     "Year" = year, 
