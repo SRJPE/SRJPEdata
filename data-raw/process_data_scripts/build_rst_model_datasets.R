@@ -13,7 +13,6 @@ SRJPEdata::rst_catch |> glimpse()
 updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
 chosen_site_years_to_model |> glimpse() 
 # Note: updated below years_to_include to chosen_site_years_to_model (this is more up to date version)
-# TODO however, years_to_include included a subsite (CONFIRM that we do not need subsite), after discussing, delete old version
 
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
@@ -39,7 +38,9 @@ rst_all_weeks <- rst_catch |>
               rename(run_year = monitoring_year) |> 
               mutate(include = T)) |> 
   filter(include == T) |> 
-  select(-include)
+  select(-include) |> 
+  filter(run_year != 2025) # TODO remove once we want to include 2025 data
+
 
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 ### ----------------------------------------------------------------------------
@@ -237,7 +238,8 @@ weekly_model_data_wo_efficiency_flows <- catch_reformatted |>
   ungroup() |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year),
          catch_standardized_by_hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)), count, round(count * average_stream_hours_fished / hours_fished, 0)),
-         hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)) & count >= 0, average_stream_hours_fished, hours_fished)
+         hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)) & count >= 0, average_stream_hours_fished, hours_fished),
+         hours_fished = ifelse(is.na(count), 0, hours_fished) # adds 0 hours fished for padded weeks with NA catch
          ) |> # add logic for situations where trap data is missing
   glimpse()
 
@@ -297,8 +299,7 @@ weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data_raw
   left_join(remove_run_year) |> 
   mutate(remove = ifelse(is.na(remove), F, remove)) |> 
   filter(remove == F) |> 
-  select(-remove)
-  
+  select(-remove) 
 
 # filter to only include complete season data 
 if (month(Sys.Date()) %in% c(9:12, 1:5)) {
@@ -335,6 +336,7 @@ weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_dat
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
 
 # write to package 
-usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE)
+usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE) 
 usethis::use_data(weekly_juvenile_abundance_efficiency_data, overwrite = TRUE)
-usethis::use_data(weekly_efficiency, overwrite = TRUE)
+usethis::use_data(weekly_efficiency, overwrite = TRUE) 
+
