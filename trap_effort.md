@@ -29,15 +29,49 @@ Below is the code for each of the methods described above:
 1) If the start and stop date/time of the sampling period are available, simply subtract the difference in time.
 
 
+``` r
+# calculating hours fished when have start and stop datetime
+hours_fished <- function(dat){
+  dat %>%
+    filter(!is.na(trap_stop_time), !is.na(trap_start_time)) %>%
+    mutate(start_datetime = ymd_hms(paste(trap_start_date, trap_start_time)),
+           stop_datetime = ymd_hms(paste(trap_stop_date, trap_stop_time)),
+           hours_fished = round(difftime(stop_datetime, start_datetime, units = "hours"), 2))
+}
+```
 
 2) If the RPMs start, RPMs end, and total revolutions are available, 
 take the average cone RPMs and divide `total_revolutions`/average RMP/60 to get total hours fished.
 
 
+``` r
+# calculating hours fished when have start and stop datetime
+revolution_calculated_hours_fished <- function(dat){
+  dat %>%
+    filter(!is.na(rpm_start) | !is.na(rpm_end), !is.na(total_revolutions)) %>% 
+    mutate(prior_day_rpm = ifelse(is.na(rpm_end), NA, lag(rpm_end)),
+           sum_rpms = ifelse(is.na(prior_day_rpm), rpm_start, rpm_start + prior_day_rpm), 
+           cone_rpms = sum_rpms / 2,
+           hours_fished = case_when(is.na(rpm_start) ~ round(total_revolutions/rpm_end/60, 2),
+                                    is.na(rpm_end) ~ round(total_revolutions/rpm_start/60, 2), 
+                                    TRUE ~ round(total_revolutions/cone_rpms/60, 2)))
+}
+```
 
 3) If only one date is available, assume that the end date is the date sampled on the following day.
 
 
+``` r
+# calculating hours fished when have only date and time
+hours_fished_one_date <- function(dat) {
+  dat %>%
+  arrange(site, subsite, start_datetime) %>%
+  mutate(end_datetime = lead(start_datetime),
+         end_datetime = case_when(difftime(end_datetime, start_datetime, units = "hours") > 120 ~ start_datetime + hours(24), 
+                                  T ~ end_datetime),
+         hours_fished = round(difftime(end_datetime, start_datetime, units = "hours"), 2))
+}
+```
 
 ### Other Assumptions
 
@@ -60,7 +94,6 @@ These occur because trap visit data was entered when the trap was not in service
 then a new trap visit entry was recorded once the trap started working again.
 
 
-
 |start_datetime      |stop_datetime       |site       |subsite          |stream        |hours_fished_methodology       |hours_fished |
 |:-------------------|:-------------------|:----------|:----------------|:-------------|:------------------------------|:------------|
 |1997-12-22 10:40:00 |1997-12-22 10:40:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |0.00 hours   |
@@ -68,8 +101,6 @@ then a new trap visit entry was recorded once the trap started working again.
 |1997-12-26 13:56:00 |1997-12-26 13:56:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |0.00 hours   |
 |1997-12-26 13:56:00 |1997-12-27 09:56:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |20.00 hours  |
 |1997-12-27 09:56:00 |1997-12-28 09:11:00 |eye riffle |eye riffle_north |feather river |using start time and stop time |23.25 hours  |
-
-
 
 ### QC
 
@@ -88,7 +119,6 @@ Hours fished are calculated by taking the difference between the date/time at ea
 observation. 
 
 
-
 |start_datetime      |end_datetime        |site      |subsite   |stream      |hours_fished_methodology | hours_fished|
 |:-------------------|:-------------------|:---------|:---------|:-----------|:------------------------|------------:|
 |1997-01-18 09:00:00 |1997-01-19 09:00:00 |adams dam |adams dam |butte creek |using only start time    |        24.00|
@@ -96,8 +126,6 @@ observation.
 |1997-03-11 07:00:00 |1997-03-12 09:15:00 |adams dam |adams dam |butte creek |using only start time    |        26.25|
 |1997-03-12 09:15:00 |1997-03-15 09:00:00 |adams dam |adams dam |butte creek |using only start time    |        71.75|
 |1997-03-15 09:00:00 |1997-03-16 09:30:00 |adams dam |adams dam |butte creek |using only start time    |        24.50|
-
-
 
 ### QC
 
@@ -116,7 +144,6 @@ Mill & Deer creeks also do not have sample period revolutions so we cannot use t
 fished. We therefore assume 24 hours fished for every day with data. 
 
 
-
 |trap_stop_date |stream     |site       |subsite    |site_group |hours_fished_methodology | hours_fished|
 |:--------------|:----------|:----------|:----------|:----------|:------------------------|------------:|
 |1992-10-14     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
@@ -124,8 +151,6 @@ fished. We therefore assume 24 hours fished for every day with data.
 |1992-10-30     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
 |1992-11-04     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
 |1992-11-05     |deer creek |deer creek |deer creek |deer creek |24 hour assumption       |           24|
-
-
 
 
 # Combine Data
@@ -140,21 +165,21 @@ We grouped hours fished data by site, subsite, week, and year and summarized to 
 
 
 ```
-#> # A tibble: 288 × 5
-#> # Groups:   year, stream, site [69]
-#>     year stream           site                    subsite     n
-#>    <int> <chr>            <chr>                   <chr>   <int>
-#>  1  1994 sacramento river red bluff diversion dam gate 1      5
-#>  2  1994 sacramento river red bluff diversion dam gate 10     4
-#>  3  1994 sacramento river red bluff diversion dam gate 11     6
-#>  4  1994 sacramento river red bluff diversion dam gate 3     12
-#>  5  1994 sacramento river red bluff diversion dam gate 5     16
-#>  6  1994 sacramento river red bluff diversion dam gate 7     11
-#>  7  1994 sacramento river red bluff diversion dam gate 9     16
-#>  8  1995 sacramento river knights landing         8.3         3
-#>  9  1995 sacramento river knights landing         8.4         7
-#> 10  1995 sacramento river red bluff diversion dam gate 1     33
-#> # ℹ 278 more rows
+## # A tibble: 288 × 5
+## # Groups:   year, stream, site [69]
+##     year stream           site                    subsite     n
+##    <int> <chr>            <chr>                   <chr>   <int>
+##  1  1994 sacramento river red bluff diversion dam gate 1      5
+##  2  1994 sacramento river red bluff diversion dam gate 10     4
+##  3  1994 sacramento river red bluff diversion dam gate 11     6
+##  4  1994 sacramento river red bluff diversion dam gate 3     12
+##  5  1994 sacramento river red bluff diversion dam gate 5     16
+##  6  1994 sacramento river red bluff diversion dam gate 7     11
+##  7  1994 sacramento river red bluff diversion dam gate 9     16
+##  8  1995 sacramento river knights landing         8.3         3
+##  9  1995 sacramento river knights landing         8.4         7
+## 10  1995 sacramento river red bluff diversion dam gate 1     33
+## # ℹ 278 more rows
 ```
 
 ### QC

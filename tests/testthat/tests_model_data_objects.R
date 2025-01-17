@@ -137,8 +137,8 @@ test_that("test that there is data for each site week combo", {
                catch_n_rows)
 })
 
-# test_join <- current_site_year_raw |> 
-#   rename(current_site_year = site_year) |> 
+# test_join <- current_site_year_raw |>
+#   rename(current_site_year = site_year) |>
 #   full_join(chosen_site_year_raw)
 
 # no missing values where we have catch

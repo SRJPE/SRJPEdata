@@ -17,7 +17,7 @@ test_that("RST catch data coverage at the tributary level has not changed", {
 test_that("No NA values in identifying catch data variables", {
   expect_equal(any(is.na(rst_catch$stream)), FALSE)
   expect_equal(any(is.na(rst_catch$site)), FALSE)
-  expect_equal(any(is.na(rst_catch$subsite)), FALSE) 
+  expect_equal(any(is.na(rst_catch$subsite)), FALSE) # note this happens for okie dam and yuba river
   expect_equal(any(is.na(rst_catch$site_group)), FALSE)
   expect_equal(any(is.na(rst_catch$date)), FALSE)
 })
@@ -35,8 +35,8 @@ test_that("RST trap data coverage at the tributary level has not changed", {
 # # No NA stream, site, subsite, site group
 test_that("No NA values in identifying trap data variables", {
   expect_equal(any(is.na(rst_trap$stream)), FALSE)
-  expect_equal(any(is.na(rst_trap$site)), FALSE)
-  expect_equal(any(is.na(rst_trap$subsite)), FALSE)
+  expect_equal(any(is.na(rst_trap$site)), FALSE) # this happens for battle creek
+  expect_equal(any(is.na(rst_trap$subsite)), FALSE) # this happens for battle, butte, yuba
   expect_equal(any(is.na(rst_trap$site_group)), FALSE)
 })
 
@@ -53,9 +53,8 @@ test_that("Always one non NA value in trap date variables", {
 test_that("RST release data coverage at the tributary level has not changed", {
   current_coverage <- release$stream |> unique() |> sort()
   
-  #TODO we seem to be missing mill, deer, & yuba release data
   expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", 
-                         "feather river", "mill creek", "sacramento river")
+                         "feather river", "mill creek", "sacramento river", "yuba river")
   expect_equal(current_coverage, expected_coverage)
 })
 
@@ -71,14 +70,14 @@ test_that("RST recapture data coverage at the tributary level has not changed", 
   current_coverage <- recaptures$stream |> unique() |> sort()
   
   expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", 
-                         "feather river", "mill creek", "sacramento river")
+                         "feather river", "mill creek", "sacramento river", "yuba river")
   expect_equal(current_coverage, expected_coverage)
 })
 
 test_that("No NA values in identifying recapture data variables", {
   expect_equal(any(is.na(recaptures$stream)), FALSE)
   expect_equal(any(is.na(recaptures$site)), FALSE)
-  expect_equal(any(is.na(recaptures$subsite)), FALSE) 
+  expect_equal(any(is.na(recaptures$subsite)), FALSE) # this happens for knights and tisdale
   expect_equal(any(is.na(recaptures$site_group)), FALSE) # TODO there should not be NAs here right? 
   expect_equal(any(is.na(recaptures$date)), FALSE)
 })

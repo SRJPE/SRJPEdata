@@ -35,25 +35,6 @@ Butte Creek is used to build the regression models because the time series is co
 
 
 
-## Feather River
-
-### Data Preparation and Approach
-
-1. Pull in gage data from CDEC (GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC))
-* GRL (2003-03-05 to 2007-06-01 H; 2020-01-04 to present): located after Thermalito Afterbay
-* FRA (2002-01-01 to present): located between Lake Oroville and Thermalito Afterbay
-
-2. Prepare datasets for regression analysis
-* Dataset with no missing data to train and test the model (Butte Creek and Feather River)
-* Dataset with missing data to make predictions (Feather River)
-
-3. Use data where there are no missing data from either dataset for regression modeling
-
-4. Use the regression model to make predictions from the testing dataset and evaluate
-
-5. Use the model to make predictions for missing data
- 
-
 
 
 
