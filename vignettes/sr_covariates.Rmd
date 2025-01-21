@@ -368,7 +368,7 @@ stock_recruit_covariates <- std_temp_dd_spawn |>
   mutate(lifestage = "spawning and incubation",
          covariate_type = "temperature") |> 
   full_join(std_temp_7dadm_final |> 
-              mutate(lifestage = NA_character_,
+              mutate(lifestage = "spawning and incubation",
                      covariate_type = "temperature")) |> 
   full_join(std_temp_weekly |> 
               mutate(lifestage = "spawning and incubation",
