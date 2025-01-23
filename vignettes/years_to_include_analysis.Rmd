@@ -9,8 +9,13 @@ vignette: >
 
 ```{r, include = FALSE}
 # Instructions for updating the years to exclude ###############################
-
-
+# The years to exclude list is maintained within csvs in data-raw/helper-tables.
+# If a year to exclude needs to be added or removed, please do so directly in the
+# csv. The simplest way to do this is:
+# 1. Open the csv, make the update, save the csv
+# 2. Run the "years_to_include_analysis.Rmd" which will save the updated years to exclude
+# data objects in the package.
+# 3. Commit and push your changes!
 
 knitr::opts_chunk$set(
   collapse = TRUE,
