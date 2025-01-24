@@ -48,7 +48,6 @@ try(if(!exists("battle_creek_data_query"))
          ) |> 
       pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -79,15 +78,16 @@ battle_creek_weekly_temp <- ubc_temp_raw |>
   summarise(mean = mean(temp_degC, na.rm = TRUE),
             max = max(temp_degC, na.rm = TRUE),
             min = min(temp_degC, na.rm = TRUE)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+  group_by(year = year(date)) |> # add 7dadm for a stock recruit covariate
+  arrange(date) |> 
+  mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+  select(-year) |> 
   mutate(stream = "battle creek",  
          site_group = "battle creek",
          gage_agency = "USFWS",
          gage_number = "UBC",
          parameter = "temperature") |> 
-  pivot_wider(names_from = "statistic", values_from = "value") |> 
   group_by(week = week(date),
-           month = month(date),
            year = year(date),
            stream, 
            gage_number, 
@@ -97,9 +97,10 @@ battle_creek_weekly_temp <- ubc_temp_raw |>
   summarize(
     max = max(max, na.rm = TRUE), 
     mean = mean(mean, na.rm = TRUE),
-    min = min(min, na.rm = TRUE)
+    min = min(min, na.rm = TRUE),
+    mean_7dadm = mean(roll_7, na.rm = T)
   ) |> 
-  pivot_longer(cols = c(max, mean, min), names_to = "statistic", values_to = "value")
+  pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
 
 ## Butte Creek ----
 ### Flow Data Pull 
@@ -151,13 +152,14 @@ try(if(!exists("butte_creek_data_query"))
          summarise(mean = mean(parameter_value, na.rm = TRUE),
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
+         
+         pivot_longer(mean:roll_7, names_to = "statistic", values_to = "value") |>
          mutate(stream = "butte creek",
                 site_group = "butte creek",
                 gage_agency = "CDEC",
                 gage_number = "BCK",
                 parameter = "flow") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -197,13 +199,16 @@ try(if(!exists("butte_creek_temp_query"))
          summarise(mean = mean(temp_degC, na.rm = TRUE),
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |> 
+         group_by(year = year(date)) |> # 7dadm for stock recruit covariate
+         arrange(date) |> 
+         mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+         select(-year) |> 
          mutate(stream = "butte creek",
                 site_group = "butte creek",
                 gage_agency = "CDEC",
                 gage_number = "BCK",
                 parameter = "temperature") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -213,9 +218,10 @@ try(if(!exists("butte_creek_temp_query"))
          summarize(
            max = max(max, na.rm = TRUE), 
            mean = mean(mean, na.rm = TRUE),
-           min = min(min, na.rm = TRUE)
+           min = min(min, na.rm = TRUE),
+           mean_7dadm = mean(roll_7, na.rm = T)
          ) |> 
-         pivot_longer(cols = c(max, mean, min), names_to = "statistic", values_to = "value")
+         pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
        ))
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data 
@@ -252,7 +258,6 @@ try(if(!exists("clear_creek_data_query"))
          ) |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -285,6 +290,10 @@ upperclear_creek_weekly_temp <- upperclear_temp_raw |>
   summarise(mean = mean(temp_degC, na.rm = TRUE),
             max = max(temp_degC),
             min = min(temp_degC)) |> 
+  group_by(year = year(date)) |> # 7dadm
+  arrange(date) |> 
+  mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+  select(-year) |> 
   mutate(stream = "clear creek",  
          site_group = "clear creek",
          site = "ucc",
@@ -292,7 +301,6 @@ upperclear_creek_weekly_temp <- upperclear_temp_raw |>
          gage_number = "UCC",
          parameter = "temperature") |> 
   group_by(week = week(date),
-           month = month(date),
            year = year(date),
            stream, 
            gage_number, 
@@ -302,9 +310,10 @@ upperclear_creek_weekly_temp <- upperclear_temp_raw |>
   summarize(
     max = max(max, na.rm = TRUE), 
     mean = mean(mean, na.rm = TRUE),
-    min = min(min, na.rm = TRUE)
+    min = min(min, na.rm = TRUE),
+    mean_7dadm = mean(roll_7, na.rm = T)
   ) |> 
-  pivot_longer(cols = c(max, mean, min), names_to = "statistic", values_to = "value")
+  pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
 
 #Lower Clear Creek
 lowerclear_temp_raw <- readxl::read_excel(here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"), sheet = 3)
@@ -317,6 +326,10 @@ lowerclear_creek_weekly_temp <- lowerclear_temp_raw |>
   summarise(mean = mean(temp_degC, na.rm = TRUE),
             max = max(temp_degC),
             min = min(temp_degC)) |> 
+  group_by(year = year(date)) |> # 7dadm
+  arrange(date) |> 
+  mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+  select(-year) |> 
   mutate(stream = "clear creek", 
          site_group = "clear creek",
          site = "lcc",
@@ -324,7 +337,6 @@ lowerclear_creek_weekly_temp <- lowerclear_temp_raw |>
          gage_number = "LCC",
          parameter = "temperature") |> 
   group_by(week = week(date),
-           month = month(date),
            year = year(date),
            stream, 
            gage_number, 
@@ -334,10 +346,10 @@ lowerclear_creek_weekly_temp <- lowerclear_temp_raw |>
   summarize(
     max = max(max, na.rm = TRUE), 
     mean = mean(mean, na.rm = TRUE),
-    min = min(min, na.rm = TRUE)
+    min = min(min, na.rm = TRUE),
+    mean_7dadm = mean(roll_7, na.rm = T)
   ) |> 
-  pivot_longer(cols = c(max, mean, min), names_to = "statistic", values_to = "value")
-
+  pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
 ## Deer Creek ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11383500)
@@ -367,7 +379,6 @@ try(if(!exists("deer_creek_data_query"))
                 statistic = "mean") |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -407,13 +418,16 @@ try(if(!exists("deer_creek_temp_query"))
          summarise(mean = mean(temp_degC, na.rm = TRUE),
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |>
+         group_by(year = year(date)) |> # 7dadm
+         arrange(date) |> 
+         mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+         select(-year) |> 
          mutate(stream = "deer creek",
                 site_group = "deer creek",
                 gage_agency = "CDEC",
                 gage_number = "DCV",
                 parameter = "temperature") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -423,9 +437,10 @@ try(if(!exists("deer_creek_temp_query"))
          summarize(
            max = max(max, na.rm = TRUE), 
            mean = mean(mean, na.rm = TRUE),
-           min = min(min, na.rm = TRUE)
+           min = min(min, na.rm = TRUE),
+           mean_7dadm = mean(roll_7, na.rm = T)
          ) |> 
-         pivot_longer(cols = c(max, mean, min), names_to = "statistic", values_to = "value")
+         pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
        ))
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data 
@@ -463,7 +478,6 @@ try(if(!exists("feather_hfc_river_data_query"))
                 parameter = "flow"
          ) |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -507,7 +521,6 @@ try(if(!exists("feather_lfc_river_data_query"))
          ) |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -552,7 +565,6 @@ try(if(!exists("lower_feather_river_data_query"))
                 parameter = "flow"
          ) |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -580,7 +592,12 @@ feather_hfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", 
   mutate(date = as_date(date)) |> 
   mutate(parameter = "temperature",
          site_group = "upper feather hfc") |> 
-  glimpse()
+  pivot_wider(names_from = "statistic", values_from = "value") |> 
+  group_by(year = year(date)) |> 
+  arrange(date) |> 
+  mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+  select(-year) |> 
+  pivot_longer(mean:roll_7, names_to = "statistic", values_to = "value") 
 
 #Note: There is no current updated gage for Feather High Flow Channel, we initially
 #explored GRL gage from CDEC but most recent data is from 2007. Overall data coverage
@@ -591,7 +608,12 @@ feather_lfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", 
   mutate(date = as_date(date)) |> 
   mutate(parameter = "temperature",
          site_group = "upper feather lfc") |> 
-  glimpse()
+  pivot_wider(names_from = "statistic", values_from = "value") |> 
+  group_by(year = year(date)) |> 
+  arrange(date) |> 
+  mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+  select(-year) |> 
+  pivot_longer(mean:roll_7, names_to = "statistic", values_to = "value") 
 
 ### Temp Data Pull 
 #### Gage #FRA
@@ -616,7 +638,11 @@ try(if(!exists("feather_lfc_temp_query"))
          summarise(mean= mean(parameter_value, na.rm = TRUE),
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+         group_by(year = year(date)) |> # 7dadm
+         arrange(date) |> 
+         mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+         select(-year) |> 
+         pivot_longer(mean:roll_7, names_to = "statistic", values_to = "query_value") |>
          full_join(feather_lfc_interpolated) |> 
          # we want to use the query values instead of the interpolated values where they exist
          mutate(value = ifelse(!is.na(query_value), query_value, value),
@@ -628,7 +654,6 @@ try(if(!exists("feather_lfc_temp_query"))
          select(-query_value) |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -638,9 +663,10 @@ try(if(!exists("feather_lfc_temp_query"))
          summarize(
            max = max(max, na.rm = TRUE), 
            mean = mean(mean, na.rm = TRUE),
-           min = min(min, na.rm = TRUE)
+           min = min(min, na.rm = TRUE),
+           mean_7dadm = mean(roll_7, na.rm = T)
          ) |> 
-         pivot_longer(cols = c(max,mean,min), names_to = "statistic", values_to = "value")
+         pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
   ))
 
 # Do a few additional temperature data pull tests to confirm that new data pull has 
@@ -669,7 +695,11 @@ try(if(!exists("feather_hfc_temp_query"))
          summarise(mean= mean(parameter_value, na.rm = TRUE),
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+         group_by(year(date)) |> # 7dadm
+         arrange(date) |> 
+         mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+         select(-year) |> 
+         pivot_longer(mean:roll_7, names_to = "statistic", values_to = "query_value") |>
          full_join(feather_hfc_interpolated) |> 
          # we want to use the query values instead of the interpolated values where they exist
          mutate(value = ifelse(!is.na(query_value), query_value, value),
@@ -681,7 +711,6 @@ try(if(!exists("feather_hfc_temp_query"))
          select(-query_value) |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -691,9 +720,10 @@ try(if(!exists("feather_hfc_temp_query"))
          summarize(
            max = max(max, na.rm = TRUE), 
            mean = mean(mean, na.rm = TRUE),
-           min = min(min, na.rm = TRUE)
+           min = min(min, na.rm = TRUE),
+           mean_7dadm = mean(roll_7, na.rm = T)
          ) |> 
-         pivot_longer(cols = c(max,mean,min), names_to = "statistic", values_to = "value")
+         pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
   ))
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data 
@@ -730,7 +760,6 @@ try(if(!exists("mill_creek_data_query"))
          ) |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -770,13 +799,16 @@ try(if(!exists("mill_creek_temp_query"))
          summarise(mean = mean(temp_degC, na.rm = TRUE),
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |> 
+         group_by(year = year(date)) |> # 7dadm
+         arrange(date) |> 
+         mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+         select(-year) |> 
          mutate(stream = "mill creek",
                 site_group = "mill creek",
                 gage_agency = "CDEC",
                 gage_number = "MLM",
                 parameter = "temperature") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -786,9 +818,10 @@ try(if(!exists("mill_creek_temp_query"))
          summarize(
            max = max(max, na.rm = TRUE), 
            mean = mean(mean, na.rm = TRUE),
-           min = min(min, na.rm = TRUE)
+           min = min(min, na.rm = TRUE),
+           mean_7dadm = mean(roll_7, na.rm = T)
          ) |> 
-         pivot_longer(cols = c(max,mean,min), names_to = "statistic", values_to = "value")
+         pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
        ))
 # Do a few additional temperature data pull tests to confirm that new data pull has 
 # more data  
@@ -824,7 +857,6 @@ try(if(!exists("sac_river_data_query"))
          ) |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -867,7 +899,6 @@ try(if(!exists("sac_river_temp_query"))
                 statistic = "mean") |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -915,7 +946,6 @@ try(if(!exists("yuba_river_data_query"))
          ) |> 
          pivot_wider(names_from = "statistic", values_from = "value") |> 
          group_by(week = week(date),
-                  month = month(date),
                   year = year(date),
                   stream, 
                   gage_number, 
@@ -938,6 +968,12 @@ try(if(nrow(yuba_river_weekly_flows) < nrow(yuba_river_existing_flow))
 #### Interpolation pull for Yuba
 yuba_river_interpolated <- read_csv(here::here("data-raw", "temperature-data", "yuba_temp_interpolation.csv")) |> 
   mutate(parameter = "temperature") |> 
+  pivot_wider(names_from = "statistic", values_from = "value") |> 
+  group_by(year = year(date)) |> 
+  arrange(date) |> 
+  mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+  select(-year) |> 
+  pivot_longer(mean:roll_7, names_to = "statistic", values_to = "value") 
   glimpse()
 
 ### Temp Data Pull 
@@ -960,7 +996,11 @@ try(if(!exists("yuba_river_temp_query"))
     summarise(mean= mean(parameter_value, na.rm = TRUE),
               max = max(parameter_value, na.rm = TRUE),
               min = min(parameter_value, na.rm = TRUE)) |> 
-    pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+      group_by(year = year(date)) |> 
+      arrange(date) |> 
+      mutate(roll_7 = rollapply(max, 7, mean, align = "center", fill = NA)) |> 
+      select(-year) |> 
+      pivot_longer(mean:roll_7, names_to = "statistic", values_to = "query_value") |>
       full_join(yuba_river_interpolated) |> 
       # we want to use the query values instead of the interpolated values where they exist
       mutate(value = ifelse(!is.na(query_value), query_value, value),
@@ -972,7 +1012,6 @@ try(if(!exists("yuba_river_temp_query"))
       select(-query_value) |> 
       pivot_wider(names_from = "statistic", values_from = "value") |> 
       group_by(week = week(date),
-               month = month(date),
                year = year(date),
                stream, 
                gage_number, 
@@ -982,9 +1021,10 @@ try(if(!exists("yuba_river_temp_query"))
       summarize(
         max = max(max, na.rm = TRUE), 
         mean = mean(mean, na.rm = TRUE),
-        min = min(min, na.rm = TRUE)
+        min = min(min, na.rm = TRUE),
+        mean_7dadm = mean(roll_7, na.rm = T)
       ) |> 
-      pivot_longer(cols = c(max,mean,min), names_to = "statistic", values_to = "value")
+      pivot_longer(cols = c(max, mean, min, mean_7dadm), names_to = "statistic", values_to = "value")
     ))
 
 # Do a few additional temperature data pull tests to confirm that new data pull has 
