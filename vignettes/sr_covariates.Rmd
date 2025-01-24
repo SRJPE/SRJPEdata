@@ -238,8 +238,8 @@ std_temp_weekly <- standard_temperature |>
 
 ```{r}
 std_temp_weekly |> 
-  ggplot(aes(x = year, y = weekly_max_temp_max)) +
-  geom_line() +
+  ggplot(aes(x = year, y = weekly_max_temp_max, color = gage_number)) +
+  geom_point() +
   facet_wrap(~stream_site) +
   labs(x = "",
        y = "Weekly max temperatures (Celcius)") +
