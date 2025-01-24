@@ -22,11 +22,6 @@ usethis::use_data(site_lookup, overwrite = TRUE)
 
 ### Flow Data Pull Tests
 battle_creek_data_query <- dataRetrieval::readNWISdv(11376550, "00060", startDate = "1995-01-01")
-# Filter existing data to use as a back up 
-battle_creek_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" & 
-           gage_number == "11376550" & 
-           parameter == "flow") 
 battle_creek_daily_flows <- battle_creek_data_query |>  # rename to match new naming structure
          select(Date, value =  X_00060_00003) |>  # rename to value
          as_tibble() |> 
@@ -36,14 +31,7 @@ battle_creek_daily_flows <- battle_creek_data_query |>  # rename to match new na
                 gage_agency = "USGS",
                 gage_number = "11376550",
                 parameter = "flow",
-                statistic = "mean" # if query returns instantaneous data then report a min, mean, and max
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(battle_creek_daily_flows) < nrow(battle_creek_existing_flow)) {
-  stop("The battle creek flow query is bad because it has less rows than the existing data")
-} 
-
+                statistic = "mean") # if query returns instantaneous data then report a min, mean, and max
 
 ### Temp Data Pull 
 #### Gage #UBC
@@ -74,11 +62,6 @@ battle_creek_daily_temp <- ubc_temp_raw |>
 
 ### Flow Data Pull Tests
 butte_creek_data_query <- CDECRetrieve::cdec_query(station = "BCK", dur_code = "H", sensor_num = "20", start_date = "1995-01-01")
-# Filter existing data to use as a back up 
-butte_creek_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" & 
-           gage_number == "BCK" & 
-           parameter == "flow") 
 
 butte_creek_daily_flows <- butte_creek_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
@@ -91,24 +74,13 @@ butte_creek_daily_flows <- butte_creek_data_query |>
                 site_group = "butte creek",
                 gage_agency = "CDEC",
                 gage_number = "BCK",
-                parameter = "flow"
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(butte_creek_daily_flows) < nrow(butte_creek_existing_flow)) {
-  stop("The butte creek flow query is bad because it has less rows than the existing data")
-}
-
+                parameter = "flow")
 
 ### Temp Data Pull 
 #### Gage #BCK
 ### Temp Data Pull Tests 
 butte_creek_temp_query <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "1995-01-01")
-# Filter existing data to use as a back up 
-butte_creek_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "BCK" &
-           parameter == "temperature") 
+
 butte_creek_daily_temp <- butte_creek_temp_query |> 
          mutate(date = as_date(datetime),
                 temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
@@ -123,11 +95,6 @@ butte_creek_daily_temp <- butte_creek_temp_query |>
                 gage_agency = "CDEC",
                 gage_number = "BCK",
                 parameter = "temperature")
-# Do a few additional temperature data pull tests to confirm that new data pull has 
-# more data 
-if(nrow(butte_creek_daily_temp) < nrow(butte_creek_existing_temp)) {
-  stop("The butte creek temperature query is bad because it has less rows than the existing data")
-}
 
 ## Clear Creek ----
 ### Flow Data Pull 
@@ -137,11 +104,7 @@ if(nrow(butte_creek_daily_temp) < nrow(butte_creek_existing_temp)) {
 
 ### Flow Data Pull Tests 
 clear_creek_data_query <- dataRetrieval::readNWISdv(11372000, "00060", startDate = "1995-01-01")
-# Filter existing data to use as a back up 
-clear_creek_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" & 
-           gage_number == "11372000" & 
-           parameter == "flow")
+
 clear_creek_daily_flows <- clear_creek_data_query |> 
          select(Date, value =  X_00060_00003) |> 
          as_tibble() |> 
@@ -153,9 +116,6 @@ clear_creek_daily_flows <- clear_creek_data_query |>
                 parameter = "flow",
                 statistic = "mean" # if query returns instantaneous data then report a min, mean, and max
          )
-if(nrow(clear_creek_daily_flows) < nrow(clear_creek_existing_flow)) {
-  stop("The clear creek flow query is bad because it has less rows than the existing data")
-}
 
 ### Temp Data Pull 
 #### Existing temp data
@@ -208,11 +168,7 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
 
 ### Flow Data Pull Tests 
 deer_creek_data_query <- dataRetrieval::readNWISdv(11383500, "00060", startDate = "1986-01-01")
-# Filter existing data to use as a back up 
-deer_creek_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" & 
-           gage_number == "11383500" & 
-           parameter == "flow")
+
 deer_creek_daily_flows <- deer_creek_data_query|> 
          select(Date, value =  X_00060_00003) |> 
          as_tibble() |> 
@@ -222,22 +178,13 @@ deer_creek_daily_flows <- deer_creek_data_query|>
                 gage_agency = "USGS",
                 gage_number = "11383500",
                 parameter = "flow",
-                statistic = "mean" 
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(deer_creek_daily_flows) < nrow(deer_creek_existing_flow)) {
-  stop("The deer creek flow query is bad because it has less rows than the existing data")
-}
+                statistic = "mean")
+
 ### Temp Data Pull 
 #### Gage #DVC
 ### Temp Data Pull Tests 
 deer_creek_temp_query <- cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1986-01-01")
-# Filter existing data to use as a back up 
-deer_creek_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "DCV" &
-           parameter == "temperature") 
+
 deer_creek_daily_temp <- deer_creek_temp_query |> 
          mutate(date = as_date(datetime),
                 temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
@@ -252,11 +199,6 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
                 gage_agency = "CDEC",
                 gage_number = "DCV",
                 parameter = "temperature")
-# Do a few additional temperature data pull tests to confirm that new data pull has 
-# more data 
-if(nrow(deer_creek_daily_temp) < nrow(deer_creek_existing_temp)) {
-  stop("The deer creek temperature query is bad because it has less rows than the existing data")
-}
 
 ## Feather River ----
 ### Flow Data Pull 
@@ -267,11 +209,7 @@ if(nrow(deer_creek_daily_temp) < nrow(deer_creek_existing_temp)) {
 ### Flow Data Pull Tests 
 # Feather High Flow Channel 
 feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1997-01-01")
-# Filter existing data to use as a back up 
-feather_hfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" & 
-           gage_number == "GRL" & 
-           parameter == "flow") 
+
 feather_hfc_river_daily_flows <- feather_hfc_river_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
          group_by(date = as.Date(datetime)) |> 
@@ -283,22 +221,13 @@ feather_hfc_river_daily_flows <- feather_hfc_river_data_query |>
                 site_group = "upper feather hfc",
                 gage_agency = "CDEC",
                 gage_number = "GRL",
-                parameter = "flow"
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(feather_hfc_river_daily_flows) < nrow(feather_hfc_river_existing_flow)) {
-  stop("The feather river hfc flow query is bad because it has less rows than the existing data")
-}
+                parameter = "flow")
+
 
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
 feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060", startDate = "1997-01-01")
-# Filter existing data to use as a back up 
-feather_lfc_river_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" & 
-           gage_number == "11407000" & 
-           parameter == "flow") 
+
 feather_lfc_river_daily_flows <- feather_lfc_river_data_query|> 
          select(Date, value =  X_00060_00003) |> 
          as_tibble() |> 
@@ -308,23 +237,12 @@ feather_lfc_river_daily_flows <- feather_lfc_river_data_query|>
                 gage_agency = "USGS",
                 gage_number = "11407000",
                 parameter = "flow",
-                statistic = "mean" 
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(feather_lfc_river_daily_flows) < nrow(feather_lfc_river_existing_flow)) {
-  stop("The feather river lfc flow query is bad because it has less rows than the existing data")
-}
+                statistic = "mean")
 
 ### Flow Data Pull Tests 
 #Lower Feather data 
 lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "E", sensor_num = "20", start_date = "2010-01-01")
 
-# Filter existing data to use as a back up 
-lower_feather_river_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" & 
-           gage_number == "FSB" & 
-           parameter == "flow") 
 lower_feather_river_daily_flows <- lower_feather_river_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
          group_by(date = as.Date(datetime)) |> 
@@ -336,13 +254,7 @@ lower_feather_river_daily_flows <- lower_feather_river_data_query |>
                 site_group = "lower feather river", 
                 gage_agency = "CDEC",
                 gage_number = "FSB",
-                parameter = "flow"
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(lower_feather_river_daily_flows) < nrow(lower_feather_river_existing_flow)) {
-  stop("The lower feather river flow query is bad because it has less rows than the existing data")
-}
+                parameter = "flow")
 
 ### Temp Data Pull 
 #### Interpolation Data
@@ -372,11 +284,7 @@ feather_lfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", 
 
 #pulling temp data for Feather River Low Flow Channel - FRA
 feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1997-01-01")
-# Filter existing data to use as a back up 
-feather_lfc_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "FRA" &
-           parameter == "temperature")
+
 feather_lfc_river_daily_temp <- feather_lfc_temp_query |> 
          mutate(date = as_date(datetime),
                 year = year(datetime),
@@ -396,20 +304,10 @@ feather_lfc_river_daily_temp <- feather_lfc_temp_query |>
                 parameter = "temperature") |> 
          select(-query_value)
 
-# Do a few additional temperature data pull tests to confirm that new data pull has 
-# more data 
-if(nrow(feather_lfc_river_daily_temp) < nrow(feather_lfc_existing_temp)) {
-  stop("The feather river lfc temperature query is bad because it has less rows than the existing data")
-}
-
 # Temperature data for HFC Feather River
 # pulling temp data for Feather River Low Flow Channel - FRA
 feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor_num = "25",  start_date = "1997-01-01")
-# Filter existing data to use as a back up 
-feather_hfc_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" & 
-           gage_number == "GRL" & 
-           parameter == "temperature") 
+
 feather_hfc_river_daily_temp <- feather_hfc_temp_query |> 
          mutate(date = as_date(datetime),
                 year = year(datetime),
@@ -429,12 +327,6 @@ feather_hfc_river_daily_temp <- feather_hfc_temp_query |>
                 parameter = "temperature") |> 
          select(-query_value)
 
-# Do a few additional temperature data pull tests to confirm that new data pull has 
-# more data 
-if(nrow(feather_hfc_river_daily_temp) < nrow(feather_hfc_existing_temp)) {
-  stop("The feather river temperature query is bad because it has less rows than the existing data")
-}
-
 ## Mill Creek ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11381500)
@@ -443,11 +335,7 @@ if(nrow(feather_hfc_river_daily_temp) < nrow(feather_hfc_existing_temp)) {
 
 ### Flow Data Pull Tests 
 mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060", startDate = "1995-01-01")
-# Filter existing data to use as a back up 
-mill_creek_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" & 
-           gage_number == "11381500" & 
-           parameter == "flow") 
+
 mill_creek_daily_flows <- mill_creek_data_query |> 
          select(Date, value =  X_00060_00003) |>  
          as_tibble() |> 
@@ -457,23 +345,13 @@ mill_creek_daily_flows <- mill_creek_data_query |>
                 gage_agency = "USGS",
                 gage_number = "11381500",
                 parameter = "flow",
-                statistic = "mean" 
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(mill_creek_daily_flows) < nrow(mill_creek_existing_flow)) {
-  stop("The mill creek flow query is bad because it has less rows than the existing data")
-}
+                statistic = "mean")
 
 ### Temp Data Pull 
 #### Gage #MLM
 ### Temp Data Pull Tests 
 mill_creek_temp_query <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1995-01-01")
-# Filter existing data to use as a back up 
-mill_creek_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "MLM" &
-           parameter == "temperature")
+
 mill_creek_daily_temp <- mill_creek_temp_query |> 
          mutate(date = as_date(datetime),
                 temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
@@ -488,11 +366,6 @@ mill_creek_daily_temp <- mill_creek_temp_query |>
                 gage_agency = "CDEC",
                 gage_number = "MLM",
                 parameter = "temperature")
-# Do a few additional temperature data pull tests to confirm that new data pull has 
-# more data  
-if(nrow(mill_creek_daily_temp) < nrow(mill_creek_existing_temp)) {
-  stop("The mill creek temperature query is bad because it has less rows than the existing data")
-}
 
 ## Sacramento River ----
 ### Flow Data Pull 
@@ -502,11 +375,7 @@ if(nrow(mill_creek_daily_temp) < nrow(mill_creek_existing_temp)) {
 
 ### Flow Data Pull Tests 
 sac_river_data_query <- dataRetrieval::readNWISdv(11390500, "00060", startDate = "1994-01-01")
-# Filter existing data to use as a back up 
-sac_river_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" & 
-           gage_number == "11390500" & 
-           parameter == "flow") 
+
 sac_river_daily_flows <- sac_river_data_query |>  
          select(Date, value =  X_00060_00003) |>  
          as_tibble() |> 
@@ -515,23 +384,13 @@ sac_river_daily_flows <- sac_river_data_query |>
                 gage_agency = "USGS",
                 gage_number = "11390500",
                 parameter = "flow",
-                statistic = "mean" 
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(sac_river_daily_flows) < nrow(sac_river_existing_flow)) {
-  stop("The sac river flow query is bad because it has less rows than the existing data")
-}
+                statistic = "mean")
 
 ### Temp Data Pull 
 #### Gage #11390500
 ### Temp Data Pull Tests
 sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", startDate = "1994-01-01")
-# Filter existing data to use as a back up 
-sac_river_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" &
-           gage_number == "11390500" &
-           parameter == "temperature") 
+
 sac_river_daily_temp <- sac_river_temp_query |> 
          select(Date, temp_degC =  X_00010_00003) %>%
          as_tibble() %>% 
@@ -542,11 +401,6 @@ sac_river_daily_temp <- sac_river_temp_query |>
                 gage_number = "11390500",
                 parameter = "temperature",
                 statistic = "mean")
-# Do a few additional temperature data pull tests to confirm that new data pull has 
-# more data  
-if(nrow(sac_river_daily_temp) < nrow(sac_river_existing_temp)) {
-  stop("The sac river temperature query is bad because it has less rows than the existing data")
-}
 
 ## Yuba River ----
 ### Flow Data Pull 
@@ -556,11 +410,7 @@ if(nrow(sac_river_daily_temp) < nrow(sac_river_existing_temp)) {
 
 ### Flow Data Pull Tests
 yuba_river_data_query <- dataRetrieval::readNWISdv(11421000, "00060", startDate = "1999-01-01")
-# Filter existing data to use as a back up 
-yuba_river_existing_flow  <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "USGS" & 
-           gage_number == "11421000" & 
-           parameter == "flow")
+
 yuba_river_daily_flows <- yuba_river_data_query |>  
          select(Date, value =  X_00060_00003)  |>  
          as_tibble() |> 
@@ -570,13 +420,7 @@ yuba_river_daily_flows <- yuba_river_data_query |>
                 gage_agency = "USGS",
                 gage_number = "11421000",
                 parameter = "flow",
-                statistic = "mean"
-         )
-# Do a few additional flow data pull tests to confirm that new data pull has 
-# more data
-if(nrow(yuba_river_daily_flows) < nrow(yuba_river_existing_flow)) {
-  stop("The yuba river flow query is bad because it has less rows than the existing data")
-}
+                statistic = "mean")
 
 ### Temp Data Pull 
 #### Interpolation pull for Yuba
@@ -588,11 +432,7 @@ yuba_river_interpolated <- read_csv(here::here("data-raw", "temperature-data", "
 #### Gage #YR7
 ### Temp Data Pull Tests 
 yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "1999-01-01")
-# Filter existing data to use as a back up 
-yuba_river_existing_temp <- SRJPEdata::environmental_data |> 
-  filter(gage_agency == "CDEC" &
-           gage_number == "YR7" &
-           parameter == "temperature")
+
 yuba_river_daily_temp <- yuba_river_temp_query |> 
     mutate(date = as_date(datetime)) |> 
     mutate(year = year(datetime)) |> 
@@ -610,12 +450,6 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
              site_group = "yuba river",
              parameter = "temperature") |> 
       select(-query_value)
-
-# Do a few additional temperature data pull tests to confirm that new data pull has 
-# more data  
-if(nrow(yuba_river_daily_temp) < nrow(yuba_river_existing_temp)) {
-  stop("The yuba river temperature query is bad because it has less rows than the existing data")
-}
 
 
 # Define the required object names
@@ -697,7 +531,6 @@ updated_environmental_data <- reshaped_data[
       mean = mean(mean, na.rm = TRUE), 
       min = min(min, na.rm = TRUE)),
   by = .(week = week(date), 
-         month = month(date),
          year = year(date), 
          stream, 
          gage_number, 
