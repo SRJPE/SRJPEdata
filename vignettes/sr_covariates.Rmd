@@ -66,12 +66,16 @@ Temperature has been found to influence spawning and rearing. Therefore it is ex
 ```{r, include=F}
 # pull in standard temp from env data
 source("data-raw/pull_data_scripts/pull_environmental_data.R")
-standard_temperature <- temp
+# code to determine month
+standard_temperature <- temp |> 
+  mutate(start_date = as.Date(paste0(year, "-01-01")),
+         date = start_date+weeks(week),
+         month = month(date))
 ```
 
 #### Number of degree days
 
-Degree days is defined here as the sum of the daily mean temperatures between August and December (spawning time period) by year and stream. 
+Degree days is defined here as the sum of the daily mean temperatures between August and December (spawning time period) by year and stream. Data have been summarized by week to optimize storage and performance so we use the weekly mean (times 7).
 
 *Note that for streams with multiple locations the max daily mean was selected. Clear Creek 2020 value is low which may be due to a few missing data points in December. This approach is vulnerable to missing data.*
 
@@ -86,35 +90,26 @@ Degree days is defined here as the sum of the daily mean temperatures between Au
 #   filter(month_min > 8)
 # Need to remove following years because incomplete: 1997 feather river, 1998 deer mill, 1999 butte and yuba
 monthly_mean <- standard_temperature |> 
-  mutate(year = year(date),
-         month = month(date),
-         value = ifelse(is.nan(value), NA, value)) |> 
+  mutate(value = ifelse(is.nan(value), NA, value)) |> 
   group_by(year, month, stream, site_group, statistic, gage_agency, gage_number, parameter) |> 
   summarize(monthly_average = mean(value, na.rm = T)) 
 
 std_temp_dd_spawn <- standard_temperature |> 
-  mutate(year = year(date),
-         rm = case_when(stream %in% c("feather river") & year == 1997 ~ "incomplete",
+  mutate(rm = case_when(stream %in% c("feather river") & year == 1997 ~ "incomplete",
                         stream %in% c("feather river") & year == 1999 ~ "incomplete",
                         stream %in% c("deer creek", "mill creek") & year == 1998 ~ "incomplete",
                         stream %in% c("butte creek", "yuba river") & year == 1999 ~ "incomplete",
                         T ~ "complete"),
          value = ifelse(is.nan(value), NA, value)) |> 
-  group_by(year, stream, site_group, statistic, gage_agency, gage_number, parameter) |> 
-  arrange() |> 
-  mutate(rolling_3_day_mean = rollapply(value, 3, mean, align = "center", fill = NA),
-         value = ifelse(is.na(value), rolling_3_day_mean, value),
-         month = month(date)) |> 
   left_join(monthly_mean) |> 
   mutate(value = ifelse(is.na(value), monthly_average, value)) |> 
-  filter(month(date) %in% c(8:12), stream != "sacramento river", rm != "incomplete") |> # filter to the spawning and incubation time period, not including sacramento because spawning is happening in tributaries
-  select(date, year, stream, gage_agency, gage_number, site_group, statistic, value) |> 
-  pivot_wider(id_cols = c(date, year, stream, gage_agency, gage_number, site_group), 
+  filter(month %in% c(8:12), stream != "sacramento river", rm != "incomplete") |> # filter to the spawning and incubation time period, not including sacramento because spawning is happening in tributaries
+  select(week, year, stream, gage_agency, gage_number, site_group, statistic, value) |> 
+  pivot_wider(id_cols = c(week, year, stream, gage_agency, gage_number, site_group), 
               values_from = "value", names_from = "statistic") |> 
-  group_by(date, stream, year, gage_agency, gage_number, site_group) |> 
-  summarize(max_mean = max(mean)) |> 
+  mutate(mean_7 = mean*7) |> # multiply by seven to get on same scale as the daily version
   group_by(year, stream, gage_agency, gage_number, site_group) |> 
-  summarize(gdd_spawn = sum(max_mean, na.rm = T)) |> glimpse()
+  summarize(gdd_spawn = sum(mean_7, na.rm = T)) |> glimpse()
 
 ```
 
@@ -152,36 +147,17 @@ This covariate is defined as the day of the year and week when the 7DADM is abov
 # 2. calculate the 7DADM
 # 3. identify the min date when drops below/above 13 C
 
-std_temp_7dadm <- standard_temperature |> 
-  filter(statistic == "max") |>  # can only calculate using the max temperature
-  #filter(month(date) %in% c(8:12)) |> 
-  mutate(year = year(date)) |> # need to add year as grouping so that the rollingmean will apply to each year separately
-  group_by(year, stream, site_group) |> 
-  arrange(stream, site_group, gage_agency, gage_number, date) |> 
-  mutate(roll_7 = rollapply(value, 7, mean, align = "center", fill = NA))
-
-# Use this to summarize rolling mean by week to fill in Nas
-std_temp_7dadm_week <- std_temp_7dadm |> 
-  mutate(week = week(date)) |> 
-  group_by(week, stream, site_group, gage_agency, gage_number, year) |> 
-  summarize(mean_7dadm = mean(roll_7, na.rm = T))
-
-# Fill in Nas with weekly mean
-std_temp_7dadm_interpolated <- std_temp_7dadm |> 
-  mutate(week = week(date)) |> 
-  left_join(std_temp_7dadm_week) |> 
-  mutate(roll_7 = ifelse(is.na(roll_7), mean_7dadm, roll_7))
-
-#ck <- filter(std_temp_7dadm_interpolated, is.na(roll_7))
-std_temp_7dadm_above_13 <- std_temp_7dadm_interpolated |> 
-  filter(roll_7 > 13) |> 
+std_temp_7dadm_above_13 <- standard_temperature |> 
+  filter(statistic == "mean_7dadm") |> 
+  filter(value > 13) |> 
   group_by(year, stream, site_group, gage_agency, gage_number) |> 
   slice_min(date) |> 
   select(date, year, week, stream, site_group, gage_agency, gage_number) |> 
   rename(above_13 = week) |> glimpse()
 
-std_temp_7dadm_below_13 <- std_temp_7dadm_interpolated |> 
-  filter(roll_7 < 13) |> 
+std_temp_7dadm_below_13 <- standard_temperature |> 
+  filter(statistic == "mean_7dadm") |> 
+  filter(value < 13) |> 
   group_by(year, stream, site_group, gage_agency, gage_number) |> 
   slice_min(date) |> 
   select(date, year, week, stream, site_group, gage_agency, gage_number) |> 
@@ -222,19 +198,11 @@ This covariate is defined as the summarized annual weekly max temperature.
 
 ```{r, include = F}
 std_temp_weekly <- standard_temperature |> 
-  filter(month(date) %in% c(8:12)) |> 
-  mutate(week = week(date),
-         year = year(date),
-         stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) |> 
-  group_by(week, year, stream, stream_site) |> 
-  summarize(w_max = max(value, na.rm = T)) |>  # find the max weekly temperature
-  ungroup() |>
-  group_by(stream_site, stream, year) |> 
-  summarize(weekly_max_temp_max = max(w_max, na.rm = T),
-            weekly_max_temp_mean = mean(w_max, na.rm = T),
-            weekly_max_temp_median = median(w_max, na.rm = T)) |> 
-  mutate(gage_number = "stream summary",
-         gage_agency = "stream summary") |> glimpse()
+  filter(month %in% c(8:12), statistic == "max") |> 
+  group_by(year, stream, gage_number, gage_agency, site_group) |> 
+  summarize(weekly_max_temp_max = max(value, na.rm = T),
+            weekly_max_temp_mean = mean(value, na.rm = T),
+            weekly_max_temp_median = median(value, na.rm = T)) |> glimpse()
   
 ```
 
@@ -242,7 +210,7 @@ std_temp_weekly <- standard_temperature |>
 std_temp_weekly |> 
   ggplot(aes(x = year, y = weekly_max_temp_max)) +
   geom_line() +
-  facet_wrap(~stream_site) +
+  facet_wrap(~gage_number) +
   labs(x = "",
        y = "Weekly max temperatures (Celcius)") +
   theme_minimal()
@@ -273,7 +241,10 @@ Precipitation and streamflow have been found to influence spawning and rearing. 
 
 ```{r}
 #TODO update once we 
-standard_flow <- flow
+standard_flow <- flow |> 
+  mutate(start_date = as.Date(paste0(year, "-01-01")),
+         date = start_date+weeks(week),
+         month = month(date))
 ```
 
 #### Mean, median, max flow
@@ -282,15 +253,13 @@ These covariates summarize daily max flows as annual mean/median/max/min within 
 
 ```{r}
 std_flow_spawn_summary <- standard_flow |> 
-  mutate(year = year(date)) |> 
-  filter(month(date) %in% c(8:12), stream != "sacramento river") |> 
-  group_by(date, year, stream, site_group, gage_number, gage_agency) |> 
-  summarize(flow_cfs = max(value)) |> 
+  filter(month %in% c(8:12), stream != "sacramento river") |> 
+  pivot_wider(names_from = "statistic", values_from = "value") |> 
   group_by(year, stream, site_group, gage_number, gage_agency) |> 
-  summarize(mean = mean(flow_cfs, na.rm = T),
-            median = median(flow_cfs, na.rm = T),
-            max = max(flow_cfs, na.rm = T),
-            min = min(flow_cfs, na.rm = T)) |> 
+  summarize(mean = mean(mean, na.rm = T),
+            median = median(mean, na.rm = T),
+            max = max(max, na.rm = T),
+            min = min(min, na.rm = T)) |> 
   pivot_longer(cols = mean:min, values_to = "value", names_to = "statistic") |> 
   mutate(value = ifelse(is.nan(value) | is.infinite(value), NA_real_, value))
 ```
@@ -311,24 +280,23 @@ std_flow_spawn_summary |>
 
 ```{r}
 std_flow_rear_summary <- standard_flow |> 
-  mutate(year = ifelse(month(date) %in% c(10:12), year(date) + 1, year(date))) |> 
-  filter(month(date) %in% c(11:12, 1:7), stream != "sacramento river") |> 
-  group_by(date, year, stream, site_group, gage_number, gage_agency) |> 
-  summarize(flow_cfs = max(value)) |> 
-  group_by(year, stream, site_group, gage_number, gage_agency) |> 
-  summarize(mean = mean(flow_cfs, na.rm = T),
-            median = median(flow_cfs, na.rm = T),
-            max = max(flow_cfs, na.rm = T),
-            min = min(flow_cfs, na.rm = T)) |> 
+  mutate(run_year = ifelse(month %in% c(10:12), year + 1, year)) |> 
+  filter(month %in% c(11:12, 1:7), stream != "sacramento river") |> 
+  pivot_wider(names_from = "statistic", values_from = "value") |> 
+  group_by(run_year, stream, site_group, gage_number, gage_agency) |> 
+  summarize(mean = mean(mean, na.rm = T),
+            median = median(mean, na.rm = T),
+            max = max(max, na.rm = T),
+            min = min(min, na.rm = T)) |> 
   pivot_longer(cols = mean:min, values_to = "value", names_to = "statistic") |> 
   mutate(value = ifelse(is.nan(value) | is.infinite(value), NA_real_, value))
 ```
 
 ```{r}
 std_flow_rear_summary |> 
-  filter(year > 2000) |> 
+  filter(run_year > 2000) |> 
   mutate(stream_site = ifelse(is.na(site_group), stream, site_group)) |> 
-  ggplot(aes(x = year, y = value, color = statistic)) +
+  ggplot(aes(x = run_year, y = value, color = statistic)) +
   geom_line() +
   facet_wrap(~stream_site, scales = "free_y") + 
   labs(x = "year", 
