@@ -160,7 +160,7 @@ heat_map <- ggplot(plot_data, aes(x = fake_date, y = wy, fill = n_streams, text 
   # scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(heat_map) 
-
+# heat_map
 ```
 
 ### Years to exclude
@@ -203,7 +203,7 @@ if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at 
 usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
 years_exclude_nice_names <- years_to_exclude_rst_data |> select("Stream" = stream, 
                                                                 "Site" = site, 
-                                                    "Year" = year, 
+                                                    "Run Year" = run_year, 
                                                     "Exclusion Type" = exclusion_type,
                                                     "Notes" = reason_for_exclusion)
 knitr::kable(head(years_exclude_nice_names, 10))
@@ -228,12 +228,12 @@ years_to_include_rst_data <- SRJPEdata::rst_catch |>
   filter(is.na(exclude)) |> 
   select(-exclude)
 
-knitr::kable(head(include, 10))
+knitr::kable(head(years_to_include_rst_data, 10))
 
 usethis::use_data(years_to_include_rst_data, overwrite = TRUE)
 ```
 
-*... with `r nrow(include) - 10` more rows*
+*... with `r nrow(years_to_include_rst_data) - 10` more rows*
 
 ## Adult Data - Years to Include in Model
 
@@ -382,6 +382,7 @@ upstream_heat_map <- ggplot(updstream_plot_data,
   #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(upstream_heat_map) 
+# upstream_heat_map
 ```
 
 ### Survey Data
@@ -416,6 +417,7 @@ redd_heat_map <- ggplot(redd_by_reach, aes(x = reach, y = year, fill = n)) +
   labs(fill = "Number of visits")
 
 plotly::ggplotly(redd_heat_map) 
+# redd_heat_map
 ```
 
 ### Years to exclude
@@ -441,7 +443,7 @@ In order to apply the years to exclude information to the modeling datasets we d
 
 The table below shows a section of this table:
 
-```{r}
+```{r, echo = FALSE}
 passage_include <- SRJPEdata::upstream_passage_estimates |> 
   distinct(stream, year) |> 
   full_join(years_to_exclude_adult|> 
@@ -488,9 +490,9 @@ years_to_include_adult <- bind_rows(passage_include,
                                     carcass_include,
                                     redd_include,
                                     holding_include)
-knitr::kable(head(include, 10))
+knitr::kable(head(years_to_include_adult, 10))
 
 usethis::use_data(years_to_include_adult, overwrite = TRUE)
 ```
 
-*... with `r nrow(include) - 10` more rows*
+*... with `r nrow(years_to_include_adult) - 10` more rows*
