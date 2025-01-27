@@ -35,6 +35,9 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
                   "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
                   "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
 )
+years_exclude_rst_csv <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
+years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
+  select(-TODOS) 
 ```
 
 The Spring Run Juvenile Production Estimate uses historical rotary screw trap and adult survey data. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and adult years to include.
@@ -176,7 +179,9 @@ We check this list against our original method annually after it is run to confi
 #### Years to Exclude Table 
 
 ```{r, echo = FALSE}
-years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data 
+years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data |> 
+  bind_rows(years_exclude_rst_csv) |> 
+  distinct()
 # Bind in new rows from recent data 
 if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 
   max_old_year <- max(years_to_exclude_rst_data$year)
@@ -425,8 +430,6 @@ plotly::ggplotly(redd_heat_map)
 We utilized above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling for adult data. See a section of the "years to exclude" table below.
 
 ```{r, echo = FALSE}
-years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
-  select(-TODOS) 
 usethis::use_data(years_to_exclude_adult, overwrite = TRUE)
 years_exclude_nice_names_adult <- years_to_exclude_adult |> select("Stream" = stream, 
                                                     "Year" = year, 
