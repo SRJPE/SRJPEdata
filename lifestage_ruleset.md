@@ -79,7 +79,6 @@ In addition to differentiating between yearling and YOY it is important for the 
 The first step was to apply a lifestage cutoff to catch records that had fork lengths recorded. These cutoffs are `fork_length < 45 = fry`, `fork_length > 45 = smolt`, `fork_length > yearling_cutoff = yearling`.
 
 
-
 |date       |stream           |site                    |subsite |site_group              | count|run    |life_stage |adipose_clipped |dead  | fork_length| weight| julian_week| julian_year|
 |:----------|:----------------|:-----------------------|:-------|:-----------------------|-----:|:------|:----------|:---------------|:-----|-----------:|------:|-----------:|-----------:|
 |2012-10-18 |sacramento river |red bluff diversion dam |gate 8  |red bluff diversion dam |     1|winter |smolt      |FALSE           |FALSE |          55|     NA|          42|        2012|
@@ -93,12 +92,9 @@ The first step was to apply a lifestage cutoff to catch records that had fork le
 |2012-05-21 |sacramento river |red bluff diversion dam |gate 6  |red bluff diversion dam |     1|fall   |smolt      |FALSE           |FALSE |          63|     NA|          21|        2012|
 |2012-02-13 |sacramento river |red bluff diversion dam |gate 6  |red bluff diversion dam |     1|winter |smolt      |TRUE            |FALSE |          84|     NA|           7|        2012|
 
-
-
 ### Determine year specific lifestage proportions
 
 There are 68906 entries with missing lifestage due to missing fork length data. 
-
 
 
 |date       |stream       |site |subsite |site_group   | count|run  |life_stage |adipose_clipped |dead | fork_length| weight| julian_week| julian_year|
@@ -110,10 +106,7 @@ There are 68906 entries with missing lifestage due to missing fork length data.
 |2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|           1|        2002|
 |2002-01-06 |battle creek |lbc  |lbc     |battle creek |     1|NA   |NA         |FALSE           |NA   |          NA|      0|           1|        2002|
 
-
-
 The first step in filling in these missing lifestages was to find the proportion for each lifestage category for a given stream, site, week, and year. This information could then be used to fill in the lifestage for missing rows within a week.
-
 
 
 | year| week|stream           |site                    | percent_fry| percent_smolt| percent_yearling|
@@ -129,8 +122,6 @@ The first step in filling in these missing lifestages was to find the proportion
 | 1994|   30|sacramento river |red bluff diversion dam |           0|             1|                0|
 | 1994|   31|sacramento river |red bluff diversion dam |           0|             1|                0|
 
-
-
 ### Determine general weekly lifestage proportions
 
 For weeks that had no fork length data in a given week, we calculated a general lifestage proportion across years. Calculating the proportion for each lifestage category for a given stream, site, and week. 
@@ -140,7 +131,6 @@ For weeks that had no fork length data in a given week, we calculated a general 
 ### Apply proportions to fill in missing values
 
 We used these proportions to fill in missing lifestage values. See the final lifestage designations below. 
-
 
 
 |date       |stream           |site                    |subsite |site_group              | count|run    |life_stage |adipose_clipped |dead  | fork_length| weight| julian_week| julian_year| week| year|model_lifestage_method   |
@@ -155,8 +145,6 @@ We used these proportions to fill in missing lifestage values. See the final lif
 |2012-03-01 |sacramento river |red bluff diversion dam |gate 8  |red bluff diversion dam |     6|fall   |fry        |FALSE           |FALSE |          31|     NA|           9|        2012|    9| 2012|assigned from fl cutoffs |
 |2012-05-21 |sacramento river |red bluff diversion dam |gate 6  |red bluff diversion dam |     1|fall   |smolt      |FALSE           |FALSE |          63|     NA|          21|        2012|   21| 2012|assigned from fl cutoffs |
 |2012-02-13 |sacramento river |red bluff diversion dam |gate 6  |red bluff diversion dam |     1|winter |smolt      |TRUE            |FALSE |          84|     NA|           7|        2012|    7| 2012|assigned from fl cutoffs |
-
-
 
 ### Generate rows for when no fish of a lifestage are caught
 
