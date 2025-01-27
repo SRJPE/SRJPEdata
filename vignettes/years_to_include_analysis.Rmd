@@ -8,6 +8,15 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+# Instructions for updating the years to exclude ###############################
+# The years to exclude list is maintained within csvs in data-raw/helper-tables.
+# If a year to exclude needs to be added or removed, please do so directly in the
+# csv. The simplest way to do this is:
+# 1. Open the csv, make the update, save the csv
+# 2. Run the "years_to_include_analysis.Rmd" which will save the updated years to exclude
+# data objects in the package.
+# 3. Commit and push your changes!
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   warning = FALSE, 
@@ -26,6 +35,9 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
                   "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
                   "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
 )
+years_exclude_rst_csv <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
+years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
+  select(-TODOS) 
 ```
 
 The Spring Run Juvenile Production Estimate uses historical rotary screw trap and adult survey data. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and adult years to include.
@@ -151,7 +163,7 @@ heat_map <- ggplot(plot_data, aes(x = fake_date, y = wy, fill = n_streams, text 
   # scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(heat_map) 
-
+# heat_map
 ```
 
 ### Years to exclude
@@ -167,7 +179,9 @@ We check this list against our original method annually after it is run to confi
 #### Years to Exclude Table 
 
 ```{r, echo = FALSE}
-years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data 
+years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data |> 
+  bind_rows(years_exclude_rst_csv) |> 
+  distinct()
 # Bind in new rows from recent data 
 if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 
   max_old_year <- max(years_to_exclude_rst_data$year)
@@ -191,12 +205,10 @@ if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at 
   years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
 }  
 
-
-
 usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
 years_exclude_nice_names <- years_to_exclude_rst_data |> select("Stream" = stream, 
                                                                 "Site" = site, 
-                                                    "Year" = year, 
+                                                    "Run Year" = run_year, 
                                                     "Exclusion Type" = exclusion_type,
                                                     "Notes" = reason_for_exclusion)
 knitr::kable(head(years_exclude_nice_names, 10))
@@ -207,108 +219,26 @@ knitr::kable(head(years_exclude_nice_names, 10))
 
 ### Applying to Modeling Datasets
 
-In order to apply the years to exclude information to the modeling datasets we did some additional analysis to create a table describing the stream, site, year, min week, and max week that should be included in the SR JPE modeling.
+In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, site, year that should be included in the SR JPE modeling.
 
 The table below shows a section of this table:
 
 ```{r, echo = FALSE}
-# Following the sample window workshop Erin Cain emailed list of stream/years
-# to exclude. 
-# Read in years_to_exclude.csv
-# Read in catch data and find the min/max week for each stream/year
-# Exclude years
-
-# analysis for red bluff - bring back in after adding to database 
-rb <- filter(SRJPEdata::rst_catch, site == "red bluff diversion dam")
-# rb |> 
-#   group_by(date) |> 
-#   summarize(count = sum(count, na.rm = T)) |> 
-#   mutate(wy = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
-#          fake_date = ifelse(month(date) %in% 10:12, ymd(paste0("1999-",month(date), "-", day(date))), 
-#                             ymd(paste0("2000-",month(date), "-", day(date))))) |> 
-#   filter(wy == 2023) |> 
-#   ggplot(aes(x = fake_date, y = count)) +
-#     geom_point()
-
-# 1996, 1998, 2001, 2002, 2004, 2006, 2017, 2019, 2020
-# 1996 - most of february is missing
-# 1998 - all of february is missing
-# 2001 - no data collection
-# 2002 - data collection started in april
-# 2004 - missing second half of february
-# 2006 - missing first two weeks of march
-# 2017 - missing a lot of winter months
-# 2019 - missing first two weeks of march
-# 2020 - no data collection after march
-exclude <- tibble(stream = c(rep("battle creek",3), rep("butte creek", 5), rep("deer creek", 9),
-                             rep("feather river", 2), rep("mill creek", 5), "sacramento river"),
-                  monitoring_year = c(1998, 2007, 2015, 
-                                      2019, 2005, 1997, 2006, 1998, 
-                                      1992, 1993, 1994, 1997, 1998, 1999, 2006, 2008, 2022,
-                                      2021, 2017, 
-                                      1997, 1998, 1999, 2004, 2009, 
-                                      2013),
-                  exclude = rep("yes", 25))
-
-min_max_week <- SRJPEdata::rst_catch |> 
-  mutate(monitoring_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
-  group_by(monitoring_year, stream, site, subsite) |> 
-  summarize(min_date = min(date),
-            min_week = week(min_date),
-            max_date = max(date),
-            max_week = week(max_date))
-
-include <- min_max_week |> 
-  left_join(exclude) |> 
-  mutate(exclude = ifelse(site == "red bluff diversion dam" & monitoring_year %in% c(1996, 1998,
-                                                                                     2001, 2002,
-                                                                                     2004, 2006,
-                                                                                     2017, 2018,
-                                                                                     2020),
-                          "yes", exclude)) |> 
+years_to_include_rst_data <- SRJPEdata::rst_catch |> 
+  mutate(run_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
+  distinct(stream, site, run_year) |> 
+  full_join(years_to_exclude_rst_data |> 
+              select(run_year, stream, site) |> 
+              mutate(exclude = T)) |> 
   filter(is.na(exclude)) |> 
   select(-exclude)
 
-knitr::kable(head(include, 10))
+knitr::kable(head(years_to_include_rst_data, 10))
 
-lfc_subsites <- c("eye riffle_north", "eye riffle_side channel", "gateway main 400' up river", "gateway_main1", "gateway_rootball", "gateway_rootball_river_left", "#steep riffle_rst", "steep riffle_10' ext", "steep side channel")
-hfc_subsites <- c("herringer_east", "herringer_upper_west", "herringer_west", "live oak", "shawns_east", "shawns_west", "sunset east bank", "sunset west bank")
-
-lfc_sites <- c("eye riffle", "gateway riffle", "steep riffle")
-hfc_sites <- c("herringer riffle", "live oak", "shawn's beach", "sunset pumps")
-
-chosen_site_years_to_model <- include |>
-  group_by(monitoring_year, stream, site) |> 
-  # decided to go inclusively 
-  # if just take min week does not account for the monitoring year so need to find min date first
-  summarise(min_date = min(min_date),
-            min_week = week(min_date),
-            max_date = max(max_date),
-            max_week = week(max_date)) |> 
-  ungroup() |> 
-  # identified as excluded due to incomplete sampling
-  mutate(exclude = case_when(
-                             monitoring_year == 1998 & site == "ubc" ~ T, 
-                             monitoring_year == 2003 & site == "ucc" ~ T,
-                             monitoring_year == 2003 & site == "yuba river" ~ T,
-                             monitoring_year == 2005 & site == "yuba river" ~ T,
-                             monitoring_year == 2008 & site == "yuba river" ~ T,
-                             monitoring_year == 2007 & site == "sunset pumps" ~ T,
-                             monitoring_year == 2009 & site == "sunset pumps" ~ T,
-                             monitoring_year == 2016 & site == "lbc" ~ T,
-                             monitoring_year == 2002 & site == "knights landing" ~ T,
-                             T ~ F),
-         site_group = case_when(site %in% lfc_sites ~ "upper feather lfc",
-                                site %in% hfc_sites ~ "upper feather hfc",
-                                T ~ NA)) |> 
-  filter(exclude == F) |> 
-  select(monitoring_year, stream, site, min_date, min_week, max_date, max_week) |> 
-  filter(!is.na(monitoring_year))
-
-usethis::use_data(chosen_site_years_to_model, overwrite = TRUE)
+usethis::use_data(years_to_include_rst_data, overwrite = TRUE)
 ```
 
-*... with `r nrow(include) - 10` more rows*
+*... with `r nrow(years_to_include_rst_data) - 10` more rows*
 
 ## Adult Data - Years to Include in Model
 
@@ -457,6 +387,7 @@ upstream_heat_map <- ggplot(updstream_plot_data,
   #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(upstream_heat_map) 
+# upstream_heat_map
 ```
 
 ### Survey Data
@@ -491,6 +422,7 @@ redd_heat_map <- ggplot(redd_by_reach, aes(x = reach, y = year, fill = n)) +
   labs(fill = "Number of visits")
 
 plotly::ggplotly(redd_heat_map) 
+# redd_heat_map
 ```
 
 ### Years to exclude
@@ -498,8 +430,6 @@ plotly::ggplotly(redd_heat_map)
 We utilized above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling for adult data. See a section of the "years to exclude" table below.
 
 ```{r, echo = FALSE}
-years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
-  select(-TODOS) 
 usethis::use_data(years_to_exclude_adult, overwrite = TRUE)
 years_exclude_nice_names_adult <- years_to_exclude_adult |> select("Stream" = stream, 
                                                     "Year" = year, 
@@ -509,3 +439,63 @@ knitr::kable(head(years_exclude_nice_names_adult, 10))
 ```
 
 *... with `r nrow(years_exclude_nice_names_adult) - 10` more rows*
+
+### Applying to Modeling Datasets
+
+In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, year by data type that should be included in the SR JPE modeling.
+
+The table below shows a section of this table:
+
+```{r, echo = FALSE}
+passage_include <- SRJPEdata::upstream_passage_estimates |> 
+  distinct(stream, year) |> 
+  full_join(years_to_exclude_adult|> 
+              filter(data_type == "upstream passage") |> 
+              select(year, stream) |> 
+              mutate(exclude = T)) |> 
+  filter(is.na(exclude)) |> 
+  select(-exclude) |> 
+  mutate(data_type = "upstream passage")
+
+carcass_include <- SRJPEdata::carcass_estimates |> 
+  distinct(stream, year) |> 
+  full_join(years_to_exclude_adult|> 
+              filter(data_type == "carcass") |> 
+              select(year, stream) |> 
+              mutate(exclude = T)) |> 
+  filter(is.na(exclude)) |> 
+  select(-exclude) |> 
+  mutate(data_type = "carcass")
+
+redd_include <- SRJPEdata::redd |> 
+  mutate(year = year(date)) |> 
+  distinct(stream, year) |> 
+  full_join(years_to_exclude_adult|> 
+              filter(data_type == "redd") |> 
+              select(year, stream) |> 
+              mutate(exclude = T)) |> 
+  filter(is.na(exclude)) |> 
+  select(-exclude) |> 
+  mutate(data_type = "redd")
+
+holding_include <- SRJPEdata::holding |> 
+  mutate(year = year(date)) |> 
+  distinct(stream, year) |> 
+  full_join(years_to_exclude_adult|> 
+              filter(data_type == "holding") |> 
+              select(year, stream) |> 
+              mutate(exclude = T)) |> 
+  filter(is.na(exclude)) |> 
+  select(-exclude) |> 
+  mutate(data_type = "holding")
+
+years_to_include_adult <- bind_rows(passage_include,
+                                    carcass_include,
+                                    redd_include,
+                                    holding_include)
+knitr::kable(head(years_to_include_adult, 10))
+
+usethis::use_data(years_to_include_adult, overwrite = TRUE)
+```
+
+*... with `r nrow(years_to_include_adult) - 10` more rows*

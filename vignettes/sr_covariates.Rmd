@@ -175,16 +175,16 @@ std_temp_7dadm_interpolated <- std_temp_7dadm |>
 #ck <- filter(std_temp_7dadm_interpolated, is.na(roll_7))
 std_temp_7dadm_above_13 <- std_temp_7dadm_interpolated |> 
   filter(roll_7 > 13) |> 
-  group_by(year, stream, site_group) |> 
+  group_by(year, stream, site_group, gage_agency, gage_number) |> 
   slice_min(date) |> 
-  select(date, year, week, stream, site_group) |> 
+  select(date, year, week, stream, site_group, gage_agency, gage_number) |> 
   rename(above_13 = week) |> glimpse()
 
 std_temp_7dadm_below_13 <- std_temp_7dadm_interpolated |> 
   filter(roll_7 < 13) |> 
-  group_by(year, stream, site_group) |> 
+  group_by(year, stream, site_group, gage_agency, gage_number) |> 
   slice_min(date) |> 
-  select(date, year, week, stream, site_group) |> 
+  select(date, year, week, stream, site_group, gage_agency, gage_number) |> 
   rename(below_13 = week)
 ```
 
@@ -226,10 +226,10 @@ std_temp_weekly <- standard_temperature |>
   mutate(week = week(date),
          year = year(date),
          stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) |> 
-  group_by(week, year, stream, stream_site) |> 
+  group_by(week, year, stream, stream_site, gage_agency, gage_number) |> 
   summarize(w_max = max(value, na.rm = T)) |>  # find the max weekly temperature
   ungroup() |>
-  group_by(stream_site, stream, year) |> 
+  group_by(stream_site, stream, year, gage_agency, gage_number) |> 
   summarize(weekly_max_temp_max = max(w_max, na.rm = T),
             weekly_max_temp_mean = mean(w_max, na.rm = T),
             weekly_max_temp_median = median(w_max, na.rm = T)) |> glimpse()
@@ -238,8 +238,8 @@ std_temp_weekly <- standard_temperature |>
 
 ```{r}
 std_temp_weekly |> 
-  ggplot(aes(x = year, y = weekly_max_temp_max)) +
-  geom_line() +
+  ggplot(aes(x = year, y = weekly_max_temp_max, color = gage_number)) +
+  geom_point() +
   facet_wrap(~stream_site) +
   labs(x = "",
        y = "Weekly max temperatures (Celcius)") +
@@ -282,9 +282,9 @@ These covariates summarize daily max flows as annual mean/median/max/min within 
 std_flow_spawn_summary <- standard_flow |> 
   mutate(year = year(date)) |> 
   filter(month(date) %in% c(8:12), stream != "sacramento river") |> 
-  group_by(date, year, stream, site_group) |> 
+  group_by(date, year, stream, site_group, gage_agency, gage_number) |> 
   summarize(flow_cfs = max(value)) |> 
-  group_by(year, stream, site_group) |> 
+  group_by(year, stream, site_group, gage_agency, gage_number) |> 
   summarize(mean = mean(flow_cfs, na.rm = T),
             median = median(flow_cfs, na.rm = T),
             max = max(flow_cfs, na.rm = T),
@@ -311,9 +311,9 @@ std_flow_spawn_summary |>
 std_flow_rear_summary <- standard_flow |> 
   mutate(year = ifelse(month(date) %in% c(10:12), year(date) + 1, year(date))) |> 
   filter(month(date) %in% c(11:12, 1:7), stream != "sacramento river") |> 
-  group_by(date, year, stream, site_group) |> 
+  group_by(date, year, stream, site_group, gage_agency, gage_number) |> 
   summarize(flow_cfs = max(value)) |> 
-  group_by(year, stream, site_group) |> 
+  group_by(year, stream, site_group,gage_agency, gage_number) |> 
   summarize(mean = mean(flow_cfs, na.rm = T),
             median = median(flow_cfs, na.rm = T),
             max = max(flow_cfs, na.rm = T),
@@ -339,14 +339,14 @@ std_flow_rear_summary |>
 
 ```{r}
 std_flow_final <- std_flow_spawn_summary |> 
-  pivot_wider(id_cols = c(year, stream, site_group), values_from = "value", names_from = "statistic") |> 
+  pivot_wider(id_cols = c(year, stream, site_group, gage_agency, gage_number), values_from = "value", names_from = "statistic") |> 
   rename(mean_flow = mean,
          median_flow = median,
          max_flow = max,
          min_flow = min) |> 
   mutate(lifestage = "spawning and incubation") |> 
   bind_rows(std_flow_rear_summary |> 
-  pivot_wider(id_cols = c(year, stream, site_group), values_from = "value", names_from = "statistic") |> 
+  pivot_wider(id_cols = c(year, stream, site_group, gage_agency, gage_number), values_from = "value", names_from = "statistic") |> 
   rename(mean_flow = mean,
          median_flow = median,
          max_flow = max,
@@ -368,7 +368,7 @@ stock_recruit_covariates <- std_temp_dd_spawn |>
   mutate(lifestage = "spawning and incubation",
          covariate_type = "temperature") |> 
   full_join(std_temp_7dadm_final |> 
-              mutate(lifestage = NA_character_,
+              mutate(lifestage = "spawning and incubation",
                      covariate_type = "temperature")) |> 
   full_join(std_temp_weekly |> 
               mutate(lifestage = "spawning and incubation",
