@@ -11,13 +11,12 @@ library(data.table)
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 SRJPEdata::rst_catch |> glimpse()
 updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
-chosen_site_years_to_model |> glimpse() 
-# Note: updated below years_to_include to chosen_site_years_to_model (this is more up to date version)
+years_to_include_rst_data <- SRJPEdata::years_to_include_rst_data |> 
+  mutate(include = T)
 
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
 # This is joined at the end
-# TODO we may want to refine this lookup with another "model_week" variable if needed
 rst_all_weeks <- rst_catch |> 
   group_by(stream, site, subsite) |> 
   summarise(min = min(date),
@@ -33,10 +32,7 @@ rst_all_weeks <- rst_catch |>
   distinct(stream, site, year, week) |> 
   cross_join(tibble(life_stage = c("fry","smolt","yearling"))) |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
-  left_join(chosen_site_years_to_model |> # need to make sure to filter out years that have been excluded
-              select(monitoring_year, stream, site) |> 
-              rename(run_year = monitoring_year) |> 
-              mutate(include = T)) |> 
+  left_join(years_to_include_rst_data) |> # need to make sure to filter out years that have been excluded
   filter(include == T) |> 
   select(-include) |> 
   filter(run_year != 2025) # TODO remove once we want to include 2025 data
@@ -50,27 +46,21 @@ rst_all_weeks <- rst_catch |>
 # Converted to data.table for performance reasons
 # Convert your data.frames to data.tables (if not already in data.table format)
 updated_standard_catch <- as.data.table(updated_standard_catch) 
-chosen_site_years_to_model <- as.data.table(chosen_site_years_to_model)
+years_to_include_rst_data <- as.data.table(years_to_include_rst_data)
 
 # Step-by-step translation of the dplyr code
 catch_with_inclusion_criteria <- updated_standard_catch[
   # Step 1: Create monitoring_year
-  , monitoring_year := ifelse(week(date) >= 45, year(date) + 1, year(date))
+  , run_year := ifelse(week(date) >= 45, year(date) + 1, year(date))
 ][
   # Step 2: Perform the left join with chosen_site_years_to_model
-  chosen_site_years_to_model, on = .(monitoring_year, stream, site), nomatch = 0
+  years_to_include_rst_data, on = .(run_year, stream, site), nomatch = 0
 ][
-  # Step 3: Mutate include_in_model column based on conditions
-  , include_in_model := ifelse(date >= min_date & date <= max_date, TRUE, FALSE)
+  # Step 3: Filter rows where include_in_model is TRUE
+  include == TRUE
 ][
-  # Step 4: Adjust include_in_model for missing min_date
-  , include_in_model := ifelse(is.na(min_date), FALSE, include_in_model)
-][
-  # Step 5: Filter rows where include_in_model is TRUE
-  include_in_model == TRUE
-][
-  # Step 6: Select and remove columns (similar to select in dplyr)
-  , !c("monitoring_year", "min_date", "max_date", "year", "week", "include_in_model")
+  # Step 4: Select and remove columns (similar to select in dplyr)
+  , !c("run_year", "year", "week", "include", "monitoring_year")
 ]
 
 

@@ -28,9 +28,7 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
     distinct(stream, site, run_year) |> 
     mutate(site_year = paste0(site, "-", run_year))
   current_site_year <- sort(current_site_year_raw$site_year)
-  chosen_site_year_raw <- chosen_site_years_to_model |> 
-    select(monitoring_year, stream, site) |> 
-    rename(run_year = monitoring_year) |> 
+  chosen_site_year_raw <- years_to_include_rst_data |> 
     mutate(site_year = paste0(site, "-", run_year)) |> 
     filter(!(run_year == 2025)) # make sure to remove this next year!
   chosen_site_year <- sort(chosen_site_year_raw$site_year)
