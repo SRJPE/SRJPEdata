@@ -52,48 +52,48 @@ We check this list against our original method annually after it is run to confi
 
 
 
-|Stream       |Site      | Year|Exclusion Type                                    |Notes                          |
-|:------------|:---------|----:|:-------------------------------------------------|:------------------------------|
-|battle creek |lbc       | 1998|automatic                                         |less than 75% of weeks sampled |
-|battle creek |lbc       | 2006|automatic                                         |less than 75% of weeks sampled |
-|battle creek |lbc       | 2016|automatic                                         |less than 75% of weeks sampled |
-|battle creek |ubc       | 2007|really low sampling                               |only 12 week of data           |
-|battle creek |ubc       | 2003|really low sampling                               |NA                             |
-|battle creek |ubc       | 2015|missing four consecutive weeks in critical window |NA                             |
-|butte creek  |adams dam | 1997|automatic                                         |less than 75% of weeks sampled |
-|butte creek  |adams dam | 1998|automatic                                         |less than 75% of weeks sampled |
-|butte creek  |okie dam  | 2019|really low sampling                               |only 10 weeks of data          |
-|butte creek  |okie dam  | 2005|really low sampling                               |only 6 weeks of data           |
+|Stream       |Site      | Run Year|Exclusion Type                                    |Notes                          |
+|:------------|:---------|--------:|:-------------------------------------------------|:------------------------------|
+|battle creek |lbc       |     1998|automatic                                         |less than 75% of weeks sampled |
+|battle creek |lbc       |     2006|automatic                                         |less than 75% of weeks sampled |
+|battle creek |lbc       |     2016|automatic                                         |less than 75% of weeks sampled |
+|battle creek |ubc       |     2007|really low sampling                               |only 12 week of data           |
+|butte creek  |adams dam |     1997|automatic                                         |less than 75% of weeks sampled |
+|butte creek  |adams dam |     1998|automatic                                         |less than 75% of weeks sampled |
+|butte creek  |okie dam  |     2019|really low sampling                               |only 10 weeks of data          |
+|butte creek  |okie dam  |     2005|really low sampling                               |only 6 weeks of data           |
+|butte creek  |okie dam  |     1997|missing four consecutive weeks in critical window |NA                             |
+|butte creek  |okie dam  |     1998|missing four consecutive weeks in critical window |NA                             |
 
 
 
-*... with 41 more rows*
+*... with 54 more rows*
 
 
 ### Applying to Modeling Datasets
 
-In order to apply the years to exclude information to the modeling datasets we did some additional analysis to create a table describing the stream, site, year, min week, and max week that should be included in the SR JPE modeling.
+In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, site, year that should be included in the SR JPE modeling.
 
 The table below shows a section of this table:
 
 
 
-| monitoring_year|stream           |site                    |subsite    |min_date   | min_week|max_date   | max_week|
-|---------------:|:----------------|:-----------------------|:----------|:----------|--------:|:----------|--------:|
-|            1994|sacramento river |red bluff diversion dam |gate 1     |1994-08-19 |       34|1994-09-19 |       38|
-|            1994|sacramento river |red bluff diversion dam |gate 10    |1994-08-29 |       35|1994-09-22 |       38|
-|            1994|sacramento river |red bluff diversion dam |gate 11    |1994-07-18 |       29|1994-08-24 |       34|
-|            1994|sacramento river |red bluff diversion dam |gate 3     |1994-10-18 |       42|1994-11-03 |       44|
-|            1994|sacramento river |red bluff diversion dam |gate 5     |1994-09-22 |       38|1994-11-03 |       44|
-|            1994|sacramento river |red bluff diversion dam |gate 7     |1994-10-14 |       42|1994-11-03 |       44|
-|            1994|sacramento river |red bluff diversion dam |gate 9     |1994-09-22 |       38|1994-11-03 |       44|
-|            1995|deer creek       |deer creek              |deer creek |1994-11-04 |       45|1995-06-18 |       25|
-|            1995|sacramento river |red bluff diversion dam |gate 1     |1995-01-23 |        4|1995-09-19 |       38|
-|            1995|sacramento river |red bluff diversion dam |gate 10    |1995-05-17 |       20|1995-09-19 |       38|
+|stream           |site                    | run_year|
+|:----------------|:-----------------------|--------:|
+|sacramento river |red bluff diversion dam |     2012|
+|sacramento river |red bluff diversion dam |     2013|
+|sacramento river |red bluff diversion dam |     2014|
+|sacramento river |red bluff diversion dam |     2015|
+|sacramento river |red bluff diversion dam |     2016|
+|sacramento river |red bluff diversion dam |     2019|
+|sacramento river |red bluff diversion dam |     2021|
+|sacramento river |red bluff diversion dam |     2022|
+|sacramento river |red bluff diversion dam |     2023|
+|sacramento river |red bluff diversion dam |     2000|
 
 
 
-*... with 494 more rows*
+*... with 231 more rows*
 
 ## Adult Data - Years to Include in Model
 
@@ -173,3 +173,28 @@ We utilized above cumulative catch curves and heatmaps to come up with a list of
 
 
 *... with 45 more rows*
+
+### Applying to Modeling Datasets
+
+In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, year by data type that should be included in the SR JPE modeling.
+
+The table below shows a section of this table:
+
+
+
+|stream       | year|data_type        |
+|:------------|----:|:----------------|
+|battle creek | 1995|upstream passage |
+|clear creek  | 1995|upstream passage |
+|battle creek | 1996|upstream passage |
+|battle creek | 1997|upstream passage |
+|battle creek | 1998|upstream passage |
+|clear creek  | 1998|upstream passage |
+|battle creek | 1999|upstream passage |
+|clear creek  | 1999|upstream passage |
+|battle creek | 2000|upstream passage |
+|clear creek  | 2000|upstream passage |
+
+
+
+*... with 265 more rows*

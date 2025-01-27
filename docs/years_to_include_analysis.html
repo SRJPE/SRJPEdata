@@ -104,9 +104,9 @@
 </ul><p>We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.</p>
 <div class="section level4">
 <h4 id="years-to-exclude-table">Years to Exclude Table<a class="anchor" aria-label="anchor" href="#years-to-exclude-table"></a></h4>
-<table class="table"><colgroup><col width="11%"><col width="9%"><col width="4%"><col width="45%"><col width="28%"></colgroup><thead><tr class="header"><th align="left">Stream</th>
+<table class="table"><colgroup><col width="11%"><col width="8%"><col width="7%"><col width="44%"><col width="27%"></colgroup><thead><tr class="header"><th align="left">Stream</th>
 <th align="left">Site</th>
-<th align="right">Year</th>
+<th align="right">Run Year</th>
 <th align="left">Exclusion Type</th>
 <th align="left">Notes</th>
 </tr></thead><tbody><tr class="odd"><td align="left">battle creek</td>
@@ -129,16 +129,6 @@
 <td align="right">2007</td>
 <td align="left">really low sampling</td>
 <td align="left">only 12 week of data</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">2003</td>
-<td align="left">really low sampling</td>
-<td align="left">NA</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">2015</td>
-<td align="left">missing four consecutive weeks in critical window</td>
-<td align="left">NA</td>
 </tr><tr class="odd"><td align="left">butte creek</td>
 <td align="left">adams dam</td>
 <td align="right">1997</td>
@@ -159,102 +149,57 @@
 <td align="right">2005</td>
 <td align="left">really low sampling</td>
 <td align="left">only 6 weeks of data</td>
-</tr></tbody></table><p><em>… with 41 more rows</em></p>
+</tr><tr class="odd"><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">1997</td>
+<td align="left">missing four consecutive weeks in critical window</td>
+<td align="left">NA</td>
+</tr><tr class="even"><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">1998</td>
+<td align="left">missing four consecutive weeks in critical window</td>
+<td align="left">NA</td>
+</tr></tbody></table><p><em>… with 54 more rows</em></p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="applying-to-modeling-datasets">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets"></a></h3>
-<p>In order to apply the years to exclude information to the modeling datasets we did some additional analysis to create a table describing the stream, site, year, min week, and max week that should be included in the SR JPE modeling.</p>
+<p>In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, site, year that should be included in the SR JPE modeling.</p>
 <p>The table below shows a section of this table:</p>
-<table class="table"><colgroup><col width="14%"><col width="15%"><col width="22%"><col width="10%"><col width="10%"><col width="8%"><col width="10%"><col width="8%"></colgroup><thead><tr class="header"><th align="right">monitoring_year</th>
-<th align="left">stream</th>
+<table class="table"><thead><tr class="header"><th align="left">stream</th>
 <th align="left">site</th>
-<th align="left">subsite</th>
-<th align="left">min_date</th>
-<th align="right">min_week</th>
-<th align="left">max_date</th>
-<th align="right">max_week</th>
-</tr></thead><tbody><tr class="odd"><td align="right">1994</td>
-<td align="left">sacramento river</td>
+<th align="right">run_year</th>
+</tr></thead><tbody><tr class="odd"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 1</td>
-<td align="left">1994-08-19</td>
-<td align="right">34</td>
-<td align="left">1994-08-31</td>
-<td align="right">35</td>
-</tr><tr class="even"><td align="right">1994</td>
-<td align="left">sacramento river</td>
+<td align="right">2012</td>
+</tr><tr class="even"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 10</td>
-<td align="left">1994-08-29</td>
-<td align="right">35</td>
-<td align="left">1994-08-31</td>
-<td align="right">35</td>
-</tr><tr class="odd"><td align="right">1994</td>
-<td align="left">sacramento river</td>
+<td align="right">2013</td>
+</tr><tr class="odd"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 11</td>
-<td align="left">1994-07-18</td>
-<td align="right">29</td>
-<td align="left">1994-08-24</td>
-<td align="right">34</td>
-</tr><tr class="even"><td align="right">1995</td>
-<td align="left">deer creek</td>
-<td align="left">deer creek</td>
-<td align="left">deer creek</td>
-<td align="left">1994-10-03</td>
-<td align="right">40</td>
-<td align="left">1995-06-18</td>
-<td align="right">25</td>
-</tr><tr class="odd"><td align="right">1995</td>
-<td align="left">sacramento river</td>
+<td align="right">2014</td>
+</tr><tr class="even"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 1</td>
-<td align="left">1994-09-01</td>
-<td align="right">35</td>
-<td align="left">1995-08-31</td>
-<td align="right">35</td>
-</tr><tr class="even"><td align="right">1995</td>
-<td align="left">sacramento river</td>
+<td align="right">2015</td>
+</tr><tr class="odd"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 10</td>
-<td align="left">1994-09-01</td>
-<td align="right">35</td>
-<td align="left">1995-08-31</td>
-<td align="right">35</td>
-</tr><tr class="odd"><td align="right">1995</td>
-<td align="left">sacramento river</td>
+<td align="right">2016</td>
+</tr><tr class="even"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 11</td>
-<td align="left">1995-03-03</td>
-<td align="right">9</td>
-<td align="left">1995-08-31</td>
-<td align="right">35</td>
-</tr><tr class="even"><td align="right">1995</td>
-<td align="left">sacramento river</td>
+<td align="right">2019</td>
+</tr><tr class="odd"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 2</td>
-<td align="left">1995-01-25</td>
-<td align="right">4</td>
-<td align="left">1995-05-04</td>
-<td align="right">18</td>
-</tr><tr class="odd"><td align="right">1995</td>
-<td align="left">sacramento river</td>
+<td align="right">2021</td>
+</tr><tr class="even"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 3</td>
-<td align="left">1994-10-18</td>
-<td align="right">42</td>
-<td align="left">1995-08-31</td>
-<td align="right">35</td>
-</tr><tr class="even"><td align="right">1995</td>
-<td align="left">sacramento river</td>
+<td align="right">2022</td>
+</tr><tr class="odd"><td align="left">sacramento river</td>
 <td align="left">red bluff diversion dam</td>
-<td align="left">gate 5</td>
-<td align="left">1994-09-22</td>
-<td align="right">38</td>
-<td align="left">1995-04-27</td>
-<td align="right">17</td>
-</tr></tbody></table><p><em>… with 488 more rows</em></p>
+<td align="right">2023</td>
+</tr><tr class="even"><td align="left">sacramento river</td>
+<td align="left">red bluff diversion dam</td>
+<td align="right">2000</td>
+</tr></tbody></table><p><em>… with 231 more rows</em></p>
 </div>
 </div>
 <div class="section level2">
@@ -350,7 +295,46 @@
 <td align="right">2017</td>
 <td align="left">carcass</td>
 <td align="left">Missing reach 1, 2, 4, and some of reach 5</td>
-</tr></tbody></table><p><em>… with 47 more rows</em></p>
+</tr></tbody></table><p><em>… with 45 more rows</em></p>
+</div>
+<div class="section level3">
+<h3 id="applying-to-modeling-datasets-1">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets-1"></a></h3>
+<p>In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, year by data type that should be included in the SR JPE modeling.</p>
+<p>The table below shows a section of this table:</p>
+<table class="table"><thead><tr class="header"><th align="left">stream</th>
+<th align="right">year</th>
+<th align="left">data_type</th>
+</tr></thead><tbody><tr class="odd"><td align="left">battle creek</td>
+<td align="right">1995</td>
+<td align="left">upstream passage</td>
+</tr><tr class="even"><td align="left">clear creek</td>
+<td align="right">1995</td>
+<td align="left">upstream passage</td>
+</tr><tr class="odd"><td align="left">battle creek</td>
+<td align="right">1996</td>
+<td align="left">upstream passage</td>
+</tr><tr class="even"><td align="left">battle creek</td>
+<td align="right">1997</td>
+<td align="left">upstream passage</td>
+</tr><tr class="odd"><td align="left">battle creek</td>
+<td align="right">1998</td>
+<td align="left">upstream passage</td>
+</tr><tr class="even"><td align="left">clear creek</td>
+<td align="right">1998</td>
+<td align="left">upstream passage</td>
+</tr><tr class="odd"><td align="left">battle creek</td>
+<td align="right">1999</td>
+<td align="left">upstream passage</td>
+</tr><tr class="even"><td align="left">clear creek</td>
+<td align="right">1999</td>
+<td align="left">upstream passage</td>
+</tr><tr class="odd"><td align="left">battle creek</td>
+<td align="right">2000</td>
+<td align="left">upstream passage</td>
+</tr><tr class="even"><td align="left">clear creek</td>
+<td align="right">2000</td>
+<td align="left">upstream passage</td>
+</tr></tbody></table><p><em>… with 265 more rows</em></p>
 </div>
 </div>
 
