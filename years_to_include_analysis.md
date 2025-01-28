@@ -67,7 +67,7 @@ We check this list against our original method annually after it is run to confi
 
 
 
-*... with 54 more rows*
+*... with 56 more rows*
 
 
 ### Applying to Modeling Datasets
@@ -93,7 +93,7 @@ The table below shows a section of this table:
 
 
 
-*... with 231 more rows*
+*... with 229 more rows*
 
 ## Adult Data - Years to Include in Model
 
