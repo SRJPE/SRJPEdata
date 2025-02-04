@@ -69,6 +69,36 @@ butte_carcass <- butte_historical |>
 # Upstream passage data, redd (mill), holding (deer)
 # These data are on EDI and should be updated following the EDI workflow
 # https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1672.1
+identifier = "1672"
+revision = list_data_package_revisions(scope, identifier, filter = "newest")
+package_id <- paste(scope, identifier, revision, sep = ".")
+
+# List data entities of the data package
+res <- read_data_entity_names(package_id)
+
+# Download the daily corrected passage
+name <- "deer_mill_upstream_passage_estimates.csv"
+entity_id <- res$entityId[res$entityName == name]
+raw <- read_data_entity(package_id, entity_id)
+upstream_passage_estimates_data <- read_csv(file = raw)
+
+upstream_passage_estimates_data_clean <- upstream_passage_estimates_data |> 
+  mutate(reach = NA,
+         adipose_clipped = NA,
+         upper_bound_estimate = ucl,
+         lower_bound_estimate = lcl,
+         confidence_level = confidence_interval) |>
+  select(year, stream, reach, passage_estimate, adipose_clipped, run, upper_bound_estimate, lower_bound_estimate, confidence_level) |>
+  glimpse()
+
+
+# name <- ".csv"
+# entity_id <- res$entityId[res$entityName == name]
+# raw <- read_data_entity(package_id, entity_id)
+# upstream_passage_data <- read_csv(file = raw)
+
+# TODO  keep redd count 
+
 
 # Feather
 # These data are not on EDI and currently we do not have a plan to use them
