@@ -82,7 +82,7 @@ entity_id <- res$entityId[res$entityName == name]
 raw <- read_data_entity(package_id, entity_id)
 upstream_passage_estimates_data <- read_csv(file = raw)
 
-upstream_passage_estimates_data_clean <- upstream_passage_estimates_data |> 
+deer_mill_upstream_passage_estimates <- upstream_passage_estimates_data |> 
   mutate(reach = NA,
          adipose_clipped = NA,
          upper_bound_estimate = ucl,
@@ -97,14 +97,15 @@ entity_id <- res$entityId[res$entityName == name]
 raw <- read_data_entity(package_id, entity_id)
 redd_data <- read_csv(file = raw)
 
-redd_data_clean <- redd_data |> 
+deer_mill_redd <- redd_data |> 
   mutate(reach_number = NA,
          latitude = NA,
          longitude = NA,
          velocity = NA,
          redd_id = NA,
          age = NA,
-         run = NA) |> # TODO are they all spring run?
+         run = NA, # TODO are they all spring run?
+         date = as.Date(date)) |> 
   select(date, stream, reach, latitude, longitude, run, velocity, redd_id, age, redd_count) |> 
   glimpse()
 
@@ -114,7 +115,7 @@ entity_id <- res$entityId[res$entityName == name]
 raw <- read_data_entity(package_id, entity_id)
 holding_data <- read_csv(file = raw)
 
-holding_data_clean <- holding_data |> 
+deer_mill_holding <- holding_data |> 
   mutate(latitude = NA,
          longitude = NA) |> 
   select(date, stream, reach, count, adipose_clipped, run, latitude, longitude) |> 
@@ -159,6 +160,6 @@ yuba_spring_passage_estimates <- yuba_passage_estimates |>
 
 # Combine and save
 carcass_estimates <- butte_carcass
-upstream_passage_estimate <- yuba_spring_passage_estimates # add battle, clear, deer, mill when ready
-# redd <-
-# holding <-
+upstream_passage_estimate <- bind_rows(yuba_spring_passage_estimates, deer_mill_upstream_passage_estimates) # add battle, clear, deer, mill when ready
+# redd <- deer_mill_redd
+# holding <-  deer_mill_holding
