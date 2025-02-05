@@ -108,6 +108,17 @@ redd_data_clean <- redd_data |>
   select(date, stream, reach, latitude, longitude, run, velocity, redd_id, age, redd_count) |> 
   glimpse()
 
+# holding (deer)
+name <- "deer_mill_holding.csv"
+entity_id <- res$entityId[res$entityName == name]
+raw <- read_data_entity(package_id, entity_id)
+holding_data <- read_csv(file = raw)
+
+holding_data_clean <- holding_data |> 
+  mutate(latitude = NA,
+         longitude = NA) |> 
+  select(date, stream, reach, count, adipose_clipped, run, latitude, longitude) |> 
+  glimpse()
 
 # Feather
 # These data are not on EDI and currently we do not have a plan to use them
