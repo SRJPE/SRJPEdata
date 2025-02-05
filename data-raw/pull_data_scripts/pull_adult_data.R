@@ -91,13 +91,22 @@ upstream_passage_estimates_data_clean <- upstream_passage_estimates_data |>
   select(year, stream, reach, passage_estimate, adipose_clipped, run, upper_bound_estimate, lower_bound_estimate, confidence_level) |>
   glimpse()
 
+# redd data (Mill) ---
+name <- "deer_mill_redd.csv"
+entity_id <- res$entityId[res$entityName == name]
+raw <- read_data_entity(package_id, entity_id)
+redd_data <- read_csv(file = raw)
 
-# name <- ".csv"
-# entity_id <- res$entityId[res$entityName == name]
-# raw <- read_data_entity(package_id, entity_id)
-# upstream_passage_data <- read_csv(file = raw)
-
-# TODO  keep redd count 
+redd_data_clean <- redd_data |> 
+  mutate(reach_number = NA,
+         latitude = NA,
+         longitude = NA,
+         velocity = NA,
+         redd_id = NA,
+         age = NA,
+         run = NA) |> # TODO are they all spring run?
+  select(date, stream, reach, latitude, longitude, run, velocity, redd_id, age, redd_count) |> 
+  glimpse()
 
 
 # Feather
