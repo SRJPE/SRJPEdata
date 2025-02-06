@@ -64,26 +64,52 @@ usethis::use_data(stock_recruit_year_lookup, overwrite = TRUE)
 # Combine the adult data and sr covariates
 
 # Todo - fill in recent years for battle and clear
-stock_recruit_model_inputs <- stock_recruit_covariates |> 
-  ungroup() |> 
-  select(-stream_site) |> # this isn't doing anything and is confusing so remove
-  mutate(site_group = case_when(gage_number %in% c("UBC","UCC","LCC","LBC") ~ tolower(gage_number), # for some clear/battle the upper/lower being noted in gage_agency
-                                is.na(site_group) ~ stream,
-                                T ~ site_group)) |> 
-  filter(site_group %in% c("ubc", "battle creek","butte creek","clear creek","lcc", "deer creek", "upper feather hfc", "feather river",
-                           "mill creek", "yuba river","sacramento river")) |> # select for the locations chosen for stock recruit (see sites vignette)
-  select(year, stream, covariate_structure, value) |> 
-  group_by(stream, year, covariate_structure) |> 
-  summarize(value = mean(value, na.rm = T)) |> # if there are multiple sources, take the mean for now - clean this up
-  pivot_wider(id_cols = c(year, stream), names_from = "covariate_structure", values_from = "value") |> 
-  full_join(observed_adult_input |> 
-              select(year, stream, data_type, count) |> 
-              group_by(year, stream, data_type) |> 
-              summarize(count = mean(count)) |> # clean this up, wherever duplicate is coming from
-              pivot_wider(names_from = "data_type", values_from = "count")) |> 
+stock_recruit_model_inputs <- observed_adult_input |> 
+  select(year, stream, data_type, count) |> 
+  group_by(year, stream, data_type) |> 
+  summarize(count = sum(count)) |> # clean this up, wherever duplicate is coming from
+  pivot_wider(names_from = "data_type", values_from = "count") |> 
   rename(holding = holding_count,
          passage = upstream_estimate,
          carcass = carcass_estimate,
-         redd = redd_count)
+         redd = redd_count) |> 
+  left_join(
+    stock_recruit_covariates |>
+      ungroup() |>
+      select(-stream_site) |> # this isn't doing anything and is confusing so remove
+      mutate(site_group = case_when(
+        gage_number %in% c("UBC", "UCC", "LCC", "LBC") ~ tolower(gage_number),
+        # for some clear/battle the upper/lower being noted in gage_agency
+        is.na(site_group) ~ stream,
+        T ~ site_group),
+        lifestage = ifelse(lifestage == "spawning and incubation", "spawning", "rearing"),
+        covariate_structure = paste0(lifestage, "_", covariate_structure)
+      ) |>
+      filter(
+        site_group %in% c(
+          "ubc",
+          "battle creek",
+          "butte creek",
+          "clear creek",
+          "lcc",
+          "deer creek",
+          "upper feather hfc",
+          "feather river",
+          "mill creek",
+          "yuba river",
+          "sacramento river"
+        )
+      ) |> # select for the locations chosen for stock recruit (see sites vignette)
+      select(year, stream, covariate_structure, value) |>
+      group_by(stream, year, covariate_structure) |>
+      summarize(value = mean(value, na.rm = T)) |> # if there are multiple sources, take the mean for now - clean this up
+      ungroup() |>
+      group_by(stream, covariate_structure) |>
+      mutate(standardized_value = as.vector(scale(value))) |>
+      pivot_wider(
+        id_cols = c(year, stream),
+        names_from = "covariate_structure",
+        values_from = "standardized_value"
+      ))
 
 usethis::use_data(stock_recruit_model_inputs, overwrite = TRUE)
