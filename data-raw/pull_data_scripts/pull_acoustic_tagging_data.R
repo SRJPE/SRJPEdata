@@ -26,27 +26,63 @@ reciever_data <- pull_reciever_data_from_ERDDAP()
 # Retrieve list of all studyIDs on FED_JSATS
 study_ids <- pull_study_ids_from_ERDDAP()
 
-# ids_with_spring <- which(str_detect(study_ids, "Spring"))
-# spring_ids <- study_ids[ids_with_spring]
-# Cannot download all at once so just pull jpe ids for now
-floras_sac_ids <- read_csv("data-raw/archive/floras_data_prep/data/SacInp.csv") |> pull(StudyID) |> unique()
-floras_feather_butte_ids <- read_csv("data-raw/archive/floras_data_prep/data/FeatherButteInp.csv") |> pull(StudyID) |> unique()
-jpe_ids_sac <- floras_sac_ids
-jpe_ids_feather_butte <- floras_feather_butte_ids
-jpe_ids <- c(floras_sac_ids, floras_feather_butte_ids)
-
-jpe_detections <- purrr::map(jpe_ids, pull_detections_data_from_ERDDAP) |> 
+# SACRAMENTO
+sacramento_studyIDs <- c("ColemanFall_2013","ColemanFall_2016","ColemanFall_2017",
+             "CNFH_FMR_2019","CNFH_FMR_2020","CNFH_FMR_2021",
+             "RBDD_2017","RBDD_2018","Wild_stock_Chinook_RBDD_2022",
+             "SacRiverSpringJPE_2022","SacRiverSpringJPE_2023","Spring_Pulse_2023",
+             "DeerCk_Wild_CHK_2018","DeerCk_Wild_CHK_2020",
+             "MillCk_Wild_CHK_2013","MillCk_Wild_CHK_2015","MillCk_Wild_CHK_2017",
+             "Wild_stock_Chinook_Rbdd_2021")
+# FOR TROUBLESHOOTING
+# sacramento_studyIDs <- "ColemanFall_2013"
+sacramento_detections <- purrr::map(sacramento_studyIDs, pull_detections_data_from_ERDDAP) |> 
   reduce(bind_rows) |> 
   mutate(first_time = as.POSIXct(first_time, 
-                                 format = "%m/%d/%Y %H:%M:%S", 
+                                 format = "%Y-%d-%m %H:%M:%S", 
                                  tz = "Etc/GMT+8"),
          last_time = as.POSIXct(last_time, 
-                                format = "%m/%d/%Y %H:%M:%S", 
+                                format = "%Y-%d-%m %H:%M:%S", 
                                 tz = "Etc/GMT+8"),
          time = as.POSIXct(time, 
-                           format = "%m/%d/%Y %H:%M:%S", 
+                           format = "%Y-%d-%mT%H:%M:%S", 
                            tz = "Etc/GMT+8")) |>
   glimpse()
 
+# BUTTE
+butte_studyIDs <- c("SB_Spring_2015","SB_Spring_2016","SB_Spring_2017","SB_Spring_2018",
+                    "SB_Spring_2019","SB_Spring_2023", "Butte_Sink_2023",
+                    "Butte_Sink_2021","Upper_Butte_2019","Upper_Butte_2020",'Upper_Butte_2021') # studies with 0 detection in Sac
+
+butte_detections <- purrr::map(butte_studyIDs, pull_detections_data_from_ERDDAP) |> 
+  reduce(bind_rows) |> 
+  mutate(first_time = as.POSIXct(first_time, 
+                                 format = "%Y-%d-%m %H:%M:%S", 
+                                 tz = "Etc/GMT+8"),
+         last_time = as.POSIXct(last_time, 
+                                format = "%Y-%d-%m %H:%M:%S", 
+                                tz = "Etc/GMT+8"),
+         time = as.POSIXct(time, 
+                           format = "%Y-%d-%mT%H:%M:%S", 
+                           tz = "Etc/GMT+8")) |>
+  glimpse()
+
+
+# FEATHER
+feather_studyIDs <- c("FR_Spring_2013","FR_Spring_2014","FR_Spring_2015","FR_Spring_2019","FR_Spring_2020",
+                      "FR_Spring_2021","FR_Spring_2023") 
+
+feather_detections <- purrr::map(feather_studyIDs, pull_detections_data_from_ERDDAP) |> 
+  reduce(bind_rows) |> 
+  mutate(first_time = as.POSIXct(first_time, 
+                                 format = "%Y-%d-%m %H:%M:%S", 
+                                 tz = "Etc/GMT+8"),
+         last_time = as.POSIXct(last_time, 
+                                format = "%Y-%d-%m %H:%M:%S", 
+                                tz = "Etc/GMT+8"),
+         time = as.POSIXct(time, 
+                           format = "%Y-%d-%mT%H:%M:%S", 
+                           tz = "Etc/GMT+8")) |>
+  glimpse()
 
 
