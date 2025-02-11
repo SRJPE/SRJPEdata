@@ -44,23 +44,32 @@ Following initial analyses and discussions, we focused on approach 3 because it 
 
 
 ```
-#> Error in `filter()`:
-#> ℹ In argument: `month %in% migratory_months`.
-#> Caused by error in `match()`:
-#> ! 'match' requires vector arguments
-#> Error in `filter()`:
-#> ℹ In argument: `month %in% holding_months`.
-#> Caused by error in `match()`:
-#> ! 'match' requires vector arguments
-#> Error: object 'gdd_trib' not found
-#> Error: object 'gdd' not found
+## Error in `filter()`:
+## ℹ In argument: `month %in% migratory_months`.
+## Caused by error in `match()`:
+## ! 'match' requires vector arguments
+```
+
+```
+## Error in `filter()`:
+## ℹ In argument: `month %in% holding_months`.
+## Caused by error in `match()`:
+## ! 'match' requires vector arguments
+```
+
+```
+## Error: object 'gdd_trib' not found
+```
+
+```
+## Error: object 'gdd' not found
 ```
 
 The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:
 
 
 ```
-#> Error: object 'gdd' not found
+## Error: object 'gdd' not found
 ```
 
 ### Flow 
@@ -69,18 +78,21 @@ Maximum flow more effectively captures the high flow events that support migrati
 
 
 ```
-#> Error in `filter()`:
-#> ℹ In argument: `month %in% migratory_and_holding_months`.
-#> Caused by error in `match()`:
-#> ! 'match' requires vector arguments
-#> Error: object 'flow_metrics' not found
+## Error in `filter()`:
+## ℹ In argument: `month %in% migratory_and_holding_months`.
+## Caused by error in `match()`:
+## ! 'match' requires vector arguments
+```
+
+```
+## Error: object 'flow_metrics' not found
 ```
 
 The following plot is of max flow (cfs) over time for all tributaries:
 
 
 ```
-#> Error: object 'flow_metrics' not found
+## Error: object 'flow_metrics' not found
 ```
 
 ### Water Year Type
@@ -90,18 +102,14 @@ To account for the influence of large scale interannual climate variability, we 
 We used the `waterYearType` package to pull water year assignments as a categorical covariate. Some streams had very few data points (i.e. for Mill Creek, only seven years were considered dependable), so we simplified all potential categories of water year type into either dry (`Dry`, `Below Normal`, `Critical`) or wet (`Wet`, `Above Normal`). The table below summarizes the number of dry and wet years that were included:
 
 
-
 |Water Year Type | Count|
 |:---------------|-----:|
 |dry             |    64|
 |wet             |    54|
 
-
-
 ### Passage Timing
 
 Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power. Passage timing was summarized as the mean, median, and min day of passage. The resulting dataset is as follows:
-
 
 
 | year|stream       | median_passage_timing| mean_passage_timing| min_passage_timing|
@@ -117,8 +125,6 @@ Passage timing was considered; however, limited data reduced the sample size of 
 | 2006|battle creek |                  26.0|            25.98750|                 25|
 | 2007|battle creek |                  22.0|            23.08021|                 19|
 
-
-
 The following plot is of median passage over time for all tributaries:
 
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
@@ -126,7 +132,6 @@ The following plot is of median passage over time for all tributaries:
 ### Total Passage as Index
 
 We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality. 
-
 
 
 | year|stream       | passage_index|
@@ -150,7 +155,7 @@ Both continuous environmental variables (flow and temperature) were standardized
 
 
 ```
-#> Error: object 'flow_metrics' not found
+## Error: object 'flow_metrics' not found
 ```
 
 
@@ -167,8 +172,6 @@ Both continuous environmental variables (flow and temperature) were standardized
 | 2002|battle creek |       0|   -0.8162630|         NA|     0.2018445|                 0.8977450|
 | 2003|battle creek |       1|   -0.0164556| -0.6931611|     0.1961676|                 3.0247102|
 | 2004|battle creek |       0|    0.0477623| -0.7325204|    -0.5475032|                -0.0138115|
-
-
 
 The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:
 
