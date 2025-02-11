@@ -402,6 +402,29 @@ sac_river_daily_temp <- sac_river_temp_query |>
                 parameter = "temperature",
                 statistic = "mean")
 
+
+# Red Bluff ---------------------------------------------------------------
+# Note that RBDD is not currently being used in SRJPE modeling (Feb 2025)
+# but may be in the future
+
+### Flow Data Pull 
+#### Gage Agency (USGS, 11377100)
+rbdd_data_query <- dataRetrieval::readNWISdv(11377100, "00060", startDate = "1994-01-01")
+
+rbdd_daily_flows <- rbdd_data_query |>  
+  select(Date, value =  X_00060_00003) |>  
+  as_tibble() |> 
+  rename(date = Date) |> 
+  mutate(stream = "sacramento river",
+         site_group = "red bluff diversion dam",
+         gage_agency = "USGS",
+         gage_number = "11377100",
+         parameter = "flow",
+         statistic = "mean")
+
+### Temp Data Pull 
+# No temperature data available at this gage.
+
 ## Yuba River ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11421000)
