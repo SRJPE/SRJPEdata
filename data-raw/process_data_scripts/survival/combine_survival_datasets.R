@@ -7,7 +7,8 @@ source("data-raw/process_data_scripts/survival/feather_build_survival_model_data
 # Combine data
 survival_model_inputs <- bind_rows(survival_model_inputs_sacramento, 
                                    survival_model_inputs_butte, 
-                                   survival_model_inputs_feather)
+                                   survival_model_inputs_feather) |> 
+  mutate(fish_weight = as.numeric(fish_weight), fish_length = as.numeric(fish_length))
 
 # save as data object
 usethis::use_data(survival_model_inputs, overwrite = TRUE)

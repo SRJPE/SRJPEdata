@@ -33,7 +33,7 @@ source("data-raw/process_data_scripts/build_rst_model_datasets.R")
 # Note: We only pull specific JPE studies now, if we want to add more in, we must specify survey_id name in pull script
 source("data-raw/pull_data_scripts/pull_acoustic_tagging_data.R")
 # Note: some funcitons are site / system specific, may need to add new logic as new systems are added
-source("data-raw/process_data_scripts/build_survival_model_datasets.R")
+source("data-raw/process_data_scripts/survival/combine_survival_datasets.R")
 
 # Update versioning and NEWS.md 
 # add updated version number and description of updates into NEWS.md file, see
