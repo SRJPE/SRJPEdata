@@ -35,14 +35,17 @@ source("data-raw/process_data_scripts/build_sr_model_datasets.R")
 # Note: We only pull specific JPE studies now, if we want to add more in, we must specify survey_id name in pull script
 source("data-raw/pull_data_scripts/pull_acoustic_tagging_data.R")
 # Note: some funcitons are site / system specific, may need to add new logic as new systems are added
-source("data-raw/process_data_scripts/build_survival_model_datasets.R")
+source("data-raw/process_data_scripts/survival/combine_survival_datasets.R")
 
 # Update versioning and NEWS.md 
 # add updated version number and description of updates into NEWS.md file, see
 # https://docs.google.com/document/d/1HgDlOpBMK5BVcrNnuB3CbZWsO6PyYbpJZdfM5C6NfRQ/edit for our versioning procedures 
 
+# RUN IF DOCS UPDATE
 devtools::document()
 pkgdown::build_site()
+#### DOCS html and .yml will be in gitignore. 
+#### Make sure to update anyways if you have rebuilt the documentation site
 devtools::test() 
 
 # TODO Probably want to add some checks here to make sure no data is turning up empty

@@ -37,7 +37,6 @@ rst_all_weeks <- rst_catch |>
   select(-include) |> 
   filter(run_year != 2025) # TODO remove once we want to include 2025 data
 
-
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 ### ----------------------------------------------------------------------------
 
@@ -329,4 +328,3 @@ weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_dat
 usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE) 
 usethis::use_data(weekly_juvenile_abundance_efficiency_data, overwrite = TRUE)
 usethis::use_data(weekly_efficiency, overwrite = TRUE) 
-
