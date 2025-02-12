@@ -60,7 +60,7 @@ catch_with_inclusion_criteria <- updated_standard_catch[
   include == TRUE
 ][
   # Step 4: Select and remove columns (similar to select in dplyr)
-  , !c("run_year", "year", "week", "include", "monitoring_year")
+  , !c("run_year", "year", "week", "include")
 ]
 
 
