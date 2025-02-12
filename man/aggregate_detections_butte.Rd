@@ -9,9 +9,10 @@ aggregate_detections_butte(
   receiever_metadata,
   replace_dict = list(replace_with = list(c("Releasepoint"), c("Sacramento"),
     c("Endpoint")), replace_list = list(c("UpperButte_RST_Rel", "UpperButte_RST",
-    "UpperButte_SKWY", "SutterBypass_Weir2_RST_Rel", "SutterBypass Weir2 RST"),
-    c("TowerBridge", "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"), c("BeniciaE",
-    "BeniciaW", "ChippsE", "ChippsW")))
+    "UpperButte_SKWY", "Butte_Blw_Sanborn_Rel", "North_Weir_Rel", "Sanborn_Slough_Rel",
+    "Laux Rd", "SutterBypass_Weir2_RST_Rel", "SutterBypass Weir2 RST"), c("TowerBridge",
+    "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"), c("BeniciaE", "BeniciaW", "ChippsE",
+    "ChippsW")))
 )
 }
 \arguments{
