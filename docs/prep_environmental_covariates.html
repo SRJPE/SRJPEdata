@@ -101,6 +101,7 @@
 <li>Degree Day 20 (DD20), where cumulative degree days are calculated against a threshold of 20 degrees Celsius <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274" class="external-link">(source)</a>
 </li>
 </ol><p>Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. The resulting dataset is as follows (note that DD less than 0 are set to 0):</p>
+<<<<<<< HEAD
 <table class="table"><thead><tr class="header"><th align="right">year</th>
 <th align="left">stream</th>
 <th align="right">gdd_trib</th>
@@ -160,58 +161,31 @@
 <div class="float">
 <img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><div class="figcaption">plot of chunk unnamed-chunk-3</div>
 </div>
+=======
+<pre><code><span><span class="co">#&gt; Error in `filter()`:</span></span>
+<span><span class="co">#&gt; ℹ In argument: `month %in% migratory_months`.</span></span>
+<span><span class="co">#&gt; Caused by error in `match()`:</span></span>
+<span><span class="co">#&gt; ! 'match' requires vector arguments</span></span>
+<span><span class="co">#&gt; Error in `filter()`:</span></span>
+<span><span class="co">#&gt; ℹ In argument: `month %in% holding_months`.</span></span>
+<span><span class="co">#&gt; Caused by error in `match()`:</span></span>
+<span><span class="co">#&gt; ! 'match' requires vector arguments</span></span>
+<span><span class="co">#&gt; Error: object 'gdd_trib' not found</span></span>
+<span><span class="co">#&gt; Error: object 'gdd' not found</span></span></code></pre>
+<p>The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:</p>
+<pre><code><span><span class="co">#&gt; Error: object 'gdd' not found</span></span></code></pre>
+>>>>>>> main
 </div>
 <div class="section level3">
 <h3 id="flow">Flow<a class="anchor" aria-label="anchor" href="#flow"></a></h3>
 <p>Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:</p>
-<table class="table"><thead><tr class="header"><th align="left">stream</th>
-<th align="right">year</th>
-<th align="right">mean_flow</th>
-<th align="right">max_flow</th>
-</tr></thead><tbody><tr class="odd"><td align="left">battle creek</td>
-<td align="right">1995</td>
-<td align="right">1081.0623</td>
-<td align="right">4565.0000</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="right">1996</td>
-<td align="right">605.7972</td>
-<td align="right">1304.2857</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">1997</td>
-<td align="right">386.9291</td>
-<td align="right">537.3333</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="right">1998</td>
-<td align="right">1077.3373</td>
-<td align="right">2206.0000</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">1999</td>
-<td align="right">614.3513</td>
-<td align="right">1593.3333</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="right">2000</td>
-<td align="right">491.4613</td>
-<td align="right">1169.2857</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">2001</td>
-<td align="right">313.1073</td>
-<td align="right">669.2857</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="right">2002</td>
-<td align="right">359.5254</td>
-<td align="right">501.1429</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">2003</td>
-<td align="right">612.9023</td>
-<td align="right">1171.2000</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="right">2004</td>
-<td align="right">467.7805</td>
-<td align="right">1225.0000</td>
-</tr></tbody></table><p>The following plot is of max flow (cfs) over time for all tributaries:</p>
-<div class="float">
-<img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"><div class="figcaption">plot of chunk unnamed-chunk-5</div>
-</div>
+<pre><code><span><span class="co">#&gt; Error in `filter()`:</span></span>
+<span><span class="co">#&gt; ℹ In argument: `month %in% migratory_and_holding_months`.</span></span>
+<span><span class="co">#&gt; Caused by error in `match()`:</span></span>
+<span><span class="co">#&gt; ! 'match' requires vector arguments</span></span>
+<span><span class="co">#&gt; Error: object 'flow_metrics' not found</span></span></code></pre>
+<p>The following plot is of max flow (cfs) over time for all tributaries:</p>
+<pre><code><span><span class="co">#&gt; Error: object 'flow_metrics' not found</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="water-year-type">Water Year Type<a class="anchor" aria-label="anchor" href="#water-year-type"></a></h3>
@@ -220,9 +194,9 @@
 <table class="table"><thead><tr class="header"><th align="left">Water Year Type</th>
 <th align="right">Count</th>
 </tr></thead><tbody><tr class="odd"><td align="left">dry</td>
-<td align="right">60</td>
+<td align="right">64</td>
 </tr><tr class="even"><td align="left">wet</td>
-<td align="right">52</td>
+<td align="right">54</td>
 </tr></tbody></table></div>
 <div class="section level3">
 <h3 id="passage-timing">Passage Timing<a class="anchor" aria-label="anchor" href="#passage-timing"></a></h3>
@@ -330,6 +304,7 @@
 <div class="section level3">
 <h3 id="combine-and-save-covariate-data">Combine and Save Covariate Data<a class="anchor" aria-label="anchor" href="#combine-and-save-covariate-data"></a></h3>
 <p>Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as <code>1</code> for wet (wet, above normal) and <code>0</code> for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):</p>
+<pre><code><span><span class="co">#&gt; Error: object 'flow_metrics' not found</span></span></code></pre>
 <table style="width:100%;" class="table"><colgroup><col width="5%"><col width="14%"><col width="8%"><col width="14%"><col width="12%"><col width="15%"><col width="28%"></colgroup><thead><tr class="header"><th align="right">year</th>
 <th align="left">stream</th>
 <th align="right">wy_type</th>

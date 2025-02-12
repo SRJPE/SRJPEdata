@@ -26,9 +26,11 @@ knitr::knit("vignettes/years_to_include_analysis.Rmd") # does not automatically 
 devtools::load_all()
 
 # Source prep data scripts 
-source("data-raw/process_data_scripts/build_adult_model_datasets.R")
-source("data-raw/process_data_scripts/build_rst_model_datasets.R")
+source("data-raw/process_data_scripts/build_adult_model_datasets.R") #TODO, error here 
+# Error because database pull for upstream passage returns empty table
 
+source("data-raw/process_data_scripts/build_rst_model_datasets.R")
+source("data-raw/process_data_scripts/build_sr_model_datasets.R")
 # Then pull acoustic tagging data
 # Note: We only pull specific JPE studies now, if we want to add more in, we must specify survey_id name in pull script
 source("data-raw/pull_data_scripts/pull_acoustic_tagging_data.R")
@@ -44,6 +46,7 @@ devtools::document()
 pkgdown::build_site()
 #### DOCS html and .yml will be in gitignore. 
 #### Make sure to update anyways if you have rebuilt the documentation site
+devtools::test() 
 
 # TODO Probably want to add some checks here to make sure no data is turning up empty
 # or something 
