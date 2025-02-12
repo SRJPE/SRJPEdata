@@ -246,6 +246,7 @@ feather_hfc_river_daily_flows <- feather_hfc_river_data_query |>
 
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
+# USGS site is through 9/20/2023 so needed to add a CDEC site for continuity
 feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060", startDate = "1997-01-01")
 
 feather_lfc_river_daily_flows <- feather_lfc_river_data_query|> 
@@ -258,6 +259,21 @@ feather_lfc_river_daily_flows <- feather_lfc_river_data_query|>
                 gage_number = "11407000",
                 parameter = "flow",
                 statistic = "mean")
+
+feather_lfc2_river_data_query <- CDECRetrieve::cdec_query(station = "TFB", dur_code = "H", sensor_num = "20", start_date = "2023-10-01")
+
+feather_lfc2_river_daily_flows <- feather_lfc2_river_data_query |> 
+  mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+  group_by(date = as.Date(datetime)) |> 
+  summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
+            max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
+            min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
+  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+  mutate(stream = "feather river",  
+         site_group = "upper feather lfc", 
+         gage_agency = "CDEC",
+         gage_number = "TFB",
+         parameter = "flow")
 
 ### Flow Data Pull Tests 
 #Lower Feather data 
@@ -528,6 +544,7 @@ flow <- rbindlist(list(battle_creek_daily_flows,
                   yuba_river_daily_flows,
                   feather_hfc_river_daily_flows,
                   feather_lfc_river_daily_flows,
+                  feather_lfc2_river_daily_flows,
                   lower_feather_river_daily_flows), use.names = TRUE, fill = TRUE) |> 
   glimpse()
 
