@@ -182,7 +182,8 @@ We check this list against our original method annually after it is run to confi
 years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data |> 
   bind_rows(years_exclude_rst_csv) |> 
   distinct()
-# Bind in new rows from recent data 
+
+# Automatic exclusion criteria to be applied to most recent year
 if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 
   max_old_year <- max(years_to_exclude_rst_data$year)
   # Consider thinking about adding subsites together, right now it looks like subsites are fished equally
@@ -226,6 +227,7 @@ The table below shows a section of this table:
 ```{r, echo = FALSE}
 years_to_include_rst_data <- SRJPEdata::rst_catch |> 
   mutate(run_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
+  filter(run_year < year(Sys.Date())) |> 
   distinct(stream, site, run_year) |> 
   full_join(years_to_exclude_rst_data |> 
               select(run_year, stream, site) |> 
