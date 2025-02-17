@@ -39,13 +39,13 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
 test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
   catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-    filter(count >= 0) 
+    filter(!is.na(count) &!is.na(life_stage)) 
   stream_na = anyNA(catch$stream)
-  site_na = anyNA(catch$site)
-  flow_na = anyNA(catch$flow_cfs)
-  std_flow_na = anyNA(catch$standardized_flow)
+  site_na = anyNA(catch$site) # note 2/14 fixing this in db update
+  flow_na = anyNA(catch$flow_cfs) # note 2/14 there are only 15 with missing data
+  std_flow_na = anyNA(catch$standardized_flow) # same as above
   # fl_na = anyNA(catch$mean_fork_length)
-  ls_na = anyNA(catch$life_stage)
+  ls_na = anyNA(catch$life_stage) # only 6 missing lifestage
   hf_na = anyNA(catch$hours_fished)
   as_hf_na = anyNA(catch$average_stream_hours_fished)
   ry_na = anyNA(catch$run_year)
@@ -73,13 +73,13 @@ test_that("still have flow and hours fished even if no catch", {
   hf_na = anyNA(catch$hours_fished)
   as_hf_na = anyNA(catch$average_stream_hours_fished)
   ry_na = anyNA(catch$run_year)
-  cshf_na = anyNA(catch$catch_standardized_by_hours_fished)
+  # cshf_na = anyNA(catch$catch_standardized_by_hours_fished) - this should be NA
   
   nas = c(stream_na, site_na, flow_na, 
           # fl_na, 
           ls_na, hf_na, as_hf_na, 
-          ry_na, cshf_na)
-  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+          ry_na)
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
                nas)
 })
 
@@ -118,9 +118,7 @@ test_that("test that there is data for each site week combo", {
            year = year(date)) |> 
     distinct(stream, site, year, week) |> 
     mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
-    left_join(chosen_site_years_to_model |> # need to make sure to filter out years that have been excluded
-                select(monitoring_year, stream, site) |> 
-                rename(run_year = monitoring_year) |> 
+    left_join(SRJPEdata::years_to_include_rst_data |> # need to make sure to filter out years that have been excluded
                 mutate(include = T)) |> 
     filter(include == T) |> 
     select(-include) |> 

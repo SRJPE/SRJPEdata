@@ -19,8 +19,8 @@ years_to_include_rst_data <- SRJPEdata::years_to_include_rst_data |>
 # This is joined at the end
 rst_all_weeks <- rst_catch |> 
   group_by(stream, site, subsite) |> 
-  summarise(min = min(date),
-            max = max(date)) |> 
+  summarise(min = min(date, na.rm = T),
+            max = max(date, na.rm = T)) |> 
   mutate(min = paste0(year(min),"-01-01"),
          max = paste0(year(max),"-12-31")) |> 
   pivot_longer(cols = c(min, max), values_to = "date") |> 
@@ -186,14 +186,22 @@ weekly_efficiency <-
 weekly_efficiency |> glimpse()
 
 # reformat flow data and summarize weekly
-# TODO 32 NAs, fill in somehow  
-flow_reformatted <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
+flow_reformatted_raw <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
   left_join(
   env_with_sites |> 
   filter(parameter == "flow",
          statistic == "mean") |> 
   group_by(year, week, site, stream, gage_agency, gage_number) |> 
   summarise(flow_cfs = mean(value, na.rm = T)))
+# To fill in NAs, find the average weekly flow across years
+mean_flow_across_years <- flow_reformatted_raw |> 
+  group_by(week, site, stream) |> 
+  summarize(mean_flow_for_data_gaps = mean(flow_cfs, na.rm = T))
+
+flow_reformatted <- flow_reformatted_raw |> 
+  left_join(mean_flow_across_years) |> 
+  mutate(flow_cfs = ifelse(is.na(flow_cfs), mean_flow_for_data_gaps, flow_cfs)) |> 
+  select(-mean_flow_for_data_gaps)
 
 # Combine catch (weekly_standard_catch), weekly efficiency, and weekly effort by site 
 weekly_efficiency |> glimpse()
