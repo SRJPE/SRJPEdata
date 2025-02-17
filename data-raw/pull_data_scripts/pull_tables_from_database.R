@@ -8,11 +8,12 @@ library(googleCloudStorageR)
 gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
 gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
 
-gcs_get_object(object_name = "model-db/catch.csv",
-              bucket = gcs_get_global_bucket(),
-              saveToDisk = "data-raw/database-tables/catch.csv",
-              overwrite = TRUE)
-rst_catch_raw <- read_csv("data-raw/database-tables/catch.csv")
+# Note that I fixed a table and pulled in directly - this will be updated on db and then can be removed
+# gcs_get_object(object_name = "model-db/catch.csv",
+#               bucket = gcs_get_global_bucket(),
+#               saveToDisk = "data-raw/database-tables/catch.csv",
+#               overwrite = TRUE)
+# rst_catch_raw <- read_csv("data-raw/database-tables/catch.csv")
 # CONNECT TO DB & VIEW TABLES --------------------------------------------------
 # Use DBI - dbConnect to connect to database - keep user id and password sectret
 con <- DBI::dbConnect(drv = RPostgres::Postgres(),
@@ -41,13 +42,14 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
  run <- dbGetQuery(con, "SELECT * FROM run")
  lifestage <- dbGetQuery(con, "SELECT * FROM lifestage")
  
- rst_catch <- rst_catch_raw |> 
-   left_join(rst_trap_locations, by = c("trap_location_id" = "id")) |> 
-   left_join(run, by = c("run_id" = "id")) |> 
-   left_join(lifestage, by = c("lifestage_id" = "id")) |> 
-   select(date, stream, site, subsite, site_group, count, run = definition.x, life_stage = definition.y,
-          adipose_clipped, dead, fork_length, weight, actual_count) |> 
-   mutate(species = "chinook")
+ # This can be removed after table is updated on db
+ # rst_catch <- rst_catch_raw |> 
+ #   left_join(rst_trap_locations, by = c("trap_location_id" = "id")) |> 
+ #   left_join(run, by = c("run_id" = "id")) |> 
+ #   left_join(lifestage, by = c("lifestage_id" = "id")) |> 
+ #   select(date, stream, site, subsite, site_group, count, run = definition.x, life_stage = definition.y,
+ #          adipose_clipped, dead, fork_length, weight, actual_count) |> 
+ #   mutate(species = "chinook")
 # PULL IN RST DATA -------------------------------------------------------------
 # Pull in Catch table
 try(rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.subsite, tl.site_group, 
