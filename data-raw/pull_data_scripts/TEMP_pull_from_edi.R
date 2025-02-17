@@ -355,7 +355,7 @@ yuba_catch_edi <- catch_edi |>
          weight = NA,
          species = "chinook",
          site = tolower(siteName),
-         subsite = case_when(subSiteName == "yuba river" ~ "yub",
+         subsite = case_when(subSiteName == "Yuba River" ~ "yub",
                              subSiteName == "Hallwood 1 RR" ~ "hal",
                              subSiteName == "Hallwood 2 RL" ~ "hal2",
                              subSiteName == "Hallwood 3" ~ "hal3"),

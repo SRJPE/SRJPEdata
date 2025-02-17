@@ -17,7 +17,7 @@ test_that("RST catch data coverage at the tributary level has not changed", {
 test_that("No NA values in identifying catch data variables", {
   expect_equal(any(is.na(rst_catch$stream)), FALSE)
   expect_equal(any(is.na(rst_catch$site)), FALSE)
-  expect_equal(any(is.na(rst_catch$subsite)), FALSE) # note this happens for okie dam and yuba river
+  expect_equal(any(is.na(rst_catch$subsite)), FALSE)
   expect_equal(any(is.na(rst_catch$site_group)), FALSE)
   expect_equal(any(is.na(rst_catch$date)), FALSE)
 })
@@ -77,8 +77,8 @@ test_that("RST recapture data coverage at the tributary level has not changed", 
 test_that("No NA values in identifying recapture data variables", {
   expect_equal(any(is.na(recaptures$stream)), FALSE)
   expect_equal(any(is.na(recaptures$site)), FALSE)
-  expect_equal(any(is.na(recaptures$subsite)), FALSE) # this happens for knights and tisdale
-  expect_equal(any(is.na(recaptures$site_group)), FALSE) # TODO there should not be NAs here right? 
+  expect_equal(any(is.na(filter(recaptures, !site %in% c("knights landing", "tisdale"))$subsite)), FALSE) # this happens for knights and tisdale, NAs are left because recapture location is unknown
+  expect_equal(any(is.na(recaptures$site_group)), FALSE)
   expect_equal(any(is.na(recaptures$date)), FALSE)
 })
 
