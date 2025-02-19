@@ -112,9 +112,9 @@ add_covariates <- surv_model_inputs_with_fish_information %>%
                         release_location == "Sanborn_Slough_Rel" ~ '4B',
                         release_location == "SutterBypass_Weir2_RST_Rel" ~ '5B',
                         TRUE ~ '6B'),
-         wy_three_categories = case_when(year %in% c(2013, 2014, 2015, 2016, 2018, 2020, 2021) ~ 0,
+         wy_two_categories = case_when(year %in% c(2013, 2014, 2015, 2016, 2018, 2020, 2021) ~ 0,
                                          year %in% c(2017, 2019, 2023) ~ 1), #0 or 1 for 2 water year type categories: dry (C,D,BN) and wet (AN,W) water year 
-         wy_four_categories = case_when(year %in% c(2014,2015, 2021) ~ 0,
+         wy_three_categories = case_when(year %in% c(2014,2015, 2021) ~ 0,
                                         year %in% c(2013, 2016, 2018, 2020) ~ 1,
                                         year %in% c(2017, 2019, 2023) ~ 2), #0, 1 or 2 for 3 water year type categories: C, D-BN-AN, W water year
          first_capture = 1, # define first capture location, it is always the release location
