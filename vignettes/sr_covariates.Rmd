@@ -65,7 +65,7 @@ Temperature has been found to influence spawning and rearing. Therefore it is ex
 
 ```{r, include=F}
 # pull in standard temp from env data
-source("data-raw/pull_data_scripts/pull_environmental_data.R")
+#source("data-raw/pull_data_scripts/pull_environmental_data.R")
 standard_temperature <- temp
 ```
 
