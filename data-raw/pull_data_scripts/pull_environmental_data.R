@@ -423,11 +423,13 @@ sac_river_daily_flows <- sac_river_data_query |>
                 statistic = "mean")
 
 ### Temp Data Pull 
-#### Gage #11390500
-### Temp Data Pull Tests
+#### Gage #11390500: large data gap between 1998 and 2016
+# Looked for additional gages - 11425500 (at verona only has 2016-2017), WLK only starts in 2012
+# Decided to use temperature data reported with RSTs to fill in gap
+
 sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", startDate = "1994-01-01")
 
-sac_river_daily_temp <- sac_river_temp_query |> 
+sac_river_daily_temp_raw <- sac_river_temp_query |> 
          select(Date, temp_degC =  X_00010_00003) %>%
          as_tibble() %>% 
          rename(date = Date,
@@ -438,6 +440,23 @@ sac_river_daily_temp <- sac_river_temp_query |>
                 parameter = "temperature",
                 statistic = "mean")
 
+sac_rst_temp_data <- SRJPEdata::rst_trap |> 
+  filter(stream == "sacramento river", !is.na(trap_start_date)) |> 
+  mutate(date = as_date(trap_start_date)) |> 
+  group_by(date) |> 
+  summarize(rst_value = mean(water_temp, na.rm = T)) |> 
+  mutate(gage_agency_rst = "CDFW",
+         gage_number_rst = "reported at RST",
+         parameter = "temperature",
+         statistic = "mean",
+         stream = "sacramento river")
+
+sac_river_daily_temp <- sac_river_daily_temp_raw |> 
+  full_join(sac_rst_temp_data) |> 
+  mutate(gage_agency = ifelse(is.na(value) & !is.na(rst_value), gage_agency_rst, gage_agency),
+         gage_number = ifelse(is.na(value) & !is.na(rst_value), gage_number_rst, gage_number),
+         value = ifelse(is.na(value) & !is.na(rst_value), rst_value, value)) |> 
+  select(-c(rst_value, gage_agency_rst, gage_number_rst))
 
 # Red Bluff ---------------------------------------------------------------
 # Note that RBDD is not currently being used in SRJPE modeling (Feb 2025)
