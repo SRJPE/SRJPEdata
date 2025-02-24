@@ -480,6 +480,21 @@ rbdd_daily_flows <- rbdd_data_query |>
 ### Temp Data Pull 
 # No temperature data available at this gage.
 
+### Reservoir Storage
+# For the SR mainstem we decided to pull in Shasta water storage
+shasta_storage_query <- cdec_query(station = "SHA", dur_code = "D", sensor_num = "15", start_date = "1999-01-01")
+
+shasta_daily_storage <- shasta_storage_query |> 
+  mutate(date = as_date(datetime)) |> 
+  mutate(year = year(datetime)) |> 
+  rename(value = parameter_value) |> 
+  mutate(gage_agency = "CDEC",
+         gage_number = "SHA",
+         stream = "sacramento river",
+         parameter = "reservoir storage",
+         statistic = "mean") |> 
+  select(-c(agency_cd, location_id, parameter_cd, datetime))
+
 ## Yuba River ----
 ### Flow Data Pull 
 #### Gage Agency (USGS, 11421000)
