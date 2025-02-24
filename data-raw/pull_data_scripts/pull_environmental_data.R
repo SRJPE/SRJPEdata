@@ -605,6 +605,8 @@ temp <- rbindlist(list(battle_creek_daily_temp,
   select(-site) |> 
   glimpse()
 
+storage <- rbindlist(list(shasta_daily_storage), use.names = T, fill = T)
+
 # Quick QC plot
 # ggplot(temp |> 
 #          filter(statistic == "mean"),
@@ -613,9 +615,10 @@ temp <- rbindlist(list(battle_creek_daily_temp,
 #   facet_wrap(~stream)
 setDT(temp)
 setDT(flow)
+setDT(storage)
 
 # Bind the rows of temp and flow with use.names=TRUE to match by column name
-combined_data <- rbindlist(list(temp, flow), use.names = TRUE, fill = TRUE) |> distinct()
+combined_data <- rbindlist(list(temp, flow, storage), use.names = TRUE, fill = TRUE) |> distinct()
 
 # Reshape the data to 'wider' format (like pivot_wider)
 reshaped_data <- dcast(combined_data, ... ~ statistic, value.var = "value")
