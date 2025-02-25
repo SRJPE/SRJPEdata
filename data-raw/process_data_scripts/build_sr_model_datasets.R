@@ -115,7 +115,7 @@ stock_recruit_model_inputs <- observed_adult_input |>
 usethis::use_data(stock_recruit_model_inputs, overwrite = TRUE)
 
 flag <- observed_adult_input |> 
-  filter(stream %in% c("battle creek","clear creek", "deer creek","mill creek")) |> 
+  filter(stream %in% c("battle creek","clear creek", "mill creek")) |> 
   select(year, stream, data_type, count) |> 
   group_by(year, stream, data_type) |> 
   summarize(count = sum(count)) |> # clean this up, wherever duplicate is coming from
@@ -127,7 +127,7 @@ flag <- observed_adult_input |>
   select(year, is_all_passage_data)
 
 mainstem_stock_recruit_model_inputs <- observed_adult_input |> 
-  filter(stream %in% c("battle creek","clear creek", "deer creek","mill creek")) |> 
+  filter(stream %in% c("battle creek","clear creek", "mill creek")) |> 
   select(year, stream, data_type, count) |> 
   group_by(year, stream, data_type) |> 
   summarize(count = sum(count)) |> # clean this up, wherever duplicate is coming from
@@ -140,10 +140,11 @@ mainstem_stock_recruit_model_inputs <- observed_adult_input |>
                              T ~ passage)) |> 
   select(year, stream, passage) |> 
   pivot_wider(names_from = "stream", values_from = "passage") |> 
-  filter(!is.na(`deer creek`) & !is.na(`clear creek`) & !is.na(`mill creek`) & !is.na(`battle creek`)) |> 
-  mutate(combined_stock = sum(`deer creek`, `clear creek`, `mill creek`, `battle creek`)) |> 
+  filter(!is.na(`clear creek`) & !is.na(`mill creek`) & !is.na(`battle creek`)) |> 
+  mutate(combined_stock = sum(`clear creek`, `mill creek`, `battle creek`)) |> 
   select(year, combined_stock) |> 
   left_join(flag) |> 
+  filter(is_all_passage_data == T) |> 
   left_join(
     stock_recruit_covariates |>
       ungroup() |>
