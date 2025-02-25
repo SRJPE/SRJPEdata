@@ -139,6 +139,44 @@ std_temp_dd_spawn |>
 
 *Figure 1. Annual sum of daily mean temperatures during spawning and incubation time period (Aug - Dec)*
 
+##### Sacramento thermal stress
+
+In the mainstem stock recruit we use the sum of days greater than 20 degrees to indicate thermal stress which could contribute to mortality ocurring in the tributaries between adult observation and juveniles at the rotary screw trap. Note that adult data from tributaries is used as the stock in the mainstem stock recruit model.
+
+```{r, include = F}
+gdd_base_sac <- 20 # https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274
+migratory_months <- 3:5
+
+# calculate sum of days above the thresholds
+gdd_sac <- standard_temperature |> 
+  mutate(month = month(date),
+         year = year(date)) |> 
+  filter(month %in% migratory_months, 
+         stream == "sacramento river",
+         statistic == "mean",
+         !is.na(value)) |> 
+  mutate(gdd_sac = value - gdd_base_sac,
+         gdd_sac = ifelse(gdd_sac < 0, 0, gdd_sac)) |> 
+  group_by(year, gage_agency, gage_number, site_group) |>
+  summarise(value = sum(gdd_sac, na.rm = T)) |>
+  ungroup() |> 
+  mutate(stream = "sacramento river",
+         lifestage = "migration",
+         covariate_type = "temperature",
+         covariate_structure = "gdd_sacramento")
+```
+
+```{r}
+gdd_sac |> 
+  ggplot(aes(x = year, y = value, color = gage_number)) +
+  geom_point() +
+  facet_wrap(~stream) +
+  scale_color_manual(values = c("#9A8822", "#5B1A18")) +
+  labs(x = "",
+       y = "Growing degree days (20 C base threshold)") +
+  theme_minimal()
+```
+
 #### Day of year when 7DADM drops above/below 13 C
 
 This covariate is defined as the day of the year and week when the 7DADM is above 13C
@@ -222,7 +260,7 @@ This covariate is defined as the summarized annual weekly max temperature.
 
 ```{r, include = F}
 std_temp_weekly <- standard_temperature |> 
-  filter(month(date) %in% c(8:12)) |> 
+  filter(month(date) %in% c(8:12), stream != "sacramento river") |> 
   mutate(week = week(date),
          year = year(date),
          stream_site = ifelse(is.na(site_group), stream, paste(stream, site_group))) |> 
@@ -247,6 +285,8 @@ std_temp_weekly |>
 ```
 
 *Figure 3. Plot of mean, median, max of the maximum weekly temperature*
+
+
 
 #### Emergence date
 
@@ -320,10 +360,26 @@ std_flow_rear_summary <- standard_flow |>
             min = min(flow_cfs, na.rm = T)) |> 
   pivot_longer(cols = mean:min, values_to = "value", names_to = "statistic") |> 
   mutate(value = ifelse(is.nan(value) | is.infinite(value), NA_real_, value))
+
+# modified the rear months for the sacramento slightly, think 11-12 is too early
+std_flow_rear_sac_summary <- standard_flow |> 
+  mutate(year = ifelse(month(date) %in% c(10:12), year(date) + 1, year(date))) |> 
+  filter(month(date) %in% c(1:7), stream == "sacramento river") |> 
+  group_by(date, year, stream, site_group, gage_agency, gage_number) |> 
+  summarize(flow_cfs = max(value)) |> 
+  group_by(year, stream, site_group,gage_agency, gage_number) |> 
+  summarize(mean = mean(flow_cfs, na.rm = T),
+            median = median(flow_cfs, na.rm = T),
+            max = max(flow_cfs, na.rm = T),
+            min = min(flow_cfs, na.rm = T)) |> 
+  pivot_longer(cols = mean:min, values_to = "value", names_to = "statistic") |> 
+  mutate(value = ifelse(is.nan(value) | is.infinite(value), NA_real_, value))
+
+std_flow_rear_combined <- bind_rows(std_flow_rear_summary, std_flow_rear_sac_summary)
 ```
 
 ```{r}
-std_flow_rear_summary |> 
+std_flow_rear_combined |> 
   filter(year > 2000) |> 
   mutate(stream_site = ifelse(is.na(site_group), stream, site_group)) |> 
   ggplot(aes(x = year, y = value, color = statistic)) +
@@ -335,7 +391,7 @@ std_flow_rear_summary |>
   theme_minimal()
 ```
 
-*Figure 5. Plot of annual summarized (mean, median, max, min) max flows during the rearing time period (Nov - July)*
+*Figure 5. Plot of annual summarized (mean, median, max, min) max flows during the rearing time period (Tributary: Nov - July, Sacramento: Jan - July)*
 
 ```{r}
 std_flow_final <- std_flow_spawn_summary |> 
@@ -345,14 +401,13 @@ std_flow_final <- std_flow_spawn_summary |>
          max_flow = max,
          min_flow = min) |> 
   mutate(lifestage = "spawning and incubation") |> 
-  bind_rows(std_flow_rear_summary |> 
+  bind_rows(std_flow_rear_combined |> 
   pivot_wider(id_cols = c(year, stream, site_group, gage_agency, gage_number), values_from = "value", names_from = "statistic") |> 
   rename(mean_flow = mean,
          median_flow = median,
          max_flow = max,
          min_flow = min) |> 
   mutate(lifestage = "rearing")) 
-  
 ```
 
 ### Combine and Save Covariate Data 
@@ -376,6 +431,7 @@ stock_recruit_covariates <- std_temp_dd_spawn |>
   full_join(std_flow_final |> 
               mutate(covariate_type = "flow")) |>  
   pivot_longer(cols = c(gdd_spawn, above_13_temp_day, above_13_temp_week, weekly_max_temp_max, weekly_max_temp_mean, weekly_max_temp_median, mean_flow, max_flow, min_flow, median_flow), values_to = "value", names_to = "covariate_structure") |> 
+  bind_rows(gdd_sac) |> 
   filter(!is.na(value)) 
 
 knitr::kable(head(stock_recruit_covariates, 10))

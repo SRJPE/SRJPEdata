@@ -423,11 +423,13 @@ sac_river_daily_flows <- sac_river_data_query |>
                 statistic = "mean")
 
 ### Temp Data Pull 
-#### Gage #11390500
-### Temp Data Pull Tests
+#### Gage #11390500: large data gap between 1998 and 2016
+# Looked for additional gages - 11425500 (at verona only has 2016-2017), WLK only starts in 2012
+# Decided to use temperature data reported with RSTs to fill in gap
+
 sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", startDate = "1994-01-01")
 
-sac_river_daily_temp <- sac_river_temp_query |> 
+sac_river_daily_temp_raw <- sac_river_temp_query |> 
          select(Date, temp_degC =  X_00010_00003) %>%
          as_tibble() %>% 
          rename(date = Date,
@@ -438,6 +440,23 @@ sac_river_daily_temp <- sac_river_temp_query |>
                 parameter = "temperature",
                 statistic = "mean")
 
+sac_rst_temp_data <- SRJPEdata::rst_trap |> 
+  filter(stream == "sacramento river", !is.na(trap_start_date)) |> 
+  mutate(date = as_date(trap_start_date)) |> 
+  group_by(date) |> 
+  summarize(rst_value = mean(water_temp, na.rm = T)) |> 
+  mutate(gage_agency_rst = "CDFW",
+         gage_number_rst = "reported at RST",
+         parameter = "temperature",
+         statistic = "mean",
+         stream = "sacramento river")
+
+sac_river_daily_temp <- sac_river_daily_temp_raw |> 
+  full_join(sac_rst_temp_data) |> 
+  mutate(gage_agency = ifelse(is.na(value) & !is.na(rst_value), gage_agency_rst, gage_agency),
+         gage_number = ifelse(is.na(value) & !is.na(rst_value), gage_number_rst, gage_number),
+         value = ifelse(is.na(value) & !is.na(rst_value), rst_value, value)) |> 
+  select(-c(rst_value, gage_agency_rst, gage_number_rst))
 
 # Red Bluff ---------------------------------------------------------------
 # Note that RBDD is not currently being used in SRJPE modeling (Feb 2025)
@@ -460,6 +479,21 @@ rbdd_daily_flows <- rbdd_data_query |>
 
 ### Temp Data Pull 
 # No temperature data available at this gage.
+
+### Reservoir Storage
+# For the SR mainstem we decided to pull in Shasta water storage
+shasta_storage_query <- cdec_query(station = "SHA", dur_code = "D", sensor_num = "15", start_date = "1999-01-01")
+
+shasta_daily_storage <- shasta_storage_query |> 
+  mutate(date = as_date(datetime)) |> 
+  mutate(year = year(datetime)) |> 
+  rename(value = parameter_value) |> 
+  mutate(gage_agency = "CDEC",
+         gage_number = "SHA",
+         stream = "sacramento river",
+         parameter = "reservoir storage",
+         statistic = "mean") |> 
+  select(-c(agency_cd, location_id, parameter_cd, datetime))
 
 ## Yuba River ----
 ### Flow Data Pull 
@@ -560,8 +594,8 @@ temp <- rbindlist(list(battle_creek_daily_temp,
                        butte_creek_daily_temp,
                        deer_creek_daily_temp,
                        mill_creek_daily_temp,
-                       sac_river_daily_temp,
-                       sac_river_daily_temp,
+                       sac_river_daily_temp |> mutate(site_group = "tisdale"),
+                       sac_river_daily_temp |> mutate(site_group = "knights landing"),
                        yuba_river_daily_temp,
                        feather_lfc_river_daily_temp,
                        feather_hfc_river_daily_temp,
@@ -571,6 +605,8 @@ temp <- rbindlist(list(battle_creek_daily_temp,
   select(-site) |> 
   glimpse()
 
+storage <- rbindlist(list(shasta_daily_storage), use.names = T, fill = T)
+
 # Quick QC plot
 # ggplot(temp |> 
 #          filter(statistic == "mean"),
@@ -579,9 +615,10 @@ temp <- rbindlist(list(battle_creek_daily_temp,
 #   facet_wrap(~stream)
 setDT(temp)
 setDT(flow)
+setDT(storage)
 
 # Bind the rows of temp and flow with use.names=TRUE to match by column name
-combined_data <- rbindlist(list(temp, flow), use.names = TRUE, fill = TRUE) |> distinct()
+combined_data <- rbindlist(list(temp, flow, storage), use.names = TRUE, fill = TRUE) |> distinct()
 
 # Reshape the data to 'wider' format (like pivot_wider)
 reshaped_data <- dcast(combined_data, ... ~ statistic, value.var = "value")
