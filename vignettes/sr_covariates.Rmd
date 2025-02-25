@@ -161,7 +161,7 @@ gdd_sac <- standard_temperature |>
   summarise(value = sum(gdd_sac, na.rm = T)) |>
   ungroup() |> 
   mutate(stream = "sacramento river",
-         lifestage = "upstream migration",
+         lifestage = "migration",
          covariate_type = "temperature",
          covariate_structure = "gdd_sacramento")
 ```
