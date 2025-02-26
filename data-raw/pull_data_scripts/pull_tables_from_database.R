@@ -177,7 +177,12 @@ try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.strea
                                                          FROM passage_estimates p
                                                          left join survey_location sl on p.survey_location_id = sl.id
                                                          left join run r on p.run_id = r.id") |> 
-      filter(stream != "butte creek"))
+      # these are fall and late-fall and somehow were included in the table but labelled as spring
+      mutate(not_spring = case_when(year == 2009 & stream == "mill creek" & passage_estimate != 237 ~ "remove",
+                                    year == 2010 & stream == "mill creek" & passage_estimate != 205 ~ "remove",
+                                    year == 2014 & stream == "deer creek" & passage_estimate != 512 ~ "remove",
+                                    T ~ "do not remove")) |> 
+      filter(stream != "butte creek", not_spring != "remove"))
 
 try(if(!exists("upstream_passage_estimates_query"))
   upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
