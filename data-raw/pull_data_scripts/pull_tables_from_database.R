@@ -188,10 +188,11 @@ try(if(!exists("upstream_passage_estimates_query"))
   upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
   else(upstream_passage_estimates <- upstream_passage_estimates_query))
 
-try(if(nrow(upstream_passage_estimates_query) <= nrow(SRJPEdata::upstream_passage_estimates)) {
-  upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
-  warning(paste("No new upstream passage estimates datasets detected in the database. Maximum date of upstream passage estimates data is", max(SRJPEdata::upstream_passage_estimates$year, na.rm = TRUE)))
-})
+# Removed because of the filter that removes data from query
+# try(if(nrow(upstream_passage_estimates_query) <= nrow(SRJPEdata::upstream_passage_estimates)) {
+#   upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
+#   warning(paste("No new upstream passage estimates datasets detected in the database. Maximum date of upstream passage estimates data is", max(SRJPEdata::upstream_passage_estimates$year, na.rm = TRUE)))
+# })
 
 # pull in holding data
 try(holding_query <- dbGetQuery(con, "SELECT h.date, sl.stream, sl.reach, h.count, h.adipose_clipped,  
