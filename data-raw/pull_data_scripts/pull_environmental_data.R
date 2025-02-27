@@ -427,18 +427,18 @@ sac_river_daily_flows <- sac_river_data_query |>
 # Looked for additional gages - 11425500 (at verona only has 2016-2017), WLK only starts in 2012
 # Decided to use temperature data reported with RSTs to fill in gap
 
-sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", startDate = "1994-01-01")
+sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", statCd = c("00001","00002"), startDate = "1994-01-01")
 
 sac_river_daily_temp_raw <- sac_river_temp_query |> 
-         select(Date, temp_degC =  X_00010_00003) %>%
-         as_tibble() %>% 
-         rename(date = Date,
-                value = temp_degC) %>% 
-         mutate(stream = "sacramento river",
-                gage_agency = "USGS",
-                gage_number = "11390500",
-                parameter = "temperature",
-                statistic = "mean")
+  select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
+  as_tibble() %>% 
+  mutate(mean = (max + min) /2) |> 
+  pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
+  rename(date = Date) %>% 
+  mutate(stream = "sacramento river",
+         gage_agency = "USGS",
+         gage_number = "11390500",
+         parameter = "temperature")
 
 sac_rst_temp_data <- SRJPEdata::rst_trap |> 
   filter(stream == "sacramento river", !is.na(trap_start_date)) |> 
