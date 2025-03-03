@@ -153,6 +153,7 @@ gdd_sac <- standard_temperature |>
          year = year(date)) |> 
   filter(month %in% migratory_months, 
          stream == "sacramento river",
+         gage_number != "reported at RST",
          statistic == "mean",
          !is.na(value)) |> 
   mutate(gdd_sac = value - gdd_base_sac,

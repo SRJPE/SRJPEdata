@@ -444,19 +444,15 @@ sac_rst_temp_data <- SRJPEdata::rst_trap |>
   filter(stream == "sacramento river", !is.na(trap_start_date)) |> 
   mutate(date = as_date(trap_start_date)) |> 
   group_by(date) |> 
-  summarize(rst_value = mean(water_temp, na.rm = T)) |> 
-  mutate(gage_agency_rst = "CDFW",
-         gage_number_rst = "reported at RST",
+  summarize(value = mean(water_temp, na.rm = T)) |> 
+  mutate(gage_agency = "CDFW",
+         gage_number = "reported at RST",
          parameter = "temperature",
          statistic = "mean",
          stream = "sacramento river")
 
 sac_river_daily_temp <- sac_river_daily_temp_raw |> 
-  full_join(sac_rst_temp_data) |> 
-  mutate(gage_agency = ifelse(is.na(value) & !is.na(rst_value), gage_agency_rst, gage_agency),
-         gage_number = ifelse(is.na(value) & !is.na(rst_value), gage_number_rst, gage_number),
-         value = ifelse(is.na(value) & !is.na(rst_value), rst_value, value)) |> 
-  select(-c(rst_value, gage_agency_rst, gage_number_rst))
+  bind_rows(sac_rst_temp_data)
 
 # Red Bluff ---------------------------------------------------------------
 # Note that RBDD is not currently being used in SRJPE modeling (Feb 2025)
@@ -479,21 +475,6 @@ rbdd_daily_flows <- rbdd_data_query |>
 
 ### Temp Data Pull 
 # No temperature data available at this gage.
-
-### Reservoir Storage
-# For the SR mainstem we decided to pull in Shasta water storage
-shasta_storage_query <- cdec_query(station = "SHA", dur_code = "D", sensor_num = "15", start_date = "1999-01-01")
-
-shasta_daily_storage <- shasta_storage_query |> 
-  mutate(date = as_date(datetime)) |> 
-  mutate(year = year(datetime)) |> 
-  rename(value = parameter_value) |> 
-  mutate(gage_agency = "CDEC",
-         gage_number = "SHA",
-         stream = "sacramento river",
-         parameter = "reservoir storage",
-         statistic = "mean") |> 
-  select(-c(agency_cd, location_id, parameter_cd, datetime))
 
 ## Yuba River ----
 ### Flow Data Pull 
@@ -605,8 +586,6 @@ temp <- rbindlist(list(battle_creek_daily_temp,
   select(-site) |> 
   glimpse()
 
-storage <- rbindlist(list(shasta_daily_storage), use.names = T, fill = T)
-
 # Quick QC plot
 # ggplot(temp |> 
 #          filter(statistic == "mean"),
@@ -615,10 +594,9 @@ storage <- rbindlist(list(shasta_daily_storage), use.names = T, fill = T)
 #   facet_wrap(~stream)
 setDT(temp)
 setDT(flow)
-setDT(storage)
 
 # Bind the rows of temp and flow with use.names=TRUE to match by column name
-combined_data <- rbindlist(list(temp, flow, storage), use.names = TRUE, fill = TRUE) |> distinct()
+combined_data <- rbindlist(list(temp, flow), use.names = TRUE, fill = TRUE) |> distinct()
 
 # Reshape the data to 'wider' format (like pivot_wider)
 reshaped_data <- dcast(combined_data, ... ~ statistic, value.var = "value")
@@ -645,8 +623,27 @@ longer_updated_environmental_data <- updated_environmental_data |>
   mutate(max = ifelse(max == "-Inf", NA, max),
          min = ifelse(min == "Inf", NA, min)) |> 
   pivot_longer(max:min, names_to = "statistic", values_to = "value") |> glimpse()
-  
-environmental_data <- longer_updated_environmental_data
+
+# For Knights Landing we pull RST temperature to fill in data gaps
+kl_rst <- longer_updated_environmental_data |> 
+  filter(gage_number == "reported at RST" & site_group == "knights landing") |> 
+  rename(rst_value = value, 
+         gage_number_rst = gage_number,
+         gage_agency_rst = gage_agency)
+kl_temp <- longer_updated_environmental_data |> 
+  filter(gage_number != "reported at RST" & site_group == "knights landing" & parameter == "temperature") |> 
+  full_join(kl_rst) |> 
+  mutate(gage_number = ifelse(is.na(value) & !is.na(rst_value), gage_number_rst, gage_number),
+         gage_agency = ifelse(is.na(value) & !is.na(rst_value), gage_agency_rst, gage_agency),
+         value = ifelse(is.na(value) & !is.na(rst_value), rst_value, value)) |> 
+  select(-c(gage_number_rst, gage_agency_rst, rst_value))
+environmental_data <- longer_updated_environmental_data |> 
+  # remove knights landing temperature
+  mutate(rm = ifelse(site_group == "knights landing" & parameter == "temperature", "remove","keep")) |> 
+  filter(rm != "remove") |> 
+  select(-rm) |> 
+  # add on knights landing temperature where gaps have been filled in
+  bind_rows(kl_temp)
 
 #Save package
 usethis::use_data(environmental_data, overwrite = TRUE)
