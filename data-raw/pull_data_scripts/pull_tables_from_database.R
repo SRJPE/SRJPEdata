@@ -41,6 +41,7 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
  
  run <- dbGetQuery(con, "SELECT * FROM run")
  lifestage <- dbGetQuery(con, "SELECT * FROM lifestage")
+ survey_location <- dbGetQuery(con, "SELECT * FROM survey_location")
  
  # This can be removed after table is updated on db
  # rst_catch <- rst_catch_raw |> 
@@ -50,6 +51,18 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
  #   select(date, stream, site, subsite, site_group, count, run = definition.x, life_stage = definition.y,
  #          adipose_clipped, dead, fork_length, weight, actual_count) |> 
  #   mutate(species = "chinook")
+ 
+ # This can be removed after the adult data pull is finalized
+gcs_get_object(object_name = "model-db/daily_redd.csv",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data-raw/database-tables/redd.csv",
+               overwrite = TRUE)
+redd_raw <- read_csv("data-raw/database-tables/redd.csv")
+redd <- redd_raw |> 
+  left_join(survey_location, by = c("survey_location_id" = "id")) |> 
+  left_join(run, by = c("run_id" = "id")) |> 
+  select(date, stream, reach, latitude, longitude, run = definition, velocity, redd_id, age, redd_count)
+
 # PULL IN RST DATA -------------------------------------------------------------
 # Pull in Catch table
 try(rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.subsite, tl.site_group, 
@@ -211,21 +224,21 @@ try(if(nrow(holding_query) <= nrow(SRJPEdata::holding)) {
 })
 
 # Pull in redd data (just daily)
-try(redd_query <- dbGetQuery(con, "SELECT r.date, sl.stream, sl.reach, r.latitude, r.longitude,
-                                   ru.definition as run, r.velocity, r.redd_id, r.age
-                                   FROM daily_redd r
-                                   left join survey_location sl on r.survey_location_id = sl.id
-                                   left join run ru on r.run_id = ru.id"))
-
-
-try(if(!exists("redd_query"))
-  redd <- SRJPEdata::redd
-  else(redd <- redd_query))
-
-try(if(nrow(redd_query) <= nrow(SRJPEdata::redd)) {
-  redd <- SRJPEdata::redd
-  warning(paste("No new redd datasets detected in the database. Maximum date of redd data is", max(SRJPEdata::redd$date, na.rm = TRUE)))
-})
+# try(redd_query <- dbGetQuery(con, "SELECT r.date, sl.stream, sl.reach, r.latitude, r.longitude,
+#                                    ru.definition as run, r.velocity, r.redd_id, r.age
+#                                    FROM daily_redd r
+#                                    left join survey_location sl on r.survey_location_id = sl.id
+#                                    left join run ru on r.run_id = ru.id"))
+# 
+# 
+# try(if(!exists("redd_query"))
+#   redd <- SRJPEdata::redd
+#   else(redd <- redd_query))
+# 
+# try(if(nrow(redd_query) <= nrow(SRJPEdata::redd)) {
+#   redd <- SRJPEdata::redd
+#   warning(paste("No new redd datasets detected in the database. Maximum date of redd data is", max(SRJPEdata::redd$date, na.rm = TRUE)))
+# })
 
 # Pull in raw carcass data 
 # TODO not seeing this table in db, do we want it?
