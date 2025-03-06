@@ -46,7 +46,7 @@ redd_non_battle_clear <- SRJPEdata::redd |>
          # species != "steelhead",
          !stream %in% c("battle creek", "clear creek")) |> 
   group_by(stream, reach, date) |> 
-  summarize(daily_reach_count = n()) |> 
+  summarize(daily_reach_count = sum(redd_count)) |> 
   ungroup() |> 
   group_by(year = year(date), stream, reach) |> 
   summarize(max_daily_reach_count = max(daily_reach_count, na.rm = TRUE)) |> 
@@ -63,7 +63,7 @@ battle_clear_redd <- SRJPEdata::redd |>
          stream %in% c("battle creek", "clear creek"),
          !reach %in% c("R6", "R6A", "R6B", "R7")) |> #TODO remove once reaches are standardized
   group_by(year = year(date), stream) |> 
-  summarize(count = n()) |> 
+  summarize(count = sum(redd_count)) |> 
   ungroup()
 
 redd_data <- bind_rows(redd_non_battle_clear, battle_clear_redd) |> glimpse()
