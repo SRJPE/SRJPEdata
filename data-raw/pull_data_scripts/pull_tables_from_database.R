@@ -44,13 +44,17 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
  survey_location <- dbGetQuery(con, "SELECT * FROM survey_location")
  
  # This can be removed after table is updated on db
- # rst_catch <- rst_catch_raw |> 
- #   left_join(rst_trap_locations, by = c("trap_location_id" = "id")) |> 
- #   left_join(run, by = c("run_id" = "id")) |> 
- #   left_join(lifestage, by = c("lifestage_id" = "id")) |> 
+ # rst_catch <- rst_catch_raw |>
+ #   left_join(rst_trap_locations, by = c("trap_location_id" = "id")) |>
+ #   left_join(run, by = c("run_id" = "id")) |>
+ #   left_join(lifestage, by = c("lifestage_id" = "id")) |>
  #   select(date, stream, site, subsite, site_group, count, run = definition.x, life_stage = definition.y,
- #          adipose_clipped, dead, fork_length, weight, actual_count) |> 
- #   mutate(species = "chinook")
+ #          adipose_clipped, dead, fork_length, weight, actual_count) |>
+ #   mutate(species = "chinook",
+ #          subsite = case_when(site == "yuba river" ~ "hal",
+ #                     T ~ subsite),
+ #          site = case_when(stream == "yuba river" ~ "hallwood",
+ #                  T ~ site))
  
  # This can be removed after the adult data pull is finalized
 gcs_get_object(object_name = "model-db/daily_redd.csv",
@@ -72,7 +76,11 @@ try(rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.su
                                        left join trap_location tl on c.trap_location_id = tl.id 
                                        left join run r on c.run_id = r.id
                                        left join lifestage ls on c.lifestage_id = ls.id") |> 
-      mutate(species = "chinook"))
+      mutate(species = "chinook",
+             subsite = case_when(site == "yuba river" ~ "hal",
+                                 T ~ subsite),
+             site = case_when(stream == "yuba river" ~ "hallwood",
+                              T ~ site)))
 
 try(if(!exists("rst_catch_query"))
   rst_catch <- SRJPEdata::rst_catch
@@ -101,7 +109,11 @@ try(rst_trap_query <-  dbGetQuery(con,
         mutate(trap_start_time = hms::as_hms(trap_start_date),
                trap_start_date = as_date(trap_start_date), 
                trap_stop_time = hms::as_hms(trap_stop_date),
-               trap_stop_date = as_date(trap_stop_date)
+               trap_stop_date = as_date(trap_stop_date),
+               subsite = case_when(site == "yuba river" ~ "hal",
+                                   T ~ subsite),
+               site = case_when(stream == "yuba river" ~ "hallwood",
+                                T ~ site)
   ))
 
 try(if(!exists("rst_trap_query"))
