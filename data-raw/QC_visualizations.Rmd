@@ -55,7 +55,7 @@ covariates <- SRJPEdata::stock_recruit_covariates
 selectInput(
   "plot_filter",
   label = tags$strong("Select Plot Type:"),
-  choices = c("missing weeks","raw count","percent cumulative catch curve","absolute cumulative catch curve"),
+  choices = c("missing weeks","raw count","percent cumulative catch curve","absolute cumulative catch curve", "flow"),
   selected = "raw count"
 )
 selectInput(
@@ -73,7 +73,7 @@ selectInput(
 ```
 
 ```{r, include = F}
-# helper functions
+# reactive data ################################################################
 btspas_cumul <- reactive({
   btspas_catch |> 
   mutate(
@@ -95,7 +95,6 @@ btspas_cumul <- reactive({
          life_stage %in% input$lifestage_filter)
   })
 
-
 missing_weeks <- reactive({
   btspas_catch |> 
   filter(is.na(count), week %in% c(seq(45, 53), seq(1, 22))) |> 
@@ -105,6 +104,20 @@ missing_weeks <- reactive({
   filter(stream %in% input$stream_filter)
   })
 
+flow <- reactive({
+  btspas_catch |> 
+    mutate(
+    date = lubridate::ymd(paste0(year, '-01-01')) + lubridate::weeks(week - 1),
+    water_year = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
+    fake_date = as_date(paste(
+      ifelse(month(date) %in% 10:12, 1999, 2000), month(date), day(date)
+    )),
+    run_year = as.factor(run_year)) |> 
+    distinct(year, run_year, fake_date, stream, site, flow_cfs, standardized_flow) |> 
+    filter(stream %in% input$stream_filter)
+})
+
+# plots #######################################################################
 # number of missing weeks by stream, site, year, lifestage
 # filter by stream
 missing_weeks_plot <- reactive(missing_weeks() |> 
@@ -122,6 +135,23 @@ missing_weeks_plot <- reactive(missing_weeks() |>
     xaxis = list(title = "Months", tickformat = "%b"),
     yaxis = list(title = "Number of missing weeks")
   ))                        
+
+flow_plot <- reactive(flow() |> 
+    plot_ly(
+    x = ~ fake_date,
+    y = ~ flow_cfs,
+    color = ~ run_year,
+    text = ~ site,
+    hovertemplate = paste("Run Year: %{text}"),
+    colors = colors_small,
+    type = 'scatter',
+    mode = 'markers'
+  ) %>%
+  layout(
+    title = "Flow (cfs)",
+    xaxis = list(title = "Months", tickformat = "%b"),
+    yaxis = list(title = "Flow (cfs)")
+  ))      
 
 #### raw count
  raw_count <- reactive(btspas_cumul() |>
@@ -187,6 +217,8 @@ absolute_cumulative <- reactive(btspas_cumul() |>
 plot <- reactive({
   if(input$plot_filter == "missing weeks"){
   missing_weeks_plot()
+  } else if(input$plot_filter == "flow") {
+  flow_plot()
 } else if(input$plot_filter == "raw count") {
   raw_count()
 } else if(input$plot_filter == "percent cumulative catch curve") {
@@ -199,3 +231,132 @@ plot <- reactive({
 renderPlotly(plot())
 ```
 
+# `weekly_juvenile_abundance_efficiency_data` {data-orientation="rows"}
+
+## Row {data-height="50"}
+
+```{r, echo = F, message = F, warning = F}
+selectInput(
+  "plot_filter2",
+  label = tags$strong("Select Plot Type:"),
+  choices = c("efficiency"),
+  selected = "efficiency"
+)
+selectInput(
+  "stream_filter2",
+  label = tags$strong("Filter by Stream:"),
+  choices = c(unique(btspas_catch$stream)),
+  selected = "battle creek"
+)
+sliderInput(
+  "year_filter2",
+  label = tags$strong("Filter by Year:"),
+  min = 1996,
+  max = 2024,
+  value = c(1996,2024))
+```
+
+```{r, include = F}
+btspas_eff_filter <- reactive({
+  btspas_efficiency |> 
+    filter(stream %in% input$stream_filter2,
+         ((run_year >= input$year_filter2[1] & run_year <= input$year_filter2[2]) | run_year ==  input$year_filter2[1])) |>
+    mutate(
+    date = lubridate::ymd(paste0(year, '-01-01')) + lubridate::weeks(week - 1),
+    fake_date = as_date(paste(
+      ifelse(month(date) %in% 10:12, 1999, 2000), month(date), day(date)
+    ))) |> 
+    ungroup() |> 
+    group_by(stream, fake_date) |> 
+    summarize(number_released = sum(number_released, na.rm = T),
+              number_recaptured = sum(number_recaptured, na.rm = T))
+  
+})
+```
+
+```{r, include = F}
+efficiency_plot <- reactive(
+  btspas_eff_filter() |>
+    plot_ly(x = ~ fake_date,
+            y = ~ number_released,
+            type = "bar",
+            name = "number released",
+            marker = list(color = "#9A8822")) |> 
+    add_trace(y = ~ number_recaptured,
+              name = "number_recaptured",
+              marker = list(color = "#899DA4")) |> 
+    layout(xaxis = list(title = "Months", tickformat = "%b%d"),
+           barmode = 'stack')
+)
+                         
+```
+
+## Row
+
+```{r, echo = F, message = F, warning = F}
+
+plot2 <- reactive({
+  if(input$plot_filter2 == "efficiency"){
+  efficiency_plot()
+  }
+})
+
+renderPlotly(plot2())
+```
+
+# `observed_adult_input` {data-orientation="rows"}
+
+## Row {data-height="50"}
+
+```{r, echo = F, message = F, warning = F}
+selectInput(
+  "plot_filter3",
+  label = tags$strong("Select Plot Type:"),
+  choices = c("adult counts"),
+  selected = "adult counts"
+)
+selectInput(
+  "stream_filter3",
+  label = tags$strong("Filter by Stream:"),
+  choices = c(unique(adult$stream)),
+  selected = "battle creek"
+)
+```
+
+```{r, include = F}
+adult_filter <- reactive({
+  adult |> 
+    pivot_wider(id_cols = c(year, stream), names_from = "data_type", values_from = "count") |> 
+    filter(stream %in% input$stream_filter3) 
+})
+
+adult_plot <- reactive(adult_filter() |> 
+  plot_ly(x = ~ year,
+          y = ~ upstream_estimate, 
+          type = "bar",
+          name = "upstream estimate",
+          marker = list(color = "#9A8822")) |> 
+    add_trace(y = ~ redd_count,
+              name = "redd count",
+              marker = list(color = "#899DA4")) |> 
+   add_trace(y = ~ holding_count,
+              name = "holding count",
+              marker = list(color = "#F8AFA8")) |> 
+   add_trace(y = ~ carcass_estimate,
+              name = "carcass estimate",
+              marker = list(color = "#DC863B"))
+  )
+```
+
+## Row
+
+```{r, echo = F, message = F, warning = F}
+
+plot3 <- reactive({
+  if(input$plot_filter3 == "adult counts"){
+  adult_plot()
+  }
+})
+
+renderPlotly(plot3())
+```
