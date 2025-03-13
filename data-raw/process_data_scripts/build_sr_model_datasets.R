@@ -62,12 +62,27 @@ usethis::use_data(stock_recruit_year_lookup, overwrite = TRUE)
 
 
 # Combine the adult data and sr covariates
+# prepare covariates for the mainstem to be added as columns. these will only apply to
+# battle, clear, deer, mill as those are the tribs above knights/tisdale
+mainstem_covariates <- stock_recruit_covariates |> 
+  filter(site_group == "knights landing") |> 
+  select(-stream_site) |> # this isn't doing anything and is confusing so remove
+  mutate(lifestage = ifelse(lifestage == "spawning and incubation", "spawning", lifestage),
+         covariate_structure = paste0("mainstemKNL_", lifestage, "_", covariate_structure)) |> 
+  select(year, covariate_structure, value) |>
+  group_by(year, covariate_structure) |>
+  summarize(value = mean(value, na.rm = T)) |> # if there are multiple sources, take the mean for now - clean this up
+  ungroup() |>
+  group_by(covariate_structure) |>
+  mutate(standardized_value = as.vector(scale(value))) |>
+  pivot_wider(
+    id_cols = c(year),
+    names_from = "covariate_structure",
+    values_from = "standardized_value")
 
 # Todo - fill in recent years for battle and clear
 stock_recruit_model_inputs <- observed_adult_input |> 
   select(year, stream, data_type, count) |> 
-  group_by(year, stream, data_type) |> 
-  summarize(count = sum(count)) |> # clean this up, wherever duplicate is coming from
   pivot_wider(names_from = "data_type", values_from = "count") |> 
   rename(holding = holding_count,
          passage = upstream_estimate,
@@ -82,7 +97,7 @@ stock_recruit_model_inputs <- observed_adult_input |>
         # for some clear/battle the upper/lower being noted in gage_agency
         is.na(site_group) ~ stream,
         T ~ site_group),
-        lifestage = ifelse(lifestage == "spawning and incubation", "spawning", "rearing"),
+        lifestage = ifelse(lifestage == "spawning and incubation", "spawning", lifestage),
         covariate_structure = paste0(lifestage, "_", covariate_structure)
       ) |>
       filter(
@@ -97,7 +112,8 @@ stock_recruit_model_inputs <- observed_adult_input |>
           "feather river",
           "mill creek",
           "yuba river",
-          "sacramento river"
+          "knights landing",
+          "tisdale"
         )
       ) |> # select for the locations chosen for stock recruit (see sites vignette)
       select(year, stream, covariate_structure, value) |>
@@ -110,67 +126,8 @@ stock_recruit_model_inputs <- observed_adult_input |>
         id_cols = c(year, stream),
         names_from = "covariate_structure",
         values_from = "standardized_value"
-      ))
+      )) |> 
+  select(-migration_gdd_sacramento) |> # this doesn't apply to any of the tribs and will show up in the mainstem covariates
+  left_join(mainstem_covariates) # note that these can be used in the mainstem SR version
 
 usethis::use_data(stock_recruit_model_inputs, overwrite = TRUE)
-
-flag <- observed_adult_input |> 
-  filter(stream %in% c("battle creek","clear creek", "mill creek")) |> 
-  select(year, stream, data_type, count) |> 
-  group_by(year, stream, data_type) |> 
-  summarize(count = sum(count)) |> # clean this up, wherever duplicate is coming from
-  pivot_wider(names_from = "data_type", values_from = "count") |> 
-  mutate(no_passage = ifelse(is.na(upstream_estimate), 1, 0)) |> 
-  group_by(year) |> 
-  summarize(no_passage = sum(no_passage)) |> 
-  mutate(is_all_passage_data = ifelse(no_passage == 0, T, F)) |> 
-  select(year, is_all_passage_data)
-
-mainstem_stock_recruit_model_inputs <- observed_adult_input |> 
-  filter(stream %in% c("battle creek","clear creek", "mill creek")) |> 
-  select(year, stream, data_type, count) |> 
-  group_by(year, stream, data_type) |> 
-  summarize(count = sum(count)) |> # clean this up, wherever duplicate is coming from
-  pivot_wider(names_from = "data_type", values_from = "count") |> 
-  rename(holding = holding_count,
-         passage = upstream_estimate,
-         redd = redd_count) |> 
-  mutate(passage = case_when(is.na(passage) & is.na(redd) ~ holding,
-                             is.na(passage) & !is.na(redd) ~ redd,
-                             T ~ passage)) |> 
-  select(year, stream, passage) |> 
-  pivot_wider(names_from = "stream", values_from = "passage") |> 
-  filter(!is.na(`clear creek`) & !is.na(`mill creek`) & !is.na(`battle creek`)) |> 
-  mutate(combined_stock = sum(`clear creek`, `mill creek`, `battle creek`)) |> 
-  select(year, combined_stock) |> 
-  left_join(flag) |> 
-  filter(is_all_passage_data == T) |> 
-  left_join(
-    stock_recruit_covariates |>
-      ungroup() |>
-      filter(site_group == "knights landing") |> 
-      select(-stream_site) |> # this isn't doing anything and is confusing so remove
-      mutate(site_group = case_when(
-        gage_number %in% c("UBC", "UCC", "LCC", "LBC") ~ tolower(gage_number),
-        # for some clear/battle the upper/lower being noted in gage_agency
-        is.na(site_group) ~ stream,
-        T ~ site_group),
-        lifestage = case_when(lifestage == "spawning and incubation" ~ "spawning", 
-                              T ~ lifestage),
-        covariate_structure = paste0(lifestage, "_", covariate_structure)
-      ) |>
-      select(year, stream, covariate_structure, value) |>
-      group_by(stream, year, covariate_structure) |>
-      summarize(value = mean(value, na.rm = T)) |> # if there are multiple sources, take the mean for now - clean this up
-      ungroup() |>
-      group_by(stream, covariate_structure) |>
-      mutate(standardized_value = as.vector(scale(value))) |>
-      pivot_wider(
-        id_cols = c(year, stream),
-        names_from = "covariate_structure",
-        values_from = "standardized_value"
-      )) |> 
-  rename(brood_year = year)
-
-usethis::use_data(mainstem_stock_recruit_model_inputs, overwrite = TRUE)
-
