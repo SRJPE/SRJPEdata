@@ -229,6 +229,27 @@ plot <- reactive({
 })
 
 renderPlotly(plot())
+
+# static plots (for now) to check all fields of weekly_juvenile_abundance_catch_data
+# leaving these here in case needed
+
+# missing mean fork length
+# btspas_catch |> 
+#   filter(is.na(mean_fork_length) & count > 0 & !is.na(count)) |> 
+#   group_by(run_year, site) |> 
+#   tally() |> 
+#   ggplot(aes(x = run_year, y = n)) +
+#   geom_col() +
+#   facet_wrap(~site)
+# 
+# # missing mean fork length
+# btspas_catch |> 
+#   filter(is.na(catch_standardized_by_hours_fished) &  !is.na(count)) |> view()
+#   group_by(run_year, site) |> 
+#   tally() |> glimpse()
+#   ggplot(aes(x = run_year, y = n)) +
+#   geom_col() +
+#   facet_wrap(~site)
 ```
 
 # `weekly_juvenile_abundance_efficiency_data` {data-orientation="rows"}

@@ -11,7 +11,7 @@ library(data.table)
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 SRJPEdata::rst_catch |> glimpse()
 updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
-years_to_include_rst_data <- SRJPEdata::years_to_include_rst_data |> 
+years_to_include_rst_data <- years_to_include_rst_data |> # if not loaded run years_to_include_analysis.Rmd vignette
   mutate(include = T)
 # Remove all adipose clipped fish - we do not want to include hatchery fish
 updated_standard_catch <- updated_standard_catch |> 
