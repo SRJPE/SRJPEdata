@@ -11,9 +11,11 @@ library(data.table)
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 SRJPEdata::rst_catch |> glimpse()
 updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
-years_to_include_rst_data <- SRJPEdata::years_to_include_rst_data |> 
+years_to_include_rst_data <- years_to_include_rst_data |> # if not loaded run years_to_include_analysis.Rmd vignette
   mutate(include = T)
-
+# Remove all adipose clipped fish - we do not want to include hatchery fish
+updated_standard_catch <- updated_standard_catch |> 
+  filter(adipose_clipped == F | is.na(adipose_clipped))
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
 # This is joined at the end
@@ -93,29 +95,31 @@ weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros,
 # Add hatchery column 
 # Currently not included in josh model data but can be added by changing join on 
 # line 176 below
-hatch_per_week <- catch_with_inclusion_criteria |> 
-  filter(adipose_clipped == TRUE) |> 
-  mutate(week = week(date),
-         year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, life_stage) |> 
-  summarize(count = sum(count, na.rm = TRUE)) |> 
-  ungroup() |> 
-  mutate(expanded_weekly_hatch_count = ifelse(stream == "feather river", 
-                                              count, 
-                                              count * 4)) |> #ASSUMING 25% marking, add mark rates in here instead.
-  select(-count) |> 
-  glimpse()
+# we are not handling hatchery rates in the data processing, instead assuming it 
+# can be handled by PLAD
+# hatch_per_week <- catch_with_inclusion_criteria |> 
+#   filter(adipose_clipped == TRUE) |> 
+#   mutate(week = week(date),
+#          year = year(date)) |> 
+#   group_by(week, year, stream, site, site_group, life_stage) |> 
+#   summarize(count = sum(count, na.rm = TRUE)) |> 
+#   ungroup() |> 
+#   mutate(expanded_weekly_hatch_count = ifelse(stream == "feather river", 
+#                                               count, 
+#                                               count * 4)) |> #ASSUMING 25% marking, add mark rates in here instead.
+#   select(-count) |> 
+#   glimpse()
 
 # subtract these values from weekly_standard_catch 
-weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |> 
-  left_join(hatch_per_week, 
-            by = c("week", "year", "stream", "site", "site_group", "life_stage")) |> 
-  mutate(expanded_weekly_hatch_count = ifelse(is.na(expanded_weekly_hatch_count), 0, expanded_weekly_hatch_count),
-         natural = ifelse(count - expanded_weekly_hatch_count < 0, 0, count - expanded_weekly_hatch_count), 
-         hatchery = ifelse(expanded_weekly_hatch_count > count, count, expanded_weekly_hatch_count)) |> 
-  select(-count, -expanded_weekly_hatch_count) |>  
-  pivot_longer(natural:hatchery, names_to = "origin", values_to = "count") |> 
-  glimpse()
+# weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |> 
+#   left_join(hatch_per_week, 
+#             by = c("week", "year", "stream", "site", "site_group", "life_stage")) |> 
+#   mutate(expanded_weekly_hatch_count = ifelse(is.na(expanded_weekly_hatch_count), 0, expanded_weekly_hatch_count),
+#          natural = ifelse(count - expanded_weekly_hatch_count < 0, 0, count - expanded_weekly_hatch_count), 
+#          hatchery = ifelse(expanded_weekly_hatch_count > count, count, expanded_weekly_hatch_count)) |> 
+#   select(-count, -expanded_weekly_hatch_count) |>  
+#   pivot_longer(natural:hatchery, names_to = "origin", values_to = "count") |> 
+#   glimpse()
 
 
 # TODO Create PLAD table - Ashley going to check what she sent nobel 
