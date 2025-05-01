@@ -1,15 +1,8 @@
 ---
 title: "RST Data checks - DBvs EDI"
-output: 
-  html_document:
-  theme: flatly
-editor_options: 
-  markdown: 
-    wrap: 72
+author: "Badhia Yunes Katz"
+output: html_document
 ---
-
-**Author**: Badhia Yunes Katz  
-**Date**: May 1st 2025  
 
 ```{r include=FALSE}
 library(DBI)
@@ -19,7 +12,7 @@ library(EML)
 library(readr)
 ```
 
-The purpose of this markdown is to compare the data that we have in jpe database and EDI.
+The purpose of this markdown is to compare the data that we have in jpe database and EDI. Data is being queried directly from the database and from EDI, this script can be used to check most up to date uploads.
 
 Database tables are be viewed first, then data is compared by stream
 
@@ -566,15 +559,54 @@ recapture_with_stream |>
 
   - Database date range
 
-```{r}
+```{r echo=FALSE}
 catch_with_stream |> 
   filter(trap_location_id %in% c(55,56,57)) |>  # trap id for Sacramento/Knights landing
   summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
 ```
   - EDI: note that EDI download was done through a zip file. It is showing off on EDI
-  
+
+Checked manually and interval is 2010 - 2024
 
 ```{r echo=FALSE}
 sacramento_tisdale <- "edi.1499.5"
 ```
 
+#### trap
+
+  - Database date range
+
+```{r echo=FALSE}
+trap_with_stream |>  
+  filter(trap_location_id %in% c(55, 56, 57)) |>  # trap id for Sacramento/Knights landing 
+  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
+            max_date = max(trap_visit_time_end, na.rm = TRUE))
+```
+
+  - EDI: 2010 - 2024
+  
+#### release
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_with_stream |> 
+  filter(trap_location_id %in% c(55, 56, 57)) |> 
+  summarize(min_date = min(date_released, na.rm = TRUE),
+            max_date = max(date_released, na.rm = TRUE))
+```
+
+  - EDI: 2012 - 2024
+  
+#### recapture
+
+  - Database date range
+
+```{r echo=FALSE}
+recapture_with_stream |> 
+  filter(trap_location_id %in% c(55, 56, 57)) |>
+  summarize(min_date = min(date), max_date = max(date))
+```
+
+  - EDI: 2010 - 2024 
+  
