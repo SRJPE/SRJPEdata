@@ -135,16 +135,37 @@ catch_with_stream |>
   - EDI date range
 
 ```{r echo=FALSE}
-battle_clear <- "edi.1509.3"
+# creating a function since will use for multiple streams
+get_date_range <- function(package_id) {
+  eml_text <- read_metadata(packageId = package_id)
+  eml <- read_eml(eml_text)
+  range <- eml$dataset$coverage$temporalCoverage$rangeOfDates
+  c(begin = range$beginDate$calendarDate, end = range$endDate$calendarDate)
+}
 
-
-battle_clear <- read_metadata("edi.1509.3") |> EML::read_eml()
-
-battle_clear$dataset$coverage$temporalCoverage$rangeOfDates
-c(range$beginDate$calendarDate, range$endDate$calendarDate)
+get_date_range("edi.1509.3") # Battle/Clear edi
 ```
 
+# Butte
 
+## catch
+
+  - Database date range
+  
+```{r echo=FALSE}
+catch_with_stream |> 
+  filter(stream == "butte creek") |> 
+  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+
+```
+  
+ - EDI date range
+
+```{r echo=FALSE}
+butte <- "edi.1497.18"
+
+get_date_range(butte)
+```
 
 # Feather River
 
@@ -164,11 +185,7 @@ catch_with_stream |>
 ```{r echo=FALSE}
 feather <- "edi.1239.23"
 
-
-feather <- read_metadata("edi.1239.23") |> EML::read_eml()
-
-feather$dataset$coverage$temporalCoverage$rangeOfDates
-c(range$beginDate$calendarDate, range$endDate$calendarDate)
+get_date_range(feather)
 ```
 
 
@@ -187,15 +204,50 @@ catch_with_stream |>
   
  - EDI date range
 
-```{r include=FALSE}
-yuba <- "edi.1529.24"
-yuba <- read_metadata("edi.1529.24") |> EML::read_eml()
-yuba$dataset$coverage$temporalCoverage$rangeOfDates
-```
-
 ```{r echo=FALSE}
-c(range$beginDate$calendarDate, range$endDate$calendarDate)
+yuba <- "edi.1529.24"
+
+
+get_date_range(yuba)
 ```
 
+# Sacramento/Knights landing 
 
+## catch
+
+  - Database date range
+
+```{r}
+catch_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) |>  # trap id for Sacramento/Knights landing
+  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+```
+  - EDI date range
+  
+  
+```{r echo=FALSE}
+
+sacramento <- "edi.1501.9"
+get_date_range(sacramento)
+
+```
+
+# Sacramento/Tisdale
+
+## catch
+
+  - Database date range
+
+```{r}
+catch_with_stream |> 
+  filter(trap_location_id %in% c(55,56,57)) |>  # trap id for Sacramento/Knights landing
+  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+```
+  - EDI date range
+  
+  
+```{r echo=FALSE}
+sacramento_tisdale <- "edi.1499.5"
+get_date_range(sacramento_tisdale)
+```
 
