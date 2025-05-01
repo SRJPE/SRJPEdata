@@ -86,25 +86,28 @@ ffc_collapse <- function(datatype, fdir){
 }
 
 
+# load from link
+source("https://raw.githubusercontent.com/ryanpeek/ffm_comparison/main/R/f_ffc_collapse.R")
+
+
+
 # pull data individually ---------------------------------------------------------------
 
-# Battle
-ffc <- FFCProcessor$new()
-ffc$set_up(gage_id = 11376550,
-           token = ffctoken)
-ffc$run()
-battle_results <- ffc$ffc_results
-
-# Butte
-ffc <- FFCProcessor$new()
-ffc$set_up(gage_id = 11390000,
-           token = ffctoken)
-ffc$run()
-butte_results <- ffc$ffc_results
+# # Battle
+# ffc <- FFCProcessor$new()
+# ffc$set_up(gage_id = 11376550,
+#            token = ffctoken)
+# ffc$run()
+# battle_results <- ffc$ffc_results
+# 
+# # Butte
+# ffc <- FFCProcessor$new()
+# ffc$set_up(gage_id = 11390000,
+#            token = ffctoken)
+# ffc$run()
+# butte_results <- ffc$ffc_results
 
 # pull multiple gages -----------------------------------------------------
-# TODO - this code is not working right now. if can't get to work then just use
-# individual
 
 tic() # start time
 ffcs <- map(gage_list, ~ffc_possible(.x, startDate = st_date, ffctoken=ffctoken, dirToSave="data-raw/helper-tables/output/ffc_run", save=TRUE)) %>%
@@ -123,6 +126,8 @@ miss_gages
 # save out missing to a file
 write_lines(miss_gages, file = "data-raw/helper-tables/output/usgs_ffcs_gages_alt_missing_data.txt")
 
+source("https://raw.githubusercontent.com/ryanpeek/ffm_comparison/main/R/f_ffc_collapse.R")
+
 # set the data type we want to collapse
 datatype="predicted_percentiles"
 
@@ -133,7 +138,7 @@ datatype="predicted_percentiles"
 ## predicted_percentiles
 
 # set directory where the raw .csv's live
-fdir=glue("{here::here()}data-raw/helper-tables/output/ffc_run/")
+fdir=glue("{here::here()}/data-raw/helper-tables/output/ffc_run/")
 
 # run it!
 df_ffc <- ffc_collapse(datatype, fdir)
@@ -144,4 +149,19 @@ df_ffc %>% distinct(gageid) %>% count()
 df_ffc %>% group_by(gageid) %>% tally()
 
 # save it
-write_csv(df_ffc, file = glue("{here::here()}data-raw/helper-tables/output/usgs_alt_{datatype}_run_{Sys.Date()}.csv"))
+write_csv(df_ffc, file = glue("{here::here()}/data-raw/helper-tables/output/usgs_alt_{datatype}_run_{Sys.Date()}.csv"))
+  
+# saving ffc resutls (TODO repeat code below, depending on data type wanted)
+datatype="ffc_results"
+
+fdir=glue("{here::here()}/data-raw/helper-tables/output/ffc_run/")
+
+results_ffc <- ffc_collapse(datatype, fdir)
+
+results_ffc %>% distinct(gageid) %>% count()
+
+results_ffc %>% group_by(gageid) %>% tally()
+
+# save it
+write_csv(results_ffc, file = glue("{here::here()}/data-raw/helper-tables/output/usgs_alt_{datatype}_run_{Sys.Date()}.csv"))
+
