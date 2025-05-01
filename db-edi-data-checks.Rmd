@@ -1,0 +1,201 @@
+
+```{r include=FALSE}
+library(DBI)
+library(tidyverse)
+library(EDIutils)
+library(EML)
+```
+
+The purpose of this markdown is to compare the data that we have in jpe database and EDI 
+
+```{r}
+con <- DBI::dbConnect(drv = RPostgres::Postgres(),
+                      host = "jpe-db.postgres.database.azure.com",
+                      dbname = "jpedb-prod",
+                      user = Sys.getenv("jpe_db_user_id"),
+                      password = Sys.getenv("jpe_db_password"),
+                      port = 5432)
+
+DBI::dbListTables(con)
+# tables to look at:
+# catch, trap, release and recapture_fish (check if it is release or release_fish) 
+```
+
+# catch table
+
+```{r include=FALSE}
+catch <- DBI::dbReadTable(con, "catch")
+```
+
+```{r echo=FALSE}
+head(catch)
+
+colnames(catch)
+```
+streams in catch table
+
+```{r}
+unique(catch$trap_location_id)
+
+catch |> 
+  mutate(i)
+  left_join(trap_location, by = ("trap_location_id" = "id")) |> 
+  view()
+```
+
+date range
+```{r echo=FALSE}
+range(catch$date, na.rm = TRUE)
+```
+
+# trap table
+
+```{r include=FALSE}
+trap <- DBI::dbReadTable(con, "trap_visit")
+```
+
+```{r echo=FALSE}
+head(trap)
+
+colnames(trap)
+```
+
+date range
+
+  - `trap_visit_start`
+```{r echo=FALSE}
+range(trap$trap_visit_time_start, na.rm = TRUE)
+```
+
+  - `trap_visit_end`
+  
+```{r echo=FALSE}
+range(trap$trap_visit_time_end, na.rm = TRUE)
+```
+
+# release table
+
+```{r include=FALSE}
+release <- DBI::dbReadTable(con, "release")
+```
+
+```{r echo=FALSE}
+head(release)
+
+colnames(released)
+```
+
+date range
+```{r echo=FALSE}
+range(release$date_released, na.rm = TRUE)
+```
+
+# recaptured_fish table
+
+```{r include=FALSE}
+recaptured_fish <- DBI::dbReadTable(con, "recaptured_fish")
+```
+
+```{r echo=FALSE}
+head(recaptured_fish)
+
+colnames(recaptured_fish)
+```
+
+date range
+```{r echo=FALSE}
+range(recaptured_fish$date, na.rm = TRUE)
+```
+
+Exploration per stream
+
+
+# Battle/Clear Creek
+
+## catch
+
+  - Database date range
+  
+```{r echo=FALSE}
+# pulling trap table to tie to a steam
+trap_location <- DBI::dbReadTable(con, "trap_location")
+trap_id <- trap_location |> 
+  rename(trap_location_id = id) |>
+  select(trap_location_id, stream) |>  glimpse()
+
+catch_with_stream <- catch |>
+  left_join(trap_id)
+  
+catch_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) |> 
+  summarize(min_date = min(date), max_date = max(date))
+  
+```
+  
+  - EDI date range
+
+```{r echo=FALSE}
+battle_clear <- "edi.1509.3"
+
+
+battle_clear <- read_metadata("edi.1509.3") |> EML::read_eml()
+
+battle_clear$dataset$coverage$temporalCoverage$rangeOfDates
+c(range$beginDate$calendarDate, range$endDate$calendarDate)
+```
+
+
+
+# Feather River
+
+## catch
+
+  - Database date range
+  
+```{r echo=FALSE}
+catch_with_stream |> 
+  filter(stream == "feather river") |> 
+  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+
+```
+  
+ - EDI date range
+
+```{r echo=FALSE}
+feather <- "edi.1239.23"
+
+
+feather <- read_metadata("edi.1239.23") |> EML::read_eml()
+
+feather$dataset$coverage$temporalCoverage$rangeOfDates
+c(range$beginDate$calendarDate, range$endDate$calendarDate)
+```
+
+
+# Yuba
+
+## catch
+
+  - Database date range
+  
+```{r echo=FALSE}
+catch_with_stream |> 
+  filter(stream == "yuba river") |> 
+  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+
+```
+  
+ - EDI date range
+
+```{r include=FALSE}
+yuba <- "edi.1529.24"
+yuba <- read_metadata("edi.1529.24") |> EML::read_eml()
+yuba$dataset$coverage$temporalCoverage$rangeOfDates
+```
+
+```{r echo=FALSE}
+c(range$beginDate$calendarDate, range$endDate$calendarDate)
+```
+
+
+
