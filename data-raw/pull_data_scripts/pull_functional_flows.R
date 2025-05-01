@@ -39,7 +39,7 @@ library(fs)
 library(here)
 
 # write a function to pull the data
-ffc_iter <- function(id, startDate, ffctoken=ffctoken, dirToSave="output/ffc", save=TRUE){
+ffc_iter <- function(id, startDate, ffctoken=ffctoken, dirToSave="e_flows/ffc", save=TRUE){
   
   # set save dir
   outDir <- glue::glue("{here()}/{dirToSave}")
@@ -110,7 +110,7 @@ source("https://raw.githubusercontent.com/ryanpeek/ffm_comparison/main/R/f_ffc_c
 # pull multiple gages -----------------------------------------------------
 
 tic() # start time
-ffcs <- map(gage_list, ~ffc_possible(.x, startDate = st_date, ffctoken=ffctoken, dirToSave="data-raw/helper-tables/output/ffc_run", save=TRUE)) %>%
+ffcs <- map(gage_list, ~ffc_possible(.x, startDate = st_date, ffctoken=ffctoken, dirToSave="data-raw/helper-tables/e_flows/ffc_run", save=TRUE)) %>%
   # add names to list
   set_names(x = ., nm=gage_list)
 toc() # end time
@@ -124,7 +124,7 @@ miss_gages <- ffcs %>% keep(is.na(.)) %>% names()
 miss_gages
 
 # save out missing to a file
-write_lines(miss_gages, file = "data-raw/helper-tables/output/usgs_ffcs_gages_alt_missing_data.txt")
+write_lines(miss_gages, file = "data-raw/helper-tables/e_flows/usgs_ffcs_gages_alt_missing_data.txt")
 
 source("https://raw.githubusercontent.com/ryanpeek/ffm_comparison/main/R/f_ffc_collapse.R")
 
@@ -138,7 +138,7 @@ datatype="predicted_percentiles"
 ## predicted_percentiles
 
 # set directory where the raw .csv's live
-fdir=glue("{here::here()}/data-raw/helper-tables/output/ffc_run/")
+fdir=glue("{here::here()}/data-raw/helper-tables/e_flows/ffc_run/")
 
 # run it!
 df_ffc <- ffc_collapse(datatype, fdir)
@@ -149,12 +149,12 @@ df_ffc %>% distinct(gageid) %>% count()
 df_ffc %>% group_by(gageid) %>% tally()
 
 # save it
-write_csv(df_ffc, file = glue("{here::here()}/data-raw/helper-tables/output/usgs_alt_{datatype}_run_{Sys.Date()}.csv"))
+write_csv(df_ffc, file = glue("{here::here()}/data-raw/helper-tables/e_flows/usgs_alt_{datatype}_run_{Sys.Date()}.csv"))
   
 # saving ffc resutls (TODO repeat code below, depending on data type wanted)
 datatype="ffc_results"
 
-fdir=glue("{here::here()}/data-raw/helper-tables/output/ffc_run/")
+fdir=glue("{here::here()}/data-raw/helper-tables/e_flows/ffc_run/")
 
 results_ffc <- ffc_collapse(datatype, fdir)
 
@@ -163,5 +163,5 @@ results_ffc %>% distinct(gageid) %>% count()
 results_ffc %>% group_by(gageid) %>% tally()
 
 # save it
-write_csv(results_ffc, file = glue("{here::here()}/data-raw/helper-tables/output/usgs_alt_{datatype}_run_{Sys.Date()}.csv"))
+write_csv(results_ffc, file = glue("{here::here()}/data-raw/helper-tables/e_flows/usgs_alt_{datatype}_run_{Sys.Date()}.csv"))
 
