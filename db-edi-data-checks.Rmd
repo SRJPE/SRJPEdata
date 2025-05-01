@@ -1,12 +1,27 @@
+---
+title: "RST Data checks - DBvs EDI"
+output: 
+  html_document:
+  theme: flatly
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+**Author**: Badhia Yunes Katz  
+**Date**: May 1st 2025  
 
 ```{r include=FALSE}
 library(DBI)
 library(tidyverse)
 library(EDIutils)
 library(EML)
+library(readr)
 ```
 
-The purpose of this markdown is to compare the data that we have in jpe database and EDI 
+The purpose of this markdown is to compare the data that we have in jpe database and EDI.
+
+Database tables are be viewed first, then data is compared by stream
 
 ```{r}
 con <- DBI::dbConnect(drv = RPostgres::Postgres(),
@@ -32,18 +47,15 @@ head(catch)
 
 colnames(catch)
 ```
+
 streams in catch table
 
 ```{r}
 unique(catch$trap_location_id)
-
-catch |> 
-  mutate(i)
-  left_join(trap_location, by = ("trap_location_id" = "id")) |> 
-  view()
 ```
 
 date range
+
 ```{r echo=FALSE}
 range(catch$date, na.rm = TRUE)
 ```
@@ -82,7 +94,7 @@ release <- DBI::dbReadTable(con, "release")
 ```{r echo=FALSE}
 head(release)
 
-colnames(released)
+colnames(release)
 ```
 
 date range
@@ -107,21 +119,21 @@ date range
 range(recaptured_fish$date, na.rm = TRUE)
 ```
 
-Exploration per stream
+## Exploration per stream {.tabset}
 
 
-# Battle/Clear Creek
+### Battle/Clear Creek
 
-## catch
+#### catch
 
   - Database date range
   
 ```{r echo=FALSE}
-# pulling trap table to tie to a steam
+# pulling trap_location table to tie to a steam
 trap_location <- DBI::dbReadTable(con, "trap_location")
 trap_id <- trap_location |> 
   rename(trap_location_id = id) |>
-  select(trap_location_id, stream) |>  glimpse()
+  select(trap_location_id, stream) 
 
 catch_with_stream <- catch |>
   left_join(trap_id)
@@ -135,20 +147,91 @@ catch_with_stream |>
   - EDI date range
 
 ```{r echo=FALSE}
-# creating a function since will use for multiple streams
-get_date_range <- function(package_id) {
-  eml_text <- read_metadata(packageId = package_id)
-  eml <- read_eml(eml_text)
-  range <- eml$dataset$coverage$temporalCoverage$rangeOfDates
-  c(begin = range$beginDate$calendarDate, end = range$endDate$calendarDate)
-}
+battle_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/58540ac4ed34ce05f3309510f4be91e5"
+# Read the catch table
+battle_catch_data <- read_csv(battle_catch_url, show_col_types = FALSE)
 
-get_date_range("edi.1509.3") # Battle/Clear edi
+range(battle_catch_data$sample_date)
 ```
 
-# Butte
 
-## catch
+#### trap
+
+  - Database date range
+
+```{r echo=FALSE}
+trap_with_stream <- trap |>
+  left_join(trap_id)
+  
+trap_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) |> 
+  summarize(min_date = min(trap_visit_time_start), max_date = max(trap_visit_time_start))
+```
+
+ - EDI date range
+
+```{r echo=FALSE}
+battle_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/eed3b61b7eb6030dafc9e4765f07a106"
+# Read the trap table
+battle_trap_data <- read_csv(battle_trap_url, show_col_types = FALSE)
+
+range(battle_trap_data$sample_date)
+
+```
+
+#### release
+
+  - Database date range (`date_released`)
+
+```{r echo=FALSE}
+release_with_stream <- release |> # join to get stream names
+  left_join(trap_id)
+
+release_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) |> 
+  summarize(min_date = min(date_released ), max_date = max(date_released ))
+```
+
+- EDI date range (`date_released`)
+
+```{r include=FALSE}
+battle_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/414dd61cd26985641875fb194328f8a6"
+
+battle_release_data <- read_csv(battle_release_url, show_col_types = FALSE)
+```
+
+
+```{r echo=FALSE}
+range(battle_release_data$date_released)
+```
+
+#### recapture
+
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+recapture_with_stream <- recaptured_fish |> # join to get stream names
+  left_join(trap_id)
+
+recapture_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) |> 
+  summarize(min_date = min(date ), max_date = max(date ))
+```
+
+- EDI date range (`date_recaptured`)
+
+```{r echo=FALSE}
+battle_recapture_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/460853b8a4a0a2308c2bfb4d3dc2793c"
+
+battle_recapture_data <- read_csv(battle_recapture_url, show_col_types = FALSE)
+
+range(battle_recapture_data$date_recaptured)
+```
+
+
+### Butte
+
+#### catch
 
   - Database date range
   
@@ -159,17 +242,81 @@ catch_with_stream |>
 
 ```
   
- - EDI date range
+  - EDI date range (current_year_butte_catch.csv `visitTime`)
 
 ```{r echo=FALSE}
-butte <- "edi.1497.18"
+butte_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1497/18/5d9e3251b1453262701d3464339934a5"
 
-get_date_range(butte)
+# Read the catch table
+butte_catch_data <- read_csv(butte_catch_url, show_col_types = FALSE)
+
+range(butte_catch_data$visitTime)
 ```
 
-# Feather River
+#### trap
 
-## catch
+  - Database date range (`trap_visit_time_end`)
+
+```{r echo=FALSE}
+trap_with_stream <- trap |>
+  left_join(trap_id)
+  
+trap_with_stream |>  #lots of NA's on trap_visit_time_start, so using trap_visit_time_end instead
+  filter(stream %in% c("butte creek")) |> 
+  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
+            max_date = max(trap_visit_time_end, na.rm = TRUE))
+```
+
+  - EDI date range (current_year_butte_trap.csv `visitTime`)
+
+```{r echo=FALSE}
+butte_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1497/18/64d3ac3b7695992c8a2cf3cfca90a4ce"
+
+# Read the catch table
+butte_trap_data <- read_csv(butte_trap_url, show_col_types = FALSE)
+
+range(butte_trap_data$visitTime)
+```
+
+#### release
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_with_stream |> 
+  filter(stream %in% c("butte creek")) |> 
+  summarize(min_date = min(date_released), max_date = max(date_released))
+```
+
+- EDI date range (`releaseTime`)
+
+```{r include=FALSE}
+butte_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1497/18/a6be3d2d878b4c4bd2815b60fda8a0db"
+
+butte_release_data <- read_csv(butte_release_url, show_col_types = FALSE)
+```
+
+
+```{r echo=FALSE}
+butte_release_data |> 
+mutate(releaseTime = as.Date(releaseTime)) |>
+  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+```
+
+#### recapture
+
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+recapture_with_stream |> 
+  filter(stream %in% c("butte creek")) |> 
+  summarize(min_date = min(date ), max_date = max(date ))
+```
+  - No recapture on EDI
+  
+### Feather River
+
+#### catch
 
   - Database date range
   
@@ -183,15 +330,82 @@ catch_with_stream |>
  - EDI date range
 
 ```{r echo=FALSE}
-feather <- "edi.1239.23"
+feather_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/c142ed6d5527bb824d113c7d64b54215"
+# Read the catch table
+feather_catch_data <- read_csv(feather_catch_url, show_col_types = FALSE)
 
-get_date_range(feather)
+range(feather_catch_data$visitTime)
+```
+
+#### trap
+
+  - Database date range (`trap_visit_time_end`)
+
+```{r echo=FALSE}
+trap_with_stream |>  
+  filter(stream %in% c("feather river")) |> 
+  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
+            max_date = max(trap_visit_time_end, na.rm = TRUE))
+```
+
+  - EDI date range (current_year_feather_catch.csv `visitTime`)
+
+```{r echo=FALSE}
+feather_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/e13781ce693c968eb8954907c64b9666"
+
+# Read the catch table
+feather_trap_data <- read_csv(feather_trap_url, show_col_types = FALSE)
+
+range(feather_trap_data$visitTime)
+```
+
+#### release
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_with_stream |> 
+  filter(stream %in% c("feather river")) |> 
+  summarize(min_date = min(date_released), max_date = max(date_released))
+```
+
+- EDI date range (`releaseTime`)
+
+```{r include=FALSE}
+feather_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/faaac9cea6a7050037d1ef92c1154ead"
+
+feather_release_data <- read_csv(feather_release_url, show_col_types = FALSE)
 ```
 
 
-# Yuba
+```{r echo=FALSE}
+feather_release_data |> 
+  mutate(releaseTime = as.Date(releaseTime)) |>
+  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+```
+#### recapture
 
-## catch
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+recapture_with_stream |> 
+  filter(stream %in% c("feather river")) |> 
+  summarize(min_date = min(date ), max_date = max(date ))
+```
+
+- EDI date range (`current_year_feather_recapture.csv`)
+
+```{r echo=FALSE}
+feather_recapture_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/5135215c5b52b74193ccc83a93812ea9"
+
+feather_recapture_data <- read_csv(feather_recapture_url, show_col_types = FALSE)
+
+range(feather_recapture_data$visitTime)
+```
+  
+### Yuba
+
+#### catch
 
   - Database date range
   
@@ -205,15 +419,72 @@ catch_with_stream |>
  - EDI date range
 
 ```{r echo=FALSE}
-yuba <- "edi.1529.24"
+yuba_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/5dc3db7932a98e185f9c4ae8b0490c1d"
+# Read the catch table
+yuba_catch_data <- read_csv(yuba_catch_url, show_col_types = FALSE)
 
-
-get_date_range(yuba)
+range(yuba_catch_data$visitTime)
 ```
 
-# Sacramento/Knights landing 
+#### trap
 
-## catch
+  - Database date range (`trap_visit_time_end`)
+
+```{r echo=FALSE}
+trap_with_stream |>  
+  filter(stream %in% c("yuba river")) |> 
+  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
+            max_date = max(trap_visit_time_end, na.rm = TRUE))
+```
+
+  - EDI date range (current_year_feather_catch.csv `visitTime`)
+
+```{r echo=FALSE}
+yuba_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/09ccf28b4e8eaa3239026109b6e408e2"
+
+# Read the trap table
+yubar_trap_data <- read_csv(yuba_trap_url, show_col_types = FALSE)
+
+range(yubar_trap_data$visitTime)
+```
+
+#### release
+
+  - Database date range - No Yuba release on DB
+
+```{r echo=FALSE}
+release_with_stream |> 
+  filter(stream %in% c("yuba river")) |> glimpse() 
+```
+
+- EDI date range (current_year_yuba_release.csv `releaseTime`)
+
+```{r include=FALSE}
+yuba_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/356e130a4b70fbb91b768c87508432df"
+
+yuba_release_data <- read_csv(yuba_release_url, show_col_types = FALSE)
+```
+
+
+```{r echo=FALSE}
+yuba_release_data |> 
+  mutate(releaseTime = as.Date(releaseTime)) |>
+  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+```
+
+#### recapture
+
+  - No Recapture on Database 
+
+```{r echo=FALSE}
+recapture_with_stream |> 
+  filter(stream %in% c("yuba river")) |>  glimpse()
+```
+  - No recapture on EDI
+  
+### Sacramento/Knights landing 
+
+#### catch
 
   - Database date range
 
@@ -222,19 +493,76 @@ catch_with_stream |>
   filter(trap_location_id %in% c(51, 52, 53, 54)) |>  # trap id for Sacramento/Knights landing
   summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
 ```
-  - EDI date range
-  
-  
+ - EDI date range (current_year_knights_landing_catch.csv)
+
 ```{r echo=FALSE}
+knights_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1501/9/98cc4ae4d068f0f1bd17560b65d83b44"
+# Read the catch table
+knights_catch_data <- read_csv(knights_catch_url, show_col_types = FALSE)
 
-sacramento <- "edi.1501.9"
-get_date_range(sacramento)
-
+range(knights_catch_data$visitTime)
 ```
 
-# Sacramento/Tisdale
+#### trap
 
-## catch
+  - Database date range (`trap_visit_time_end`)
+
+```{r echo=FALSE}
+trap_with_stream |>  
+  filter(trap_location_id %in% c(51, 52, 53, 54)) |>  # trap id for Sacramento/Knights landing 
+  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
+            max_date = max(trap_visit_time_end, na.rm = TRUE))
+```
+
+  - EDI date range (current_year_feather_catch.csv `visitTime`)
+
+```{r echo=FALSE}
+knigts_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1501/9/104b1e3f236b495564ee77efda3392af"
+
+# Read the trap table
+knighs_trap_data <- read_csv(knigts_trap_url, show_col_types = FALSE)
+
+range(knighs_trap_data$visitTime)
+```
+
+#### release
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) |> 
+  summarize(min_date = min(date_released, na.rm = TRUE),
+            max_date = max(date_released, na.rm = TRUE))
+```
+
+- EDI date range (current_year_yuba_release.csv `releaseTime`)
+
+```{r}
+knights_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1501/9/bed15fe599f379266fe4ca74ebba0b6a"
+
+knights_release_data <- read_csv(knights_release_url, show_col_types = FALSE)
+
+knights_release_data |> 
+  mutate(releaseTime = as.Date(releaseTime)) |>
+  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+```
+
+#### recapture
+
+  - Database date range
+
+```{r echo=FALSE}
+recapture_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) |>
+  summarize(min_date = min(date), max_date = max(date))
+```
+  - No recapture on EDI
+  
+  
+### Sacramento/Tisdale
+
+#### catch
 
   - Database date range
 
@@ -243,11 +571,10 @@ catch_with_stream |>
   filter(trap_location_id %in% c(55,56,57)) |>  # trap id for Sacramento/Knights landing
   summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
 ```
-  - EDI date range
+  - EDI: note that EDI download was done through a zip file. It is showing off on EDI
   
-  
+
 ```{r echo=FALSE}
 sacramento_tisdale <- "edi.1499.5"
-get_date_range(sacramento_tisdale)
 ```
 
