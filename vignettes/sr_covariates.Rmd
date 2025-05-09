@@ -216,7 +216,7 @@ std_temp_7dadm_interpolated <- std_temp_7dadm |>
 
 #ck <- filter(std_temp_7dadm_interpolated, is.na(roll_7))
 std_temp_7dadm_above_13 <- std_temp_7dadm_interpolated |> 
-  filter(roll_7 > 13) |> 
+  filter(roll_7 > 13, month(date) %in% 3:12) |> # remove jan and feb when adults are not in tribs
   group_by(year, stream) |> 
   slice_min(date) |> 
   select(date, year, week, stream) |> 
@@ -352,7 +352,7 @@ std_flow_spawn_summary |>
 
 ```{r}
 std_flow_rear_summary <- standard_flow |> 
-  mutate(year = ifelse(month(date) %in% c(10:12), year(date) + 1, year(date))) |> 
+  mutate(year = ifelse(month(date) %in% c(1:7), year(date) - 1, year(date))) |> # associating this with brood year
   filter(month(date) %in% c(11:12, 1:7), stream != "sacramento river") |> 
   group_by(date, year, stream) |> 
   summarize(flow_cfs = max(value)) |> 
@@ -366,7 +366,7 @@ std_flow_rear_summary <- standard_flow |>
 
 # modified the rear months for the sacramento slightly, think 11-12 is too early
 std_flow_rear_sac_summary <- standard_flow |> 
-  mutate(year = ifelse(month(date) %in% c(10:12), year(date) + 1, year(date))) |> 
+  mutate(year = ifelse(month(date) %in% c(1:7), year(date) - 1, year(date))) |> # associating this with brood year
   filter(month(date) %in% c(1:7), stream == "sacramento river") |> 
   group_by(date, year, stream) |> 
   summarize(flow_cfs = max(value)) |> 
