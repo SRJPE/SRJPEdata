@@ -66,8 +66,18 @@ battle_clear_redd <- SRJPEdata::redd |>
   summarize(count = sum(redd_count)) |> 
   ungroup()
 
-redd_data <- bind_rows(redd_non_battle_clear, battle_clear_redd) |> glimpse()
+redd_summary <- bind_rows(redd_non_battle_clear, battle_clear_redd) |> 
+  add_row(year = 2022,
+          stream = "clear creek",
+          count = 6) |> 
+  add_row(year = 2023,
+          stream = "clear creek",
+          count = 0) |> 
+  add_row(year = 2024,
+          stream = "clear creek",
+          count = 4)
 
+usethis::use_data(redd_summary, overwrite = TRUE) # save as data object because there is processing required for redd data and helpful to have
 
 # carcass CJS estimates -----------------------------------------------------------------
 
@@ -89,7 +99,7 @@ exclude_adult <- SRJPEdata::years_to_exclude_adult |>
 observed_adult_input <- full_join(upstream_passage_estimates |>
                                      select(year, stream,
                                             upstream_estimate = passage_estimate),
-                                   redd_data |> 
+                                   redd_summary |> 
                                      rename(redd_count = count),
                                    by = c("year", "stream")) |>
   full_join(holding |>
