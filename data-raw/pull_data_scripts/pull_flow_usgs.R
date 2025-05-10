@@ -51,26 +51,54 @@ glimpse(combined_flow)
 
 
 # separating per stream
-battle <- combined_flow |> 
-  filter(site_name == "Battle") |> 
-  glimpse()
+# battle_raw <- combined_flow |> 
+#   filter(site_name == "Battle") |> 
+#   glimpse()
 
 # write.csv(battle, "data-raw/usgs_flow_tables/battle.csv")
 
+# mean flow for each water year - testing with battle only
+# battle <- battle_raw |>
+#   group_by(site_name, water_year) |>
+#   summarize(mean_discharge = mean(flow_cfs, na.rm = TRUE), .groups = "drop") |> 
+#   arrange(desc(mean_discharge)) |> # rank water years by mean discharge 
+#   mutate(rank = row_number()) |> 
+#   mutate(water_year_type = case_when(rank <= n_years / 3 ~ "Wet", # assign water year type
+#                                      rank > 2 * n_years / 3 ~ "Dry",
+#                                      TRUE ~ "Average")) |> 
+#   glimpse()
+
+
+
+mean_discharge_by_site <- combined_flow |>
+  group_by(site_name, water_year) |>
+  summarize(mean_discharge = mean(flow_cfs, na.rm = TRUE), .groups = "drop")
+
+# rank and assign water year type within each stream
+water_year_types <- mean_discharge_by_site |>
+  group_by(site_name) |>
+  arrange(desc(mean_discharge)) |>
+  mutate(rank = row_number(),
+         n_years = n(),  # total water years per site
+         water_year_type = case_when(rank <= n_years / 3 ~ "Wet",
+                                     rank > 2 * n_years / 3 ~ "Dry",
+                                     TRUE ~ "Average")) |>
+  ungroup() |> 
+  glimpse()
 
 # calculating flow exceedence probability
 
-battle_fep <- battle |>
-  arrange(desc(flow_cfs)) |>
-  mutate(M = row_number(),
-         n = n(),  
-         exceedance_probability = (M / (n + 1)) * 100) |> 
-  glimpse()
-
-ggplot(battle_fep, aes(x = exceedance_probability, y = flow_cfs)) +
-  geom_line(color = "blue") +
-  scale_y_log10() +
-  labs(title = "Annual Flow Exceedence Graph",
-       x = "Exceedance Probability (%)",
-       y = "Average Daily Flow (cfs)") +
-  theme_minimal()
+# battle_fep <- battle |>
+#   arrange(desc(flow_cfs)) |>
+#   mutate(M = row_number(),
+#          n = n(),  
+#          exceedance_probability = (M / (n + 1)) * 100) |> 
+#   glimpse()
+# 
+# ggplot(battle_fep, aes(x = exceedance_probability, y = flow_cfs)) +
+#   geom_line(color = "blue") +
+#   scale_y_log10() +
+#   labs(title = "Annual Flow Exceedence Graph",
+#        x = "Exceedance Probability (%)",
+#        y = "Average Daily Flow (cfs)") +
+#   theme_minimal()
