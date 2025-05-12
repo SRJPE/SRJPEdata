@@ -1,0 +1,110 @@
+---
+title: "Covariate Development for Forecast Models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Covariate Development for Forecast Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE, 
+  message = FALSE,
+  echo = FALSE,
+  comment = "#>", 
+  fig.width=8, fig.height=5)
+
+library(tidyverse)
+library(SRJPEdata)
+library(lubridate)
+
+colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                  "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
+                  "#F1BB7B", "#FD6467", "#5B1A18", # Grand Budapest 1 (-4)
+                  "#D8B70A", "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
+)
+
+sr_covariates <- SRJPEdata::stock_recruit_covariates
+```
+
+# Process for developing forecast covariates
+
+TODO Notes of what to include
+- Describe how this forecast phase fits in with previous work on selecting covariates for stock recruit model and how it is different 
+- highlight that some of the historical covariates that we have already tested will be the same structure as used in forecast models (e.g. like the spawning/incubating lifestage variables)
+- Define what we mean by "scenario" or "continuous"
+- When data for a covariate are not available, there are two options for the forecast model. We are focusing on the scenario type of variable
+
+TODO include lucidapp diagram (https://lucid.app/lucidchart/54013423-12f2-42cc-a6cb-e9097fea1ad7/edit?beaconFlowId=21FC89EB4FE4986F&invitationId=inv_80180167-225e-4c43-9082-67bdc58283b2&page=0_0#)
+
+## Covariates included in forecast models
+
+TODO insert table that lists the covariates we are currently including in forecast models
+
+Note that this covariate list will be iteratively updated and improved
+
+# Preparing covariates
+
+## Continuous variables
+
+### Spawning and incubation flow variables
+
+- min flow: Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the minimum
+- max flow: Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the maximum
+
+```{r, include = F}
+si_min_flow <- sr_covariates |> 
+filter(lifestage == "spawning and incubation", covariate_structure == "min_flow")
+
+si_max_flow <- sr_covariates |> 
+filter(lifestage == "spawning and incubation", covariate_structure == "max_flow")
+```
+
+### Spawning and incubation temperature variables
+
+- max temp: Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the mean. An annual value is calculated by taking the max of the weekly max.
+- above 13C threshold: This covariate is defined as the week of the year when the 7DADM is above 13C. Data are filtered to Mar-Dec because this is the time period where spring run are in the tributaries and may be experiencing temperature stress. This includes holding as well as spawning and incubation time period.
+
+```{r, include = F}
+si_max_temp <- sr_covariates |> 
+filter(lifestage == "spawning and incubation", covariate_structure == "weekly_max_temp_max")
+
+above_13 <- sr_covariates |> 
+filter(covariate_structure == "above_13_temp_week")
+```
+
+### Reservoir storage
+
+- monthly reservoir storage: Using reservoir storage data, calculate the monthly average storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)
+
+```{r, include = F}
+# Pull monthly reservoir storage: https://cdec.water.ca.gov/dynamicapp/QueryMonthly?s=KES
+```
+
+## Scenario variales
+
+### Water year type
+
+```{r, include = F}
+#TODO pull in water year type (CDEC hydrological https://data.ca.gov/dataset/cdec-water-year-type-dataset/resource/301aaef5-940d-4915-8ed6-baada4e101f5). Add on more recent years (need to find where best to pull 2023-2025)
+
+#Process data into 3 categories: aggregate into 3 categories: C, D/BN/AN, W
+```
+
+### Flow year type
+
+```{r, include = F}
+# Connect to the work Badhia did to create "flow exceedance" water year types based on CDFW calculations
+# We can either source that script, or move the code here - ashley and badhia to discuss
+
+```
+
+
+
+# Combine and save data
+
+TODO decide if we need to add a filter to the most recent year? Open question depending on how model code is set up
