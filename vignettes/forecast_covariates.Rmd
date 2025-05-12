@@ -19,6 +19,8 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(SRJPEdata)
 library(lubridate)
+library(CDECRetrieve)
+library(dplyr)
 
 colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
                   "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
@@ -83,6 +85,25 @@ filter(covariate_structure == "above_13_temp_week")
 
 ```{r, include = F}
 # Pull monthly reservoir storage: https://cdec.water.ca.gov/dynamicapp/QueryMonthly?s=KES
+
+rs_monthly_raw <- cdec_query(station = "KES", sensor = "15", duration = "M")
+
+rs_monthly_raw <- rs_monthly |> 
+  mutate(date = as.Date(DateTime),
+         year = year(date),
+         value = Value,
+         name = "rs_monthly",
+         water_year = NA,
+         month = month(date),
+         jpe_year = if_else(month == 1, year - 1, year),
+         jpe_month = if_else(month == 1, 12L, month - 1L),
+         jpe_date = make_date(year = jpe_year, month = jpe_month),
+         # jpe_date = if_else(month == 1, 12L, month - 1L), # if we only want the month
+         water_year = NA,
+         stream = "shasta dam") |> 
+  select(name, year, water_year, stream, jpe_date, value) |> 
+  glimpse()
+
 ```
 
 ## Scenario variales
@@ -91,8 +112,22 @@ filter(covariate_structure == "above_13_temp_week")
 
 ```{r, include = F}
 #TODO pull in water year type (CDEC hydrological https://data.ca.gov/dataset/cdec-water-year-type-dataset/resource/301aaef5-940d-4915-8ed6-baada4e101f5). Add on more recent years (need to find where best to pull 2023-2025)
-
 #Process data into 3 categories: aggregate into 3 categories: C, D/BN/AN, W
+wy_url <- "https://data.ca.gov/datastore/dump/301aaef5-940d-4915-8ed6-baada4e101f5?format=csv"
+
+wy_raw <- read_csv(wy_url)
+
+wy <- wy_raw |> 
+  mutate(wy_type = case_when(WYT %in% c("D", "BN", "AN") ~ "D/BN/AN",
+                             T ~ WYT),
+         year = NA,
+         water_year = WY,
+         name = "3_category_wy_type",
+         stream = NA,
+         jpe_date = "all",
+         value = NA) |>
+  select(name, year, water_year, stream, jpe_date, value) |> 
+  glimpse()
 ```
 
 ### Flow year type
@@ -100,6 +135,7 @@ filter(covariate_structure == "above_13_temp_week")
 ```{r, include = F}
 # Connect to the work Badhia did to create "flow exceedance" water year types based on CDFW calculations
 # We can either source that script, or move the code here - ashley and badhia to discuss
+
 
 ```
 
