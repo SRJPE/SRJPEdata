@@ -21,6 +21,8 @@ library(SRJPEdata)
 library(lubridate)
 library(CDECRetrieve)
 library(dplyr)
+library(gsheet)
+library(kableExtra)
 
 colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
                   "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
@@ -55,6 +57,29 @@ TODO include lucidapp diagram (https://lucid.app/lucidchart/54013423-12f2-42cc-a
 ## Covariates included in forecast models
 
 TODO insert table that lists the covariates we are currently including in forecast models
+
+
+```{r echo=FALSE}
+covariate_table <- tibble::tibble(
+  name = c("spawning/incubation minimum flow",
+    "spawning/incubation maximum flow",
+    "spawning/incubation maximum temperature",
+    "above 13C threshold",
+    "3-category water year type", 
+    "3-category flow exceedance year type",
+    "monthly reservoir storage",
+    "monthly peak flow"),
+  description = c("Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the minimum. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
+                  "Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the maximum. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
+                  "Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the mean. An annual value is calculated by taking the max of the weekly max. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
+                  "This covariate is defined as the week of the year when the 7DADM is above 13C. Data are filtered to Mar-Dec because this is the time period where spring run are in the tributaries and may be experiencing temperature stress.\nNote, we currently do not have max daily temperatures for the Sacramento so mainstem is not included. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
+                  "Use water year type from CDEC for the Sacramento Valley and aggregate into 3 categories: C, D/BN/AN, W. This is a scenario based covariate meaning we do not need any data for the forecast. All 3 categories would be run for the forecast.",
+                  "Use the flow exceedance methodology provided by the CDFW Instream Flow team (find mean annual flow by water year for each stream and rank the water years where the top 33% are wet, middle are average, bottom are dry) to categorize years for each stream into 3 categories: wet, average, dry",
+                  "Using reservoir storage data, calculate the monthly max storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)",
+                  "Calculate the peak flow for each watershed and month. This would be different based on JPE date"))
+
+covariate_table
+```
 
 Note that this covariate list will be iteratively updated and improved
 
@@ -91,16 +116,17 @@ filter(covariate_structure == "above_13_temp_week")
 ### Reservoir storage
 
 - monthly reservoir storage: Using reservoir storage data, calculate the monthly average storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)
+- This data contains monthly reservoir storage volumes (acre-feet) for Keswick Reservoir (KES), retrieved from the California Data Exchange Center (CDEC) operated by the California Department of Water Resources (DWR). The earliest data available is on 1965
 
 ```{r, include = F}
 # Pull monthly reservoir storage: https://cdec.water.ca.gov/dynamicapp/QueryMonthly?s=KES
 
-rs_monthly_raw <- cdec_query(station = "KES", sensor = "15", duration = "M")
+rs_monthly_raw <- cdec_query(station = "KES", sensor = "15", dur_code = "M", start_date = "1965-10-01")
 
-rs_monthly_raw <- rs_monthly |> 
-  mutate(date = as.Date(DateTime),
+rs_monthly <- rs_monthly_raw |> 
+  mutate(date = as.Date(datetime),
          year = year(date),
-         value = Value,
+         value = parameter_value,
          name = "rs_monthly",
          water_year = NA,
          month = month(date),
@@ -111,7 +137,7 @@ rs_monthly_raw <- rs_monthly |>
          water_year = NA,
          stream = "shasta dam") |> 
   filter(month %in% c(12, 1, 2, 3 )) |> 
-  select(name, year, water_year, stream, jpe_date, value) |> 
+  select(name, year, water_year, stream, jpe_date, value) |>  # should we add month as well?
   glimpse()
 
 ```
@@ -120,8 +146,10 @@ rs_monthly_raw <- rs_monthly |>
 
 ### Water year type
 
+  - This dataset provides annual Chronological Reconstructed Sacramento and San Joaquin Valley Water Year Hydrologic Classification Indices Based on measured unimpaired runoff (in million acre-feet). It was retrieved from the California Open Data Portal
+  
 ```{r, include = F}
-#TODO pull in water year type (CDEC hydrological https://data.ca.gov/dataset/cdec-water-year-type-dataset/resource/301aaef5-940d-4915-8ed6-baada4e101f5). Add on more recent years (need to find where best to pull 2023-2025)
+# https://data.ca.gov/dataset/cdec-water-year-type-dataset/resource/301aaef5-940d-4915-8ed6-baada4e101f5). Add on more recent years (need to find where best to pull 2023-2025)
 #Process data into 3 categories: aggregate into 3 categories: C, D/BN/AN, W
 wy_url <- "https://data.ca.gov/datastore/dump/301aaef5-940d-4915-8ed6-baada4e101f5?format=csv"
 
