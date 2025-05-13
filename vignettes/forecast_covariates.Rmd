@@ -35,7 +35,16 @@ sr_covariates <- SRJPEdata::stock_recruit_covariates
 
 # Process for developing forecast covariates
 
-TODO Notes of what to include
+The diagram outlines the process for developing covariates for forecast models used in stock-recruit. It build upon prior work that identified and tested covariates using historical data, now shifting focus to how those covariates are adapted for use in forecast scenarios.
+
+Some covariates were selected and evaluated based on literature review and expert input, followed by testing with historical data using leave-one-out (LOO) analysis. As we transition to forecast applications.
+
+As we transition to forecast application, we need to find out if the data for a given covariate will be available at the time of forecasting. If yes, the covariate will be included in the forecast model using the same structure as the historical covariate. If the answer is no, meaning the covariate data will not be available during the forecaste period, then two strategies are considered:
+
+  1 Use continuous forecast data, if available
+  2 Create a discrete covariate based on historical data: restructure and bin the variable into categories based on historical conditions (e.g. high, medium, low)
+
+#TODO Notes of what to include
 - Describe how this forecast phase fits in with previous work on selecting covariates for stock recruit model and how it is different 
 - highlight that some of the historical covariates that we have already tested will be the same structure as used in forecast models (e.g. like the spawning/incubating lifestage variables)
 - Define what we mean by "scenario" or "continuous"
@@ -101,6 +110,7 @@ rs_monthly_raw <- rs_monthly |>
          # jpe_date = if_else(month == 1, 12L, month - 1L), # if we only want the month
          water_year = NA,
          stream = "shasta dam") |> 
+  filter(month %in% c(12, 1, 2, 3 )) |> 
   select(name, year, water_year, stream, jpe_date, value) |> 
   glimpse()
 
