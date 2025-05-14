@@ -1,5 +1,5 @@
 ---
-title: "Covariate Development for Forecast Models"
+title: "Covariate Development for Forecast and Scenario Models"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Covariate Development for Forecast Models}
@@ -33,15 +33,18 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 )
 
 sr_covariates <- SRJPEdata::stock_recruit_covariates
+source("data-raw/pull_data_scripts/pull_environmental_data.R")
 ```
 
-# Process for developing forecast covariates
+This vignette focuses on developing covariates that could be used in forecast or scenario SR JPE models. We build upon prior work that identified and tested covariates using historical data,  and transition to how those covariates are adapted for use in forecast or scenario scenarios.
 
-The diagram outlines the process for developing covariates for forecast models used in stock-recruit. It build upon prior work that identified and tested covariates using historical data, now shifting focus to how those covariates are adapted for use in forecast scenarios.
+## Process for developing forecast covariates
+
+The diagram outlines the process for developing covariates for forecast and scenario models. 
 
 Some covariates were selected and evaluated based on literature review and expert input, followed by testing with historical data using leave-one-out (LOO) analysis. 
 
-As we transition to forecast application, we need to find out if the data for a given covariate will be available at the time of forecasting. If yes, the covariate will be included in the forecast model using the same structure as the historical covariate. If the answer is no, meaning the covariate data will not be available during the forecaste period, then two strategies are considered:
+As we transition to forecast and scenario model application, we need to find out if the data for a given covariate will be available at the time of forecasting. If yes, the covariate will be included in the forecast model using the same structure as the historical covariate. If the answer is no, meaning the covariate data will not be available during the forecaste period, then two strategies are considered:
 
   1. Use continuous forecast data, if available
   
@@ -51,7 +54,6 @@ As we transition to forecast application, we need to find out if the data for a 
 
 
 ## Covariates included in forecast models
-
 
 ```{r include=FALSE}
 covariate_table <- tibble::tibble(
@@ -83,14 +85,16 @@ kable(covariate_table, caption = "Covariate Descriptions")
 
 *Note that this covariate list will be iteratively updated and improved*
 
-# Preparing covariates
+## Preparing covariates
 
-## Continuous variables
+### Continuous variables
 
-### Spawning and incubation flow variables
+#### Spawning and incubation flow variables
 
-- min flow: Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the minimum
-- max flow: Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the maximum
+These data are pulled from `stock_recruit_covarites`
+
+- **min flow**: Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the minimum
+- **max flow**: Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the maximum
 
 ```{r, include = F}
 si_min_flow <- sr_covariates |> 
@@ -98,9 +102,9 @@ filter(lifestage == "spawning and incubation", covariate_structure == "min_flow"
   as_tibble() |> 
   mutate(name = "si_min_flow",
          water_year = NA,
-         jpe_date = NA_Date_,
-         value = as.character(value)) |> 
-  select(name, year, water_year, stream, jpe_date, value) |> 
+         # jpe_date = NA_Date_
+         ) |> 
+  select(name, year, water_year, stream, value) |> 
   glimpse()
 
 si_max_flow <- sr_covariates |> 
@@ -108,15 +112,17 @@ filter(lifestage == "spawning and incubation", covariate_structure == "max_flow"
   as_tibble() |> 
   mutate(name = "si_max_flow",
          water_year = NA,
-         jpe_date = NA_Date_,
-         value = as.character(value)) |> 
-  select(name, year, water_year, stream, jpe_date, value)
+         # jpe_date = NA_Date_,
+         ) |> 
+  select(name, year, water_year, stream, value)
 ```
 
-### Spawning and incubation temperature variables
+#### Spawning and incubation temperature variables
 
-- max temp: Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the mean. An annual value is calculated by taking the max of the weekly max.
-- above 13C threshold: This covariate is defined as the week of the year when the 7DADM is above 13C. Data are filtered to Mar-Dec because this is the time period where spring run are in the tributaries and may be experiencing temperature stress. This includes holding as well as spawning and incubation time period.
+These data are pulled from `stock_recruit_covarites`
+
+- **max temp**: Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the mean. An annual value is calculated by taking the max of the weekly max.
+- **above 13C threshold**: This covariate is defined as the week of the year when the 7DADM is above 13C. Data are filtered to Mar-Dec because this is the time period where spring run are in the tributaries and may be experiencing temperature stress. This includes holding as well as spawning and incubation time period.
 
 ```{r, include = F}
 si_max_temp <- sr_covariates |> 
@@ -124,9 +130,9 @@ filter(lifestage == "spawning and incubation", covariate_structure == "weekly_ma
   as_tibble() |> 
   mutate(name = "si_max_temp",
          water_year = NA,
-         jpe_date = NA_Date_,
-         value = as.character(value)) |> 
-  select(name, year, water_year, stream, jpe_date, value) |> 
+         # jpe_date = NA_Date_,
+         ) |> 
+  select(name, year, water_year, stream, value) |> 
   glimpse()
 
 above_13 <- sr_covariates |> 
@@ -134,15 +140,14 @@ above_13 <- sr_covariates |>
   as_tibble() |> 
   mutate(name = "above_13",
          water_year = NA,
-         jpe_date = NA_Date_,
-         value = as.character(value)) |>
-  select(name, year, water_year, stream, jpe_date, value) 
+         # jpe_date = NA_Date_,
+         ) |>
+  select(name, year, water_year, stream, value) 
 ```
 
-### Reservoir storage
+#### Reservoir storage
 
-- monthly reservoir storage: Using reservoir storage data, calculate the monthly average storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)
-- This data contains monthly reservoir storage volumes (acre-feet) for Keswick Reservoir (KES), retrieved from the California Data Exchange Center (CDEC) operated by the California Department of Water Resources (DWR). The earliest data available is on 1965
+- **monthly reservoir storage**: Using reservoir storage data, calculate the monthly average storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec). This data contains monthly reservoir storage volumes (acre-feet) for Keswick Reservoir (KES), retrieved from the California Data Exchange Center (CDEC) operated by the California Department of Water Resources (DWR). The earliest data available is in 1965. Stream is NA because it applies to all streams and should not be joined on stream.
 
 ```{r, include = F}
 # Pull monthly reservoir storage: https://cdec.water.ca.gov/dynamicapp/QueryMonthly?s=KES
@@ -152,24 +157,63 @@ rs_monthly_raw <- cdec_query(station = "KES", sensor = "15", dur_code = "M", sta
 rs_monthly <- rs_monthly_raw |> 
   mutate(date = as.Date(datetime),
          year = year(date),
-         value = as.character(parameter_value),
+         value = parameter_value,
          name = "rs_monthly",
          water_year = NA,
          month = month(date),
-         jpe_year = if_else(month == 1, year - 1, year),
-         jpe_month = if_else(month == 1, 12L, month - 1L),
-         jpe_date = make_date(year = jpe_year, month = jpe_month),
+         # jpe_year = if_else(month == 1, year - 1, year),
+         # jpe_month = if_else(month == 1, 12L, month - 1L),
+         # jpe_date = make_date(year = jpe_year, month = jpe_month),
          # jpe_date = if_else(month == 1, 12L, month - 1L), # if we only want the month
-         water_year = NA,
-         stream = "shasta dam") |> 
+         stream = NA) |> 
   filter(month %in% c(12, 1, 2, 3 )) |> 
-  select(name, year, water_year, stream, jpe_date, value)  # should we add month as well?
+  select(name, year, water_year, month, stream, value)  # should we add month as well?
  
 ```
 
-## Scenario variales
+Plot the last 10 years - note that data have been filtered to Dec-Mar for use in JPE forecasting
 
-### Water year type
+```{r, echo = F, message = F, warning = F}
+rs_monthly |> 
+  filter(year >= 2015) |> 
+  mutate(year = as.factor(year)) |> 
+  ggplot(aes(x = month, y = value, color = year)) +
+  geom_point() +
+  scale_color_manual(values = colors_full) +
+  theme_bw()
+```
+
+#### Peak flow
+
+- **monthly peak flow**: Calculate the peak flow for each watershed and month. This would be different based on JPE date. Takes the mean daily flow and finds the max for each month, year, and stream.
+
+```{r, include = F}
+# This requires running "pull_environmental_data.R"
+peak_flow_monthly <- flow |> 
+  filter(statistic == "mean") |> 
+  mutate(month = month(date),
+         year = year(date),
+         name = "monthly_max_flow") |>  
+  group_by(stream, month, year, name) |> 
+  summarize(value = max(value, na.rm = T))
+```
+
+Plot the last 10 years
+
+```{r, echo = F, message = F, warning = F}
+peak_flow_monthly |> 
+  filter(year >= 2015) |> 
+  mutate(year = as.factor(year)) |> 
+  ggplot(aes(x = month, y = value, color = year)) +
+  geom_line() +
+  scale_color_manual(values = colors_full) +
+  theme_bw() +
+  facet_wrap(~stream, scales = "free_y")
+```
+
+### Scenario variales
+
+#### 3-category water year type
 
   - This dataset provides annual Chronological Reconstructed Sacramento and San Joaquin Valley Water Year Hydrologic Classification Indices Based on measured unimpaired runoff (in million acre-feet). It was retrieved from the California Open Data Portal
   
@@ -181,20 +225,32 @@ wy_url <- "https://data.ca.gov/datastore/dump/301aaef5-940d-4915-8ed6-baada4e101
 wy_raw <- read_csv(wy_url)
 
 wy <- wy_raw |> 
+  filter(!is.na(WY)) |> 
   mutate(wy_type = case_when(WYT %in% c("D", "BN", "AN") ~ "D/BN/AN",
                              T ~ WYT),
          year = NA,
          water_year = WY,
          name = "3_category_wy_type",
          stream = NA,
-         jpe_date = NA_Date_,
-         value = NA) |>
-  select(name, year, water_year, stream, jpe_date, value) 
+         # jpe_date = NA_Date_,
+         text_value = wy_type) |>
+  select(name, year, water_year, stream, text_value) 
 ```
 
-### 3-category flow exceedance year type
 
-  - This dataset defines the water year type for each stream based on the methodology outlined in the Standard Operating Procedure for Flow Duration Analysis in California [CDFW-IFP-005, August 2013](https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=74183). It uses daily flow data from USGS gages to calculate the mean annual discharge (cfs) for each water year. Water years are then ranked by mean discharge within each stream and split into three categories:
+```{r, echo = F, message = F, warning = F}
+wy |> 
+  #filter(year >= 2015) |> 
+  ggplot(aes(x = water_year, y = text_value)) +
+  geom_point() +
+  scale_color_manual(values = colors_full) +
+  theme_bw() +
+  labs(y = "")
+```
+
+#### 3-category flow exceedance year type
+
+  - This dataset defines the water year type for each stream based on the methodology outlined in the Standard Operating Procedure for Flow Duration Analysis in California [CDFW-IFP-005, August 2013](https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=74183). It uses daily flow data from USGS gages to calculate the mean annual discharge (cfs) for each water year and location. Water years are then ranked by mean discharge within each stream and split into three categories:
   
     - Wet: Top 33%
     - Average: Middle 33%
@@ -204,14 +260,14 @@ wy <- wy_raw |>
 # Connect to the work Badhia did to create "flow exceedance" water year types based on CDFW calculations
 # We can either source that script, or move the code here - ashley and badhia to discuss
 gage_ids <- c(
-  Battle = "11376550",
-  Butte = "11390000",
-  Clear = "11372000",
-  Deer = "11383500",
-  Feather_LFC = "11407000",
-  Mill = "11381500",
-  Yuba = "11421000",
-  Knights_Landing = "11390500"
+  `battle creek` = "11376550",
+  `butte creek` = "11390000",
+  `clear creek` = "11372000",
+  `deer creek` = "11383500",
+  `feather river` = "11407000",
+  `mill creek` = "11381500",
+  `yuba river` = "11421000",
+  `sacramento river` = "11390500"
 )
 
 start_date <- format(Sys.Date() - 30*365, "%Y-%m-%d")  # ~30 years ago
@@ -257,26 +313,49 @@ flow_water_year_type <- water_year_types |>
   mutate(name = "3_category_flow_exceedance_year_type", 
          year = NA,
          stream = site_name,
-         jpe_date = NA_Date_,
-         value = as.character(water_year_type)) |> 
-  select(name, year, water_year, stream, jpe_date, value)
+         # jpe_date = NA_Date_,
+         text_value = as.character(water_year_type)) |> 
+  select(name, year, water_year, stream, text_value)
 ```
 
 
-# Combine and save data
+```{r, echo = F, message = F, warning = F}
+# flow_water_year_type |> 
+#   ggplot(aes(x = water_year, y = text_value)) +
+#   geom_point() +
+#   scale_color_manual(values = colors_full) +
+#   theme_bw() +
+#   labs(y = "") +
+#   facet_wrap(~stream)
 
-```{r include=FALSE}
-forecast_covariates <- bind_rows(si_min_flow, si_max_flow, si_max_temp, above_13, rs_monthly, flow_water_year_type, wy) |> glimpse()
+
+flow_water_year_type |> 
+  mutate(value = case_when(text_value == "Wet" ~ 3,
+                           text_value == "Average" ~ 2,
+                           T ~ 1)) |> 
+  ggplot(aes(x = water_year, y = value)) +
+  geom_line() +
+  #scale_color_manual(values = colors_full) +
+  theme_bw() +
+  labs(y = "") +
+  facet_wrap(~stream)
+
+```
+
+
+## Combine and save data
+
+```{r echo=FALSE, message = F, warning = F}
+forecast_covariates <- bind_rows(si_min_flow, si_max_flow, si_max_temp, above_13, rs_monthly, flow_water_year_type, wy, peak_flow_monthly) |> glimpse()
 
 #checks
-unique(forecast_covariates$name)
+# unique(forecast_covariates$name)
+# unique(forecast_covariates$stream)
+# filter(forecast_covariates, !name %in% c("rs_monthly", "3_category_wy_type") & is.na(stream))
 
-# saveRDS(forecast_covariates, here::here("data", "forecast_covariates.RDS")) #TODO run this once data looks good
+knitr::kable(head(forecast_covariates, 10))
 ```
 
-```{r echo=FALSE}
-forecast_covariates |> glimpse()
+```{r}
+usethis::use_data(forecast_covariates, overwrite = TRUE)
 ```
-
-
-TODO decide if we need to add a filter to the most recent year? Open question depending on how model code is set up
