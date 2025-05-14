@@ -22,6 +22,7 @@ library(lubridate)
 library(CDECRetrieve)
 library(dplyr)
 library(dataRetrieval)
+library(knitr)
 
 colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
                   "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
@@ -38,27 +39,21 @@ sr_covariates <- SRJPEdata::stock_recruit_covariates
 
 The diagram outlines the process for developing covariates for forecast models used in stock-recruit. It build upon prior work that identified and tested covariates using historical data, now shifting focus to how those covariates are adapted for use in forecast scenarios.
 
-Some covariates were selected and evaluated based on literature review and expert input, followed by testing with historical data using leave-one-out (LOO) analysis. As we transition to forecast applications.
+Some covariates were selected and evaluated based on literature review and expert input, followed by testing with historical data using leave-one-out (LOO) analysis. 
 
 As we transition to forecast application, we need to find out if the data for a given covariate will be available at the time of forecasting. If yes, the covariate will be included in the forecast model using the same structure as the historical covariate. If the answer is no, meaning the covariate data will not be available during the forecaste period, then two strategies are considered:
 
-  1 Use continuous forecast data, if available
-  2 Create a discrete covariate based on historical data: restructure and bin the variable into categories based on historical conditions (e.g. high, medium, low)
+  1. Use continuous forecast data, if available
+  
+  2. Create a discrete covariate based on historical data: restructure and bin the variable into categories based on historical conditions (e.g. high, medium, low)
 
-#TODO Notes of what to include
-- Describe how this forecast phase fits in with previous work on selecting covariates for stock recruit model and how it is different 
-- highlight that some of the historical covariates that we have already tested will be the same structure as used in forecast models (e.g. like the spawning/incubating lifestage variables)
-- Define what we mean by "scenario" or "continuous"
-- When data for a covariate are not available, there are two options for the forecast model. We are focusing on the scenario type of variable
+![*Spring Run JPE Forecast Covariate Process Diagram*](images/sr_jpe_covariate_process_diagram.png){width="108%"}
 
-TODO include lucidapp diagram (https://lucid.app/lucidchart/54013423-12f2-42cc-a6cb-e9097fea1ad7/edit?beaconFlowId=21FC89EB4FE4986F&invitationId=inv_80180167-225e-4c43-9082-67bdc58283b2&page=0_0#)
 
 ## Covariates included in forecast models
 
-TODO insert table that lists the covariates we are currently including in forecast models
 
-
-```{r echo=FALSE}
+```{r include=FALSE}
 covariate_table <- tibble::tibble(
   name = c("spawning/incubation minimum flow",
     "spawning/incubation maximum flow",
@@ -71,16 +66,22 @@ covariate_table <- tibble::tibble(
   description = c("Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the minimum. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
                   "Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the maximum. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
                   "Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the mean. An annual value is calculated by taking the max of the weekly max. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
-                  "This covariate is defined as the week of the year when the 7DADM is above 13C. Data are filtered to Mar-Dec because this is the time period where spring run are in the tributaries and may be experiencing temperature stress.\nNote, we currently do not have max daily temperatures for the Sacramento so mainstem is not included. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
+                  "This covariate is defined as the week of the year when the 7DADM is above 13C. Data are filtered to Mar-Dec because this is the time period where spring run are in the tributaries and may be experiencing temperature stress. Note, we currently do not have max daily temperatures for the Sacramento so mainstem is not included. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.",
                   "Use water year type from CDEC for the Sacramento Valley and aggregate into 3 categories: C, D/BN/AN, W. This is a scenario based covariate meaning we do not need any data for the forecast. All 3 categories would be run for the forecast.",
                   "Use the flow exceedance methodology provided by the CDFW Instream Flow team (find mean annual flow by water year for each stream and rank the water years where the top 33% are wet, middle are average, bottom are dry) to categorize years for each stream into 3 categories: wet, average, dry",
                   "Using reservoir storage data, calculate the monthly max storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)",
                   "Calculate the peak flow for each watershed and month. This would be different based on JPE date"))
 
-covariate_table
+
 ```
 
-Note that this covariate list will be iteratively updated and improved
+
+
+```{r covariate-table, echo=FALSE}
+kable(covariate_table, caption = "Covariate Descriptions")
+```
+
+*Note that this covariate list will be iteratively updated and improved*
 
 # Preparing covariates
 
@@ -191,7 +192,13 @@ wy <- wy_raw |>
   select(name, year, water_year, stream, jpe_date, value) 
 ```
 
-### Flow year type
+### 3-category flow exceedance year type
+
+  - This dataset defines the water year type for each stream based on the methodology outlined in the Standard Operating Procedure for Flow Duration Analysis in California [CDFW-IFP-005, August 2013](https://nrm.dfg.ca.gov/FileHandler.ashx?DocumentID=74183). It uses daily flow data from USGS gages to calculate the mean annual discharge (cfs) for each water year. Water years are then ranked by mean discharge within each stream and split into three categories:
+  
+    - Wet: Top 33%
+    - Average: Middle 33%
+    - Dry: Bottom 33%
 
 ```{r, include = F}
 # Connect to the work Badhia did to create "flow exceedance" water year types based on CDFW calculations
@@ -247,7 +254,7 @@ water_year_types <- mean_discharge_by_site |>
   glimpse()
 
 flow_water_year_type <- water_year_types |> 
-  mutate(name = "flow_water_year_type", # confirm this is what we want to call it
+  mutate(name = "3_category_flow_exceedance_year_type", 
          year = NA,
          stream = site_name,
          jpe_date = NA_Date_,
@@ -264,7 +271,11 @@ forecast_covariates <- bind_rows(si_min_flow, si_max_flow, si_max_temp, above_13
 #checks
 unique(forecast_covariates$name)
 
-# saveRDS(forecast_covariates, here::here("data", "forecast_covariates.RDS"))
+# saveRDS(forecast_covariates, here::here("data", "forecast_covariates.RDS")) #TODO run this once data looks good
+```
+
+```{r echo=FALSE}
+forecast_covariates |> glimpse()
 ```
 
 
