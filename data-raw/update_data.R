@@ -22,6 +22,7 @@ knitr::knit("vignettes/trap_effort.Rmd")
 knitr::knit("vignettes/lifestage_ruleset.Rmd") # very slow but logic is a bit tricky, could be one to update to data.table
 knitr::knit("vignettes/years_to_include_analysis.Rmd") # does not automatically exclude adults yet, so add that
 knitr::knit("vignettes/sr_covariates.Rmd")
+knitr::knit("vignettes/forecast_covariates.Rmd")
 # rebuild site to save updated data objects in package
 devtools::load_all()
 

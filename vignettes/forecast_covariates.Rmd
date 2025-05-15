@@ -298,16 +298,30 @@ mean_discharge_by_site <- combined_flow |>
   summarize(mean_discharge = mean(flow_cfs, na.rm = TRUE), .groups = "drop")
 
 # rank and assign water year type within each stream
-water_year_types <- mean_discharge_by_site |>
+# water_year_types <- mean_discharge_by_site |>
+#   group_by(site_name) |>
+#   arrange(desc(mean_discharge)) |>
+#   mutate(rank = row_number(),
+#          n_years = n(),  # total water years per site
+#          water_year_type = case_when(rank <= n_years / 3 ~ "Wet",
+#                                      rank > 2 * n_years / 3 ~ "Dry",
+#                                      TRUE ~ "Average")) |>
+#   ungroup() |> 
+#   glimpse()
+
+# Calculate flow exceedance and then use that to split up. This is pretty much the same
+# as the ranked and divide by 3 approach. Using this for consistently with CDFW.
+# P = 100 * [ M / (n + 1) ]
+
+water_year_types <- mean_discharge_by_site |> 
   group_by(site_name) |>
   arrange(desc(mean_discharge)) |>
   mutate(rank = row_number(),
-         n_years = n(),  # total water years per site
-         water_year_type = case_when(rank <= n_years / 3 ~ "Wet",
-                                     rank > 2 * n_years / 3 ~ "Dry",
-                                     TRUE ~ "Average")) |>
-  ungroup() |> 
-  glimpse()
+         n_years = n(),
+         exceedance_probability = 100*(rank/(n_years + 1)),
+         water_year_type = case_when(exceedance_probability <= 33.3 ~ "Wet",
+                                     exceedance_probability > 33.3 & exceedance_probability <= 66.3 ~ "Average",
+                                     T ~ "Dry"))
 
 flow_water_year_type <- water_year_types |> 
   mutate(name = "3_category_flow_exceedance_year_type", 
@@ -315,6 +329,7 @@ flow_water_year_type <- water_year_types |>
          stream = site_name,
          # jpe_date = NA_Date_,
          text_value = as.character(water_year_type)) |> 
+  ungroup() |> 
   select(name, year, water_year, stream, text_value)
 ```
 
