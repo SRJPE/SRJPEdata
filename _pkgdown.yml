@@ -81,6 +81,8 @@ navbar:
     href: reference/index.html
   - text: 'Articles'
     menu: 
+      - text: 'Summary of Data for Modeling '
+        href: articles/summary_of_data_for_modeling.html
       - text: 'Lifestage Rulesets'
         href: articles/lifestage_ruleset.html
       - text: 'Site Selection for Stock Recruit Modeling'
@@ -93,10 +95,11 @@ navbar:
         href: articles/prep_environmental_covariates.html
       - text: 'Stock Recruit Model Covariate Prep'
         href: articles/sr_covariates.html
+      - text: 'Forecast and Scenario Model Covariate Prep'
+        href: articles/forecast_covariates.html
       - text: 'Filling Temperature Data Gaps'
         href: articles/temp_regression.html
-      - text: 'Summary of Data for Modeling '
-        href: articles/summary_of_data_for_modeling.html
+
   - text: 'News'
     href: news/index.html
         
