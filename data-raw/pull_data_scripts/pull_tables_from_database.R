@@ -207,7 +207,27 @@ try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.strea
                                     year == 2010 & stream == "mill creek" & passage_estimate != 205 ~ "remove",
                                     year == 2014 & stream == "deer creek" & passage_estimate != 512 ~ "remove",
                                     T ~ "do not remove")) |> 
-      filter(stream != "butte creek", not_spring != "remove"))
+      filter(stream != "butte creek", not_spring != "remove") |> 
+      # TODO these should be added to the database though we are likely moving away from db for adult data because too hard to maintain
+      add_row(year = 2022,
+              stream = "clear creek",
+              passage_estimate = 195) |> 
+      add_row(year = 2023,
+              stream = "clear creek",
+              passage_estimate = 0) |> 
+      # source of below data is e-mail chain from ashley / sam provins / gabby week of 1/14/2025
+      add_row(year = 2022,
+              stream = "battle creek",
+              passage_estimate = 152) |> 
+      add_row(year = 2023,
+              stream = "battle creek",
+              passage_estimate = 7) |> # one of these was a feather river spring run
+      add_row(year = 2024,
+              stream = "battle creek",
+              passage_estimate = 30) |> 
+      add_row(year = 2024,
+              stream = "clear creek",
+              passage_estimate = 6))
 
 try(if(!exists("upstream_passage_estimates_query"))
   upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
@@ -235,7 +255,8 @@ try(if(nrow(holding_query) <= nrow(SRJPEdata::holding)) {
   warning(paste("No new holding datasets detected in the database. Holding data  is", Sys.Date()))
 })
 
-# Pull in redd data (just daily)
+# We are not pulling in redd data from the database. Redd summary is generated in buld_adult_model_datasets
+# Pull in redd data (just daily) 
 # try(redd_query <- dbGetQuery(con, "SELECT r.date, sl.stream, sl.reach, r.latitude, r.longitude,
 #                                    ru.definition as run, r.velocity, r.redd_id, r.age
 #                                    FROM daily_redd r
@@ -270,7 +291,3 @@ try(if(nrow(carcass_estimates_query) <= nrow(SRJPEdata::carcass_estimates)) {
   carcass_estimates <- SRJPEdata::carcass_estimates
   warning(paste("No new carcass estimates datasets detected in the database. Maximum date of carcass estimate data is", max(SRJPEdata::carcass_estimates$year, na.rm = TRUE)))
 })
-
-
-
-

@@ -65,8 +65,7 @@ usethis::use_data(stock_recruit_year_lookup, overwrite = TRUE)
 # prepare covariates for the mainstem to be added as columns. these will only apply to
 # battle, clear, deer, mill as those are the tribs above knights/tisdale
 mainstem_covariates <- stock_recruit_covariates |> 
-  filter(site_group == "knights landing") |> 
-  select(-stream_site) |> # this isn't doing anything and is confusing so remove
+  filter(stream == "sacramento river") |> 
   mutate(lifestage = ifelse(lifestage == "spawning and incubation", "spawning", lifestage),
          covariate_structure = paste0("mainstemKNL_", lifestage, "_", covariate_structure)) |> 
   select(year, covariate_structure, value) |>
@@ -91,31 +90,9 @@ stock_recruit_model_inputs <- observed_adult_input |>
   left_join(
     stock_recruit_covariates |>
       ungroup() |>
-      select(-stream_site) |> # this isn't doing anything and is confusing so remove
-      mutate(site_group = case_when(
-        gage_number %in% c("UBC", "UCC", "LCC", "LBC") ~ tolower(gage_number),
-        # for some clear/battle the upper/lower being noted in gage_agency
-        is.na(site_group) ~ stream,
-        T ~ site_group),
-        lifestage = ifelse(lifestage == "spawning and incubation", "spawning", lifestage),
+      mutate(lifestage = ifelse(lifestage == "spawning and incubation", "spawning", lifestage),
         covariate_structure = paste0(lifestage, "_", covariate_structure)
       ) |>
-      filter(
-        site_group %in% c(
-          "ubc",
-          "battle creek",
-          "butte creek",
-          "clear creek",
-          "lcc",
-          "deer creek",
-          "upper feather hfc",
-          "feather river",
-          "mill creek",
-          "yuba river",
-          "knights landing",
-          "tisdale"
-        )
-      ) |> # select for the locations chosen for stock recruit (see sites vignette)
       select(year, stream, covariate_structure, value) |>
       group_by(stream, year, covariate_structure) |>
       summarize(value = mean(value, na.rm = T)) |> # if there are multiple sources, take the mean for now - clean this up

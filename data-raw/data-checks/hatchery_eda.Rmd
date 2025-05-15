@@ -1,0 +1,247 @@
+---
+title: "Preliminary Hatchery Analysis"
+output: word_document
+date: "2025-03-17"
+---
+
+```{r setup_initial, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(lubridate)
+library(readxl)
+library(sf)
+library(ggspatial)
+```
+
+## Preliminary Hatchery Analysis
+
+### What happens if we do a simple expansion of clip rate?
+
+A simple expansion of clip rate involves:
+
+1. Expanding the number of adipose-clipped fish caught at the trap by the assumed clip rate (typically 25%).  
+2. Subtracting this expanded hatchery total from the total number of fish caught in the trap.
+
+**NOTES**
+
+* Use 25% mark rate for everywhere except Feather 
+* Feather assume 100% mark rate (this is spring run mark rate, we would be incorrect for fall fish)
+
+
+### Exploratory Data Analysis (EDA)
+
+Below we apply a simple expansion of clip rate to designate hatchery fish (table) and then create some exploratory plots to investigate potential issues with this approach. 
+
+```{r load_data, echo = FALSE, message = FALSE, include = FALSE}
+knitr::knit("vignettes/lifestage_ruleset.Rmd")
+source("data-raw/process_data_scripts/build_rst_model_datasets.R")
+```
+
+```{r apply_hatch_designation, echo = FALSE}
+# NOTES
+# Use 25% mark rate for everywhere except feather 
+# Feather assume 100% mark rate (this is spring run mark rate, we would be incorrect for fall fish)
+
+# Calculate total hatchery per week 
+
+hatch_per_week <- catch_with_inclusion_criteria |> 
+  filter(adipose_clipped == TRUE) |> 
+  mutate(week = week(date),
+         year = year(date)) |> 
+  group_by(week, year, stream, site, site_group, life_stage) |> 
+  summarize(count = sum(count, na.rm = TRUE)) |> 
+  ungroup() |> 
+  mutate(expanded_weekly_hatch_count = ifelse(stream == "feather river", # Feather assuming 100%
+                                              count, 
+                                              count * 4)) |> #ASSUMING 25% marking, add mark rates in here instead.
+  select(-count) 
+
+# subtract these values from weekly_standard_catch 
+weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |> 
+  left_join(hatch_per_week, 
+            by = c("week", "year", "stream", "site", "site_group", "life_stage")) |> 
+  mutate(expanded_weekly_hatch_count = ifelse(is.na(expanded_weekly_hatch_count), 0, expanded_weekly_hatch_count),
+         natural = count - expanded_weekly_hatch_count, 
+         hatchery = ifelse(expanded_weekly_hatch_count > count, 
+                           NA, expanded_weekly_hatch_count)) 
+  # select(-count, -expanded_weekly_hatch_count) |>  
+  # pivot_longer(natural:hatchery, names_to = "origin", values_to = "count") 
+  
+knitr::kable(head(weekly_standard_catch_with_hatch_designation |> select(-count, -expanded_weekly_hatch_count), 10))
+```
+
+### Visualizing Distribution of Natural and Hatchery Fish
+
+
+The first plot shows the calculated natural fish after hatchery subtraction. This shows some negative values where expanded hatchery count exceeded catch in trap on a given trap visit. 
+
+```{r plot_distributions, echo = FALSE}
+# Filter outliers 
+ggplot(weekly_standard_catch_with_hatch_designation |> 
+         filter(count != 0, natural < 5000) |> 
+         mutate(creates_negative_count = ifelse(natural < 0, TRUE, FALSE))) +
+  geom_histogram(aes(x = natural, fill = creates_negative_count), bins = 30, alpha = 0.7) +
+  facet_wrap(~stream, scales = "free") +
+  scale_fill_manual(values = c("#56B4E9", "#E69F00")) +
+  labs(title = "Distribution of Natural Fish Catch",
+       x = "Number of Natural Fish",
+       y = "Frequency") +
+  theme_minimal()
+```
+
+If we zoom in to just look at these negative values, we see that this is happening on butte, yuba, and sacramento. Most instances of this occuring are on the sacramento river.   
+
+```{r plot_distributions_ 2, echo = FALSE}
+# Filter outliers 
+ggplot(weekly_standard_catch_with_hatch_designation |> 
+         filter(count != 0, natural < 0) |> 
+         mutate(creates_negative_count = ifelse(natural < 0, TRUE, FALSE))) +
+  geom_histogram(aes(x = natural, fill = creates_negative_count), bins = 30, alpha = 0.7) +
+  facet_wrap(~stream) +
+  scale_fill_manual(values = c("#E69F00")) +
+  labs(title = "Distribution of Natural Fish Catch",
+       x = "Number of Natural Fish",
+       y = "Frequency") +
+  theme_minimal()
+```
+
+
+But, it is still important to remember that hatchery fish are released and throughout the system, and caught in every trap, even ones that are not directly downstream of a hatchery. So this could be causing data issues on other systems even if we are not seeing negative values. 
+
+The plot below shows releases after 1991 by location over time. 
+
+```{r load_hatchery_data, echo = FALSE}
+hatchery_release <- read_excel("data-raw/helper-tables/CVFRChin_RELEASE DB_v2_POSTED011519.xlsx", 
+                               sheet = 2) |>  
+  filter(Hatchery %in% c("CNFH", "COL", "FRH", "FEA"),  
+         Year_start > 1991)
+
+ggplot(hatchery_release) +
+  geom_point(aes(x = Release_year, y = Total_N, color = Release_location), alpha = .5) +
+  # facet_wrap(~Release_location, scales = "free") +
+  # scale_color_manual(values = c("#56B4E9")) +
+  labs(title = "Hatchery Releases Over Time",
+       x = "Release Year",
+       y = "Total Released") +
+  theme_minimal() + 
+  theme(
+    legend.position = "bottom",      # Move legend to the bottom
+    legend.key.size = unit(0.3, "cm"),  # Smaller legend keys (symbols)
+    legend.text = element_text(size = 6),  # Smaller legend text
+    legend.title = element_text(size = 8)  # Sm
+    )
+```
+
+The below map also shows hatchery release locations are not just at hatcheries but are all over the system. 
+
+```{r map_hatchery_releases, echo = FALSE}
+filtered_hatchery_release <- hatchery_release |>  
+  filter(Release_site_long < -116, Release_site_long > -125,  # Adjust longitude for full coverage
+         Release_site_lat > 36, Release_site_lat < 44) 
+
+hatchery_sf <- st_as_sf(filtered_hatchery_release,  
+                         coords = c("Release_site_long", "Release_site_lat"),  
+                         crs = 4326)
+
+bbox <- st_bbox(hatchery_sf)  # Bounding box of the dataset
+
+# Create the map
+ggplot() +
+  annotation_map_tile(type = "osm") +  # OpenStreetMap tiles
+  geom_sf(data = hatchery_sf, color = "#E69F00", size = 3, alpha = .5) +  # Plot release points
+  labs(title = "Hatchery Release Sites", x = "Longitude", y = "Latitude") +
+  theme_minimal()
+
+```
+
+### Investigating Negative Values
+
+To look a little closer at the identified issue areas, we filtered to look only at rows where we are creating negative natural count numbers after expanding hatchery catch. 
+
+```{r investigate_negatives, echo = FALSE}
+library(dplyr)
+library(knitr)
+library(gt)
+
+# Filter negative values
+negative_values <- weekly_standard_catch_with_hatch_designation |>  
+  filter(natural < 0) 
+```
+
+#### Streams with Negative Values:
+```{r investigate_negatives_2, echo = FALSE}
+print(unique(negative_values$stream))
+```
+#### Sites with Negative Values:
+```{r investigate_negatives_3, echo = FALSE}
+print(unique(negative_values$site))
+```
+
+#### Detailed tables for each site
+```{r investigate_negatives_4, echo = FALSE}
+# Format detailed tables for each site
+format_table <- function(data, site_name) {
+  data |> 
+    filter(site == site_name) |> 
+    select(week, year, stream, site, life_stage, count, natural, hatchery) |> 
+    arrange(year, week) |> 
+    gt() |> 
+    tab_header(title = paste("Negative Values at", site_name)) |> 
+    fmt_number(columns = c(count, natural, hatchery), decimals = 2) |> 
+    cols_label(
+      week = "Week",
+      year = "Year",
+      stream = "Stream",
+      site = "Site",
+      life_stage = "Life Stage",
+      count = "Total Count",
+      natural = "Natural Fish",
+      hatchery = "Hatchery Fish"
+    ) |> 
+    tab_style(
+      style = list(cell_fill(color = "lightpink")),
+      locations = cells_body(columns = natural, rows = natural < 0)
+    )
+}
+```
+
+##### Okie Dam
+
+The one value at okie dam is only -3 fish and occurs because only one fish was caught in the trap on a given day, this fish was hatchery so expansions indicate negative fish. This would not be an issue if we changed negative values to 0 but is indicative of a problem with this approach. 
+
+```{r investigate_negatives_5, echo = FALSE}
+format_table(negative_values, "okie dam")
+
+```
+
+##### Hallwood
+The one value at hallwood indicates - 5 natural fish on a day when 195 expanded hatchery fish were caught. In this case 50 hatchery fish were caught and 150 natural. This expansion seems more uncertain, but there is still only one negative instance, again this sseems like a minor issue but indicative of a larger problem with this approach. 
+
+```{r investigate_negatives_6, echo = FALSE}
+format_table(negative_values, "hallwood")
+
+```
+
+##### Knights Landing & Tisdale 
+
+Both Sacramento traps show many instances of this issue. An alternative approach will need to be applied to ensure that Sacramento data is not skewed by issues with applying a simple hatchery clip rate expansion. 
+
+```{r investigate_negatives_7, echo = FALSE}
+format_table(negative_values, "knights landing")
+
+```
+
+##### Tisdale
+
+```{r investigate_negatives_8, echo = FALSE}
+format_table(negative_values, "tisdale")
+
+```
+
+### Conclusion
+
+Applying a simple expansion of clip rate would create issues with negative catch values in the data. This is primarily a problem on the Sacramento River (and likely also Feather River if we account for Fall Run Releases, not accounted for in this analysis) but it could also skew catch data throughout the system since fish are released upstream of all traps, not just traps downstream of hatcheries. 
+
+An alternative approach will need to be applied to designate hatchery fish in SR JPE RST data. 
+
+
