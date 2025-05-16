@@ -56,34 +56,13 @@ battle_creek_daily_temp <- ubc_temp_raw |>
 
 ## Butte Creek ----
 ### Flow Data Pull 
-#### Gage Agency (CDEC, BCK)
+#### Gage Agency (USGS, BCK)
 
+# Grant Heneley at CDFW recommended using USGS instead of CDEC because CDEC will sometimes have weird datapoints
 # Pull data 
-
-### Flow Data Pull Tests
-# Data from CDEC only available starting 1997-03-14
-# We use USGS to pull data for 1995-1997, 1999
-butte_creek_data_query <- CDECRetrieve::cdec_query(station = "BCK", dur_code = "H", sensor_num = "20", start_date = "1998-01-01")
-
-butte_creek_daily_flows_cdec <- butte_creek_data_query |> 
-         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
-         group_by(date = as.Date(datetime)) |> 
-         summarise(mean = mean(parameter_value, na.rm = TRUE),
-                   max = max(parameter_value, na.rm = TRUE),
-                   min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "butte creek",
-                site_group = "butte creek",
-                gage_agency = "CDEC",
-                gage_number = "BCK",
-                parameter = "flow") |> 
-  filter(year(date) != 1999)
-
-# Historical data pull
-BCK_USGS <- readNWISdv(11390000, "00060")
-BCK_daily_flows <- BCK_USGS %>%
+butte_creek_data_query <- readNWISdv(11390000, "00060")
+butte_creek_daily_flows <- butte_creel_data_query %>%
   select(Date, flow_cfs =  X_00060_00003) %>%
-  filter(lubridate::year(Date) %in% c(1995, 1996, 1997, 1999)) %>%
   as_tibble() %>%
   rename(date = Date,
          value = flow_cfs) |>
@@ -91,30 +70,24 @@ BCK_daily_flows <- BCK_USGS %>%
          stream = "butte creek",
          site_group = "butte creek",
          gage_agency = "USGS",
-         gage_number = "BCK",
+         gage_number = "11390000",
          parameter = "flow",
          statistic = "mean") 
-butte_creek_daily_flows <- bind_rows(butte_creek_daily_flows_cdec, 
-                                     BCK_daily_flows)
+
 ### Temp Data Pull 
 #### Gage #BCK
 ### Temp Data Pull Tests 
-butte_creek_temp_query <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "1995-01-01")
-
+butte_creek_temp_query <- dataRetrieval::readNWISdv(11390000, "00010", statCd = c("00001","00002"), startDate = "1994-01-01")
 butte_creek_daily_temp <- butte_creek_temp_query |> 
-         mutate(date = as_date(datetime),
-                temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
-         filter(temp_degC < 40, temp_degC > 0) |>
-         group_by(date) |> 
-         summarise(mean = mean(temp_degC, na.rm = TRUE),
-                   max = max(temp_degC, na.rm = TRUE),
-                   min = min(temp_degC, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "butte creek",
-                site_group = "butte creek",
-                gage_agency = "CDEC",
-                gage_number = "BCK",
-                parameter = "temperature")
+  select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
+  as_tibble() %>% 
+  mutate(mean = (max + min) /2) |> 
+  pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
+  rename(date = Date) %>% 
+  mutate(stream = "butte creek",
+         gage_agency = "USGS",
+         gage_number = "11390000",
+         parameter = "temperature")
 
 ## Clear Creek ----
 ### Flow Data Pull 
