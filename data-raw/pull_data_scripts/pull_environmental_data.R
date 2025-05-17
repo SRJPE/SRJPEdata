@@ -61,7 +61,7 @@ battle_creek_daily_temp <- ubc_temp_raw |>
 # Grant Heneley at CDFW recommended using USGS instead of CDEC because CDEC will sometimes have weird datapoints
 # Pull data 
 butte_creek_data_query <- readNWISdv(11390000, "00060")
-butte_creek_daily_flows <- butte_creel_data_query %>%
+butte_creek_daily_flows <- butte_creek_data_query %>%
   select(Date, flow_cfs =  X_00060_00003) %>%
   as_tibble() %>%
   rename(date = Date,

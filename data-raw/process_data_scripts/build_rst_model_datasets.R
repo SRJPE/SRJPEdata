@@ -10,12 +10,15 @@ library(data.table)
 # Rewrite script from catch pulled from JPE database
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
 SRJPEdata::rst_catch |> glimpse()
-updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
+#updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
 years_to_include_rst_data <- years_to_include_rst_data |> # if not loaded run years_to_include_analysis.Rmd vignette
   mutate(include = T)
 # Remove all adipose clipped fish - we do not want to include hatchery fish
-updated_standard_catch <- updated_standard_catch |> 
-  filter(adipose_clipped == F | is.na(adipose_clipped))
+updated_standard_catch <- rst_catch |> 
+  mutate(remove = case_when(stream != "butte creek" & adipose_clipped == T ~ "remove",
+                            T ~ "keep")) |> 
+  filter(remove == "keep") |> 
+  select(-remove)
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
 # This is joined at the end
@@ -61,7 +64,7 @@ catch_with_inclusion_criteria <- updated_standard_catch[
   include == TRUE
 ][
   # Step 4: Select and remove columns (similar to select in dplyr)
-  , !c("run_year", "year", "week", "include")
+  , !c("run_year", "include")
 ]
 
 
@@ -177,17 +180,15 @@ weekly_efficiency <-
   group_by(stream, 
            site, 
            site_group, 
-           origin,
-           median_fork_length_released, # we add origin and fork length for figures
+           #origin,
+           #median_fork_length_released, # we add origin and fork length for figures
            week_released = week(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
             number_recaptured = sum(count, na.rm = TRUE)) |> 
   ungroup() |> 
-  rename(origin_released = origin) |> 
+  #rename(origin_released = origin) |> 
   glimpse()
-
-weekly_efficiency |> glimpse()
 
 # reformat flow data and summarize weekly
 flow_reformatted_raw <- rst_all_weeks |> # we want flows for all weeks, even if missing samples

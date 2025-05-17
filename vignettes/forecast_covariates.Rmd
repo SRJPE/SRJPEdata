@@ -33,7 +33,6 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 )
 
 sr_covariates <- SRJPEdata::stock_recruit_covariates
-source("data-raw/pull_data_scripts/pull_environmental_data.R")
 ```
 
 This vignette focuses on developing covariates that could be used in forecast or scenario SR JPE models. We build upon prior work that identified and tested covariates using historical data,  and transition to how those covariates are adapted for use in forecast or scenario scenarios.

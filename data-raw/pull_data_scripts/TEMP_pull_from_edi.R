@@ -2,25 +2,34 @@
 # into the database. This fix was implemented to make sure all data were available
 # for modeling and not to hold up the modeling process. When these data are added
 # to the database this script can be archived.
+
+# As of May 2025 we are in the process of pulling over all data from EDI rather
+# than relying on historical data. The one situation where we will need to pull in
+# historical data is for Knights Landing because not all data are on EDI
+
 library(tidyverse)
 library(EDIutils)
 
-# Find max dates in SRJPEdata
-dates <- rst_catch |> 
-  group_by(stream, site) |> 
-  summarize(min = min(date, na.rm = T),
-            max = max(date, na.rm = T))
+pull_edi <- function(id, index, version) {
+  scope <- "edi"
+  identifier <- id
+  # latest_version <- list_data_package_revisions(scope, identifier) |>
+  #   tail(1)
+  latest_version <- version
+  package_id <- paste(scope, identifier, latest_version, sep = ".")
+  res <- read_data_entity_names(packageId = package_id)
+  raw <- read_data_entity(packageId = package_id, entityId = res$entityId[index])
+  edi <- read_csv(file = raw)
+}
+# not pulling latest version for some of these because we moved to zip file
+# and harder to pull in. ultimately these data will just be pulled from db
+# anyways
 
 # Butte -------------------------------------------------------------------
-res <- read_data_entity_names(packageId = "edi.1497.14")
-raw <- read_data_entity(packageId = "edi.1497.14", entityId = res$entityId[1])
-catch_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1497.14", entityId = res$entityId[2])
-recapture_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1497.14", entityId = res$entityId[3])
-release_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1497.14", entityId = res$entityId[4])
-trap_edi <- read_csv(file = raw)
+catch_edi <- pull_edi("1497", 1, 14)
+recapture_edi <- pull_edi("1497", 2, 14)
+release_edi <- pull_edi("1497", 3, 14)
+trap_edi <- pull_edi("1497", 4, 14)
 
 butte_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
@@ -46,8 +55,6 @@ butte_catch_edi <- catch_edi |>
          life_stage = lifeStage,
          fork_length = forkLength,
          actual_count = actualCount) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date) > 2021) |> 
   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, actual_count, species) 
 
@@ -73,8 +80,6 @@ butte_recapture_edi <- recapture_edi |>
          run = finalRun,
          life_stage = lifeStage,
          fork_length = forkLength) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date) > 2021) |> 
   select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, species)
 
@@ -100,8 +105,6 @@ butte_trap_edi <- trap_edi |>
          include = includeCatch,
          water_velocity = waterVel,
          water_temp = waterTemp) |> 
-  left_join(dates) |> 
-  filter(trap_stop_date > max & year(trap_stop_date) > 2021) |> 
   select(trap_start_date, visit_type, trap_stop_date, stream, site, subsite,
          site_group, trap_functioning, fish_processed, rpm_start, rpm_end,
          total_revolutions, discharge, water_velocity, water_temp, turbidity,
@@ -119,20 +122,13 @@ butte_release_edi <- release_edi |>
          run = markedRun,
          life_stage = markedLifeStage,
          origin = markedFishOrigin) |> 
-  left_join(dates) |> 
-  filter(date_released > max & year(date_released) > 2021) |> 
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, run, life_stage, origin)
 # Battle/Clear ------------------------------------------------------------
-res <- read_data_entity_names(packageId = "edi.1509.2")
-raw <- read_data_entity(packageId = "edi.1509.2", entityId = res$entityId[1])
-catch_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1509.2", entityId = res$entityId[3])
-recapture_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1509.2", entityId = res$entityId[4])
-release_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1509.2", entityId = res$entityId[2])
-trap_edi <- read_csv(file = raw)
+catch_edi <- pull_edi("1509", 1, 2)
+recapture_edi <- pull_edi("1509", 3, 2)
+release_edi <- pull_edi("1509", 4, 2)
+trap_edi <- pull_edi("1509", 2, 2)
 
 battle_clear_catch_edi <- catch_edi |> 
   mutate(common_name = tolower(common_name)) |> 
@@ -151,8 +147,6 @@ battle_clear_catch_edi <- catch_edi |>
          actual_count = NA_character_) |> 
   rename(date = sample_date,
          run = fws_run) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date) > 2021) |> 
   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, actual_count, species) 
 
@@ -174,8 +168,6 @@ battle_clear_recapture_edi <- recapture_edi |>
          adipose_clipped = hatchery_origin,
          count = number_recaptured,
          fork_length = median_fork_length_recaptured) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date)) |> 
   select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, species)
 
@@ -192,8 +184,6 @@ battle_clear_trap_edi <- trap_edi |>
          trap_stop_time = sample_time,
          total_revolutions = end_counter,
          water_velocity = velocity) |> 
-  left_join(dates) |> 
-  filter(trap_stop_date > max & year(trap_stop_date)) |> 
   select(trap_start_date, trap_stop_date, stream, site, subsite,
          site_group, total_revolutions, water_velocity, turbidity)
 
@@ -207,8 +197,6 @@ battle_clear_release_edi <- release_edi |>
                           site == "upper clear creek" ~ "ucc"),
          subsite = NA) |> 
   rename(origin = origin_released) |> 
-  left_join(dates) |> 
-  filter(date_released > max & year(date_released) > 2021) |> 
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, origin)
 
@@ -256,8 +244,6 @@ feather_catch_edi <- catch_edi |>
          life_stage = lifeStage,
          fork_length = forkLength,
          actual_count = actualCount) |> 
-  left_join(dates) |> 
-  filter(date > max) |> 
   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, actual_count, species) 
 
@@ -279,8 +265,6 @@ feather_recapture_edi <- recapture_edi |>
          count = n,
          life_stage = lifeStage,
          fork_length = forkLength) |> 
-  left_join(dates) |> 
-  filter(date > max) |> 
   select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, species)
 
@@ -302,8 +286,6 @@ feather_trap_edi <- trap_edi |>
          rpm_end = rpmRevolutionsAtEnd,
          include = includeCatch,
          water_temp = waterTemp) |> 
-  left_join(dates) |> 
-  filter(trap_stop_date > max) |> 
   select(trap_start_date, visit_type, trap_stop_date, stream, site, subsite,
          site_group, trap_functioning, fish_processed, rpm_start, rpm_end,
          total_revolutions, water_temp, include)
@@ -328,21 +310,14 @@ feather_release_edi <- release_edi |>
          number_released = nReleased,
          run = markedRun,
          origin = markedFishOrigin) |> 
-  left_join(dates) |> 
-  filter(date_released > max) |> 
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, run, life_stage, origin)
 
 # Yuba --------------------------------------------------------------------
-res <- read_data_entity_names(packageId = "edi.1529.11")
-raw <- read_data_entity(packageId = "edi.1529.11", entityId = res$entityId[1])
-catch_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1529.11", entityId = res$entityId[2])
-recapture_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1529.11", entityId = res$entityId[3])
-release_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1529.11", entityId = res$entityId[4])
-trap_edi <- read_csv(file = raw)
+catch_edi <- pull_edi("1529", 1, 11)
+recapture_edi <- pull_edi("1529", 2, 11)
+release_edi <- pull_edi("1529", 3, 11)
+trap_edi <- pull_edi("1529", 4, 11)
 
 yuba_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
@@ -365,8 +340,6 @@ yuba_catch_edi <- catch_edi |>
          life_stage = lifeStage,
          fork_length = forkLength,
          actual_count = actualCount) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date)) |> 
   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, actual_count, species)
 
@@ -389,8 +362,6 @@ yuba_recapture_edi <- recapture_edi |>
          count = n,
          life_stage = lifeStage,
          fork_length = forkLength) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date)) |> 
   select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, species)
 
@@ -413,8 +384,6 @@ yuba_trap_edi <- trap_edi |>
          rpm_end = rpmRevolutionsAtEnd,
          include = includeCatch,
          water_temp = waterTemp) |> 
-  left_join(dates) |> 
-  filter(trap_stop_date > max & year(trap_stop_date)) |> 
   select(trap_start_date, visit_type, trap_stop_date, stream, site, subsite,
          site_group, trap_functioning, fish_processed, rpm_start, rpm_end,
          total_revolutions, water_temp, turbidity, include)
@@ -430,21 +399,15 @@ yuba_release_edi <- release_edi |>
          number_released = nReleased,
          run = markedRun,
          origin = markedFishOrigin) |> 
-  left_join(dates) |> 
-  filter(date_released > max & year(date_released)) |> 
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, run, life_stage, origin)
 
 # Knights Landing ---------------------------------------------------------
-res <- read_data_entity_names(packageId = "edi.1501.2")
-raw <- read_data_entity(packageId = "edi.1501.2", entityId = res$entityId[2])
-catch_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1501.2", entityId = res$entityId[3])
-recapture_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1501.2", entityId = res$entityId[5])
-release_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1501.2", entityId = res$entityId[1])
-trap_edi <- read_csv(file = raw)
+catch_edi <- pull_edi("1501", 2, 2)
+recapture_edi <- pull_edi("1501", 3, 2)
+release_edi <- pull_edi("1501", 5, 2)
+trap_edi <- pull_edi("1501", 1, 2)
+
 
 knights_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
@@ -463,8 +426,6 @@ knights_catch_edi <- catch_edi |>
          count = n,
          life_stage = lifeStage,
          fork_length = forkLength) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date)) |> 
   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, actual_count, species)
 
@@ -484,8 +445,6 @@ knights_recapture_edi <- recapture_edi |>
          count = n,
          life_stage = lifeStage,
          fork_length = forkLength) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date)) |> 
   select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, species)
 
@@ -504,8 +463,6 @@ knights_trap_edi <- trap_edi |>
          water_temp = waterTemp,
          water_velocity = waterVel,
          trap_stop_date = trap_end_date) |> 
-  left_join(dates) |> 
-  filter(trap_stop_date > max & year(trap_stop_date)) |> 
   select(trap_start_date, visit_type, trap_stop_date, stream, site, subsite,
          site_group, trap_functioning, fish_processed, rpm_start, rpm_end,
          total_revolutions, water_temp, water_velocity, discharge, turbidity, include)
@@ -521,21 +478,14 @@ knights_release_edi <- release_edi |>
          run = markedRun,
          origin = markedFishOrigin,
          life_stage = markedLifeStage) |> 
-  left_join(dates) |> 
-  filter(date_released > max & year(date_released)) |> 
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, run, life_stage, origin)
 
 # Tisdale ---------------------------------------------------------
-res <- read_data_entity_names(packageId = "edi.1499.4")
-raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[1])
-catch_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[3])
-recapture_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[4])
-release_edi <- read_csv(file = raw)
-raw <- read_data_entity(packageId = "edi.1499.4", entityId = res$entityId[2])
-trap_edi <- read_csv(file = raw)
+catch_edi <- pull_edi("1499", 1, 4)
+recapture_edi <- pull_edi("1499", 3, 4)
+release_edi <- pull_edi("1499", 4, 4)
+trap_edi <- pull_edi("1499", 2, 4)
 
 tisdale_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
@@ -556,8 +506,6 @@ tisdale_catch_edi <- catch_edi |>
          life_stage = lifeStage,
          fork_length = forkLength,
          run = finalRun) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date)) |> 
   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, actual_count, species)
 
@@ -578,8 +526,6 @@ tisdale_recapture_edi <- recapture_edi |>
          life_stage = lifeStage,
          fork_length = forkLength,
          run = finalRun) |> 
-  left_join(dates) |> 
-  filter(date > max & year(date)) |> 
   select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
          dead, fork_length, weight, species)
 
@@ -598,8 +544,6 @@ tisdale_trap_edi <- trap_edi |>
          water_temp = waterTemp,
          water_velocity = waterVel,
          trap_stop_date = trap_end_date) |> 
-  left_join(dates) |> 
-  filter(trap_stop_date > max & year(trap_stop_date)) |> 
   select(trap_start_date, visit_type, trap_stop_date, stream, site, subsite,
          site_group, trap_functioning, fish_processed, rpm_start, rpm_end,
          total_revolutions, water_temp, water_velocity, discharge, turbidity, include)
@@ -615,8 +559,6 @@ tisdale_release_edi <- release_edi |>
          run = markedRun,
          origin = markedFishOrigin,
          life_stage = markedLifeStage) |> 
-  left_join(dates) |> 
-  filter(date_released > max & year(date_released)) |> 
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, run, life_stage, origin)
 
