@@ -200,6 +200,45 @@ battle_clear_release_edi <- release_edi |>
   select(date_released, release_id, stream, site, subsite, site_group,
          number_released, origin)
 
+# Deer/Mill ---------------------------------------------------------------
+catch_edi <- pull_edi("1504", 1, 3)
+recapture_edi <- pull_edi("1504", 2, 3)
+release_edi <- pull_edi("1504", 3, 3)
+trap_edi <- pull_edi("1504", 4, 3)
+
+deer_mill_catch_edi <- catch_edi |> 
+  rename(life_stage = lifestage) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream)
+
+deer_mill_trap_edi <- trap_edi |> 
+  rename(trap_stop_date = date,
+         rpm_start = rpm_before,
+         rpm_end = rpm_after,
+         water_temp = water_temperature) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream) |> 
+  select(trap_stop_date, stream, site, subsite, site_group, turbidity, water_temp, rpm_start, rpm_end)
+
+deer_mill_release_edi <- release_edi |> 
+  rename(date_release = release_date,
+         origin = release_origin) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream) |> 
+  select(date_release, release_id, stream, site, subsite, site_group, number_released, origin)
+
+deer_mill_recapture_edi <- recapture_edi |> 
+  rename(date = recapture_date,
+         count = total_recaptured) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream,
+         fork_length = mean_fl_recaptured) |> 
+  select(date, release_id, stream, site, subsite, site_group, count, fork_length)
+
 # Feather -----------------------------------------------------------------
 # Note there was an issue pushing these files to EDI due to large file size
 # Until this is resolved, reading in the files locally
@@ -567,24 +606,28 @@ tisdale_release_edi <- release_edi |>
 
 temp_catch <- bind_rows(battle_clear_catch_edi,
                         butte_catch_edi,
+                        deer_mill_catch_edi,
                         feather_catch_edi,
                         yuba_catch_edi,
                         knights_catch_edi,
                         tisdale_catch_edi)
 temp_recapture <- bind_rows(battle_clear_recapture_edi,
                             butte_recapture_edi,
+                            deer_mill_recapture_edi,
                             feather_recapture_edi,
                             yuba_recapture_edi,
                             knights_recapture_edi,
                             tisdale_recapture_edi)
 temp_release <- bind_rows(battle_clear_release_edi,
                           butte_release_edi,
+                          deer_mill_release_edi,
                           feather_release_edi,
                           yuba_release_edi,
                           knights_release_edi,
                           tisdale_release_edi)
 temp_trap <- bind_rows(battle_clear_trap_edi,
                        butte_trap_edi,
+                       deer_mill_trap_edi,
                        feather_trap_edi,
                        yuba_trap_edi,
                        knights_trap_edi,

@@ -35,7 +35,7 @@ rst_all_weeks <- rst_catch |>
   mutate(week = week(date),
          year = year(date)) |> 
   distinct(stream, site, year, week) |> 
-  cross_join(tibble(life_stage = c("fry","smolt","yearling"))) |> 
+  #cross_join(tibble(life_stage = c("fry","smolt","yearling"))) |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
   left_join(years_to_include_rst_data) |> # need to make sure to filter out years that have been excluded
   filter(include == T) |> 
@@ -70,71 +70,20 @@ catch_with_inclusion_criteria <- updated_standard_catch[
 
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
-weekly_standard_catch_no_zeros <- catch_with_inclusion_criteria |> 
+weekly_standard_catch <- catch_with_inclusion_criteria |> 
   mutate(week = week(date),
          year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, life_stage) %>% #removed run & adclip here 
+  group_by(stream, site, site_group, week, year) %>% 
   summarize(mean_fork_length = mean(fork_length, na.rm = T),
             mean_weight = mean(weight, na.rm = T),
             count = sum(count, na.rm = T))  |>  
-  filter(count > 0) |> 
   mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
   ungroup() |> glimpse()
-
-weekly_standard_catch_zeros <- catch_with_inclusion_criteria |> 
-  mutate(week = week(date),
-         year = year(date)) |> 
-  group_by(week, year, stream, site, site_group, life_stage) %>% #removed run & adclip here  
-  summarize(mean_fork_length = mean(fork_length, na.rm = T),
-            mean_weight = mean(weight, na.rm = T),
-            count = sum(count, na.rm = T))  |>  
-  filter(count == 0) |> 
-  mutate(site_year_week = paste0(site, "_", year, "_", week)) |> 
-  glimpse()
-
-weekly_standard_catch <- bind_rows(weekly_standard_catch_no_zeros, 
-                                   weekly_standard_catch_zeros) |> glimpse()
-
-# Add hatchery column 
-# Currently not included in josh model data but can be added by changing join on 
-# line 176 below
-# we are not handling hatchery rates in the data processing, instead assuming it 
-# can be handled by PLAD
-# hatch_per_week <- catch_with_inclusion_criteria |> 
-#   filter(adipose_clipped == TRUE) |> 
-#   mutate(week = week(date),
-#          year = year(date)) |> 
-#   group_by(week, year, stream, site, site_group, life_stage) |> 
-#   summarize(count = sum(count, na.rm = TRUE)) |> 
-#   ungroup() |> 
-#   mutate(expanded_weekly_hatch_count = ifelse(stream == "feather river", 
-#                                               count, 
-#                                               count * 4)) |> #ASSUMING 25% marking, add mark rates in here instead.
-#   select(-count) |> 
-#   glimpse()
-
-# subtract these values from weekly_standard_catch 
-# weekly_standard_catch_with_hatch_designation <- weekly_standard_catch |> 
-#   left_join(hatch_per_week, 
-#             by = c("week", "year", "stream", "site", "site_group", "life_stage")) |> 
-#   mutate(expanded_weekly_hatch_count = ifelse(is.na(expanded_weekly_hatch_count), 0, expanded_weekly_hatch_count),
-#          natural = ifelse(count - expanded_weekly_hatch_count < 0, 0, count - expanded_weekly_hatch_count), 
-#          hatchery = ifelse(expanded_weekly_hatch_count > count, count, expanded_weekly_hatch_count)) |> 
-#   select(-count, -expanded_weekly_hatch_count) |>  
-#   pivot_longer(natural:hatchery, names_to = "origin", values_to = "count") |> 
-#   glimpse()
-
-
-# TODO Create PLAD table - Ashley going to check what she sent nobel 
-# Erin can add! In prep data for model - in JPE datasets 
-# FL bins for year, week, stream, site 
-# Bins need to match PLAD bins (or finer) so we can map
-# Think through how hatchery would play in here  
 
 # Trap Formatting ---------------------------------------------------------
 # Weekly effort from vignette/trap_effort.Rmd
 weekly_effort_by_site <- weekly_hours_fished |> 
-  group_by(week, year, stream, site, site_group) %>% 
+  group_by(stream, site, site_group, week, year) %>% 
   summarize(hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
   ungroup()
 
@@ -174,7 +123,7 @@ weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
 weekly_efficiency <- 
   left_join(release, 
             recaptures |> # need to summarize first so you don't get duplicated release data when joining
-              group_by(release_id, stream, site, site_group) |> 
+              group_by(stream, site, site_group, release_id) |> 
               summarize(count = sum(count, na.rm = T)),
             by = c("release_id", "stream", "site", "site_group")) |> 
   group_by(stream, 
@@ -196,11 +145,11 @@ flow_reformatted_raw <- rst_all_weeks |> # we want flows for all weeks, even if 
   env_with_sites |> 
   filter(parameter == "flow",
          statistic == "mean") |> 
-  group_by(year, week, site, stream, gage_agency, gage_number) |> 
+  group_by(stream, site, week, year, gage_agency, gage_number) |> 
   summarise(flow_cfs = mean(value, na.rm = T)))
 # To fill in NAs, find the average weekly flow across years
 mean_flow_across_years <- flow_reformatted_raw |> 
-  group_by(week, site, stream) |> 
+  group_by(stream, site, week) |> 
   summarize(mean_flow_for_data_gaps = mean(flow_cfs, na.rm = T))
 
 flow_reformatted <- flow_reformatted_raw |> 
@@ -208,32 +157,27 @@ flow_reformatted <- flow_reformatted_raw |>
   mutate(flow_cfs = ifelse(is.na(flow_cfs), mean_flow_for_data_gaps, flow_cfs)) |> 
   select(-mean_flow_for_data_gaps)
 
-# Combine catch (weekly_standard_catch), weekly efficiency, and weekly effort by site 
-weekly_efficiency |> glimpse()
-
-weekly_effort_by_site |> glimpse()
-
-# TODO do we want to use the weekly_standard_catch_with_hatch_designation instead
-catch_reformatted <- weekly_standard_catch |>  glimpse()
+catch_reformatted <- weekly_standard_catch 
 
 # Combine all 3 tables together 
 weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
-  left_join(weekly_effort_by_site, by = c("year", "week", "stream", "site")) |> 
+  left_join(weekly_effort_by_site, by = c("stream", "site", "week","year")) |> 
   # Join efficnecy data to catch data
   left_join(weekly_efficiency |> 
               group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
               summarize(number_released = sum(number_released),
                         number_recaptured = sum(number_recaptured)), 
-            by = c("week" = "week_released",
-                   "year" = "year_released", "stream", 
-                   "site")) |> 
+            by = c("stream", 
+                   "site",
+                   "week" = "week_released",
+                   "year" = "year_released")) |> 
   # join flow data to dataset, full_join because we want to keep flow even for missing weeks
-  full_join(flow_reformatted, by = c("week", "year", "site", "stream", "life_stage")) |> 
+  full_join(flow_reformatted, by = c("stream","site","week", "year")) |> 
   # select columns that josh uses 
   select(year, week, stream, site, count, mean_fork_length, 
          number_released, number_recaptured,
          hours_fished, 
-         flow_cfs, life_stage) |> 
+         flow_cfs) |> 
   group_by(stream) |> 
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE),
          standardized_flow = as.vector(scale(flow_cfs))) |> # standardizes and centers see ?scale
