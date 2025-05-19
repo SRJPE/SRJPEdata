@@ -138,10 +138,8 @@ flow_reformatted <- flow_reformatted_raw |>
   mutate(flow_cfs = ifelse(is.na(flow_cfs), mean_flow_for_data_gaps, flow_cfs)) |> 
   select(-mean_flow_for_data_gaps)
 
-catch_reformatted <- weekly_standard_catch 
-
 # Combine all 3 tables together 
-weekly_model_data_wo_efficiency_flows <- catch_reformatted |> 
+weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |> 
   left_join(weekly_effort_by_site, by = c("stream", "site", "week","year")) |> 
   # Join efficnecy data to catch data
   left_join(weekly_efficiency |> 
