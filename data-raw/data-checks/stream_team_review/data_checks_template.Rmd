@@ -23,6 +23,10 @@ The following checks are performed:
 - Find percent difference greater than 2%
 - Find where data are missing
 
+There are no longer any differences in the dataset for the following reasons:
+- We found an issue where week was being defined differently by two different R packages resulting in different weekly summaries. This has been resolved. Week is defined as Julian Week (7-day period starting with Jan 1)
+- We removed the lifestage processing as it is not currently being used.
+
 # Juvenile
 
 ```{r, include = F}
@@ -83,7 +87,7 @@ catch_compare_1 <- full_join(weekly_rst_catch |>
                              weekly_edi_catch1) |> 
    mutate(p_diff = ((abs(count - srjpedata_count))/((count + srjpedata_count)/2)) * 100)
 
-catch_compare_2 <- full_join(weekly_juvenile_abundance_model_data |> 
+catch_compare_2 <- full_join(SRJPEdata::weekly_juvenile_abundance_catch_data |> 
                                select(year, week, stream, site, count) |> 
                                rename(srjpedata_count = count),
                              weekly_edi_catch2) |> 
@@ -91,7 +95,7 @@ catch_compare_2 <- full_join(weekly_juvenile_abundance_model_data |>
 ```
 
 
-## Weekly counts {.tabselect}
+## Weekly counts {.tabset}
 
 1. Summary of percent difference
 2. Percent difference greater than 2%
@@ -367,10 +371,140 @@ SRJPEdata::years_to_exclude_rst_data |> filter(site == "tisdale")
 na_plot(catch_compare_2, "tisdale")
 ```
 
-## Weekly efficiency
+## Weekly efficiency {.tabset}
 
-- release, recaptures v EDI
 - weekly_juvenile_abundance_efficiency_data v EDI data
+
+Note that the data on EDI has a few NA years.
+
+```{r, include = F}
+temp_recapture <- read_csv("data-raw/data-checks/stream_team_review/temp_recapture1.csv")
+temp_release <- read_csv("data-raw/data-checks/stream_team_review/temp_release1.csv")
+
+weekly_efficiency_edi <- 
+  left_join(temp_release, 
+            temp_recapture |> # need to summarize first so you don't get duplicated release data when joining
+              group_by(stream, site, site_group, release_id) |> 
+              summarize(count = sum(count, na.rm = T)),
+            by = c("release_id", "stream", "site", "site_group")) |> 
+  group_by(stream, 
+           site, 
+           site_group, 
+           #origin,
+           #median_fork_length_released, # we add origin and fork length for figures
+           week_released = week(date_released), 
+           year_released = year(date_released)) |> 
+  summarize(number_released = sum(number_released, na.rm = TRUE),
+            number_recaptured = sum(count, na.rm = TRUE)) |> 
+  ungroup() 
+eff_compare <- full_join(SRJPEdata::weekly_juvenile_abundance_efficiency_data |> 
+                               select(year, week, stream, site, number_released, number_recaptured) |> 
+                               rename(srjpedata_recapture = number_recaptured,
+                                      srjpedata_relase = number_released),
+                             weekly_efficiency_edi |> 
+                           rename(year = year_released,
+                                  week = week_released)) |> 
+   mutate(p_diff_recapture = ((abs(number_recaptured - srjpedata_recapture))/((number_recaptured + srjpedata_recapture)/2)) * 100,
+          p_diff_release = ((abs(number_released - srjpedata_relase))/((number_released + srjpedata_relase)/2)) * 100) |> 
+  pivot_longer(cols = c(p_diff_recapture, p_diff_release), names_to = "type", values_to = "p_diff")
+
+eff_compare_release <- filter(eff_compare, type == "p_diff_release")
+eff_compare_recapture <- filter(eff_compare, type == "p_diff_recapture")
+```
+
+### Battle/Clear
+
+#### Summary of the percent difference between data on EDI and data used for juvenile abundance model
+
+**Recaptures**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_recapture, "battle creek")
+```
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_recapture, "clear creek")
+```
+
+**Releases**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_release, "battle creek")
+```
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_release, "clear creek")
+```
+
+### Butte
+
+#### Summary of the percent difference between data on EDI and data used for juvenile abundance model
+
+**Recaptures**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_recapture, "butte creek")
+```
+
+**Releases**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_release, "butte creek")
+```
+
+### Deer/Mill
+
+#### Summary of the percent difference between data on EDI and data used for juvenile abundance model
+
+These data are pulled from DataTackle. Additional testing has been done on this data and we are confident they are correct.
+
+### Feather
+
+#### Summary of the percent difference between data on EDI and data used for juvenile abundance model
+
+**Recaptures**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_recapture, "feather river")
+```
+
+**Releases**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_release, "feather river")
+```
+
+### Yuba
+
+#### Summary of the percent difference between data on EDI and data used for juvenile abundance model
+
+**Recaptures**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_recapture, "yuba river")
+```
+
+**Releases**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_release, "yuba river")
+```
+
+### Knights Landing/Tisdale
+
+#### Summary of the percent difference between data on EDI and data used for juvenile abundance model
+
+**Recaptures**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_recapture, "sacramento river")
+```
+
+**Releases**
+
+```{r, echo = F, warning = F, message = F}
+p_diff_summary_plot(eff_compare_release, "sacramento river")
+```
 
 # Adult {.tabselect}
 

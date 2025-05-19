@@ -633,3 +633,5 @@ temp_trap <- bind_rows(battle_clear_trap_edi,
                        knights_trap_edi,
                        tisdale_trap_edi) |> 
   mutate(include = ifelse(include == "Yes", T, F))
+write_csv(temp_release, "data-raw/data-checks/stream_team_review/temp_release1.csv")
+write_csv(temp_recapture, "data-raw/data-checks/stream_team_review/temp_recapture1.csv")
