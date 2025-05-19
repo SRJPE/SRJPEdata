@@ -2,9 +2,9 @@
 source("data-raw/pull_data_scripts/for_testing_combine_data.R")
 
 # temp regression vignette needs to come before the environmental data
-knitr::knit("vignettes/temp_regression.Rmd")
+#knitr::knit("vignettes/temp_regression.Rmd")
 # Next source environmental data 
-source("data-raw/pull_data_scripts/pull_environmental_data.R")
+#source("data-raw/pull_data_scripts/pull_environmental_data.R")
 # in package (rebuild?)
 devtools::load_all()
 devtools::document()
