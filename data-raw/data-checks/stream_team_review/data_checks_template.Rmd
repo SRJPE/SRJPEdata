@@ -27,9 +27,21 @@ The following checks are performed:
 
 ```{r, include = F}
 # pull data from TEMP_pull_from_edi.R
-source("data-raw/pull_data_scripts/TEMP_pull_from_edi.R")
-
+#source("data-raw/pull_data_scripts/TEMP_pull_from_edi.R")
+# This was generated from TEMP_pull_from_edi and loaded to save time
+temp_catch <- read_csv("data-raw/data-checks/stream_team_review/temp_catch1.csv")
 weekly_juv_srjpedata <- SRJPEdata::weekly_juvenile_abundance_catch_data
+
+# run build_rst_model_datasets.R
+#weekly_juv_srjpedata <- weekly_juvenile_abundance_catch_data
+#write_csv(weekly_juv_srjpedata, "data-raw/data-checks/stream_team_review/weekly_juv_data_run_local.csv")
+#local_data <- read_csv("data-raw/data-checks/stream_team_review/weekly_juv_data_run_local.csv")
+# ck <- weekly_juvenile_abundance_catch_data_ck |>
+#   select(year, week, stream, site, count) |>
+#   rename(srjpedata = count) |>
+#   full_join(weekly_juv_srjpedata |>
+#               select(year, week, stream, site, count))
+# filter(ck, srjpedata != count)
 
 # filter to chinook
 weekly_edi_catch1 <- temp_catch |> 
@@ -72,7 +84,7 @@ catch_compare_1 <- full_join(weekly_rst_catch |>
                              weekly_edi_catch1) |> 
    mutate(p_diff = ((abs(count - srjpedata_count))/((count + srjpedata_count)/2)) * 100)
 
-catch_compare_2 <- full_join(weekly_juv_srjpedata |> 
+catch_compare_2 <- full_join(weekly_juvenile_abundance_catch_data |> 
                                select(year, week, stream, site, count) |> 
                                rename(srjpedata_count = count),
                              weekly_edi_catch2) |> 
@@ -132,6 +144,7 @@ na_plot <- function(data_select, site_select) {
 ```{r, echo = F, warning = F, message = F}
 p_diff_summary_plot(catch_compare_2, "battle creek")
 ```
+
 ```{r, echo = F, warning = F, message = F}
 p_diff_summary_plot(catch_compare_2, "clear creek")
 ```

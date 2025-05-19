@@ -4,7 +4,6 @@
 library(SRJPEdata)
 library(lubridate)
 library(tidyverse)
-library(data.table)
 
 # Catch Formatting --------------------------------------------------------------
 # Rewrite script from catch pulled from JPE database
@@ -19,6 +18,7 @@ updated_standard_catch <- rst_catch |>
                             T ~ "keep")) |> 
   filter(remove == "keep") |> 
   select(-remove)
+
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
 # This is joined at the end
@@ -47,26 +47,10 @@ rst_all_weeks <- rst_catch |>
 
 # Filter to use inclusion criteria ---------------------------------------------
 
-# Converted to data.table for performance reasons
-# Convert your data.frames to data.tables (if not already in data.table format)
-updated_standard_catch <- as.data.table(updated_standard_catch) 
-years_to_include_rst_data <- as.data.table(years_to_include_rst_data)
-
-# Step-by-step translation of the dplyr code
-catch_with_inclusion_criteria <- updated_standard_catch[
-  # Step 1: Create monitoring_year
-  , run_year := ifelse(week(date) >= 45, year(date) + 1, year(date))
-][
-  # Step 2: Perform the left join with chosen_site_years_to_model
-  years_to_include_rst_data, on = .(run_year, stream, site), nomatch = 0
-][
-  # Step 3: Filter rows where include_in_model is TRUE
-  include == TRUE
-][
-  # Step 4: Select and remove columns (similar to select in dplyr)
-  , !c("run_year", "include")
-]
-
+catch_with_inclusion_criteria <- updated_standard_catch |> 
+  mutate(run_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
+  left_join(years_to_include_rst_data) |> 
+  filter(include == T)
 
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
@@ -99,9 +83,6 @@ env_with_sites <- environmental_data |>
 #          year = year(date)) |> 
 #   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
 #   summarize(mean_flow = mean(value, na.rm = T)) |> glimpse()
-
-# Convert env_with_sites to a data.table (if not already one)
-env_with_sites <- as.data.table(env_with_sites)
 
 # Filter, mutate, and summarize using data.table syntax
 weekly_flow <- env_with_sites |> filter(parameter == "flow")
@@ -280,6 +261,13 @@ weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_dat
   select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow, flow_cfs) |> 
   filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
+
+ck <- weekly_juvenile_abundance_catch_data |>
+  select(year, week, stream, site, count) |>
+  rename(srjpedata = count) |>
+  full_join(SRJPEdata::weekly_juvenile_abundance_catch_data |>
+              select(year, week, stream, site, count))
+filter(ck, srjpedata != count)
 
 # write to package 
 usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE) 

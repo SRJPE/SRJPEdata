@@ -1,5 +1,5 @@
 library(tidyverse)
-library(SRJPEdata)
+#library(SRJPEdata)
 library(lubridate)
 
 colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
@@ -90,6 +90,13 @@ catch_compare_2 <- full_join(weekly_juv_srjpedata |>
                              weekly_edi_catch2) |> 
   mutate(p_diff = ((abs(count - srjpedata_count))/((count + srjpedata_count)/2)) * 100)
 
+# compare data to weely_standard_catch
+catch_compare_2a <- full_join(weekly_standard_catch |> 
+                               select(year, week, stream, site, count) |> 
+                               rename(srjpedata_count = count),
+                             weekly_edi_catch2) |> 
+  mutate(p_diff = ((abs(count - srjpedata_count))/((count + srjpedata_count)/2)) * 100)
+
 p_diff_summary_plot <- function(data_select, stream_select) {
   data_select |> 
     filter(stream == stream_select) |> 
@@ -127,5 +134,5 @@ na_plot <- function(data_select, site_select) {
 ### Battle/Clear
 
 #### Summary of the percent difference between data on EDI and data used for juvenile abundance model
-
 p_diff_summary_plot(catch_compare_2, "battle creek")
+p_diff_summary_plot(catch_compare_2a, "battle creek")
