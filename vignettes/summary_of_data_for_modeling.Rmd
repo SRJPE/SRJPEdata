@@ -36,13 +36,25 @@ colors_full <-  c("#9986A5", "#C18748", #Royal 2
 
 ### Overview
 
-The spring run juvenile production estimate (SR JPE) contains a suite of submodels that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to fit the stock recruit model. 
+The spring run juvenile production estimate (SR JPE) contains a suite of submodels that rely on different datasets. This document is currently focused on Chinook monitoring data that will be used to fit the stock recruit model and within season models. The within season model relies on juvenile data and the stock recruit relies on both juvenile and adult datasets.  
 
 Additional sections will be added to highlight survival, genetics, and covariate data. 
 
-# Stock Recruit Modeling Data Selection
+# Modeling Data Selection
 
-Gathering and identifying spring run Chinook monitoring data to use in the spring run juvenile production estimate (SR JPE) was an iterative, multistep process. We acquired, processed and described monitoring data, hosted workshops to define a ruleset for evaluating years to exclude based on missing data ([see years to include vignette for an in depth overview of this process](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html)), selected data where there was both adult and juvenile data, and finally selected a single adult dataset to use for each year and stream. The diagram below visualizes this process and shows the total number of datasets we retained along the way.
+Gathering and identifying spring run Chinook monitoring data to use in the spring run juvenile production estimate (SR JPE) was an iterative, multistep process. 
+
+Filtering applied to juvenile RST data - necessary for both within season and stock recruit model data. 
+
+1) We acquired, processed and described monitoring that we presented in workshops to define a ruleset for evaluating years to exclude based on missing data ([see years to include vignette for an in depth overview of this process](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html)). This filtered juvenile dataset is used for both the within season and stock recruit models. 
+
+Additional filters required for the stock recruit: 
+
+2) We selected data where there was both adult and juvenile data. 
+3) We selected a single adult dataset to use for each year and stream. 
+
+
+The diagram below visualizes this process and shows the total number of datasets we retained along the way.
 
 ![](images/data_selection_diagram.png){width=108%}
 
@@ -144,50 +156,198 @@ plot_data |>
 
 *Plot does not include Sacramento River mainstem monitoring. This data may also be utilized in the SR JPE but will not be included in the stock recruit models. For some monitoring types data is collected annually or monthly communicated through gaps in the colored lines.*
 
-### Filtering data to years that contain both juvinile and adult monitoring
-
-In order to utilize data for the stock recruit models, we need both juvenile data inputs (RST data) and adult data inputs (adults) for each year. The plot below shows the time windows where there is overlapping juvenile and adult monitoring on each tributary. While this limits the amount of data, it still provides a few large windows for most monitoring programs.
-
-```{r, echo = FALSE}
-potential_jpe_window <- plot_data |> 
-  pivot_wider(id_cols = c("date", "year", "month", "stream", "site", "subsite", "site_group"),
-              names_from = sampling_type,
-              values_from = sampling_exists,
-              values_fill = NA_real_) |>
-  group_by(year, stream) |> 
-  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass estimate`)) ~ TRUE,
-                                            any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
-                                            any(!is.na(rst)) && any(!is.na(holding)) ~ TRUE,
-                                            any(!is.na(rst)) && any(!is.na(`upstream passage estimate`)) ~ TRUE,
-                                            T ~ FALSE)) |> 
-  ungroup() 
-
-avaliable_years_plot <- potential_jpe_window |> 
-  filter(potential_SR_window) |> 
-  ggplot(aes(x = year, y = stream, color = potential_SR_window)) +
-  geom_point(data = potential_jpe_window, 
-             aes(x = year, y = stream), color = "gray", size = 6, shape = 15) + 
-  geom_point(size = 7, shape = 15) + 
-  theme_minimal() +
-  labs(y = "",
-       x = ""
-       # title = "Time Windows where Annual RST and Adult Data Exist"
-       ) +
-  scale_color_manual(values = colors_small) +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0)) + 
-   scale_y_discrete(limits=rev)
-
-avaliable_years_plot
-```
-
-*Gray boxes indicate that monitoring occurred but data is not being utilized for the stock recruit since a year does not have both adult and juvenile data* 
-
 ## Excluding Incomplete Years 
 
 Although the SR JPE aims to utilize all available data, there are some years where data is sparse and is excluded from analysis. This decision process is documented in the [Years to Include Analysis](https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html).
 
-After filtering the RST and adult data to remove incomplete or inconsistent years, we are left with the following windows for the SR JPE. Gray boxes indicate that monitoring occurred but data is not being utilized for modeling. See years to exclude tables for additional information on why a year might be excluded.
+**Juvenile datasets filtered to exclude incomplete years.**
+
+```{r, echo = FALSE}
+library(dplyr)
+library(ggplot2)
+
+# Set your custom colors
+included_color <- "#9A8822"
+excluded_color <- "gray"
+
+# Load and join exclusion data
+rst_years_to_exclude <- SRJPEdata::years_to_exclude_rst_data |>  
+  mutate(exclude = TRUE)
+
+rst_plot_data_with_exclusion <- rst_plot_data |> 
+  left_join(rst_years_to_exclude |> 
+              select(stream, site, year = run_year, exclude))  |> 
+  mutate(exclude = ifelse(is.na(exclude), FALSE, exclude)) |>
+  distinct(stream, year, exclude)
+
+# Plot with gray for excluded and green for included
+rst_years_plot <- ggplot(rst_plot_data_with_exclusion, aes(x = year, y = stream)) +
+  
+  # Gray squares for excluded years
+  geom_point(
+    data = rst_plot_data_with_exclusion |> filter(exclude),
+    aes(x = year, y = stream),
+    shape = 15, color = excluded_color, size = 6
+  ) +
+  
+  # Green squares for included years
+  geom_point(
+    data = rst_plot_data_with_exclusion |> filter(!exclude),
+    aes(x = year, y = stream),
+    shape = 15, color = included_color, size = 6
+  ) +
+  
+  theme_minimal() +
+  labs(
+    title = "Juvenile RST Monitoring Years by Stream",
+    x = NULL, y = NULL
+  ) +
+  scale_y_discrete(limits = rev(unique(rst_plot_data$stream))) +
+  theme(
+    text = element_text(family = "Arial"),
+    legend.position = "none",
+    plot.title = element_text(hjust = 0)
+  )
+
+rst_years_plot
+```
+
+*Gray boxes indicate that monitoring occurred but data is not being utilized. Data may be excluded because the data was considered incomplete for a given monitoring type and year.*
+
+**Adult dataset filtered to exclude incomplete years**
+
+```{r, echo = FALSE}
+# Load exclusion data for adults
+adult_years_to_exclude <- SRJPEdata::years_to_exclude_adult |>  
+  mutate(exclude = TRUE) |> 
+  rename(sampling_type = data_type)
+
+# Apply to each adult dataset
+adult_carcass_plot_data_excluded <- adult_carcass_plot_data |>  
+  left_join(adult_years_to_exclude)
+
+redd_plot_data_excluded <- redd_plot_data |>  
+  left_join(adult_years_to_exclude)
+
+holding_plot_data_excluded <- holding_plot_data |>  
+  left_join(adult_years_to_exclude)
+
+upstream_passage_plot_data_excluded <- upstream_passage_plot_data |>  
+  left_join(adult_years_to_exclude)
+
+# Combine adult data
+adult_plot_data <- bind_rows(
+  adult_carcass_plot_data_excluded,
+  redd_plot_data_excluded,
+  holding_plot_data_excluded,
+  upstream_passage_plot_data_excluded
+) |> 
+  filter(stream != "sacramento river") |> 
+  distinct(stream, year, exclude) |> 
+  mutate(exclude = ifelse(is.na(exclude), FALSE, exclude))
+
+# Set your custom colors
+included_color <- "#9A8822"
+excluded_color <- "gray"
+
+# Create plot
+adult_years_plot <- ggplot(adult_plot_data, aes(x = year, y = stream)) +
+  
+  # Gray squares for excluded adult years
+  geom_point(
+    data = adult_plot_data |> filter(exclude),
+    aes(x = year, y = stream),
+    shape = 15, color = excluded_color, size = 6
+  ) +
+  
+  # Green squares for included adult years
+  geom_point(
+    data = adult_plot_data |> filter(!exclude),
+    aes(x = year, y = stream),
+    shape = 15, color = included_color, size = 6
+  ) +
+  
+  theme_minimal() +
+  labs(
+    title = "Adult Monitoring Years by Stream",
+    x = NULL, y = NULL
+  ) +
+  scale_y_discrete(limits = rev(unique(adult_plot_data$stream))) +
+  theme(
+    text = element_text(family = "Arial"),
+    legend.position = "none",
+    plot.title = element_text(hjust = 0)
+  )
+
+adult_years_plot
+
+```
+*Gray boxes indicate that monitoring occurred but data is not being utilized. Data may be excluded because the data was considered incomplete for a given monitoring type and year.*
+
+## Summary Table of Years to Use for Within Season
+
+The summary table below describes which years remain after filtering out incomplete juvenile data. This table accounts for years excluded based on data quality and completeness considerations.
+
+```{r, echo = FALSE, message=FALSE}
+
+rst_years_to_exclude <- SRJPEdata::years_to_exclude_rst_data |> 
+  mutate(exclude = TRUE)
+
+rst_plot_data_with_exclusion <- rst_plot_data |> 
+  left_join(rst_years_to_exclude |> 
+              select(stream, site, year = run_year, exclude))  |> 
+  filter(is.na(exclude))
+
+# Function to turn a vector of years into range strings
+collapse_years_to_ranges <- function(years) {
+  years <- sort(unique(years))
+  ranges <- list()
+  start <- years[1]
+  end <- years[1]
+  
+  for (i in 2:length(years)) {
+    if (years[i] == end + 1) {
+      end <- years[i]
+    } else {
+      ranges <- append(ranges, list(c(start, end)))
+      start <- years[i]
+      end <- years[i]
+    }
+  }
+  ranges <- append(ranges, list(c(start, end)))  # Append the final range
+  
+  # Convert each range to string
+  range_strings <- sapply(ranges, function(r) {
+    if (r[1] == r[2]) {
+      as.character(r[1])
+    } else {
+      paste(r[1], r[2], sep = " - ")
+    }
+  })
+  
+  paste(range_strings, collapse = ", ")
+}
+
+# Apply the function in your summary
+test <- rst_plot_data_with_exclusion |> 
+  group_by(Stream = stream) |> 
+  summarise(
+    `Years to Include in Model` = collapse_years_to_ranges(year),
+    `Total Number of Years` = n_distinct(year),
+    .groups = "drop"
+  )
+
+knitr::kable(test)
+
+test_for_sum <- test |> rename(num_years = `Total Number of Years`)
+```
+
+This table shows us that there are a total of `r sum(test_for_sum$num_years)` stream years to use for developing the SR JPE stock recruit model. 
+
+### Filtering data to years that contain both juvinile and adult monitoring
+
+After excluding incomplete years, the stock recruit data requires additional filtering. 
+In order to utilize data for the stock recruit models, we need both juvenile data inputs (RST data) and adult data inputs (adults) for each year. The plot below shows the time windows where there is overlapping juvenile and adult monitoring on each tributary. While this limits the amount of data, it still provides a few large windows for most monitoring programs.
 
 ```{r, echo = FALSE}
 # TODO add a label with the number of years excluded
@@ -226,39 +386,6 @@ updated_plot_data <- bind_rows(rst_plot_data,
   filter(stream != "sacramento river") |> 
   distinct() |> 
   mutate(exclude = ifelse(is.na(exclude), FALSE, exclude))
-#   mutate(color = case_when(sampling_type == "rst" ~ colors_full[1], 
-#                            sampling_type == "holding" ~ colors_full[2],
-#                            sampling_type == "redd" ~ colors_full[3],
-#                            sampling_type == "carcass estimate" ~ colors_full[4],
-#                            sampling_type == "upstream passage estimate" ~ colors_full[5],
-#                            !is.na(exclude) ~ "gray"),
-#          shapes = ifelse(is.na(exclude), "0", "15")) 
-
-# plot_data |> 
-#   ggplot2::ggplot(aes(x = date, 
-#                       y = sampling_type, 
-#                       color = sampling_type,
-#                       alpha = sampling_exists)) + 
-#   geom_point(aes(shape = exclude)) +
-#   # geom_point(aes(color = exclude)) +
-#   scale_color_manual(values = colors_full) +
-#   theme_minimal() +
-#   labs(y = "",
-#        x = ""
-#        # title = "Monitoring Data Overview"
-#        ) +
-#   facet_grid(rows=vars(stream), switch = "y") +
-#   # facet_wrap(~stream)
-#   theme(text = element_text(family = "Arial"),
-#         strip.text.y.left = element_text(angle = 0, family = "Arial"), 
-#         legend.title = element_blank(),
-#         legend.position = "bottom",
-#         axis.text.y = element_blank(),
-#         panel.spacing = unit(.5, "lines"),
-#         plot.title = element_text(hjust = 0)
-#         # panel.background = element_rect(fill = NA, color = "black")
-#         ) +
-#   guides(alpha = FALSE)
 ```
 
 
@@ -269,7 +396,7 @@ updated_potential_jpe_window <- updated_plot_data |>
   pivot_wider(id_cols = c("date", "year", "month", "stream", "site", "subsite", "site_group"),
               names_from = sampling_type,
               values_from = sampling_exists,
-              values_fill = NA_real_) |>
+              values_fill = NA_real_) |> 
   group_by(year, stream) |> 
   summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass estimate`)) ~ TRUE,
                                             any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
@@ -284,7 +411,7 @@ avaliable_years_plot <- updated_potential_jpe_window |>
   filter(potential_SR_window) |> 
   ggplot(aes(x = year, y = stream, color = potential_SR_window)) +
   # add old data as a point layer to show total 
-  geom_point(data = potential_jpe_window, 
+  geom_point(data = updated_potential_jpe_window, 
              aes(x = year, y = stream), color = "gray", size = 6, shape = 15) + 
   # add new data to show comparison, gray are excluded years
   geom_point(size = 6, shape = 15) + 
@@ -304,7 +431,6 @@ avaliable_years_plot
 
 
 *Gray boxes indicate that monitoring occurred but data is not being utilized for the stock recruit. Data may be excluded because there is not adult and juvenile annual overlap or because the data was considered incomplete for a given monitoring type and year.* 
-
 
 ## Summary Table of Years to Use for Stock Recruit
 
