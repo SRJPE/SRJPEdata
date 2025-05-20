@@ -87,13 +87,6 @@ weekly_effort_by_site <- weekly_hours_fished |>
   summarize(hours_fished = sum(hours_fished, na.rm = TRUE)) |> # weekly data is at the subsite level, we need to add together the subsites
   ungroup()
 
-weekly_effort_by_site |> 
-  mutate(stream_site = paste0(stream, "-", site),
-         year = as.factor(year)) |> 
-  ggplot(aes(x = week, y = hours_fished, color = year)) +
-  geom_line() +
-  facet_wrap(~stream_site)
-
 # Environmental -----------------------------------------------------------
 env_with_sites <- environmental_data |> 
   left_join(site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
