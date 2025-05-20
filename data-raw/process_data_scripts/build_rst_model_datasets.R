@@ -32,8 +32,8 @@ updated_standard_catch <- updated_standard_catch_raw |> # all NA fork length wou
   filter(life_stage == "young of the year") |> 
   select(-c(remove, life_stage, day, month, cutoff))
 
-yearlings_removed <- filter(updated_standard_catch_raw, life_stage == "yearling")
-write_csv(yearlings_removed, "data-raw/data-checks/stream_team_review/yearlings_removed.csv")
+# yearlings_removed <- filter(updated_standard_catch_raw, life_stage == "yearling")
+# write_csv(yearlings_removed, "data-raw/data-checks/stream_team_review/yearlings_removed.csv")
 
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
@@ -84,8 +84,15 @@ weekly_standard_catch <- catch_with_inclusion_criteria |>
 # Weekly effort from vignette/trap_effort.Rmd
 weekly_effort_by_site <- weekly_hours_fished |> 
   group_by(stream, site, site_group, week, year) %>% 
-  summarize(hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
+  summarize(hours_fished = sum(hours_fished, na.rm = TRUE)) |> # weekly data is at the subsite level, we need to add together the subsites
   ungroup()
+
+weekly_effort_by_site |> 
+  mutate(stream_site = paste0(stream, "-", site),
+         year = as.factor(year)) |> 
+  ggplot(aes(x = week, y = hours_fished, color = year)) +
+  geom_line() +
+  facet_wrap(~stream_site)
 
 # Environmental -----------------------------------------------------------
 env_with_sites <- environmental_data |> 
