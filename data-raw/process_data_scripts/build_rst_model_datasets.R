@@ -12,12 +12,28 @@ SRJPEdata::rst_catch |> glimpse()
 #updated_standard_catch |> glimpse() #if not loaded run lifestage_ruleset.Rmd vignette 
 years_to_include_rst_data <- years_to_include_rst_data |> # if not loaded run years_to_include_analysis.Rmd vignette
   mutate(include = T)
+yearling_ruleset <- SRJPEdata::daily_yearling_ruleset
 # Remove all adipose clipped fish - we do not want to include hatchery fish
-updated_standard_catch <- rst_catch |> 
+# Remove yearling fish - we do not want to include yearlings
+updated_standard_catch_raw <- SRJPEdata::rst_catch |> 
   mutate(remove = case_when(stream != "butte creek" & adipose_clipped == T ~ "remove",
-                            T ~ "keep")) |> 
+                            T ~ "keep"),
+         run = tolower(run),
+         day = day(date),
+         month = month(date)) |> 
   filter(remove == "keep") |> 
-  select(-remove)
+  left_join(yearling_ruleset) |> 
+  mutate(life_stage = case_when(fork_length > cutoff & 
+                                  (run %in% c("spring", "not recorded", "unknown", "mixed") | is.na(run)) ~ "yearling",
+                                T ~ "young of the year"))
+
+# save separately so easy to tell which yearlings being removed
+updated_standard_catch <- updated_standard_catch_raw |> # all NA fork length would be assumed YOY
+  filter(life_stage == "young of the year") |> 
+  select(-c(remove, life_stage, day, month, cutoff))
+
+yearlings_removed <- filter(updated_standard_catch_raw, life_stage == "yearling")
+write_csv(yearlings_removed, "data-raw/data-checks/stream_team_review/yearlings_removed.csv")
 
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
