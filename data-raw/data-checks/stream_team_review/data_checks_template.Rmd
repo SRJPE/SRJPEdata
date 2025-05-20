@@ -20,7 +20,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 
 The following checks are performed:
 
-- Find percent difference greater than 2%
+- Summarize percent difference in data
 - Find where data are missing
 
 There are no longer any differences in the dataset for the following reasons:
@@ -108,10 +108,6 @@ catch_compare_2 <- full_join(SRJPEdata::weekly_juvenile_abundance_catch_data |>
 
 ## Weekly counts {.tabset}
 
-1. Summary of percent difference
-2. Percent difference greater than 2%
-3. Missing data
-
 ```{r, include = F}
 # 1. rst_catch v EDI data
 # 2. weekly_juvenile_abundance_catch_data v EDI data
@@ -163,10 +159,6 @@ p_diff_summary_plot(catch_compare_2, "battle creek")
 p_diff_summary_plot(catch_compare_2, "clear creek")
 ```
 
-#### Highlight datapoints where the percent difference is greater than 2% different
-
-- Battle and Clear Creek do not have any points with greater than 2% difference
-
 #### Find missing data
 
 The missing data in SRJPEdata should align with the years that have been excluded
@@ -204,10 +196,6 @@ na_plot(catch_compare_2, "ucc")
 p_diff_summary_plot(catch_compare_2, "butte creek")
 ```
 
-#### Highlight datapoints where the percent difference is greater than 2% different
-
-- Butte Creek does not have any differences greater than 2%
-
 ```{r, include = F}
 # Dig into data points that are off
 # Issues were coming from adults not being excluded and this is now fixed
@@ -244,10 +232,6 @@ p_diff_summary_plot(catch_compare_2, "deer creek")
 p_diff_summary_plot(catch_compare_2, "mill creek")
 ```
 
-#### Highlight datapoints where the percent difference is greater than 2% different
-
-- Mill and Deer Creek do not have differences greater than 2%
-
 
 #### Find missing data
 
@@ -283,9 +267,6 @@ na_plot(catch_compare_2, "mill creek")
 p_diff_summary_plot(catch_compare_2, "feather river")
 ```
 
-#### Highlight datapoints where the percent difference is greater than 2% different
-
-- Feather Rive does not have any data with greater than 2% difference
 
 #### Find missing data
 
@@ -330,9 +311,6 @@ na_plot(catch_compare_2, "steep riffle")
 p_diff_summary_plot(catch_compare_2, "yuba river")
 ```
 
-#### Highlight datapoints where the percent difference is greater than 2% different
-
-- Yuba River does not have any datapoints greater than 2% difference
 
 #### Find missing data
 
@@ -353,10 +331,6 @@ na_plot(catch_compare_2, "hallwood")
 ```{r, echo = F, warning = F, message = F}
 p_diff_summary_plot(catch_compare_1, "sacramento river")
 ```
-
-#### Highlight datapoints where the percent difference is greater than 2% different
-
-- Knights Landing and Tisdale do not have datapoints greater than 2% difference
 
 #### Find missing data
 
