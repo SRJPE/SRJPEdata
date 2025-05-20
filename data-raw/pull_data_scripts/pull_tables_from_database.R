@@ -36,8 +36,10 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
  #   rst_trap_locations <- SRJPEdata::rst_trap_locations
  #   warning(paste("No new rst locations added to the database."))
  # })
- 
- usethis::use_data(rst_trap_locations, overwrite = TRUE)
+ site_lookup <- rst_trap_locations |>  
+   select(stream, site, subsite, site_group) |> 
+   distinct()
+ usethis::use_data(site_lookup, overwrite = TRUE)
  
  run <- dbGetQuery(con, "SELECT * FROM run")
  lifestage <- dbGetQuery(con, "SELECT * FROM lifestage")

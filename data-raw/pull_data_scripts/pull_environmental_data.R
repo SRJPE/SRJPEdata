@@ -5,13 +5,6 @@ library(dataRetrieval)
 # If any of the queries do not work the code is set up to fail. This is on purpose
 # because the queries aren't working we shouldn't be updating data.
 
-### Read in lookup table for environmental data --------------------------------
-site_lookup <- SRJPEdata::rst_trap_locations |> 
-  select(stream, site, subsite, site_group) |> 
-  distinct()
-# save as data object 
-usethis::use_data(site_lookup, overwrite = TRUE)
-
 ### Pull Flow and Temperature Data for each JPE tributary ----------------------
 
 ## Battle Creek ----
