@@ -105,8 +105,7 @@ release_standard <- standard_release |>
 
 # Join the Knights Landing standard catch with EDI data
 # Join data from Data Tackle
-
-rst_catch <- bind_rows(temp_catch, catch_standard, rst_catch_query_pilot) |> 
+rst_catch_prep <- bind_rows(temp_catch, catch_standard, rst_catch_query_pilot) |> 
   mutate(fork_length = ifelse(fork_length == 0, NA, fork_length), # looks like there were some cases where fork length is 0. this should be handled more upstream but fixing it here for now
          julian_week = week(date),
          julian_year = year(date), # adding week for noble
@@ -117,11 +116,28 @@ rst_catch <- bind_rows(temp_catch, catch_standard, rst_catch_query_pilot) |>
                              T ~ subsite),
          site = case_when(stream == "battle creek" & is.na(site) & year(date) > 2004 ~ "ubc",
                           stream == "yuba river" ~ "hallwood",
-                          T ~ site)) |> 
+                          T ~ site))
+# find dates where only the fyke trap is fishing
+okie_rst <- rst_catch_prep |> 
+  filter(site == "okie dam", subsite != "okie dam fyke trap") |> 
+  mutate(date = as_date(date)) |> # remove time so that won't affect it
+  pull(date)
+
+# okie_fyke_only <- rst_catch_prep |>
+#   mutate(date = as_date(date)) |> 
+#   filter(site == "okie dam", !date %in% okie_rst)
+# write_csv(okie_fyke_only, "data-raw/data-checks/stream_team_review/butte/fyke_only_dates.csv")
+  
+rst_catch <- rst_catch_prep |> 
+  mutate(butte_fyke_filter = case_when(site == "okie dam" & as_date(date) %in% okie_rst ~ "rst & fyke",
+                                       site == "okie dam" & !as_date(date) %in% okie_rst ~ "fyke only",
+                                       T ~ "not butte")) |> 
   filter(!(stream == "mill creek" & month(date) > 6 & year(date) == 2023)) |> # Remove June entry for Mill Creek
   filter(species %in% c("chinook","chinook salmon"), # filter for only chinook
          life_stage != "adult",# remove the adult fish (mostly on Butte)
-         !is.na(stream)) # 7 NAs I think come from knights landings
+         !is.na(stream),# 7 NAs I think come from knights landings
+         butte_fyke_filter != "fyke only") |> 
+  select(-c(butte_fyke_filter))
 
 rst_trap <- bind_rows(temp_trap, trap_standard, rst_trap_query_pilot)  |> 
   mutate(subsite = case_when(site == "okie dam" & is.na(subsite) ~ "okie dam 1", # fix missing subsites

@@ -55,8 +55,9 @@ weekly_edi_catch1 <- temp_catch |>
   group_by(stream, site, week, year) |> 
   summarize(count = sum(count, na.rm = T))
 
+
 # remove adults and adipose clipped
-weekly_edi_catch2 <- temp_catch |> 
+weekly_edi_catch2_prep <- temp_catch |> 
    mutate(subsite = case_when(site == "okie dam" & is.na(subsite) ~ "okie dam 1", # fix missing subsites
                              stream == "battle creek" & is.na(subsite) & year(date) > 2004 ~ "ubc",
                              site == "yuba river" ~ "hal",
@@ -69,10 +70,20 @@ weekly_edi_catch2 <- temp_catch |>
          species = tolower(species),
          life_stage = ifelse(is.na(life_stage), "not recorded", tolower(life_stage)),
          remove = case_when(stream != "butte creek" & adipose_clipped == T ~ "remove",
-                            T ~ "keep")) |> 
+                            T ~ "keep"))
+okie_rst <- weekly_edi_catch2_prep |> 
+  mutate(date = as_date(date)) |> 
+  filter(site == "okie dam", subsite != "okie dam fyke trap") |> 
+  pull(date)
+
+weekly_edi_catch2 <- weekly_edi_catch2_prep |> 
+  mutate(butte_fyke_filter = case_when(site == "okie dam" & as_date(date) %in% okie_rst ~ "rst & fyke",
+                                       site == "okie dam" & !as_date(date) %in% okie_rst ~ "fyke only",
+                                       T ~ "not butte")) |> 
   filter((species %in% c("chinook", "chinook salmon") | is.na(species)),
          life_stage != "adult",
-         remove == "keep") |> 
+         remove == "keep",
+         butte_fyke_filter != "fyke only") |> 
   group_by(stream, site, week, year) |> 
   summarize(count = sum(count, na.rm = T))
 
