@@ -194,29 +194,40 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
                 parameter = "temperature")
 
 ## Feather River ----
-### Flow Data Pull 
-#### Gage Agency (CDEC, GRL)
 
 #Pull data
-
-### Flow Data Pull Tests 
 # Feather High Flow Channel 
-feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1997-01-01")
+# Do not use GRL because unreliable
+# From Kassie 05/20/2025: I wanted to update you on the Feather flow data- specifically the gage at Gridley. It has been historically unreliable and we use the gage at Fish Barrier Dam (FRB) + Hatchery (ORF) + Thermalito Afterbay Outlet (which we get monthly via email). They have recalibrated it (not sure when) so I think moving forward we can use it but for historical flow data maybe we use our database. I’ve attached our flow database that Katie updates regularly. She also updates our temperature database from our Vemco receivers and we can provide that data as well just let me know.
+# feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1997-01-01")
+# 
+# feather_hfc_river_daily_flows <- feather_hfc_river_data_query |> 
+#          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+#          group_by(date = as.Date(datetime)) |> 
+#          summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
+#                    max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
+#                    min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
+#          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+#          mutate(stream = "feather river", 
+#                 site_group = "upper feather hfc",
+#                 gage_agency = "CDEC",
+#                 gage_number = "GRL",
+#                 parameter = "flow")
 
-feather_hfc_river_daily_flows <- feather_hfc_river_data_query |> 
-         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
-         group_by(date = as.Date(datetime)) |> 
-         summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
-                   max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
-                   min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "feather river", 
-                site_group = "upper feather hfc",
-                gage_agency = "CDEC",
-                gage_number = "GRL",
-                parameter = "flow")
 
-
+# Kassie sent their flow database
+library(googleCloudStorageR)
+library(Hmisc)
+gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
+gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
+gcs_get_object(object_name = "environmental/data-raw/feather_Flows_4.9.25.accdb",
+               bucket = gcs_get_global_bucket(),
+               saveToDisk = "data-raw/data-prep/standard-format-data/feather_flow_db.accdb",
+               overwrite = TRUE)
+feather_flow_db <- "data-raw/data-prep/standard-format-data/feather_flow_db.accdb"
+mdb.get(feather_flow_db, tables = T)
+feather_flow_raw <- mdb.get(feather_flow_db, tables = "Flows Master")
+feather_gage_raw <- mdb.get(feather_flow_db, tables = "Gauge Locations")
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
 # USGS site is through 9/20/2023 so needed to add a CDEC site for continuity
@@ -343,6 +354,7 @@ feather_hfc_river_daily_temp <- feather_hfc_temp_query |>
 #Pull data
 
 ### Flow Data Pull Tests 
+# MLM
 mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060", startDate = "1995-01-01")
 
 mill_creek_daily_flows <- mill_creek_data_query |> 

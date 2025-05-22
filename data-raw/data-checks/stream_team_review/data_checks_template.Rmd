@@ -220,6 +220,11 @@ SRJPEdata::years_to_exclude_rst_data |> filter(site == "okie dam")
 na_plot(catch_compare_2, "okie dam")
 ```
 
+```{r, include = F}
+butte_catch_edi_most_recent <- read_csv("data-raw/helper-tables/butte_catch.csv")
+filter(butte_catch_edi_most_recent, week(visitTime) == 4, year(visitTime) == 2020) |> view()
+```
+
 ### Deer/Mill
 
 #### Summary of the percent difference between data on EDI and data used for juvenile abundance model
