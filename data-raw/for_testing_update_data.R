@@ -20,9 +20,7 @@ knitr::knit("vignettes/years_to_include_analysis.Rmd") # does not automatically 
 devtools::load_all()
 
 # Source prep data scripts 
-source("data-raw/process_data_scripts/build_adult_model_datasets.R") #TODO, error here 
-# Error because database pull for upstream passage returns empty table
-
+source("data-raw/process_data_scripts/build_adult_model_datasets.R") 
 source("data-raw/process_data_scripts/build_rst_model_datasets.R")
 
 devtools::test() 
