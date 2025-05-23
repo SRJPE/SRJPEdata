@@ -294,7 +294,7 @@ annual_adult_raw <- bind_rows(battle_redd,
                           butte_carcass,
                           butte_holding,
                           data_from_ryan,
-                          feather_redd,
+                          #feather_redd,
                           yuba_spring_passage_estimates)
 
 # Apply years to exclude

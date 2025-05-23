@@ -26,10 +26,19 @@ pull_edi <- function(id, index, version) {
 # anyways
 
 # Butte -------------------------------------------------------------------
-catch_edi <- pull_edi("1497", 1, 14)
-recapture_edi <- pull_edi("1497", 2, 14)
-release_edi <- pull_edi("1497", 3, 14)
-trap_edi <- pull_edi("1497", 4, 14)
+# pull from the most up to date version
+# saved in helper files for now because this is in process of being
+# pulled in from the DB
+
+# catch_edi <- pull_edi("1497", 1, 14)
+# recapture_edi <- pull_edi("1497", 2, 14)
+# release_edi <- pull_edi("1497", 3, 14)
+# trap_edi <- pull_edi("1497", 4, 14)
+
+catch_edi <- read_csv("data-raw/helper-tables/butte_catch.csv")
+recapture_edi <- read_csv("data-raw/helper-tables/butte_recapture.csv")
+release_edi <- read_csv("data-raw/helper-tables/butte_release.csv")
+trap_edi <- read_csv("data-raw/helper-tables/butte_trap.csv")
 
 butte_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
@@ -223,12 +232,12 @@ deer_mill_trap_edi <- trap_edi |>
   select(trap_stop_date, stream, site, subsite, site_group, turbidity, water_temp, rpm_start, rpm_end)
 
 deer_mill_release_edi <- release_edi |> 
-  rename(date_release = release_date,
+  rename(date_released = release_date,
          origin = release_origin) |> 
   mutate(site = stream,
          subsite = site,
          site_group = stream) |> 
-  select(date_release, release_id, stream, site, subsite, site_group, number_released, origin)
+  select(date_released, release_id, stream, site, subsite, site_group, number_released, origin)
 
 deer_mill_recapture_edi <- recapture_edi |> 
   rename(date = recapture_date,
@@ -260,7 +269,7 @@ trap_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_trap.xlsx")
 lfc <- c("eye riffle_north", "eye riffle_side channel", "gateway main 400' up river", "gateway_main1", "gateway_rootball", "gateway_rootball_river_left", "#steep riffle_rst", "steep riffle_10' ext", "steep side channel")
 hfc <- c("herringer_east", "herringer_upper_west", "herringer_west", "live oak", "shawns_east", "shawns_west", "sunset east bank", "sunset west bank")
 
-lfc_site <- c("eye riffle")
+lfc_site <- c("eye riffle", "steep riffle", "gateway riffle")
 hfc_site <- c("live oak","shawn's beach","sunset pumps","herringer riffle")
 
 feather_catch_edi <- catch_edi |> 

@@ -5,8 +5,8 @@
 .Ruserdata
 .Renviron
 *config.json
-*.xlsx
 *.xls
+*.xlsx
 *.mdb
 *.DS_Store
 *.DBF

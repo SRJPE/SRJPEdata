@@ -263,7 +263,7 @@ weekly_hours_fished %>%
   theme_minimal() +
       labs(x = "Week", y = "Hours Fished", 
            color = "",
-       title = "Batte Creek Hours Fished")
+       title = "Battle Creek Hours Fished")
 
 weekly_hours_fished %>% 
   filter(stream == "butte creek", year == 2022) |> 
@@ -320,7 +320,11 @@ weekly_hours_fished %>%
            color = "",
        title = "Sacramento River Hours Fished")
 
+```
 
+The following plot shows all years
+
+```{r, echo = F, message = F, warning=F}
 weekly_hours_fished %>% 
   ggplot(aes(x = hours_fished, fill = site)) +
   geom_histogram(alpha = .75, position = 'dodge') +

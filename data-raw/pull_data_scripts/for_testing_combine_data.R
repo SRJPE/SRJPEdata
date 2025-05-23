@@ -12,43 +12,54 @@ gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
 
 gcs_get_object(object_name = "standard-format-data/standard_recapture.csv",
                bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/data-prep/standard-format-data/standard_recapture.csv",
+               saveToDisk = "data-raw/helper-tables/standard_recapture.csv",
                overwrite = TRUE)
-standard_recapture <- read_csv("data-raw/data-prep/standard-format-data/standard_recapture.csv")
+standard_recapture <- read_csv("data-raw/helper-tables/standard_recapture.csv")
 # standard release data table
 gcs_get_object(object_name = "standard-format-data/standard_release.csv",
                bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/data-prep/standard-format-data/standard_release.csv",
+               saveToDisk = "data-raw/helper-tables/standard_release.csv",
                overwrite = TRUE)
-standard_release <- read_csv("data-raw/data-prep/standard-format-data/standard_release.csv")
+standard_release <- read_csv("data-raw/helper-tables/standard_release.csv")
 
 # RST Monitoring Data
 # standard rst catch data table
 gcs_get_object(object_name = "standard-format-data/standard_rst_catch_051525.csv",
                bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/data-prep/standard-format-data/standard_catch.csv",
+               saveToDisk = "data-raw/helper-tables/standard_catch.csv",
                overwrite = TRUE)
-standard_catch <- read_csv("data-raw/data-prep/standard-format-data/standard_catch.csv")
+standard_catch <- read_csv("data-raw/helper-tables/standard_catch.csv")
 
 # standard rst trap data table
 gcs_get_object(object_name = "standard-format-data/standard_rst_trap.csv",
                bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/data-prep/standard-format-data/standard_trap.csv",
+               saveToDisk = "data-raw/helper-tables/standard_trap.csv",
                overwrite = TRUE)
-standard_trap <- read_csv("data-raw/data-prep/standard-format-data/standard_trap.csv")
+standard_trap <- read_csv("data-raw/helper-tables/standard_trap.csv")
 
-# Knights Landing RST pre 2006 --------------------------------------------
+# Knights Landing RST pre 2006 & Butte Creek pre 2015 --------------------------
 
 catch_standard <- standard_catch |> 
   filter(site == "knights landing", date < as_date("2006-10-02")) |> 
+  mutate(site_group = "knights landing") |> 
+  bind_rows(standard_catch |> 
+              filter(stream == "butte creek", date < as_date("2015-11-03")) |> 
+              mutate(site_group = "butte creek")) |> 
   rename(life_stage = lifestage) |> 
   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped, dead, fork_length, weight, species)
+
 trap_standard <- standard_trap |> 
   filter(site == "knights landing", trap_stop_date < as_date("2006-10-02")) |> 
+  mutate(site_group = "knights landing") |> 
+  bind_rows(standard_trap |> 
+              filter(stream == "butte creek", trap_stop_date < as_date("2015-11-03")) |> 
+              mutate(site_group = "butte creek")) |> 
   rename(total_revolutions = sample_period_revolutions,
          rpm_start = rpms_start,
          rpm_end = rpms_end) |> 
-  select(trap_start_date, trap_stop_date, stream, site, subsite, total_revolutions, visit_type, trap_functioning, fish_processed, rpm_start, rpm_end, include)
+  select(trap_start_date, trap_stop_date, stream, site, subsite, site_group, total_revolutions, visit_type, trap_functioning, fish_processed, rpm_start, rpm_end, include)
+
+# Butte did not have release trials prior to 2021
 recapture_standard <- standard_recapture |> 
   filter(site == "knights landing", date_recaptured < as_date("2006-10-02")) |> 
   mutate(site_group = site) |> 
@@ -56,12 +67,14 @@ recapture_standard <- standard_recapture |>
          count = number_recaptured,
          fork_length = median_fork_length_recaptured) |> 
   select(date, release_id, stream, site, subsite, site_group, count, fork_length)
+
 release_standard <- standard_release |> 
   filter(site == "knights landing", date_released < as_date("2006-10-02")) |> 
   rename(origin = origin_released,
          run = run_released,
          life_stage = lifestage_released) |> 
-  select(date_released, release_id, stream, site, number_released, origin, run, life_stage)
+  mutate(site_group = "knights landing") |> 
+  select(date_released, release_id, stream, site, site_group, number_released, origin, run, life_stage)
 
 # Combine RST data -----------------------------------------------------------------
 
@@ -114,7 +127,7 @@ rst_trap <- bind_rows(temp_trap, trap_standard, rst_trap_query_pilot)  |>
 release <- bind_rows(release_standard, release_query_pilot |> 
                        mutate(release_id = as.character(release_id)), temp_release)  |> 
   mutate(site = ifelse(is.na(site) & stream == "butte creek", "okie dam", site)) |> 
-  filter(!is.na(number_released)) |> # there should not be any NAs
+  filter(!is.na(number_released), year(date_released) != 1900) |> # there should not be any NAs
   glimpse()
 recaptures <- bind_rows(recapture_standard, recaptures_query_pilot |> mutate(release_id = as.character(release_id)), temp_recapture) |> glimpse()
 
