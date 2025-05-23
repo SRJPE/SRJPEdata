@@ -84,73 +84,20 @@ test_that("No NA values in identifying recapture data variables", {
 
 
 # Adult data tests -------------------------------------------------------------
-# Passage Counts
-test_that("Upstream passage counts data coverage at the tributary level has not changed", {
-  current_coverage <- upstream_passage$stream |> unique() |> sort()
+# Annual counts
+test_that("Annual adult counts data coverage at the tributary level has not changed", {
+  current_coverage <- annual_adult$stream |> unique() |> sort()
   
-  expected_coverage <- c("battle creek", "clear creek", "deer creek", "mill creek", 
+  expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", "mill creek", 
                          "yuba river")
   expect_equal(current_coverage, expected_coverage)
 })
 
-test_that("No NA values in identifying passage counts data variables", {
-  expect_equal(any(is.na(upstream_passage$stream)), FALSE)
-  expect_equal(any(is.na(upstream_passage$date)), FALSE)
+test_that("No NA values in identifying annual adult data variables", {
+  expect_equal(any(is.na(annual_adult$stream)), FALSE)
+  expect_equal(any(is.na(annual_adult$year)), FALSE)
 })
 
-# Passage Estimates
-test_that("Upstream passage estimates data coverage at the tributary level has not changed", {
-  current_coverage <- upstream_passage_estimates$stream |> unique() |> sort()
-  
-  expected_coverage <- c("battle creek", "clear creek", "deer creek", "mill creek", 
-                         "yuba river")
-  expect_equal(current_coverage, expected_coverage)
-})
-
-test_that("No NA values in identifying passage estimates data variables", {
-  expect_equal(any(is.na(upstream_passage_estimates$stream)), FALSE)
-  expect_equal(any(is.na(upstream_passage_estimates$year)), FALSE)
-})
-
-# Redd
-test_that("Redd data coverage at the tributary level has not changed", {
-  current_coverage <- redd$stream |> unique() |> sort()
-  
-  expected_coverage <- c("battle creek", "clear creek", "feather river", "mill creek", 
-                         "yuba river")
-  expect_equal(current_coverage, expected_coverage)
-})
-
-test_that("No NA values in identifying redd data variables", {
-  expect_equal(any(is.na(redd$stream)), FALSE)
-  expect_equal(any(is.na(redd$date)), FALSE)
-})
-
-# carcass
-test_that("Carcass estinates data coverage at the tributary level has not changed", {
-  current_coverage <- carcass_estimates$stream |> unique() |> sort()
-  
-  expected_coverage <- c("butte creek", "feather river", "yuba river")
-  expect_equal(current_coverage, expected_coverage)
-})
-
-test_that("No NA values in identifying carcass data variables", {
-  expect_equal(any(is.na(carcass_estimates$stream)), FALSE)
-  expect_equal(any(is.na(carcass_estimates$year)), FALSE)
-})
-
-# holding
-test_that("Holding data coverage at the tributary level has not changed", {
-  current_coverage <- holding$stream |> unique() |> sort()
-  
-  expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek")
-  expect_equal(current_coverage, expected_coverage)
-})
-
-test_that("No NA values in identifying holding data variables", {
-  expect_equal(any(is.na(holding$stream)), FALSE)
-  expect_equal(any(is.na(holding$year)), FALSE)
-})
 
 
 

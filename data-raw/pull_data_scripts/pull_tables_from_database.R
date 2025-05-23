@@ -76,11 +76,7 @@ try(rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.su
                                        left join trap_location tl on c.trap_location_id = tl.id 
                                        left join run r on c.run_id = r.id
                                        left join lifestage ls on c.lifestage_id = ls.id") |> 
-      mutate(species = "chinook",
-             subsite = case_when(site == "yuba river" ~ "hal",
-                                 T ~ subsite),
-             site = case_when(stream == "yuba river" ~ "hallwood",
-                              T ~ site)))
+      mutate(species = "chinook"))
 
 try(if(!exists("rst_catch_query"))
   rst_catch <- SRJPEdata::rst_catch
@@ -109,11 +105,8 @@ try(rst_trap_query <-  dbGetQuery(con,
         mutate(trap_start_time = hms::as_hms(trap_start_date),
                trap_start_date = as_date(trap_start_date), 
                trap_stop_time = hms::as_hms(trap_stop_date),
-               trap_stop_date = as_date(trap_stop_date),
-               subsite = case_when(site == "yuba river" ~ "hal",
-                                   T ~ subsite),
-               site = case_when(stream == "yuba river" ~ "hallwood",
-                                T ~ site)
+               trap_stop_date = as_date(trap_stop_date)
+               
   ))
 
 try(if(!exists("rst_trap_query"))
@@ -201,33 +194,7 @@ try(upstream_passage_estimates_query <- dbGetQuery(con, "SELECT p.year, sl.strea
                                                          p.confidence_level
                                                          FROM passage_estimates p
                                                          left join survey_location sl on p.survey_location_id = sl.id
-                                                         left join run r on p.run_id = r.id") |> 
-      # these are fall and late-fall and somehow were included in the table but labelled as spring
-      mutate(not_spring = case_when(year == 2009 & stream == "mill creek" & passage_estimate != 237 ~ "remove",
-                                    year == 2010 & stream == "mill creek" & passage_estimate != 205 ~ "remove",
-                                    year == 2014 & stream == "deer creek" & passage_estimate != 512 ~ "remove",
-                                    T ~ "do not remove")) |> 
-      filter(stream != "butte creek", not_spring != "remove") |> 
-      # TODO these should be added to the database though we are likely moving away from db for adult data because too hard to maintain
-      add_row(year = 2022,
-              stream = "clear creek",
-              passage_estimate = 195) |> 
-      add_row(year = 2023,
-              stream = "clear creek",
-              passage_estimate = 0) |> 
-      # source of below data is e-mail chain from ashley / sam provins / gabby week of 1/14/2025
-      add_row(year = 2022,
-              stream = "battle creek",
-              passage_estimate = 152) |> 
-      add_row(year = 2023,
-              stream = "battle creek",
-              passage_estimate = 7) |> # one of these was a feather river spring run
-      add_row(year = 2024,
-              stream = "battle creek",
-              passage_estimate = 30) |> 
-      add_row(year = 2024,
-              stream = "clear creek",
-              passage_estimate = 6))
+                                                         left join run r on p.run_id = r.id"))
 
 try(if(!exists("upstream_passage_estimates_query"))
   upstream_passage_estimates <- SRJPEdata::upstream_passage_estimates
