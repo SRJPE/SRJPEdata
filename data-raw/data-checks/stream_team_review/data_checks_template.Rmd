@@ -176,7 +176,7 @@ UBC: run year 1998, 2001, 2003, 2007, 2015
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> 
   filter(site == "ubc") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
@@ -190,7 +190,7 @@ UCC: run year 2003, 2009, 2023, 2024
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> 
   filter(site == "ucc") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
@@ -210,12 +210,19 @@ p_diff_summary_plot(catch_compare_2, "butte creek")
 # Dig into data points that are off
 # Issues were coming from adults not being excluded and this is now fixed
 
-filter(catch_compare_2, stream == "butte creek", p_diff > 2)
+# filter(catch_compare_2, stream == "butte creek", p_diff > 2)
+# 
+# filter(weekly_juvenile_abundance_catch_data, week == 44, year == 2022, stream == "butte creek") |> view()
+# filter(butte_catch_edi, week(visitTime) == 4, year(visitTime) == 2020) |> view()
+# filter(rst_catch, julian_week == 44, julian_year == 2022, stream == "butte creek")
 
-filter(weekly_juvenile_abundance_catch_data, week == 44, year == 2022, stream == "butte creek") |> view()
-filter(butte_catch_edi, week(visitTime) == 4, year(visitTime) == 2020) |> view()
-filter(rst_catch, julian_week == 44, julian_year == 2022, stream == "butte creek")
-
+# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+#   filter(stream == "butte creek") |> 
+#   group_by(year) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+#   filter(stream == "butte creek") |> view()
 ```
 
 #### Find missing data
@@ -224,7 +231,7 @@ okie dam: run year 1997, 1998, 2005, 2006, 2019
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "okie dam") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
@@ -261,7 +268,7 @@ The EDI data missing is because for the comparison I did not pull from the most 
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "deer creek") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
@@ -274,7 +281,7 @@ The EDI data missing is because for the comparison I did not pull from the most 
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "mill creek") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
@@ -296,7 +303,7 @@ eye riffle: run year 2021
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "eye riffle") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 
@@ -308,7 +315,7 @@ herringer riffle: run year 2010, 2016, 2017, 2021
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "herringer riffle") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 
@@ -320,7 +327,7 @@ steep riffle: run year 2006, 2013, 2015, 2016
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "steep riffle") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 
@@ -343,7 +350,7 @@ halwood: run years 2000, 2003
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "hallwood") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
@@ -360,86 +367,86 @@ p_diff_summary_plot(catch_compare_1, "sacramento river")
 
 
 ```{r, include = F}
-edi <- read_csv("data-raw/data-checks/stream_team_review/knights_landing_recapture.csv")
-edi <- read_csv("data-raw/data-checks/stream_team_review/tisdale_catch.csv")
-edi |> 
-  group_by(catchRawID) |> 
-  tally() |> 
-  filter(n > 1)
-
-min(edi$visitTime)
-max(edi$visitTime)
-
-edi |> 
-  group_by(catchRawID) |> 
-  tally() |> 
-  filter(n > 1)
-
-ck <- edi |> filter(year(visitTime) == 2016)
+# edi <- read_csv("data-raw/data-checks/stream_team_review/knights_landing_recapture.csv")
+# edi <- read_csv("data-raw/data-checks/stream_team_review/tisdale_catch.csv")
+# edi |> 
+#   group_by(catchRawID) |> 
+#   tally() |> 
+#   filter(n > 1)
+# 
+# min(edi$visitTime)
+# max(edi$visitTime)
+# 
+# edi |> 
+#   group_by(catchRawID) |> 
+#   tally() |> 
+#   filter(n > 1)
+# 
+# ck <- edi |> filter(year(visitTime) == 2016)
 
 #2016 17863
-SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-  filter(site == "knights landing", year == 2016) |> 
-  group_by(year) |> 
-  summarize(count = sum(count, na.rm = T))
-
-weekly_rst_catch |> 
-  filter(site == "knights landing", year == 2017, week == 44)
-SRJPEdata::rst_catch |> 
-  filter(site == "knights landing", year(date) == 2017, week(date) == 44) |> view()
-
-edi |> 
-  filter(commonName == "Chinook salmon") |> 
-  filter(year(visitTime) == 2017, week(visitTime) == 44) |> view()
-# 2016 18392
-weekly_rst_catch |> 
-  filter(site == "knights landing", year == 2016) |> 
-  group_by(year) |> 
-  summarize(count = sum(count, na.rm = T))
-
-SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-  filter(site == "knights landing") |> 
-  group_by(year) |> 
-  summarize(count = sum(count, na.rm = T))
-
-SRJPEdata::rst_catch |> 
-  filter(site == "knights landing", year(date) == 2016, adipose_clipped == T) |> 
-  summarize(count = sum(count, na.rm = T))
-
-updated_standard_catch_raw |> 
-  filter(site == "knights landing", life_stage == "yearling") |> view()
-
-
-# Tisdale
-#2016 17863
-SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-  filter(site == "knights landing", year == 2016) |> 
-  group_by(year) |> 
-  summarize(count = sum(count, na.rm = T))
-
-# 5857
-weekly_rst_catch |> 
-  filter(site == "tisdale" & ((year == 2019 & week >= 40) | (year == 2020 & week < 40))) |> 
-  group_by(year) |> 
-  summarize(count = sum(count, na.rm = T))
-#5638
-SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-  filter(site == "tisdale" & ((year == 2019 & week >= 40) | (year == 2020 & week < 40))) |> 
-  group_by(year) |> 
-  summarize(count = sum(count, na.rm = T))
-
-SRJPEdata::rst_catch |> 
-  filter(site == "tisdale" & ((year(date) == 2019 & week(date) >= 40) | (year(date) == 2020 & week(date) < 40))) |> 
-  filter(adipose_clipped == T) |> 
-  summarize(count = sum(count, na.rm = T))
-
-ck <- edi |> 
-  filter(((year(visitTime) == 2019 & week(visitTime) >= 40) | (year(visitTime) == 2020 & week(visitTime) < 40))) |> 
-  filter(commonName == "Chinook salmon", fishOrigin == "Natural") |> 
-  summarize(sum = sum(n))
-
-updated_standard_catch_raw |> 
-  filter(site == "tisdale", life_stage == "yearling") |> view()
+# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+#   filter(site == "knights landing", year == 2016) |> 
+#   group_by(year) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# weekly_rst_catch |> 
+#   filter(site == "knights landing", year == 2017, week == 44)
+# SRJPEdata::rst_catch |> 
+#   filter(site == "knights landing", year(date) == 2017, week(date) == 44) |> view()
+# 
+# edi |> 
+#   filter(commonName == "Chinook salmon") |> 
+#   filter(year(visitTime) == 2017, week(visitTime) == 44) |> view()
+# # 2016 18392
+# weekly_rst_catch |> 
+#   filter(site == "knights landing", year == 2016) |> 
+#   group_by(year) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+#   filter(site == "knights landing") |> 
+#   group_by(year) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# SRJPEdata::rst_catch |> 
+#   filter(site == "knights landing", year(date) == 2016, adipose_clipped == T) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# updated_standard_catch_raw |> 
+#   filter(site == "knights landing", life_stage == "yearling") |> view()
+# 
+# 
+# # Tisdale
+# #2016 17863
+# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+#   filter(site == "knights landing", year == 2016) |> 
+#   group_by(year) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# # 5857
+# weekly_rst_catch |> 
+#   filter(site == "tisdale" & ((year == 2019 & week >= 40) | (year == 2020 & week < 40))) |> 
+#   group_by(year) |> 
+#   summarize(count = sum(count, na.rm = T))
+# #5638
+# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+#   filter(site == "tisdale" & ((year == 2019 & week >= 40) | (year == 2020 & week < 40))) |> 
+#   group_by(year) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# SRJPEdata::rst_catch |> 
+#   filter(site == "tisdale" & ((year(date) == 2019 & week(date) >= 40) | (year(date) == 2020 & week(date) < 40))) |> 
+#   filter(adipose_clipped == T) |> 
+#   summarize(count = sum(count, na.rm = T))
+# 
+# ck <- edi |> 
+#   filter(((year(visitTime) == 2019 & week(visitTime) >= 40) | (year(visitTime) == 2020 & week(visitTime) < 40))) |> 
+#   filter(commonName == "Chinook salmon", fishOrigin == "Natural") |> 
+#   summarize(sum = sum(n))
+# 
+# updated_standard_catch_raw |> 
+#   filter(site == "tisdale", life_stage == "yearling") |> view()
 ```
 
 #### Find missing data
@@ -450,7 +457,7 @@ Note than pre 2006 data are not on EDI
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "knights landing") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
@@ -461,7 +468,7 @@ tisdale: run years 2010, 2012
 
 ```{r, echo = F, message = F, message = F, warning = F}
 SRJPEdata::years_to_exclude_rst_data |> filter(site == "tisdale") |> 
-  arrange(year)
+  arrange(run_year)
 ```
 
 ```{r, echo = F, warning = F, message = F}
