@@ -121,7 +121,7 @@ the stop date is missing we assume it is the start date of the next record.
 Note that there are some records with 0 hours.
 These occur because trap visit data was entered when the trap was not in service and
 then a new trap visit entry was recorded once the trap started working again. There
-are some erroneous values. These will be addressed at the end of the script but setting limits.
+are some erroneous values. These will be addressed at the end of the script by setting limits.
 
 ```{r, echo = FALSE}
 method_one_hours_fished <- SRJPEdata::rst_trap |>  
