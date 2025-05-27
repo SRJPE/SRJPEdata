@@ -3,28 +3,27 @@
 \docType{data}
 \name{upstream_passage_estimates}
 \alias{upstream_passage_estimates}
-\title{Adult Upstream passage monitoring estimates}
+\alias{annual_adult}
+\title{Annual adult estimates}
 \format{
 \itemize{
-\item \code{year}: year data were collected
+\item \code{year}: year data were collected (calendar year)
 \item \code{stream}: stream data were collected on
-\item \code{passage_estimate}: yearly aggregated interpolated upstream passage estimate
-\item \code{run}: run of fish (if assigned)
-\item \code{adipose_clipped}: whether or not the adipose fin was clipped
+\item \code{count}: annual estimate
+\item \code{data_type}: type of data (redd, carcass estimate, holding, passage estimate)
+\item \code{lower_bound_estimate}: if confidence intervals are available, value for the lower bound estimate
+\item \code{upper_bound_estimate}: if confidence intervals are available, value for the upper bound estimate
+\item \code{confidence_level}: if confidence intervals are available, level of confidence provided
 }
 }
 \source{
-Adult upstream passage estimates were provided by monitoring programs.
-These data are currently being uploaded to EDI. In the meantime you can find data exploration scripts
-for each tributary \href{https://github.com/SRJPE/JPE-datasets/tree/main/data-raw/qc-markdowns/adult-upstream-passage-monitoring}{here} and
-combined passage estimates \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/adult_passage_estimate_standard_format.Rmd}{here}.
+Annual adult estimates were provided by monitoring programs.
+These data are currently being uploaded to EDI.
 }
 \usage{
-upstream_passage_estimates
+annual_adult
 }
 \description{
-Adult upstream passage estimates, Generalized Additive Model (GAM)
-used to generate passage estimates from raw passage data. Upstream passage estimates
-are available for: battle creek, clear creek, deer creek, mill creek, yuba river, butte creek.
+Annual adult estimates by data type provided by monitoring programs.
 }
 \keyword{datasets}

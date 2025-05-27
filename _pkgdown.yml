@@ -16,12 +16,11 @@ reference:
   desc: Data used as model inputs to passage to spawner (p2s) model or directly input to stock recruit 
 - contents: 
   - p2s_model_covariates_standard
-  - observed_adult_input
 - subtitle: Juvenile Datasets
   desc: Data used as inputs to juvenile bt-spas-x abundance model 
 - contents: 
   - weekly_juvenile_abundance_catch_data
-  - weekly_juvenile_abundance_model_data
+  - weekly_juvenile_abundance_efficiency_data
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model 
 - contents: 
@@ -40,16 +39,11 @@ reference:
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
 - contents: 
-  - upstream_passage
-  - upstream_passage_estimates 
-  - carcass_estimates 
-  - redd
-  - holding 
+  - annual_adult
 - subtitle: Modeling Ruleset Datasets
   desc: Helper datasets used to subset, categorize and describe model data, used to prepare weekly_juvenile_abundance_model_data
 - contents: 
   - daily_yearling_ruleset
-  - chosen_site_years_to_model
   - btspasx_special_priors_data
   - weekly_hours_fished
 - subtitle: Environmental Data
@@ -67,6 +61,7 @@ reference:
   - pull_reciever_data_from_ERDDAP
   - pull_study_ids_from_ERDDAP
   - aggregate_detections_butte
+  - aggregate_detections_feather
   - aggregate_detections_sacramento
   - get_receiver_sites_metadata
   - make_fish_encounter_history

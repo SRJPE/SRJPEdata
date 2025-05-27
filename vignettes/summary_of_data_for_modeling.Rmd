@@ -68,51 +68,15 @@ rst_plot_data <- SRJPEdata::rst_catch |>
   select(year, month, stream, site, subsite, site_group, monthly_catch_exists, sampling_exists, sampling_type) |> 
   mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) 
 
-adult_carcass_plot_data <- SRJPEdata::carcass_estimates |> 
-  mutate(sampling_type = "carcass estimate",
+adult_plot_data <- SRJPEdata::annual_adult |> 
+  mutate(sampling_type = data_type,
          sampling_exists = 100) |> 
   select(year, stream, sampling_type, sampling_exists) |> 
   mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) 
-
-upstream_passage_plot_data <- SRJPEdata::upstream_passage_estimates |> 
-  mutate(sampling_type = "upstream passage estimate",
-         sampling_exists = 100) |> 
-  select(year, stream, sampling_type, sampling_exists) |> 
-  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) 
-
-# TODO figure out where redd data is for clear 
-# note that ashley identified the issue in the data prep for the db and fixed it. assigned inigo to update db
-# follow up on this first week of June
-redd_plot_data <- SRJPEdata::redd |> 
-  mutate(week = week(date),
-         year = year(date),
-         month = month(date)) |> 
-  group_by(year, month, stream) |> 
-  summarize(sampling_type = "redd",
-            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
-  ungroup() |> 
-  select(year, month, stream, sampling_exists, sampling_type) |> 
-  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
-  distinct()
-
-holding_plot_data <- SRJPEdata::holding |> 
-  mutate(week = week(date),
-         year = year(date),
-         month = month(date)) |> 
-  group_by(year, month, stream) |> 
-  summarize(sampling_type = "holding",
-            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
-    ungroup() |> 
-  select(year, month, stream, sampling_exists, sampling_type) |> 
-  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
-  distinct()
 
 # Combine 
 plot_data <- bind_rows(rst_plot_data, 
-                       adult_carcass_plot_data, 
-                       redd_plot_data,
-                       holding_plot_data,
-                       upstream_passage_plot_data) |> 
+                       adult_plot_data) |> 
   filter(stream != "sacramento river") |> 
   distinct() 
 
@@ -155,10 +119,10 @@ potential_jpe_window <- plot_data |>
               values_from = sampling_exists,
               values_fill = NA_real_) |>
   group_by(year, stream) |> 
-  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass estimate`)) ~ TRUE,
+  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(carcass_estimate)) ~ TRUE,
                                             any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
                                             any(!is.na(rst)) && any(!is.na(holding)) ~ TRUE,
-                                            any(!is.na(rst)) && any(!is.na(`upstream passage estimate`)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(upstream_estimate)) ~ TRUE,
                                             T ~ FALSE)) |> 
   ungroup() 
 
@@ -195,34 +159,13 @@ After filtering the RST and adult data to remove incomplete or inconsistent year
 rst_years_to_exclude <- SRJPEdata::years_to_exclude_rst_data |> 
   mutate(exclude = TRUE)
 
-adult_years_to_exclude <- SRJPEdata::years_to_exclude_adult |> 
-  mutate(exclude = TRUE) |> 
-  rename(sampling_type = data_type)
-
 rst_plot_data <- rst_plot_data |> 
   left_join(rst_years_to_exclude |> 
               select(stream, site, year = run_year, exclude))  
 
-adult_carcass_plot_data <- adult_carcass_plot_data |> 
- left_join(adult_years_to_exclude) 
-
-
-upstream_passage_plot_data <- upstream_passage_plot_data |> 
-   left_join(adult_years_to_exclude) 
-
-#TODO where is clear creek redd data??
-redd_plot_data <- redd_plot_data |> 
-  left_join(adult_years_to_exclude) 
-
-holding_plot_data <- holding_plot_data |> 
-   left_join(adult_years_to_exclude) 
-
-# Combine 
+# Combine (adult years to exclude already excluded in pull_adult_data.R)
 updated_plot_data <- bind_rows(rst_plot_data, 
-                       adult_carcass_plot_data, 
-                       redd_plot_data,
-                       holding_plot_data,
-                       upstream_passage_plot_data) |> 
+                       adult_plot_data) |> 
   filter(stream != "sacramento river") |> 
   distinct() |> 
   mutate(exclude = ifelse(is.na(exclude), FALSE, exclude))
@@ -271,10 +214,10 @@ updated_potential_jpe_window <- updated_plot_data |>
               values_from = sampling_exists,
               values_fill = NA_real_) |>
   group_by(year, stream) |> 
-  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass estimate`)) ~ TRUE,
+  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(carcass_estimate)) ~ TRUE,
                                             any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
                                             any(!is.na(rst)) && any(!is.na(holding)) ~ TRUE,
-                                            any(!is.na(rst)) && any(!is.na(`upstream passage estimate`)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(upstream_estimate)) ~ TRUE,
                                             T ~ FALSE)) |> 
   ungroup() 
 
@@ -310,6 +253,8 @@ avaliable_years_plot
 
 The summary table below describes which years have overlapping RST and adult data. This table accounts for years excluded based on data quality and completeness considerations.
 
+Feather River is currently not included in stock recruit modeling due to no adult data that represent spring run. This data gap is currently in the process of being filled.
+
 ```{r, echo = FALSE, message=FALSE}
 test <- updated_potential_jpe_window |>
   filter(potential_SR_window) |>
@@ -323,12 +268,12 @@ years_for_jpe <- tibble(Stream = unique(test$stream),
                                                         "2001 - 2004, 2007 - 2008, 2013 - 2014, 2016 - 2018, 2020 - ongoing", #Butte
                                                         "2003 - 2010, 2012 - 2015, 2021 - ongoing", # clear
                                                         "1992, 1995 - 1996, 2000 - 2003, 2005, 2007, 2009 - 2010, 2022 - ongoing", #deer 
-                                                        "2010 - 2012, 2018 - 2020, 2022 - ongoing", # feather
+                                                       # "2010 - 2012, 2018 - 2020, 2022 - ongoing", # feather
                                                         "2000 - 2003, 2005 - 2008, 2010", #mill
                                                         "2004 - 2008" #yuba
                                                         ),
                         "Total Number of Years" = c(11, 14, 13, 11, 7, 
-                                                    9, 
+                                                    #9, 
                                                     5))
 
 knitr::kable(years_for_jpe)

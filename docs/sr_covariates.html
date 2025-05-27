@@ -32,6 +32,9 @@
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
+      <a href="articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
+    </li>
+    <li>
       <a href="articles/lifestage_ruleset.html">Lifestage Rulesets</a>
     </li>
     <li>
@@ -50,10 +53,10 @@
       <a href="articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
     </li>
     <li>
-      <a href="articles/temp_regression.html">Filling Temperature Data Gaps</a>
+      <a href="articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
     </li>
     <li>
-      <a href="articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
+      <a href="articles/temp_regression.html">Filling Temperature Data Gaps</a>
     </li>
   </ul></li>
 <li>
@@ -84,7 +87,7 @@
 <h2 id="selecting-stock-recruit-environmental-covariates">Selecting Stock Recruit Environmental Covariates<a class="anchor" aria-label="anchor" href="#selecting-stock-recruit-environmental-covariates"></a></h2>
 <p>FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found <a href="https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0" class="external-link">here</a>. FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to generate the following environmental covariates table to test within the SR model.</p>
 <p><em>Table 1. Summary of covariates to include in stock recruit modeling based on preliminary literature review.</em></p>
-<table class="table  lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; margin-left: auto; margin-right: auto;'><thead><tr><th style="text-align:left;">
+<table class="table  lightable-classic" style='color: black; font-family: "Arial Narrow", "Source Sans Pro", sans-serif; margin-left: auto; margin-right: auto;'><thead><tr><th style="text-align:left;">
 Covariate Type
 </th>
 <th style="text-align:left;">
@@ -234,8 +237,148 @@ NA
 <h4 id="number-of-degree-days">Number of degree days<a class="anchor" aria-label="anchor" href="#number-of-degree-days"></a></h4>
 <p>Degree days is defined here as the sum of the daily mean temperatures between August and December (spawning time period) by year and stream.</p>
 <p><em>Note that for streams with multiple locations the max daily mean was selected. Clear Creek 2020 value is low which may be due to a few missing data points in December. This approach is vulnerable to missing data.</em></p>
+<div class="float">
+<img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"><div class="figcaption">plot of chunk unnamed-chunk-5</div>
+</div>
+<p><em>Figure 1. Annual sum of daily mean temperatures during spawning and incubation time period (Aug - Dec)</em></p>
+<div class="section level5">
+<h5 id="sacramento-thermal-stress">Sacramento thermal stress<a class="anchor" aria-label="anchor" href="#sacramento-thermal-stress"></a></h5>
+<p>In the mainstem stock recruit we use the sum of days greater than 20 degrees to indicate thermal stress which could contribute to mortality ocurring in the tributaries between adult observation and juveniles at the rotary screw trap. Note that adult data from tributaries is used as the stock in the mainstem stock recruit model.</p>
+<div class="float">
+<img src="figure/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"><div class="figcaption">plot of chunk unnamed-chunk-7</div>
 </div>
 </div>
+</div>
+<div class="section level4">
+<h4 id="day-of-year-when-7dadm-drops-abovebelow-13-c">Day of year when 7DADM drops above/below 13 C<a class="anchor" aria-label="anchor" href="#day-of-year-when-7dadm-drops-abovebelow-13-c"></a></h4>
+<p>This covariate is defined as the day of the year and week when the 7DADM is above 13C</p>
+<ul><li>Data are not filtered to the spawning time period (Aug-Dec) as this threshold is typically met before August. Data do not include Jan and Feb as spring run are not in tributaries yet</li>
+<li>Below 13C is not included as this does not make sense in terms of impact on salmon. Temperatures are rarely below 13C during the spawning time period and if they are, unlikely to be significantly cold enough to have an impact</li>
+<li>Note, we currently do not have max daily temperatures for the Sacramento so mainstem is not included. There are a few datapoints based on the plot below that are worth further investigation.</li>
+</ul><p><strong>Plot of week where threshold is met (above 13 C) for all years and streams</strong></p>
+<div class="float">
+<img src="figure/unnamed-chunk-9-1.png" alt="plot of chunk unnamed-chunk-9"><div class="figcaption">plot of chunk unnamed-chunk-9</div>
+</div>
+<p><em>Figure 2. Plot of week where threshold is met (above or below 13) for all years and streams</em></p>
+</div>
+<div class="section level4">
+<h4 id="max-temperature">Max temperature<a class="anchor" aria-label="anchor" href="#max-temperature"></a></h4>
+<p>This covariate is defined as the summarized annual weekly max temperature.</p>
+<ul><li>Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) across years within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the daily mean.</li>
+<li>Summarize the weekly max for each stream and year by finding the mean, median, and max.</li>
+</ul><div class="float">
+<img src="figure/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"><div class="figcaption">plot of chunk unnamed-chunk-12</div>
+</div>
+<p><em>Figure 3. Plot of mean, median, max of the maximum weekly temperature</em></p>
+</div>
+<div class="section level4">
+<h4 id="emergence-date">Emergence date<a class="anchor" aria-label="anchor" href="#emergence-date"></a></h4>
+<p><em>In development</em></p>
+<p>Emergence data encompasses the effect of temperature and is expected to affect growth and survival of juveniles. Modeled following <a href="https://esajournals.onlinelibrary.wiley.com/doi/full/10.1002/ecs2.4160" class="external-link">Kaylor et al. 2022</a>. Daily Ei values are summed from the spawn date, and emergence is assumed to occur on the first day where Ei exceeds 1.</p>
+<p>Ei = 1 / exp [loge a - loge(Ti - b)]</p>
+<p>logea = 6.872 b = -0.332 Ti = mean daily temperature Ei = daily contribution to development (ranging from 0 to 1)</p>
+<p>Constants derived from <a href="https://afspubs.onlinelibrary.wiley.com/doi/epdf/10.1577/1548-8659%281990%29119%3C0927%3ATESADO%3E2.3.CO%3B2" class="external-link">Beacham and Murray (1990)</a></p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="flow">Flow<a class="anchor" aria-label="anchor" href="#flow"></a></h3>
+<p>Precipitation and streamflow have been found to influence spawning and rearing. Therefore it is expected to affect the translation from stock to recruit. Streamflow can be included in multiple different formats including:</p>
+<ul><li>Mean, median, max precipitation (or streamflow)</li>
+</ul><div class="section level4">
+<h4 id="mean-median-max-flow">Mean, median, max flow<a class="anchor" aria-label="anchor" href="#mean-median-max-flow"></a></h4>
+<p>These covariates summarize daily max flows as annual mean/median/max/min within the spawning and rearing time period.</p>
+<pre><code><span><span class="co">#&gt; Error in `mutate()`:</span></span>
+<span><span class="co">#&gt; ℹ In argument: `year = year(date)`.</span></span>
+<span><span class="co">#&gt; Caused by error in `as.Date.default()`:</span></span>
+<span><span class="co">#&gt; ! do not know how to convert 'x' to class "Date"</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Error: object 'std_flow_spawn_summary' not found</span></span></code></pre>
+<p><em>Figure 4. Plot of annual summarized (mean, median, max, min) max flows during the spawning and incubation time period (Aug - Dec)</em></p>
+<pre><code><span><span class="co">#&gt; Error in `mutate()`:</span></span>
+<span><span class="co">#&gt; ℹ In argument: `year = ifelse(month(date) %in% c(1:7), year(date) - 1, year(date))`.</span></span>
+<span><span class="co">#&gt; Caused by error in `as.Date.default()`:</span></span>
+<span><span class="co">#&gt; ! do not know how to convert 'x' to class "Date"</span></span>
+<span><span class="co">#&gt; Error in `mutate()`:</span></span>
+<span><span class="co">#&gt; ℹ In argument: `year = ifelse(month(date) %in% c(1:7), year(date) - 1, year(date))`.</span></span>
+<span><span class="co">#&gt; Caused by error in `as.Date.default()`:</span></span>
+<span><span class="co">#&gt; ! do not know how to convert 'x' to class "Date"</span></span>
+<span><span class="co">#&gt; Error: object 'std_flow_rear_summary' not found</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Error: object 'std_flow_rear_combined' not found</span></span></code></pre>
+<p><em>Figure 5. Plot of annual summarized (mean, median, max, min) max flows during the rearing time period (Tributary: Nov - July, Sacramento: Jan - July)</em></p>
+<pre><code><span><span class="co">#&gt; Error: object 'std_flow_spawn_summary' not found</span></span></code></pre>
+</div>
+</div>
+<div class="section level3">
+<h3 id="combine-and-save-covariate-data">Combine and Save Covariate Data<a class="anchor" aria-label="anchor" href="#combine-and-save-covariate-data"></a></h3>
+<p>All covariate datasets are combined into one table and saved as an export from the SRJPEdata package. This data can be accessed using <code>SRJPEdata::stock_recruit_covariates</code> and can be joined to the <code><a href="reference/site_lookup.html">SRJPEdata::site_lookup</a></code> table in order to fill in covariates for each site and year.</p>
+<p>The first 10 rows of <code>SRJPEdata::stock_recruit_covariates</code> are shown below.</p>
+<pre><code><span><span class="co">#&gt; Error: object 'std_flow_final' not found</span></span></code></pre>
+<table class="table"><colgroup><col width="5%"><col width="13%"><col width="26%"><col width="16%"><col width="25%"><col width="12%"></colgroup><thead><tr class="header"><th align="right">year</th>
+<th align="left">stream</th>
+<th align="left">lifestage</th>
+<th align="left">covariate_type</th>
+<th align="left">covariate_structure</th>
+<th align="right">value</th>
+</tr></thead><tbody><tr class="odd"><td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">gdd_spawn</td>
+<td align="right">1031.28945</td>
+</tr><tr class="even"><td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">above_13_temp_day</td>
+<td align="right">259.00000</td>
+</tr><tr class="odd"><td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">above_13_temp_week</td>
+<td align="right">38.00000</td>
+</tr><tr class="even"><td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">weekly_max_temp_max</td>
+<td align="right">21.66667</td>
+</tr><tr class="odd"><td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">weekly_max_temp_mean</td>
+<td align="right">11.92361</td>
+</tr><tr class="even"><td align="right">1998</td>
+<td align="left">butte creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">weekly_max_temp_median</td>
+<td align="right">10.52778</td>
+</tr><tr class="odd"><td align="right">1999</td>
+<td align="left">deer creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">gdd_spawn</td>
+<td align="right">2081.75842</td>
+</tr><tr class="even"><td align="right">1999</td>
+<td align="left">deer creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">above_13_temp_day</td>
+<td align="right">106.00000</td>
+</tr><tr class="odd"><td align="right">1999</td>
+<td align="left">deer creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">above_13_temp_week</td>
+<td align="right">16.00000</td>
+</tr><tr class="even"><td align="right">1999</td>
+<td align="left">deer creek</td>
+<td align="left">spawning and incubation</td>
+<td align="left">temperature</td>
+<td align="left">weekly_max_temp_max</td>
+<td align="right">23.50000</td>
+</tr></tbody></table></div>
 </div>
 
 

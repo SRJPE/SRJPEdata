@@ -25,4 +25,6 @@ devtools::load_all()
 source("data-raw/process_data_scripts/build_rst_model_datasets.R")
 source("data-raw/process_data_scripts/build_sr_model_datasets.R")
 
+devtools::document()
+pkgdown::build_site()
 devtools::test() 
