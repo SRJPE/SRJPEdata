@@ -35,7 +35,7 @@ The remaining differences are due to the removal of yearlings.
 # pull data from TEMP_pull_from_edi.R
 #source("data-raw/pull_data_scripts/TEMP_pull_from_edi.R")
 # This was generated from TEMP_pull_from_edi and loaded to save time
-temp_catch <- read_csv("data-raw/data-checks/stream_team_review/temp_catch1.csv")
+temp_catch <- read_csv("data-raw/data-checks/stream_team_review/temp_catch0527.csv")
 
 # run build_rst_model_datasets.R
 #weekly_juv_srjpedata <- weekly_juvenile_abundance_catch_data
@@ -207,22 +207,8 @@ p_diff_summary_plot(catch_compare_2, "butte creek")
 ```
 
 ```{r, include = F}
-# Dig into data points that are off
-# Issues were coming from adults not being excluded and this is now fixed
+# Comparison with Grant's data
 
-# filter(catch_compare_2, stream == "butte creek", p_diff > 2)
-# 
-# filter(weekly_juvenile_abundance_catch_data, week == 44, year == 2022, stream == "butte creek") |> view()
-# filter(butte_catch_edi, week(visitTime) == 4, year(visitTime) == 2020) |> view()
-# filter(rst_catch, julian_week == 44, julian_year == 2022, stream == "butte creek")
-
-# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-#   filter(stream == "butte creek") |> 
-#   group_by(year) |> 
-#   summarize(count = sum(count, na.rm = T))
-# 
-# SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-#   filter(stream == "butte creek") |> view()
 ```
 
 #### Find missing data
