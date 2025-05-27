@@ -235,7 +235,8 @@ feather_flow <- feather_flow_raw |>
   group_by(Date) |> 
   summarize(hatch_oroville = mean(Hatch.Oroville, na.rm = T),
             TAO = mean(TAO, na.rm = T)) |> 
-  mutate(HFC = hatch_oroville+TAO) |> 
+  mutate(value = hatch_oroville+TAO) |> 
+  select(-c(hatch_oroville, TAO)) |> 
   rename(date = Date) |> 
   filter(date <= "2025-03-31") |> 
   mutate(stream = "feather river", 
@@ -534,7 +535,7 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
 # Define the required object names
 required_objects <- c("battle_creek_data_query", "butte_creek_data_query", "butte_creek_temp_query",
                       "clear_creek_data_query", "deer_creek_data_query", "deer_creek_temp_query",
-                      "feather_hfc_river_data_query", "feather_lfc_river_data_query", "lower_feather_river_data_query",
+                      "feather_flow_raw", "feather_lfc_river_data_query", "lower_feather_river_data_query",
                       "feather_lfc_temp_query", "feather_hfc_temp_query", 
                       "mill_creek_data_query", "mill_creek_temp_query", 
                       "sac_river_data_query", "sac_river_temp_query",
@@ -553,7 +554,7 @@ library(data.table)
 # Combine all flow data from different streams
 # Created a site group variable so that the hfc and lfc will bind with the correct sites
 # so need to bind feather to the site lookup separately
-flow <- rbindlist(list(battle_creek_daily_flows,
+flow_daily <- rbindlist(list(battle_creek_daily_flows,
                   butte_creek_daily_flows, 
                   clear_creek_daily_flows,
                   deer_creek_daily_flows,
@@ -598,10 +599,10 @@ temp <- rbindlist(list(battle_creek_daily_temp,
 #   geom_line() +
 #   facet_wrap(~stream)
 setDT(temp)
-setDT(flow)
+setDT(flow_daily)
 
 # Bind the rows of temp and flow with use.names=TRUE to match by column name
-combined_data <- rbindlist(list(temp, flow), use.names = TRUE, fill = TRUE) |> distinct()
+combined_data <- rbindlist(list(temp, flow_daily), use.names = TRUE, fill = TRUE) |> distinct()
 
 # Reshape the data to 'wider' format (like pivot_wider)
 reshaped_data <- dcast(combined_data, ... ~ statistic, value.var = "value")

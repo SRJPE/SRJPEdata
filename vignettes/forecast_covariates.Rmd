@@ -188,7 +188,7 @@ rs_monthly |>
 
 ```{r, include = F}
 # This requires running "pull_environmental_data.R"
-peak_flow_monthly <- flow |> 
+peak_flow_monthly <- flow_daily |> 
   filter(statistic == "mean") |> 
   mutate(month = month(date),
          year = year(date),
