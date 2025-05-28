@@ -12,12 +12,12 @@ rst_data <- weekly_juvenile_abundance_catch_data |>
   mutate(brood_year = run_year - 1,
          rst = T)
 # adults years to exclude already applied
-adult_data <- observed_adult_input |> 
+adult_data <- annual_adult |> 
   select(year, stream, data_type, count) |> 
   pivot_wider(id_cols = c(year, stream), names_from = "data_type", values_from = "count") |> 
   mutate(passage = ifelse(upstream_estimate == "NULL", F, T),
-         redd = ifelse(redd_count == "NULL", F, T),
-         holding = ifelse(holding_count == "NULL", F, T),
+         redd = ifelse(redd == "NULL", F, T),
+         holding = ifelse(holding == "NULL", F, T),
          carcass = ifelse(carcass_estimate == "NULL", F, T)) |> 
   select(year, stream, passage, redd, holding, carcass) |> 
   rename(brood_year = year)
@@ -80,13 +80,11 @@ mainstem_covariates <- stock_recruit_covariates |>
     values_from = "standardized_value")
 
 # Todo - fill in recent years for battle and clear
-stock_recruit_model_inputs <- observed_adult_input |> 
+stock_recruit_model_inputs <- annual_adult |> 
   select(year, stream, data_type, count) |> 
   pivot_wider(names_from = "data_type", values_from = "count") |> 
-  rename(holding = holding_count,
-         passage = upstream_estimate,
-         carcass = carcass_estimate,
-         redd = redd_count) |> 
+  rename(passage = upstream_estimate,
+         carcass = carcass_estimate) |> 
   left_join(
     stock_recruit_covariates |>
       ungroup() |>

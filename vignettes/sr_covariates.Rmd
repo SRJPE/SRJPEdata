@@ -30,6 +30,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
                   "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
                   "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
 )
+source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
 ```
 
 There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selction and processing for different models: (1) Stock Recruit Covariates (this document) and (2) Adult Model Covariates.
@@ -314,7 +315,7 @@ Precipitation and streamflow have been found to influence spawning and rearing. 
 
 ```{r}
 #TODO update once we 
-standard_flow <- flow
+standard_flow <- flow_daily
 ```
 
 #### Mean, median, max flow

@@ -1,0 +1,23 @@
+stream,year,carcass_estimate,lower_bound_estimate,upper_bound_estimate,confidence_level
+butte creek,2001,18415,NA,NA,NA
+butte creek,2002,12893,NA,NA,NA
+butte creek,2003,6063,NA,NA,NA
+butte creek,2004,10221,NA,NA,NA
+butte creek,2005,16981,NA,NA,NA
+butte creek,2006,6296,NA,NA,NA
+butte creek,2007,6237,NA,NA,NA
+butte creek,2008,10009,NA,NA,NA
+butte creek,2009,2561,NA,NA,NA
+butte creek,2010,1979,NA,NA,NA
+butte creek,2011,4859,NA,NA,NA
+butte creek,2012,16140,15806,16885,NA
+butte creek,2013,15887,15400,16477,NA
+butte creek,2014,4851,4461,5310,90
+butte creek,2015,413,329,575,90
+butte creek,2016,5371,4789,5992,90
+butte creek,2017,515,375,6806,90
+butte creek,2018,2362,2129,2807,90
+butte creek,2019,14863,NA,NA,NA
+butte creek,2020,1281,1037,1478,95
+butte creek,2021,1807,1184,2849,95
+butte creek,2022,2900,2223,3735,95

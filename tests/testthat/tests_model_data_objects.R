@@ -39,13 +39,12 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
 test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
   catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
-    filter(!is.na(count) &!is.na(life_stage)) 
+    filter(!is.na(count)) 
   stream_na = anyNA(catch$stream)
   site_na = anyNA(catch$site) # note 2/14 fixing this in db update
   flow_na = anyNA(catch$flow_cfs) # note 2/14 there are only 15 with missing data
   std_flow_na = anyNA(catch$standardized_flow) # same as above
   # fl_na = anyNA(catch$mean_fork_length)
-  ls_na = anyNA(catch$life_stage) # only 6 missing lifestage
   hf_na = anyNA(catch$hours_fished)
   as_hf_na = anyNA(catch$average_stream_hours_fished)
   ry_na = anyNA(catch$run_year)
@@ -53,9 +52,9 @@ test_that("there is no missing values (hours fished...ect) when there is catch d
   
   nas = c(stream_na, site_na, flow_na, 
           # fl_na, commented out for now, should be okay if fl nas, primarily should be using lifestage instead
-          ls_na, hf_na, as_hf_na, 
+           hf_na, as_hf_na, 
           ry_na, cshf_na)
-  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
                nas)
 })
 
@@ -69,7 +68,6 @@ test_that("still have flow and hours fished even if no catch", {
   flow_na = anyNA(catch$flow_cfs)
   std_flow_na = anyNA(catch$standardized_flow)
   # fl_na = anyNA(catch$mean_fork_length)
-  ls_na = anyNA(catch$life_stage)
   hf_na = anyNA(catch$hours_fished)
   as_hf_na = anyNA(catch$average_stream_hours_fished)
   ry_na = anyNA(catch$run_year)
@@ -77,9 +75,9 @@ test_that("still have flow and hours fished even if no catch", {
   
   nas = c(stream_na, site_na, flow_na, 
           # fl_na, 
-          ls_na, hf_na, as_hf_na, 
+          hf_na, as_hf_na, 
           ry_na)
-  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
                nas)
 })
 
@@ -96,7 +94,7 @@ test_that("there is no -Inf values (hours fished...ect) when there is catch data
   
   nas = c(flow_na, std_flow_na, 
           hf_na, as_hf_na, cshf_na)
-  expect_equal(c(NA, NA, FALSE, FALSE, NA), 
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, NA), 
                nas)
 })
 

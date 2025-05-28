@@ -2,7 +2,7 @@
 title: "Covariate Development for Forecast and Scenario Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Covariate Development for Forecast Models}
+  %\VignetteIndexEntry{Covariate Development for Forecast and Scenario Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -33,8 +33,10 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 )
 
 sr_covariates <- SRJPEdata::stock_recruit_covariates
-source("data-raw/pull_data_scripts/pull_environmental_data.R")
+source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
+standard_flow <- flow_daily
 ```
+
 
 This vignette focuses on developing covariates that could be used in forecast or scenario SR JPE models. We build upon prior work that identified and tested covariates using historical data,  and transition to how those covariates are adapted for use in forecast or scenario scenarios.
 
@@ -189,7 +191,7 @@ rs_monthly |>
 
 ```{r, include = F}
 # This requires running "pull_environmental_data.R"
-peak_flow_monthly <- flow |> 
+peak_flow_monthly <- standard_flow |> 
   filter(statistic == "mean") |> 
   mutate(month = month(date),
          year = year(date),

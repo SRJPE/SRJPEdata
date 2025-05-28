@@ -36,8 +36,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
                   "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
 )
 years_exclude_rst_csv <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude.csv"))
-years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
-  select(-TODOS) 
+years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv"))  
 ```
 
 The Spring Run Juvenile Production Estimate uses historical rotary screw trap and adult survey data. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and adult years to include.
@@ -267,165 +266,7 @@ Below are the methods we used for excluding years by adult data type:
 -   Exclude year if video is out for more than 4 weeks in the sampling season
 -   Exclude year if flows exceed a threshold value on each tributary (overpass weir etc..). Threshold determined by monitoring program. 
 
-Additionally we conducted outreach to stream teams to review our list and highlight any other years that should be excluded.
-
-### Video Data
-
-#### Cumulative catch curves
-
-The cumulative catch curve below shows cumulative upstream passage over time for Battle Creek. We used similar plots for each tributary with video data to exclude years where there is very limited sampling. This plot shows that in 2006 and 2019, upstream passage monitoring started late in the season on Battle Creek. 
-
-```{r, echo = FALSE}
-standard_upstream <- SRJPEdata::upstream_passage
-spring_run_upstream_passage <- filter(standard_upstream, run == "spring" | stream %in% c("Yuba River")) %>%
-  # filter(is_yearling == FALSE) %>%
-  mutate(day = day(date),
-         month = month(date),
-         year = year(date),
-         water_year = ifelse(month %in% 10:12, year + 1, year),
-         fake_date = as_date(paste(ifelse(month %in% 10:12, 1899, 1900), month, day))) %>%
-  group_by(fake_date, water_year, stream, date) %>%
-  summarize(count = sum(count))%>%
-  ungroup() 
-
-# Yearly counts by stream/year
-spring_run_total_upstream_passage <- spring_run_upstream_passage %>%
-  group_by(water_year, stream) %>%
-  summarize(total = sum(count))
-
-
-spring_run_cumulative_upstream_passage <- spring_run_upstream_passage %>% 
-  arrange(date) %>%
-  group_by(stream, water_year) %>%
-  mutate(count = ifelse(is.na(count), 0, count), 
-         total_count = sum(count, na.rm = T), 
-         cumulative_catch = cumsum(count),
-         prop_cuml_catch = cumulative_catch/total_count * 100)
-
-
-plotly::plot_ly(spring_run_cumulative_upstream_passage |> 
-                  filter(stream == "battle creek"), x = ~fake_date, y = ~prop_cuml_catch, 
-              text = ~water_year,
-              hovertemplate = paste(
-                "Water Year: %{text}"),
-              color = ~as_factor(water_year),
-              colors = colors_full,
-              type = 'scatter', mode = 'lines') %>%
-      plotly::layout(xaxis = list(title = "Months", tickformat = "%b"),
-               yaxis = list(title = "Percent Cumulative Catch"),
-               title = "Battle Creek Cumulative Upstream Passage Curve")
-```
-
-#### Heat map of all tributaries
-
-The heat map below shows when video monitoring occurs for all streams. Some video passage systems have continued footage throughout the season. Some years there are gaps within season for specific systems.
-
-```{r, echo = FALSE}
-#TODO strange that max is 4.5
-#TODO upstream passage is still empty! Need to fix 
-standard_upstream <- SRJPEdata::upstream_passage
-upstream_date_week <- standard_upstream %>% 
-  mutate(day = day(date),
-         month = month(date),
-         fake_date = as_date(paste0("2000-", month, "-", day))) %>%
-  select(fake_date) %>%
-  distinct() %>%
-  mutate(week = week(fake_date))
-# This helper table provides a date range for each numeric week
-# This is used as hover text label in the heatmap
-upstream_date_range <- upstream_date_week %>%
-  group_by(week) %>%
-  slice_min(fake_date) %>%
-  rename(min_date = fake_date) %>%
-  left_join(catch_date_week %>%
-              group_by(week) %>%
-              slice_max(fake_date) %>%
-              rename(max_date = fake_date)) %>%
-  mutate(min_date = format(min_date, "%b %d"),
-         max_date = format(max_date, "%b %d"),
-         date_range = paste(min_date,"-",max_date))
-upstream_summary <- standard_upstream %>%
-  select(date, stream) %>%
-  distinct() %>% 
-  mutate(week = week(date),
-         year = year(date)) %>%
-  group_by(stream, week, year) %>%
-  tally()
-
-upstream_weekly <- upstream_summary %>% 
-  # add catch_date_week to make sure all weeks are included in the data
-  right_join(select(upstream_date_week, week) %>% 
-               distinct()) %>% 
-  pivot_wider(id_cols = c("stream", "year"), 
-              names_from = week, 
-              values_from = n, 
-              values_fill = 0) %>%
-  pivot_longer(cols = -c("stream","year"), names_to = "week", values_to = "number_days_sampled") %>%
-  mutate(week = as.numeric(week)) %>%
-  left_join(upstream_date_range) %>%
-  mutate(fake_date = case_when(week %in% c(40:53) ~ ymd("1999-01-01") + weeks(week - 1),
-                               T ~ ymd("2000-01-01") + weeks(week - 1)))
-
-updstream_plot_data <- upstream_weekly %>%
-      filter(number_days_sampled > 0) %>%
-      mutate(wy = ifelse(week >= 37, year + 1, year)) %>%
-      group_by(week, wy, date_range, fake_date) %>%
-      summarize(streams = paste(unique(stream), collapse = ", "),
-                n_streams = length(unique(stream))) %>%
-      ungroup() %>%
-      mutate(week = factor(week, levels = c(37:53, 1:36)),
-             wy = factor(wy))
-year_labels <- c(1995, 2000, 2005, 2010, 2015, 2020)
-
-upstream_heat_map <- ggplot(updstream_plot_data, 
-                   aes(x = fake_date, y = wy, fill = n_streams, text = paste0(date_range, "<br>", streams))) +
-  geom_tile() +
-  #scale_y_continuous(n.breaks = 5, breaks = waiver()) +
-  scale_y_discrete(breaks = year_labels) +
-  scale_x_date(date_labels = "%b", breaks = "2 months") +
-  theme_minimal() + 
-  ylab('water year') +
-  xlab("") + 
-  #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
-  labs(fill = "Number of streams")
-plotly::ggplotly(upstream_heat_map) 
-# upstream_heat_map
-```
-
-### Survey Data
-
-The below heat map shows Battle Creek redd survey coverage. It shows decent coverage of redd surveys across reaches and years with some gaps in early years and more gaps post 2015. We excluded years where less than 50% of reaches were sampled. 
-
-```{r, echo = FALSE}
-# REDD 
-# redd - battle creek example 
-standard_redd <- SRJPEdata::redd
-redd_by_reach <- standard_redd |> 
-  filter(stream == "battle creek") |> 
-  mutate(reach = case_when(reach %in% c("1", "R1A", "R1B", "R12") ~ "R1",
-                            reach == "2" ~ "R2",
-                            reach == "3" ~ "R3", 
-                            reach == "4" ~ "R4",
-                            reach == "5" ~ "R5",
-                            T ~ reach)) |> 
-  select(date, stream, reach) %>% 
-  distinct() %>% 
-  mutate(week = week(date),
-         year = year(date)) %>%
-  group_by(stream, reach, year) %>%
-  tally() 
-
-redd_heat_map <- ggplot(redd_by_reach, aes(x = reach, y = year, fill = n)) +
-  geom_tile() +
-  theme_minimal() + 
-  ylab('water year') +
-  xlab("") +
-  #scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
-  labs(fill = "Number of visits")
-
-plotly::ggplotly(redd_heat_map) 
-# redd_heat_map
-```
+We used these rules as preliminary way to identify potentially incomplete years and then conducted outreach to stream teams to review our list and highlight any other years that should be excluded or not.
 
 ### Years to exclude
 
@@ -449,52 +290,12 @@ In order to apply the years to exclude information to the modeling datasets we d
 The table below shows a section of this table:
 
 ```{r, echo = FALSE}
-passage_include <- SRJPEdata::upstream_passage_estimates |> 
-  distinct(stream, year) |> 
-  full_join(years_to_exclude_adult|> 
-              filter(data_type == "upstream passage") |> 
-              select(year, stream) |> 
-              mutate(exclude = T)) |> 
-  filter(is.na(exclude)) |> 
-  select(-exclude) |> 
-  mutate(data_type = "upstream passage")
+# years to exclude already applied to pull_adult_data.R
+years_to_include_adult <- SRJPEdata::annual_adult |> 
+  mutate(data_type = case_when(data_type == "upstream_estimate" ~ "upstream passage",
+                               data_type == "carcass_estimate" ~ "carcass",
+                               T ~ data_type))
 
-carcass_include <- SRJPEdata::carcass_estimates |> 
-  distinct(stream, year) |> 
-  full_join(years_to_exclude_adult|> 
-              filter(data_type == "carcass") |> 
-              select(year, stream) |> 
-              mutate(exclude = T)) |> 
-  filter(is.na(exclude)) |> 
-  select(-exclude) |> 
-  mutate(data_type = "carcass")
-
-redd_include <- SRJPEdata::redd |> 
-  mutate(year = year(date)) |> 
-  distinct(stream, year) |> 
-  full_join(years_to_exclude_adult|> 
-              filter(data_type == "redd") |> 
-              select(year, stream) |> 
-              mutate(exclude = T)) |> 
-  filter(is.na(exclude)) |> 
-  select(-exclude) |> 
-  mutate(data_type = "redd")
-
-holding_include <- SRJPEdata::holding |> 
-  mutate(year = year(date)) |> 
-  distinct(stream, year) |> 
-  full_join(years_to_exclude_adult|> 
-              filter(data_type == "holding") |> 
-              select(year, stream) |> 
-              mutate(exclude = T)) |> 
-  filter(is.na(exclude)) |> 
-  select(-exclude) |> 
-  mutate(data_type = "holding")
-
-years_to_include_adult <- bind_rows(passage_include,
-                                    carcass_include,
-                                    redd_include,
-                                    holding_include)
 knitr::kable(head(years_to_include_adult, 10))
 
 usethis::use_data(years_to_include_adult, overwrite = TRUE)

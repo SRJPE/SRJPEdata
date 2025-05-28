@@ -10,6 +10,7 @@ vignette: >
 ```{r, include = FALSE}
 library(tidyverse)
 library(lubridate)
+library(hms)
 knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE,
@@ -47,17 +48,24 @@ We explored three primary methods to calculate hours fished. Methods were chosen
 2) Use RPMs start, RPMs end, and total revolutions (Method 2 was used as a comparison method but was ultimately not picked as the final method)
 3) Use start time only 
 
+Over time locations have required different methods based on what information is available. For example, historically it was more common that a location might only have one date. However, currently all locations collect both a start and stop datetime. We have therefore adapted method 1 to use in all cases noting that historically when a start or stop date is missing we would apply method 3 and use the last stop time for a missing start date or the next start time for a missing stop date.
+
 Below is the code for each of the methods described above: 
 
-1) If the start and stop date/time of the sampling period are available, simply subtract the difference in time.
+1) If the start and stop date/time of the sampling period are available, simply subtract the difference in time. There are some cases where start or stop might be missing. In those cases, we use the last stop time for a missing start date or the next start time for a missing stop date.
 
 ```{r, helpers}
 # calculating hours fished when have start and stop datetime
 hours_fished <- function(dat){
   dat %>%
-    filter(!is.na(trap_stop_time), !is.na(trap_start_time)) %>%
-    mutate(start_datetime = ymd_hms(paste(trap_start_date, trap_start_time)),
-           stop_datetime = ymd_hms(paste(trap_stop_date, trap_stop_time)),
+    mutate(trap_start_time = as_hms(trap_start_date), # pull out hms from date
+           trap_stop_time = as_hms(trap_stop_date), # pull out hms from date
+           start_datetime = ymd_hms(paste(as_date(trap_start_date), trap_start_time)), # fills in 00:00:00 for those without time originally
+           stop_datetime = ymd_hms(paste(as_date(trap_stop_date), trap_stop_time)),  # fills in 00:00:00 for those without time originally
+           start_datetime = case_when(is.na(start_datetime) ~ lag(stop_datetime), 
+                                      T ~ start_datetime), # assigns next stop for missing start
+           stop_datetime = case_when(is.na(stop_datetime) ~ lead(start_datetime), 
+                                     T ~ stop_datetime), # assigns next start time for missing stop
            hours_fished = round(difftime(stop_datetime, start_datetime, units = "hours"), 2))
 }
 ```
@@ -105,22 +113,22 @@ in nonsensical hours fished. In these cases, we assume 24 hour sampling periods.
 
 ## Hours Fished {.tabset}
 
-## Method 1: Battle Creek, Clear Creek, Feather River, Knights Landing, Tisdale
-
-The above creeks have data available to calculate the hours fished. There are a few
-cases when start date is NA. For these we fill in the start date assuming
-it is the sample date of the previous record. Note that there are some records with 0 hours.
+We now process all locations together using a combination of method 1 and 3. 
+All locations currently have both a start and stop date though this was not the case
+historically. There are cases when start date or stop date is NA. 
+For these we fill in the start date assuming it is the sample date of the previous record. When
+the stop date is missing we assume it is the start date of the next record.
+Note that there are some records with 0 hours.
 These occur because trap visit data was entered when the trap was not in service and
-then a new trap visit entry was recorded once the trap started working again.
+then a new trap visit entry was recorded once the trap started working again. There
+are some erroneous values. These will be addressed at the end of the script by setting limits.
 
-```{r, battle, echo = FALSE}
-method_one_hours_fished <- filter(SRJPEdata::rst_trap, stream %in% 
-                                c("battle creek", "clear creek", 
-                                  "feather river", "sacramento river")) %>% 
+```{r, echo = FALSE}
+method_one_hours_fished <- SRJPEdata::rst_trap |>  
   select(trap_start_date, trap_start_time, trap_stop_date, trap_stop_time, 
-         stream, site, subsite, site_group) %>% 
-  arrange(site, subsite, trap_stop_date, trap_stop_time) %>% 
-  mutate(hours_fished_methodology = "using start time and stop time") %>% 
+         stream, site, subsite, site_group)  |>  
+  arrange(site, subsite, trap_stop_date, trap_stop_time) |>  
+  mutate(hours_fished_methodology = "using start time and stop time") |>  
   hours_fished()
 
 knitr::kable(head(method_one_hours_fished |> 
@@ -145,7 +153,7 @@ The histogram below shows data filtered to remove the outliers though there are 
 
 ```{r, echo = FALSE}
 method_one_hours_fished %>% 
-  filter(hours_fished < 1000 & hours_fished > -1000) |> 
+  filter(hours_fished < 200 & hours_fished > -200) |> 
   ggplot(aes(x = hours_fished, fill = stream)) +
   geom_histogram(position = "dodge") +
   theme_minimal() + 
@@ -155,36 +163,11 @@ method_one_hours_fished %>%
        title = "Hours Fished Calculated Using Method One")
 ```
 
-
-## Method 3: Butte Creek & Yuba River
-
-Hours fished are calculated by taking the difference between the date/time at each 
-observation. 
-
-```{r, butte, yuba, echo = FALSE}
-## Butte ####
-method_three_hours_fished <- filter(SRJPEdata::rst_trap, stream %in% c("butte creek", "yuba river")) %>%
-  distinct(trap_stop_date, trap_stop_time, site, subsite, site_group, stream) %>%
-  mutate(start_datetime = ymd_hms(paste(trap_stop_date, trap_stop_time))) %>%
-  mutate(hours_fished_methodology = "using only start time") %>% 
-  hours_fished_one_date() %>% 
-  mutate(end_datetime = case_when(trap_stop_date == "2007-05-03" ~ ymd_hms("2007-05-04 08:00:00"),
-                                  trap_stop_date == "2008-04-23" ~ ymd_hms("2008-04-24 07:15:00"),
-                                  trap_stop_date == "2015-06-03" ~ ymd_hms("2015-06-04 08:00:00"),
-                                  T ~ end_datetime),
-         hours_fished = round(difftime(end_datetime, start_datetime, units = "hours"), 2),
-         hours_fished = ifelse(hours_fished < 0, 24, hours_fished))
-# tried treating post 2015 differnt since it is cAMP data and has start and end dates but caused a lot of huge outliers
-knitr::kable(head(method_three_hours_fished |> 
-                    select(start_datetime, end_datetime, site, subsite, stream, hours_fished_methodology, hours_fished), 5))
-```
-
-### QC
-
 The dot plot below shows hours fished for each stream by date. Here we see several distinct bands of dots in  24 hour increments, indicating that the trap is most often checked every day but that there are some instances where it is checked every other or every few days. 
 
 ```{r, echo = FALSE}
-method_three_hours_fished %>% 
+method_one_hours_fished %>% 
+  filter(hours_fished < 200 & hours_fished > -200) |> 
   ggplot(aes(x = trap_stop_time, y = hours_fished, color = stream)) +
   geom_point() + 
   theme_minimal() + 
@@ -195,69 +178,19 @@ method_three_hours_fished %>%
 # decided to set as 5 days - 120 hours
 ```
 
-Anything greater than 5 days of trap operation was considered a mistake and set at 24 hours instead. The histogram below shows data filtered to remove the outliers though we still see some inconsistencies with hours fished below or equal to 0. 
-
-```{r, echo = FALSE}
-method_three_hours_fished %>% 
-  filter(hours_fished < 200) %>% 
-  ggplot(aes(x = hours_fished, fill = stream)) +
-  geom_histogram(position = "dodge") + 
-  theme_minimal() + 
-  scale_fill_manual(values = colors_small) +
-    labs(x = "Hours Fished", 
-       y = "", 
-       title = "Hours Fished Calculated Using Method Three")
-# these are typos and will be fixed by assuming 24 hours fished
-# butte_hours_fished %>% 
-#   filter(hours_fished > 5000) %>% tally()
-```
-
-## Mill Creek & Deer Creek
-
-Mill & Deer creeks do not have data available (no time variable) to calculate hours fished.
-Mill & Deer creeks also do not have sample period revolutions so we cannot use trap revolutions 
-fished. We therefore assume 24 hours fished for every day with data. 
-
-```{r, deer & mill, echo = FALSE}
-## Deer & mill #####
-deer_mill_hours_fished <- filter(SRJPEdata::rst_trap, stream %in% c("deer creek", "mill creek")) %>% 
-  distinct(trap_stop_date, stream, site, subsite, site_group) %>% 
-  mutate(hours_fished_methodology = "24 hour assumption") %>% 
-  mutate(hours_fished = 24)
-
-knitr::kable(head(deer_mill_hours_fished, 5))
-```
-
-
 # Combine Data
 
-We combined all methods to create one table with daily hours fished for each trap. We added rows with 0 effort for days that where there is no trapping data. 
+We added rows with 0 effort for days that where there is no trapping data and applied rulesets to ensure erroneous data are not included.
 
 ```{r, echo = FALSE}
 # all wee need is stop_date, hours_fished, stream, site
 # do not sum by subsites. this can be done in further analysis
-
-method_one <- method_one_hours_fished %>% 
+hours_fished_combined <- method_one_hours_fished %>% 
   select(stream, site, subsite, site_group, trap_stop_date, trap_stop_time, hours_fished) %>% 
   mutate(hours_fished = as.numeric(hours_fished),
          hours_fished = case_when(hours_fished > 500 ~ 24,
                                   hours_fished < 0 ~ 24, 
-                                  T ~ hours_fished))
-
-method_three <- method_three_hours_fished %>% 
-  select(stream, site, subsite, site_group, trap_stop_date, trap_stop_time, hours_fished) %>% 
-  mutate(hours_fished = as.numeric(hours_fished),
-         hours_fished = case_when(hours_fished > 120 ~  24,
-                                  hours_fished < 0 ~ 24, 
-                                  T ~ hours_fished))
-
-mill_and_deer <- deer_mill_hours_fished %>% 
-  select(stream, site, subsite, site_group, trap_stop_date, hours_fished) %>% 
-  mutate(hours_fished = as.numeric(hours_fished))
-
-hours_fished_combined <- bind_rows(method_one,
-                                   method_three,
-                                   mill_and_deer) %>% 
+                                  T ~ hours_fished)) %>% 
   # if hours fished NA assumed 24 hours
   mutate(hours_fished = ifelse(is.na(hours_fished), 24, hours_fished)) %>% 
   rename(date = trap_stop_date) %>% 
@@ -266,6 +199,18 @@ hours_fished_combined <- bind_rows(method_one,
   summarise(hours_fished = sum(hours_fished)) |> 
   padr::pad(interval = "day", group = c("stream", "site", "subsite", "site_group")) |> # pad to create days when there are gaps 
   mutate(hours_fished = ifelse(is.na(hours_fished), 0, hours_fished)) # fill these gaps with 0 effort 
+```
+
+```{r}
+hours_fished_combined %>% 
+  filter(stream == "butte creek") |> 
+  ggplot(aes(x = date, y = hours_fished)) +
+  geom_line() + 
+  facet_wrap(~subsite, scales = "free")+ 
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+      labs(x = "Week", y = "Hours Fished", 
+       title = "Hours Fished All Methods")
 ```
 
 ## Summarized by week
@@ -305,19 +250,81 @@ usethis::use_data(weekly_hours_fished, overwrite = TRUE)
 
 ### QC
 
-The following plots provide visuals to show weekly hours fished for all tributaries. Note that this is for all years of data so there are multiple datapoints for a given week due to multiple years being represented.
+The following plots provide visuals to show weekly hours fished for a few select stream and calendar year. 
+Note that for the combined plots this is for all years of data so there are multiple datapoints for a given week due to multiple years being represented and multiple subsites.
 
 ```{r, echo = FALSE}
 weekly_hours_fished %>% 
-  ggplot(aes(x = week, y = hours_fished, color = factor(site))) +
+  filter(stream == "battle creek", year == 2022) |> 
+  ggplot(aes(x = week, y = hours_fished, color = factor(subsite))) +
   geom_point() + 
-  facet_wrap(~stream, scales = "free")+ 
+  facet_wrap(~year, scales = "free")+ 
   scale_color_manual(values = colors_full) +
   theme_minimal() +
       labs(x = "Week", y = "Hours Fished", 
-       title = "Hours Fished All Methods")
+           color = "",
+       title = "Battle Creek Hours Fished")
 
+weekly_hours_fished %>% 
+  filter(stream == "butte creek", year == 2022) |> 
+  ggplot(aes(x = week, y = hours_fished, color = factor(subsite))) +
+  geom_point() + 
+  facet_wrap(~year, scales = "free")+ 
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+      labs(x = "Week", y = "Hours Fished", 
+           color = "",
+       title = "Butte Creek Hours Fished")
 
+weekly_hours_fished %>% 
+  filter(stream == "deer creek", year == 2023) |> 
+  ggplot(aes(x = week, y = hours_fished, color = factor(subsite))) +
+  geom_point() + 
+  facet_wrap(~year, scales = "free")+ 
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+      labs(x = "Week", y = "Hours Fished", 
+           color = "",
+       title = "Deer Creek Hours Fished")
+
+weekly_hours_fished %>% 
+  filter(stream == "feather river", year == 2022) |> 
+  ggplot(aes(x = week, y = hours_fished, color = factor(subsite))) +
+  geom_point() + 
+  facet_wrap(~year, scales = "free")+ 
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+      labs(x = "Week", y = "Hours Fished", 
+           color = "",
+       title = "Feather River Hours Fished")
+
+weekly_hours_fished %>% 
+  filter(stream == "yuba river", year == 2023) |> 
+  ggplot(aes(x = week, y = hours_fished, color = factor(subsite))) +
+  geom_point() + 
+  facet_wrap(~year, scales = "free")+ 
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+      labs(x = "Week", y = "Hours Fished", 
+           color = "",
+       title = "Yuba River Hours Fished")
+
+weekly_hours_fished %>% 
+  filter(stream == "sacramento river", year == 2022) |> 
+  ggplot(aes(x = week, y = hours_fished, color = factor(subsite))) +
+  geom_point() + 
+  facet_wrap(~year, scales = "free")+ 
+  scale_color_manual(values = colors_full) +
+  theme_minimal() +
+      labs(x = "Week", y = "Hours Fished", 
+           color = "",
+       title = "Sacramento River Hours Fished")
+
+```
+
+The following plot shows all years
+
+```{r, echo = F, message = F, warning=F}
 weekly_hours_fished %>% 
   ggplot(aes(x = hours_fished, fill = site)) +
   geom_histogram(alpha = .75, position = 'dodge') +

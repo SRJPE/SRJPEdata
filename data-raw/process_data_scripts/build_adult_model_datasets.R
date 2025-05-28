@@ -3,26 +3,26 @@ library(tidyverse)
 
 # upstream passage and estimates -----------------------------------------------
 # upstream passage - use these data for passage timing calculations
-upstream_passage <- SRJPEdata::upstream_passage |> 
-  filter(!is.na(date)) |>
-  mutate(stream = tolower(stream),
-         year = year(date)) |>
-  filter(run %in% c("spring", NA, "not recorded")) |>
-  group_by(year, direction, stream) |>
-  summarise(count = sum(count, na.rm = T)) |>
-  ungroup() |>
-  pivot_wider(names_from = direction, values_from = count) |>
-  # calculate upstream passage for streams where passage direction is recorded
-  mutate(down = ifelse(is.na(down), 0, down),
-         up = case_when(stream %in% c("deer creek", "mill creek") ~ NA,
-                        !stream %in% c("deer creek", "mill creek") & is.na(up) ~ 0,
-                        TRUE ~ up)) |> 
-  select(-`not recorded`) |>
-  group_by(year, stream) |>
-  summarise(count = round(up - down), 0) |>
-  select(year, count, stream) |>
-  ungroup() |>
-  glimpse()
+# upstream_passage <- SRJPEdata::upstream_passage |> 
+#   filter(!is.na(date)) |>
+#   mutate(stream = tolower(stream),
+#          year = year(date)) |>
+#   filter(run %in% c("spring", NA, "not recorded")) |>
+#   group_by(year, direction, stream) |>
+#   summarise(count = sum(count, na.rm = T)) |>
+#   ungroup() |>
+#   pivot_wider(names_from = direction, values_from = count) |>
+#   # calculate upstream passage for streams where passage direction is recorded
+#   mutate(down = ifelse(is.na(down), 0, down),
+#          up = case_when(stream %in% c("deer creek", "mill creek") ~ NA,
+#                         !stream %in% c("deer creek", "mill creek") & is.na(up) ~ 0,
+#                         TRUE ~ up)) |> 
+#   select(-`not recorded`) |>
+#   group_by(year, stream) |>
+#   summarise(count = round(up - down), 0) |>
+#   select(year, count, stream) |>
+#   ungroup() |>
+#   glimpse()
 # TODO think if we want to retain the adipose_clip and run info 
 
 # pull in passage estimates and use these for upstream_count
@@ -113,44 +113,6 @@ observed_adult_input <- full_join(upstream_passage_estimates |>
                values_to = "count",
                names_to = "data_type") |>
   filter(!is.na(count)) |>
-  # TODO when this gets updated in database we need to remove
-  add_row(year = 2022,
-          stream = "clear creek",
-          data_type = "redd_count",
-          count = 6) |> 
-  add_row(year = 2023,
-          stream = "clear creek",
-          data_type = "redd_count",
-          count = 0) |> 
-  add_row(year = 2022,
-          stream = "clear creek",
-          data_type = "upstream_estimate",
-          count = 195) |> 
-  add_row(year = 2023,
-          stream = "clear creek",
-          data_type = "upstream_estimate",
-          count = 0) |> 
-  # source of below data is e-mail chain from ashley / sam provins / gabby week of 1/14/2025
-  add_row(year = 2022,
-          stream = "battle creek",
-          data_type = "upstream_estimate",
-          count = 152) |> 
-  add_row(year = 2023,
-          stream = "battle creek",
-          data_type = "upstream_estimate",
-          count = 7) |> # one of these was a feather river spring run
-  add_row(year = 2024,
-          stream = "battle creek",
-          data_type = "upstream_estimate",
-          count = 30) |> 
-  add_row(year = 2024,
-          stream = "clear creek",
-          data_type = "upstream_estimate",
-          count = 6) |> 
-  add_row(year = 2024,
-          stream = "clear creek",
-          data_type = "redd_count",
-          count = 4) |> 
   arrange(stream, year) |>
   left_join(exclude_adult) |> 
   filter(is.na(reason_for_exclusion)) |> 
