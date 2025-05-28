@@ -604,7 +604,7 @@ counts and data table for review.
 ```{r, include = F}
 
 adult_plot <- function(stream_select) {
-SRJPEdata::observed_adult_input |> 
+SRJPEdata::annual_adult |> 
   filter(stream == stream_select) |> 
     ggplot(aes(x = year, y = count, color = data_type)) +
     geom_line() +

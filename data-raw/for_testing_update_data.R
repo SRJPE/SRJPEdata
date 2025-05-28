@@ -19,12 +19,12 @@ knitr::knit("vignettes/sr_covariates.Rmd")
 knitr::knit("vignettes/forecast_covariates.Rmd")
 # rebuild site to save updated data objects in package
 devtools::load_all()
-
+detach(package:data.table)
 # Source prep data scripts 
 # source("data-raw/process_data_scripts/build_adult_model_datasets.R") 
 source("data-raw/process_data_scripts/build_rst_model_datasets.R")
 source("data-raw/process_data_scripts/build_sr_model_datasets.R")
 
 devtools::document()
-pkgdown::build_site()
+#pkgdown::build_site()
 devtools::test() 
