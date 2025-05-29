@@ -226,32 +226,24 @@ data_from_ryan <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.cs
 #   glimpse()
 
 # Feather
-# For the short term we decided to pull in Feather River redd data
-# and filter to September 1 and October 15 to identify spring run
-# Casey said this actually wasn't the best way and recommended using number tagged minus number returning to hatchery minus over summer morts
+# Data provided by Casey Campos
+# To get spring run in river spawning number we would take "broodstock tagged" minus "broodstock returning to the hatchery" minus"over summer mortality"
+# The more I thought about it I realized that those redd survey data are not going to be the best to use because the effort has been inconsistent. We now have the drone-based redd surveys that will have a similar effort every year and could be used in conjunction with the weir counts, but turning the images into redd counts is a bottleneck.
+# For incorporating the historic data, my initial thought is to use the number of fish we tag for broodstock at the Hatchery in the spring minus the number that return in the fall as an indicator of the in-river spring-run population size. We know we that it will always be an underestimate because not all the spring-run go to the Hatchery in the spring.
+# Prior to year 1 of the weir, we were unsure how much of the run were making it to the Hatchery and being tagged. What we saw year 1, was a large percentage of the fish passing the weir did go into the hatchery (see table below).
+# Th table shows the number of spring-run tagged for broodstock, number returning to the Hatchery in the fall, the number of over summer mortalities during the same period, and includes the corrected count at the weir for 2024.
 
-# identifier = "1802"
-# revision = list_data_package_revisions(scope, identifier, filter = "newest")
-# package_id <- paste(scope, identifier, revision, sep = ".")
-# 
-# # List data entities of the data package
-# res <- read_data_entity_names(package_id)
-# 
-# # Download the daily corrected passage
-# name <- "redd_observation_w_zeros.csv"
-# entity_id <- res$entityId[res$entityName == name]
-# raw <- read_data_entity(package_id, entity_id)
-# data <- read_csv(file = raw)
-# 
-# feather_redd <- data |> 
-#   mutate(year = year(date),
-#          fake_date_filter = as_date((paste0("2000-",month(date), "-", day(date))))) |> 
-#   filter(fake_date_filter >= "2000-09-01" & fake_date_filter <= "2000-10-15") |> 
-#   group_by(year) |> 
-#   summarize(count = sum(number_redds)) |> 
-#   mutate(stream = "feather river",
-#          data_type = "redd")
+feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_052925.csv"))
 
+feather_spring_spawner <- feather_adult_raw |> 
+  rename(broodstock_tagged = `broodstock tagged `,
+         broodstock_returns = `broodstock returning to the Hatchery`,
+         over_summer_mortality = `Over summer Mortality`,
+         fms_corrected_count = `FMS corrected count`) |> 
+  mutate(count = broodstock_tagged - broodstock_returns - over_summer_mortality,
+         stream = "feather river",
+         data_type = "broodstock_tag") |> 
+  select(year, stream, count, data_type)
 
 # Yuba
 # Upstream passage data
@@ -294,7 +286,7 @@ annual_adult_raw <- bind_rows(battle_redd,
                           butte_carcass,
                           butte_holding,
                           data_from_ryan,
-                          #feather_redd,
+                          feather_spring_spawner,
                           yuba_spring_passage_estimates)
 
 # Apply years to exclude
