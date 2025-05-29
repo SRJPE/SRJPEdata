@@ -61,7 +61,10 @@ holding_months <- 5:8
 
 # read in temperature data pull (database-tables does not have the mean column)
 standard_temperature <- SRJPEdata::environmental_data |> 
-  filter(parameter == "temperature")
+  filter(parameter == "temperature") |> 
+  mutate(newyears = ymd(paste0(year,"-01-01")),
+         date = newyears + weeks(week),
+         month = month(date))
 
 # calculate sum of days above the thresholds
 gdd_sac <- standard_temperature |> 
@@ -112,7 +115,11 @@ Maximum flow more effectively captures the high flow events that support migrati
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 migratory_and_holding_months <- 3:8
 
-flow <- SRJPEdata::environmental_data |> filter(parameter == "flow")
+flow <- SRJPEdata::environmental_data |> 
+  filter(parameter == "flow") |> 
+  mutate(newyears = ymd(paste0(year,"-01-01")),
+         date = newyears + weeks(week),
+         month = month(date))
 
 flow_metrics <- flow |> 
   filter(month %in% migratory_and_holding_months) |>
@@ -158,63 +165,6 @@ knitr::kable(water_year_data |> filter(!is.na(water_year_type)) |>
 
 ```
 
-### Passage Timing
-
-Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power. Passage timing was summarized as the mean, median, and min day of passage. The resulting dataset is as follows:
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# pull raw upstream counts because they still contain date
-upstream_passage_timing <- SRJPEdata::upstream_passage  |> 
-  filter(!is.na(date),
-         run %in% c("spring","not recorded"),
-         direction %in% c(NA, "up")) |>
-  mutate(stream = tolower(stream),
-         year = year(date),
-         week = week(date)) |>
-  group_by(year, stream) |>
-  summarise(median_passage_timing = median(week, na.rm = T),
-            mean_passage_timing = mean(week, na.rm = T),
-            min_passage_timing = min(week, na.rm = T)) |>
-  ungroup() 
-
-knitr::kable(head(upstream_passage_timing, 10))
-```
-
-The following plot is of median passage over time for all tributaries:
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-upstream_passage_timing |> 
-  ggplot(aes(x = year, y = median_passage_timing)) + 
-  geom_line(color = "#899DA4") +
-  facet_wrap(~stream, scales = "free_y") + 
-  labs(x = "",
-       y = "Median Passage Timing",
-       title = "Median Passage Timing By Stream") +
-  theme_minimal()
-```
-
-### Total Passage as Index
-
-We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality. 
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# pull in passage estimates and use these for upstream_count
-upstream_passage_index <- SRJPEdata::upstream_passage_estimates |> 
-  mutate(passage_index = passage_estimate) |>
-  select(year, stream, passage_index)
-
-knitr::kable(head(upstream_passage_index, 10))
-
-upstream_passage_index |> 
-  ggplot(aes(x = year, y = passage_index)) + 
-  geom_line(color = "#899DA4") +
-  facet_wrap(~stream, scales = "free_y") + 
-  labs(x = "",
-       y = "Passage Index",
-       title = "Passage Index By Stream") +
-  theme_minimal()
-```
-
 ### Combine and Save Covariate Data 
 
 Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as `1` for wet (wet, above normal) and `0` for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):
@@ -223,24 +173,18 @@ Both continuous environmental variables (flow and temperature) were standardized
 p2s_model_covariates_standard <- full_join(flow_metrics,
                                              gdd,
                                              by = c("year", "stream")) |>
-  full_join(upstream_passage_timing,
-            by = c("year", "stream")) |>
   full_join(water_year_data,
             by = c("year" = "WY")) |>
-  full_join(upstream_passage_index,
-            by = c("year", "stream")) |>
   filter(!is.na(stream),
          stream != "sacramento river") |>
-  select(-c(mean_flow, mean_passage_timing, min_passage_timing,
+  select(-c(mean_flow,
             gdd_trib, gdd_sac)) |>
   group_by(stream) |> 
   mutate(wy_type = ifelse(water_year_type == "dry", 0, 1),
          max_flow_std = as.vector(scale(max_flow)),
-         gdd_std = as.vector(scale(gdd_total)),
-         passage_index = as.vector(scale(passage_index)),
-         median_passage_timing_std = as.vector(scale(median_passage_timing))) |>
+         gdd_std = as.vector(scale(gdd_total))) |>
   ungroup() |> 
-  select(year, stream, wy_type, max_flow_std, gdd_std, passage_index, median_passage_timing_std) |>
+  select(year, stream, wy_type, max_flow_std, gdd_std) |>
   arrange(stream, year)
 
 knitr::kable(head(p2s_model_covariates_standard, 10))
@@ -250,7 +194,7 @@ The following plot is of standardized covariates (covariates are colored by type
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 p2s_model_covariates_standard |> 
-  pivot_longer(max_flow_std:median_passage_timing_std, names_to = "variable", values_to = "standardized_value") |> 
+  pivot_longer(max_flow_std:gdd_std, names_to = "variable", values_to = "standardized_value") |> 
   ggplot(aes(x = year, y = standardized_value, color = variable)) + 
   geom_line() +
   scale_color_manual(values = colors_small) +

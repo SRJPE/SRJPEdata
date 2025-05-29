@@ -44,20 +44,17 @@ Butte Creek is used to build the regression models because the time series is co
 5. Visualize the predicted and actual temperature over time to asses model performance trends
 
 ```{r, include = F}
-butte <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "2000-01-01")
+butte <- dataRetrieval::readNWISdv(11390000, "00010", statCd = c("00001","00002"), startDate = "1994-01-01")
 butte_format <- butte |> 
-    mutate(date = as_date(datetime),
-           temp_degC = fahrenheit.to.celsius(parameter_value, round = 1)) |>
-    filter(temp_degC < 40, temp_degC > 0.5) |>
-    group_by(date) |> 
-    summarise(mean = mean(temp_degC, na.rm = TRUE),
-              max = max(temp_degC, na.rm = TRUE),
-              min = min(temp_degC, na.rm = TRUE)) |> 
-    pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-    mutate(stream = "butte creek",
-           gage_agency = "CDEC",
-           gage_number = "BCK",
-           parameter = "temperature")
+  select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
+  as_tibble() %>% 
+  mutate(mean = (max + min) /2) |> 
+  pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
+  rename(date = Date) %>% 
+  mutate(stream = "butte creek",
+         gage_agency = "USGS",
+         gage_number = "11390000",
+         parameter = "temperature")
 
 ```
 

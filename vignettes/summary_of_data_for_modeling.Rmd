@@ -80,51 +80,15 @@ rst_plot_data <- SRJPEdata::rst_catch |>
   select(year, month, stream, site, subsite, site_group, monthly_catch_exists, sampling_exists, sampling_type) |> 
   mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) 
 
-adult_carcass_plot_data <- SRJPEdata::carcass_estimates |> 
-  mutate(sampling_type = "carcass estimate",
+adult_plot_data <- SRJPEdata::annual_adult |> 
+  mutate(sampling_type = data_type,
          sampling_exists = 100) |> 
   select(year, stream, sampling_type, sampling_exists) |> 
   mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) 
-
-upstream_passage_plot_data <- SRJPEdata::upstream_passage_estimates |> 
-  mutate(sampling_type = "upstream passage estimate",
-         sampling_exists = 100) |> 
-  select(year, stream, sampling_type, sampling_exists) |> 
-  mutate(date = as.Date(paste0(year, "-", 11, "-01"), format = "%Y-%m-%d")) 
-
-# TODO figure out where redd data is for clear 
-# note that ashley identified the issue in the data prep for the db and fixed it. assigned inigo to update db
-# follow up on this first week of June
-redd_plot_data <- SRJPEdata::redd |> 
-  mutate(week = week(date),
-         year = year(date),
-         month = month(date)) |> 
-  group_by(year, month, stream) |> 
-  summarize(sampling_type = "redd",
-            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
-  ungroup() |> 
-  select(year, month, stream, sampling_exists, sampling_type) |> 
-  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
-  distinct()
-
-holding_plot_data <- SRJPEdata::holding |> 
-  mutate(week = week(date),
-         year = year(date),
-         month = month(date)) |> 
-  group_by(year, month, stream) |> 
-  summarize(sampling_type = "holding",
-            sampling_exists = ifelse(stream %in% c("mill creek", "deer creek"), 100, length(unique(date))/30 * 100)) |> 
-    ungroup() |> 
-  select(year, month, stream, sampling_exists, sampling_type) |> 
-  mutate(date = as.Date(paste0(year, "-", month, "-01"), format = "%Y-%m-%d")) |> 
-  distinct()
 
 # Combine 
 plot_data <- bind_rows(rst_plot_data, 
-                       adult_carcass_plot_data, 
-                       redd_plot_data,
-                       holding_plot_data,
-                       upstream_passage_plot_data) |> 
+                       adult_plot_data) |> 
   filter(stream != "sacramento river") |> 
   distinct() 
 
@@ -217,52 +181,15 @@ rst_years_plot
 **Adult dataset filtered to exclude incomplete years**
 
 ```{r, echo = FALSE}
-# Load exclusion data for adults
-adult_years_to_exclude <- SRJPEdata::years_to_exclude_adult |>  
-  mutate(exclude = TRUE) |> 
-  rename(sampling_type = data_type)
-
-# Apply to each adult dataset
-adult_carcass_plot_data_excluded <- adult_carcass_plot_data |>  
-  left_join(adult_years_to_exclude)
-
-redd_plot_data_excluded <- redd_plot_data |>  
-  left_join(adult_years_to_exclude)
-
-holding_plot_data_excluded <- holding_plot_data |>  
-  left_join(adult_years_to_exclude)
-
-upstream_passage_plot_data_excluded <- upstream_passage_plot_data |>  
-  left_join(adult_years_to_exclude)
-
-# Combine adult data
-adult_plot_data <- bind_rows(
-  adult_carcass_plot_data_excluded,
-  redd_plot_data_excluded,
-  holding_plot_data_excluded,
-  upstream_passage_plot_data_excluded
-) |> 
-  filter(stream != "sacramento river") |> 
-  distinct(stream, year, exclude) |> 
-  mutate(exclude = ifelse(is.na(exclude), FALSE, exclude))
-
 # Set your custom colors
 included_color <- "#9A8822"
 excluded_color <- "gray"
 
 # Create plot
 adult_years_plot <- ggplot(adult_plot_data, aes(x = year, y = stream)) +
-  
-  # Gray squares for excluded adult years
-  geom_point(
-    data = adult_plot_data |> filter(exclude),
-    aes(x = year, y = stream),
-    shape = 15, color = excluded_color, size = 6
-  ) +
-  
   # Green squares for included adult years
   geom_point(
-    data = adult_plot_data |> filter(!exclude),
+    data = adult_plot_data,
     aes(x = year, y = stream),
     shape = 15, color = included_color, size = 6
   ) +
@@ -355,34 +282,13 @@ In order to utilize data for the stock recruit models, we need both juvenile dat
 rst_years_to_exclude <- SRJPEdata::years_to_exclude_rst_data |> 
   mutate(exclude = TRUE)
 
-adult_years_to_exclude <- SRJPEdata::years_to_exclude_adult |> 
-  mutate(exclude = TRUE) |> 
-  rename(sampling_type = data_type)
-
 rst_plot_data <- rst_plot_data |> 
   left_join(rst_years_to_exclude |> 
               select(stream, site, year = run_year, exclude))  
 
-adult_carcass_plot_data <- adult_carcass_plot_data |> 
- left_join(adult_years_to_exclude) 
-
-
-upstream_passage_plot_data <- upstream_passage_plot_data |> 
-   left_join(adult_years_to_exclude) 
-
-#TODO where is clear creek redd data??
-redd_plot_data <- redd_plot_data |> 
-  left_join(adult_years_to_exclude) 
-
-holding_plot_data <- holding_plot_data |> 
-   left_join(adult_years_to_exclude) 
-
-# Combine 
+# Combine (adult years to exclude already excluded in pull_adult_data.R)
 updated_plot_data <- bind_rows(rst_plot_data, 
-                       adult_carcass_plot_data, 
-                       redd_plot_data,
-                       holding_plot_data,
-                       upstream_passage_plot_data) |> 
+                       adult_plot_data) |> 
   filter(stream != "sacramento river") |> 
   distinct() |> 
   mutate(exclude = ifelse(is.na(exclude), FALSE, exclude))
@@ -398,10 +304,11 @@ updated_potential_jpe_window <- updated_plot_data |>
               values_from = sampling_exists,
               values_fill = NA_real_) |> 
   group_by(year, stream) |> 
-  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(`carcass estimate`)) ~ TRUE,
+  summarize(potential_SR_window = case_when(any(!is.na(rst)) && any(!is.na(carcass_estimate)) ~ TRUE,
                                             any(!is.na(rst)) && any(!is.na(redd)) ~ TRUE,
                                             any(!is.na(rst)) && any(!is.na(holding)) ~ TRUE,
-                                            any(!is.na(rst)) && any(!is.na(`upstream passage estimate`)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(upstream_estimate)) ~ TRUE,
+                                            any(!is.na(rst)) && any(!is.na(broodstock_tag)) ~ TRUE,
                                             T ~ FALSE)) |> 
   ungroup() 
 

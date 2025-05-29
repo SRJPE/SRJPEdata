@@ -56,34 +56,13 @@ battle_creek_daily_temp <- ubc_temp_raw |>
 
 ## Butte Creek ----
 ### Flow Data Pull 
-#### Gage Agency (CDEC, BCK)
+#### Gage Agency (USGS, BCK)
 
+# Grant Heneley at CDFW recommended using USGS instead of CDEC because CDEC will sometimes have weird datapoints
 # Pull data 
-
-### Flow Data Pull Tests
-# Data from CDEC only available starting 1997-03-14
-# We use USGS to pull data for 1995-1997, 1999
-butte_creek_data_query <- CDECRetrieve::cdec_query(station = "BCK", dur_code = "H", sensor_num = "20", start_date = "1998-01-01")
-
-butte_creek_daily_flows_cdec <- butte_creek_data_query |> 
-         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
-         group_by(date = as.Date(datetime)) |> 
-         summarise(mean = mean(parameter_value, na.rm = TRUE),
-                   max = max(parameter_value, na.rm = TRUE),
-                   min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "butte creek",
-                site_group = "butte creek",
-                gage_agency = "CDEC",
-                gage_number = "BCK",
-                parameter = "flow") |> 
-  filter(year(date) != 1999)
-
-# Historical data pull
-BCK_USGS <- readNWISdv(11390000, "00060")
-BCK_daily_flows <- BCK_USGS %>%
+butte_creek_data_query <- readNWISdv(11390000, "00060")
+butte_creek_daily_flows <- butte_creek_data_query %>%
   select(Date, flow_cfs =  X_00060_00003) %>%
-  filter(lubridate::year(Date) %in% c(1995, 1996, 1997, 1999)) %>%
   as_tibble() %>%
   rename(date = Date,
          value = flow_cfs) |>
@@ -91,30 +70,24 @@ BCK_daily_flows <- BCK_USGS %>%
          stream = "butte creek",
          site_group = "butte creek",
          gage_agency = "USGS",
-         gage_number = "BCK",
+         gage_number = "11390000",
          parameter = "flow",
          statistic = "mean") 
-butte_creek_daily_flows <- bind_rows(butte_creek_daily_flows_cdec, 
-                                     BCK_daily_flows)
+
 ### Temp Data Pull 
 #### Gage #BCK
 ### Temp Data Pull Tests 
-butte_creek_temp_query <- cdec_query(station = "BCK", dur_code = "H", sensor_num = "25", start_date = "1995-01-01")
-
+butte_creek_temp_query <- dataRetrieval::readNWISdv(11390000, "00010", statCd = c("00001","00002"), startDate = "1994-01-01")
 butte_creek_daily_temp <- butte_creek_temp_query |> 
-         mutate(date = as_date(datetime),
-                temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
-         filter(temp_degC < 40, temp_degC > 0) |>
-         group_by(date) |> 
-         summarise(mean = mean(temp_degC, na.rm = TRUE),
-                   max = max(temp_degC, na.rm = TRUE),
-                   min = min(temp_degC, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "butte creek",
-                site_group = "butte creek",
-                gage_agency = "CDEC",
-                gage_number = "BCK",
-                parameter = "temperature")
+  select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
+  as_tibble() %>% 
+  mutate(mean = (max + min) /2) |> 
+  pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
+  rename(date = Date) %>% 
+  mutate(stream = "butte creek",
+         gage_agency = "USGS",
+         gage_number = "11390000",
+         parameter = "temperature")
 
 ## Clear Creek ----
 ### Flow Data Pull 
@@ -221,27 +194,57 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
                 parameter = "temperature")
 
 ## Feather River ----
-### Flow Data Pull 
-#### Gage Agency (CDEC, GRL)
 
 #Pull data
-
-### Flow Data Pull Tests 
 # Feather High Flow Channel 
-feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1997-01-01")
+# Do not use GRL because unreliable
+# From Kassie 05/20/2025: I wanted to update you on the Feather flow data- specifically the gage at Gridley. It has been historically unreliable and we use the gage at Fish Barrier Dam (FRB) + Hatchery (ORF) + Thermalito Afterbay Outlet (which we get monthly via email). They have recalibrated it (not sure when) so I think moving forward we can use it but for historical flow data maybe we use our database. I’ve attached our flow database that Katie updates regularly. She also updates our temperature database from our Vemco receivers and we can provide that data as well just let me know.
+# feather_hfc_river_data_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "20", start_date = "1997-01-01")
+# 
+# feather_hfc_river_daily_flows <- feather_hfc_river_data_query |> 
+#          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+#          group_by(date = as.Date(datetime)) |> 
+#          summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
+#                    max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
+#                    min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
+#          pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+#          mutate(stream = "feather river", 
+#                 site_group = "upper feather hfc",
+#                 gage_agency = "CDEC",
+#                 gage_number = "GRL",
+#                 parameter = "flow")
 
-feather_hfc_river_daily_flows <- feather_hfc_river_data_query |> 
-         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
-         group_by(date = as.Date(datetime)) |> 
-         summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
-                   max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
-                   min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "feather river", 
-                site_group = "upper feather hfc",
-                gage_agency = "CDEC",
-                gage_number = "GRL",
-                parameter = "flow")
+
+# Kassie sent their flow database
+# I wanted to update you on the Feather flow data- specifically the gage at Gridley. It has been historically unreliable and we use the gage at Fish Barrier Dam (FRB) + Hatchery (ORF) + Thermalito Afterbay Outlet (which we get monthly via email). They have recalibrated it (not sure when) so I think moving forward we can use it but for historical flow data maybe we use our database. I’ve attached our flow database that Katie updates regularly. She also updates our temperature database from our Vemco receivers and we can provide that data as well just let me know.
+# library(googleCloudStorageR)
+library(Hmisc)
+# gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
+# gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
+# gcs_get_object(object_name = "environmental/data-raw/feather_Flows_4.9.25.accdb",
+#                bucket = gcs_get_global_bucket(),
+#                saveToDisk = "data-raw/TEMP_data/feather_flow_db.accdb",
+#                overwrite = TRUE)
+feather_flow_db <- here::here("data-raw", "TEMP_data", "feather_flow_db.accdb")
+mdb.get(feather_flow_db, tables = T)
+feather_flow_raw <- mdb.get(feather_flow_db, tables = "Flows Master")
+feather_gage_raw <- mdb.get(feather_flow_db, tables = "Gauge Locations")
+# Assume that Hatch.Oroville is FRB+ORF then need to add TAO
+detach(package:Hmisc)
+feather_flow <- feather_flow_raw |> 
+  group_by(Date) |> 
+  summarize(hatch_oroville = mean(Hatch.Oroville, na.rm = T),
+            TAO = mean(TAO, na.rm = T)) |> 
+  mutate(value = hatch_oroville+TAO) |> 
+  select(-c(hatch_oroville, TAO)) |> 
+  rename(date = Date) |> 
+  filter(date <= "2025-03-31") |> 
+  mutate(stream = "feather river", 
+         site_group = "upper feather hfc",
+         gage_agency = "DWR Feather",
+         gage_number = "FRB+ORF+TAO",
+         parameter = "flow",
+         statistic = "mean")
 
 
 ### Flow Data Pull Tests 
@@ -370,6 +373,7 @@ feather_hfc_river_daily_temp <- feather_hfc_temp_query |>
 #Pull data
 
 ### Flow Data Pull Tests 
+# MLM
 mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060", startDate = "1995-01-01")
 
 mill_creek_daily_flows <- mill_creek_data_query |> 
@@ -531,7 +535,7 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
 # Define the required object names
 required_objects <- c("battle_creek_data_query", "butte_creek_data_query", "butte_creek_temp_query",
                       "clear_creek_data_query", "deer_creek_data_query", "deer_creek_temp_query",
-                      "feather_hfc_river_data_query", "feather_lfc_river_data_query", "lower_feather_river_data_query",
+                      "feather_flow_raw", "feather_lfc_river_data_query", "lower_feather_river_data_query",
                       "feather_lfc_temp_query", "feather_hfc_temp_query", 
                       "mill_creek_data_query", "mill_creek_temp_query", 
                       "sac_river_data_query", "sac_river_temp_query",
@@ -550,7 +554,7 @@ library(data.table)
 # Combine all flow data from different streams
 # Created a site group variable so that the hfc and lfc will bind with the correct sites
 # so need to bind feather to the site lookup separately
-flow <- rbindlist(list(battle_creek_daily_flows,
+flow_daily <- rbindlist(list(battle_creek_daily_flows,
                   butte_creek_daily_flows, 
                   clear_creek_daily_flows,
                   deer_creek_daily_flows,
@@ -559,7 +563,7 @@ flow <- rbindlist(list(battle_creek_daily_flows,
                   sac_river_daily_flows |> mutate(site_group = "knights landing"),
                   rbdd_daily_flows,
                   yuba_river_daily_flows,
-                  feather_hfc_river_daily_flows,
+                  feather_flow, # data from DWR
                   feather_lfc_river_daily_flows,
                   feather_lfc2_river_daily_flows,
                   lower_feather_river_daily_flows), use.names = TRUE, fill = TRUE) |> 
@@ -595,10 +599,10 @@ temp <- rbindlist(list(battle_creek_daily_temp,
 #   geom_line() +
 #   facet_wrap(~stream)
 setDT(temp)
-setDT(flow)
+setDT(flow_daily)
 
 # Bind the rows of temp and flow with use.names=TRUE to match by column name
-combined_data <- rbindlist(list(temp, flow), use.names = TRUE, fill = TRUE) |> distinct()
+combined_data <- rbindlist(list(temp, flow_daily), use.names = TRUE, fill = TRUE) |> distinct()
 
 # Reshape the data to 'wider' format (like pivot_wider)
 reshaped_data <- dcast(combined_data, ... ~ statistic, value.var = "value")
@@ -608,8 +612,8 @@ updated_environmental_data <- reshaped_data[
   , .(max = max(max, na.rm = TRUE), 
       mean = mean(mean, na.rm = TRUE), 
       min = min(min, na.rm = TRUE)),
-  by = .(week = week(date), 
-         year = year(date), 
+  by = .(week = lubridate::week(date), 
+         year = lubridate::year(date), 
          stream, 
          gage_number, 
          gage_agency, 
