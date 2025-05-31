@@ -278,7 +278,9 @@
 
 #' @title Environmental Gage Data
 #' @name environmental_data
-#' @description Environmental gage data for each tributary in the SR JPE.
+#' @description Environmental gage data for each tributary in the SR JPE. 
+#' Data includes flow and temperature measurements from gages located on tributaries and the Sacramento River mainstem. 
+#' Data were compiled from CDEC and USGS sources and are summarized by week and statistic type.
 #' @format
 #' \itemize{
 #'   \item \code{year}: Year associated with environmental measure 
