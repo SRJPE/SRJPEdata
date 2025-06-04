@@ -149,18 +149,24 @@ above_13 <- sr_covariates |>
 
 #### Reservoir storage
 
-- **monthly reservoir storage**: Using reservoir storage data, calculate the monthly average storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec). This data contains monthly reservoir storage volumes (acre-feet) for Keswick Reservoir (KES), retrieved from the California Data Exchange Center (CDEC) operated by the California Department of Water Resources (DWR). The earliest data available is in 1965. Stream is NA because it applies to all streams and should not be joined on stream.
+- **monthly reservoir storage**: Using reservoir storage data, calculate the monthly average storage for Keswick Reservoir and Shasta Reservoir. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec). This data contains monthly reservoir storage volumes (acre-feet) for Keswick Reservoir (KES), retrieved from the California Data Exchange Center (CDEC) operated by the California Department of Water Resources (DWR) and Shasta Reservoir USGS (11370000). 
+
+For Keswick - the earliest data available is in 1965. Stream is NA because it applies to all streams and should not be joined on stream.
+
+For Shasta - the earliest data available is in _TODO_ Stream is NA because it applies to all streams and should not be joined on stream.
+
+**Keswick Reservoir (KES)**
 
 ```{r, include = F}
 # Pull monthly reservoir storage: https://cdec.water.ca.gov/dynamicapp/QueryMonthly?s=KES
+# KESWICK
+rs_keswick_monthly_raw <- cdec_query(station = "KES", sensor = "15", dur_code = "M", start_date = "1965-10-01")
 
-rs_monthly_raw <- cdec_query(station = "KES", sensor = "15", dur_code = "M", start_date = "1965-10-01")
-
-rs_monthly <- rs_monthly_raw |> 
+rs_keswick_monthly <- rs_keswick_monthly_raw |> 
   mutate(date = as.Date(datetime),
          year = year(date),
          value = parameter_value,
-         name = "rs_monthly",
+         name = "rs_keswick_monthly",
          water_year = NA,
          month = month(date),
          # jpe_year = if_else(month == 1, year - 1, year),
@@ -176,7 +182,52 @@ rs_monthly <- rs_monthly_raw |>
 Plot the last 10 years - note that data have been filtered to Dec-Mar for use in JPE forecasting
 
 ```{r, echo = F, message = F, warning = F}
-rs_monthly |> 
+rs_keswick_monthly |> 
+  filter(year >= 2015) |> 
+  mutate(year = as.factor(year)) |> 
+  ggplot(aes(x = month, y = value, color = year)) +
+  geom_point() +
+  scale_color_manual(values = colors_full) +
+  theme_bw()
+```
+
+**Shasta Reservoir (11370000)**
+
+```{r, include = F}
+# Pull monthly reservoir storage: https://waterdata.usgs.gov/monitoring-location/11370000/#dataTypeId=daily-00054-0&period=P10YKES
+
+# SHASTA 
+# TODO Query unsuccessful from website, using the USGS download data button throws an error so there may be something messed up internally 
+# UPDATE WHEN RESOLVED
+# siteNumber <- 11370000
+# storage_code <- "00054"
+# rs_shasta_monthly_raw <- dataRetrieval::readNWISdv(11370000, "00054", "1950-01-01", "2025-01-01")
+
+rs_shasta_monthly_raw <- readxl::read_excel("data-raw/helper-tables/20250214_ShastaStorage_2013-2023.xlsx")
+
+rs_shasta_monthly <- rs_shasta_monthly_raw |> 
+  mutate(date = as.Date(Date),
+         year = year(date),
+         value = Storage_AcreFeet,
+         name = "rs_shasta_monthly",
+         water_year = NA,
+         month = month(date),
+         # jpe_year = if_else(month == 1, year - 1, year),
+         # jpe_month = if_else(month == 1, 12L, month - 1L),
+         # jpe_date = make_date(year = jpe_year, month = jpe_month),
+         # jpe_date = if_else(month == 1, 12L, month - 1L), # if we only want the month
+         stream = NA) |> 
+  group_by(month, name, year, water_year, stream) |> 
+  summarise(value = mean(value, na.rm = TRUE)) |> 
+  filter(month %in% c(12, 1, 2, 3 )) |> 
+  select(name, year, water_year, month, stream, value)  # should we add month as well?
+ 
+```
+
+Plot the last 10 years - note that data have been filtered to Dec-Mar for use in JPE forecasting
+
+```{r, echo = F, message = F, warning = F}
+rs_shasta_monthly |> 
   filter(year >= 2015) |> 
   mutate(year = as.factor(year)) |> 
   ggplot(aes(x = month, y = value, color = year)) +
@@ -363,7 +414,7 @@ flow_water_year_type |>
 ## Combine and save data
 
 ```{r echo=FALSE, message = F, warning = F}
-forecast_covariates <- bind_rows(si_min_flow, si_max_flow, si_max_temp, above_13, rs_monthly, flow_water_year_type, wy, peak_flow_monthly) |> glimpse()
+forecast_covariates <- bind_rows(si_min_flow, si_max_flow, si_max_temp, above_13, rs_keswick_monthly, rs_shasta_monthly, flow_water_year_type, wy, peak_flow_monthly) |> glimpse()
 
 #checks
 # unique(forecast_covariates$name)
