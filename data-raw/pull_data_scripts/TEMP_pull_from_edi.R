@@ -42,7 +42,8 @@ trap_edi <- read_csv("data-raw/helper-tables/butte_trap.csv")
 
 butte_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
-  filter(commonName == "chinook salmon") |> 
+  filter(commonName == "chinook salmon",
+         visitTime >= as_date("2015-11-03")) |> 
   mutate(stream = "butte creek",
          site_group = "butte creek",
          adipose_clipped = case_when(fishOrigin == "Natural" ~ F,
@@ -93,6 +94,7 @@ butte_recapture_edi <- recapture_edi |>
          dead, fork_length, weight, species)
 
 butte_trap_edi <- trap_edi |> 
+  filter(visitTime >= as_date("2015-11-03")) |> 
   arrange(subSiteName, visitTime) |>
   mutate(trap_start_date = ymd_hms(lag(visitTime)),
          trap_stop_date = ymd_hms(visitTime),
