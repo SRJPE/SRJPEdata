@@ -33,7 +33,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 )
 
 sr_covariates <- SRJPEdata::stock_recruit_covariates
-source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
+# source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
 standard_flow <- flow_daily
 ```
 
@@ -203,7 +203,9 @@ rs_keswick_monthly |>
 # storage_code <- "00054"
 # rs_shasta_monthly_raw <- dataRetrieval::readNWISdv(11370000, "00054", "1950-01-01", "2025-01-01")
 
-rs_shasta_monthly_raw <- readxl::read_excel("data-raw/helper-tables/20250214_ShastaStorage_2013-2023.xlsx")
+rs_shasta_monthly_raw <- readxl::read_excel(here::here("data-raw", 
+                                                       "helper-tables",
+                                                       "20250214_ShastaStorage_2013-2023.xlsx"))
 
 rs_shasta_monthly <- rs_shasta_monthly_raw |> 
   mutate(date = as.Date(Date),

@@ -15,8 +15,8 @@ knitr::knit("vignettes/prep_environmental_covariates.Rmd")
 knitr::knit("vignettes/trap_effort.Rmd")
 #knitr::knit("vignettes/lifestage_ruleset.Rmd") # very slow but logic is a bit tricky, could be one to update to data.table
 knitr::knit("vignettes/years_to_include_analysis.Rmd") # does not automatically exclude adults yet, so add that
-knitr::knit("vignettes/sr_covariates.Rmd")
-knitr::knit("vignettes/forecast_covariates.Rmd")
+knitr::knit("vignettes/sr_covariates.Rmd") # TODO - this sources pull environmental data even through already sourced, slows down process
+knitr::knit("vignettes/forecast_covariates.Rmd") # TODO - this sources pull environmental data even through already sourced, slows down process
 # rebuild site to save updated data objects in package
 devtools::load_all()
 detach(package:data.table)
