@@ -297,41 +297,70 @@
 #'   \item \code{parameter}: Parameter measured, includes "flow" and "temperature"
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   }
-#'   \strong{Flow gages:}
+#' @details
+#'  Gage Information
+#'   \strong Deer creek
 #'   \itemize{
-#'   \strong Deer creek 
-#'   \itemize{
+#'   \itemize{flow gages:
 #'   \item USGS - 11383500
 #'   \item CDEC - DCV
 #'   }
+#'   \itemize{temperature gages:
+#'   \item CDEC - DCV
+#'   }
+#'   }
 #'   \strong Sacramento River 
 #'   \itemize{
+#'   \itemize{flow gages
 #'   \item USGS - 11383500
 #'   \item USGS - 11377100
 #'   }
+#'   \itemize{temperature gages
+#'   \item USGS - 11383500
+#'   }
+#'   }
 #'   \strong Battle Creek 
 #'   \itemize{
+#'   \itemize{flow gages
 #'   \item USGS - 11376550
 #'   \item USFWS - UBC
 #'   }
+#'   \itemize{temperature gages
+#'   \item USFWS - UBC
+#'   }
+#'   }
 #'   \strong Butte Creek 
 #'   \itemize{
+#'   \itemize{flow gages
 #'   \item USGS - 11376550
 #'   \item USGS - BCK
 #'   }
+#'   }
 #'   \strong Clear Creek 
 #'   \itemize{
+#'   \itemize{flow gages
 #'   \item USFWS - UCC
 #'   \item USGS - 11372000
 #'   \item USFWS - LCC
 #'   }
+#'   \itemize{temperature gages
+#'   \item USFWS - UCC
+#'   \item USFWS - LCC
+#'   }
+#'   }
 #'   \strong Mill Creek 
 #'   \itemize{
+#'   \itemize{flow gages
 #'   \item USGS - 11381500
 #'   \item CDEC - MLM
 #'   }
+#'   \itemize{temperature gages
+#'   \item CDEC - MLM
+#'   }
+#'   }
 #'   \strong Feather River 
 #'   \itemize{
+#'   \itemize{flow gages
 #'   \item USGS - 11407000
 #'   \item CDEC - TFB 
 #'   \item CDEC - GRL
@@ -339,49 +368,25 @@
 #'   \item CDEC - FRA
 #'   \item interpolated 
 #'   }
+#'   \itemize{temperature gages
+#'   \item CDEC - GRL
+#'   \item CDEC - FRA 
+#'   \item interpolated 
+#'   }
+#'   }
 #'   \strong Yuba River 
 #'   \itemize{
+#'   \itemize{flow gages
 #'   \item USGS - 11421000
 #'   \item CDEC - YR7
 #'   \item interpolated 
 #'   }
-#'   }
-#'   \strong{Temperature gages:}
-#'   \itemize{
-#'   \strong Deer creek 
-#'   \itemize{
-#'   \item CDEC - DCV
-#'   }
-#'   \strong Sacramento River 
-#'   \itemize{
-#'   \item USGS - 11383500
-#'   }
-#'   \strong Battle Creek 
-#'   \itemize{
-#'   \item USFWS - UBC
-#'   }
-#'   \strong Clear Creek 
-#'   \itemize{
-#'   \item USFWS - UCC
-#'   \item USFWS - LCC
-#'   }
-#'   \strong Mill Creek 
-#'   \itemize{
-#'   \item CDEC - MLM
-#'   }
-#'   \strong Feather River 
-#'   \itemize{
-#'   \item CDEC - GRL
-#'   \item CDEC - FRA
-#'   \item interpolated 
-#'   }
-#'   \strong Yuba River 
-#'   \itemize{
+#'   \itemize{temperature gages
 #'   \item CDEC - YR7
 #'   \item interpolated 
 #'   }
 #'   }
-#'   @source USGS/CDEC/FWS. See `data-raw/pull_environmental_data.R` for more details.
+#' @source USGS/CDEC/FWS. See `data-raw/pull_environmental_data.R` for more details.
 'environmental_data'
 
 #' @title Survival Model Data
@@ -419,7 +424,7 @@
 #'   \item \code{release_location}: Location of release 
 #'   \item \code{year}: Year of release 
 #'   }
-#'   @source Central Valley Enhanced Acoustic Tagging Project. 
+#' @source Central Valley Enhanced Acoustic Tagging Project. 
 #'   This data package queries tagging data from many studies using the ERDDAP data server.
 #'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
 'survival_model_inputs'
