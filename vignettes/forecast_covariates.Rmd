@@ -33,7 +33,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 )
 
 sr_covariates <- SRJPEdata::stock_recruit_covariates
-# source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
+source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
 standard_flow <- flow_daily
 ```
 
@@ -197,20 +197,19 @@ rs_keswick_monthly |>
 # Pull monthly reservoir storage: https://waterdata.usgs.gov/monitoring-location/11370000/#dataTypeId=daily-00054-0&period=P10YKES
 
 # SHASTA 
-# TODO Query unsuccessful from website, using the USGS download data button throws an error so there may be something messed up internally 
-# UPDATE WHEN RESOLVED
-# siteNumber <- 11370000
-# storage_code <- "00054"
-# rs_shasta_monthly_raw <- dataRetrieval::readNWISdv(11370000, "00054", "1950-01-01", "2025-01-01")
+# note here that we are pulling the instantaneous value at midnight (statCd = 32400), which is the only way
+# we can get the query to work. this matches the data provided by Flora in an excel:
+# rs_shasta_monthly_raw <- readxl::read_excel(here::here("data-raw", 
+#                                                        "helper-tables",
+#                                                        "20250214_ShastaStorage_2013-2023.xlsx"))
 
-rs_shasta_monthly_raw <- readxl::read_excel(here::here("data-raw", 
-                                                       "helper-tables",
-                                                       "20250214_ShastaStorage_2013-2023.xlsx"))
+rs_shasta_monthly_raw <- dataRetrieval::readNWISdv(siteNumbers = 11370000, statCd = 32400, parameterCd = "00054", 
+                                                   startDate = "1950-01-01", endDate = "2025-01-01")
 
 rs_shasta_monthly <- rs_shasta_monthly_raw |> 
   mutate(date = as.Date(Date),
          year = year(date),
-         value = Storage_AcreFeet,
+         value = X_00054_32400,
          name = "rs_shasta_monthly",
          water_year = NA,
          month = month(date),
