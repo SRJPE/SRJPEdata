@@ -49,9 +49,10 @@ pull_reciever_data_from_ERDDAP <- function() {
 #' @return A character vector containing unique study IDs.
 #'
 #' @details This function retrieves unique study IDs from the 'FED_JSATS_detects' ERDDAP table. It fetches the data from the specified ERDDAP server URL and extracts the 'study_id' field, ensuring uniqueness of the study IDs.
-#'
+#' This function is dependent on the "rerddap" package and should be installed previous to using this function.
 #' @examples
 #' # Pull study IDs from ERDDAP
+#' library(rerddap)
 #' study_ids <- pull_study_ids_from_ERDDAP()
 #' 
 #' @export

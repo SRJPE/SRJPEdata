@@ -457,4 +457,7 @@
 #'   \item \code{site}: Site RST is located on   
 #'   \item \code{subsite}: Specific trap site   
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+#'   }
+#' @examples
+#' head(site_lookup)
 'site_lookup'
