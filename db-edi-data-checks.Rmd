@@ -17,12 +17,21 @@ The purpose of this markdown is to compare the data that we have in jpe database
 Database tables are be viewed first, then data is compared by stream
 
 ```{r}
-con <- DBI::dbConnect(drv = RPostgres::Postgres(),
-                      host = "jpe-db.postgres.database.azure.com",
-                      dbname = "jpedb-prod",
-                      user = Sys.getenv("jpe_db_user_id"),
-                      password = Sys.getenv("jpe_db_password"),
-                      port = 5432)
+# con <- DBI::dbConnect(drv = RPostgres::Postgres(),
+#                       host = "jpe-db.postgres.database.azure.com",
+#                       dbname = "jpedb-prod",
+#                       user = Sys.getenv("jpe_db_user_id"),
+#                       password = Sys.getenv("jpe_db_password"),
+#                       port = 5432)
+
+con <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = "jpedb-staging",
+  host = "jpe-db.postgres.database.azure.com",
+  port = 5432,                
+  user = "AdminJPE",
+  password = "Food4Chinook"
+)
 
 DBI::dbListTables(con)
 # tables to look at:
@@ -68,6 +77,7 @@ colnames(trap)
 date range
 
   - `trap_visit_start`
+  
 ```{r echo=FALSE}
 range(trap$trap_visit_time_start, na.rm = TRUE)
 ```
