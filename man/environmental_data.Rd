@@ -16,91 +16,9 @@
 \item \code{parameter}: Parameter measured, includes "flow" and "temperature"
 \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 }
-\strong{Flow gages:}
-\itemize{
-\strong Deer creek
-\itemize{
-\item USGS - 11383500
-\item CDEC - DCV
 }
-\strong Sacramento River
-\itemize{
-\item USGS - 11383500
-\item USGS - 11377100
-}
-\strong Battle Creek
-\itemize{
-\item USGS - 11376550
-\item USFWS - UBC
-}
-\strong Butte Creek
-\itemize{
-\item USGS - 11376550
-\item USGS - BCK
-}
-\strong Clear Creek
-\itemize{
-\item USFWS - UCC
-\item USGS - 11372000
-\item USFWS - LCC
-}
-\strong Mill Creek
-\itemize{
-\item USGS - 11381500
-\item CDEC - MLM
-}
-\strong Feather River
-\itemize{
-\item USGS - 11407000
-\item CDEC - TFB
-\item CDEC - GRL
-\item CDEC - FSB
-\item CDEC - FRA
-\item interpolated
-}
-\strong Yuba River
-\itemize{
-\item USGS - 11421000
-\item CDEC - YR7
-\item interpolated
-}
-}
-\strong{Temperature gages:}
-\itemize{
-\strong Deer creek
-\itemize{
-\item CDEC - DCV
-}
-\strong Sacramento River
-\itemize{
-\item USGS - 11383500
-}
-\strong Battle Creek
-\itemize{
-\item USFWS - UBC
-}
-\strong Clear Creek
-\itemize{
-\item USFWS - UCC
-\item USFWS - LCC
-}
-\strong Mill Creek
-\itemize{
-\item CDEC - MLM
-}
-\strong Feather River
-\itemize{
-\item CDEC - GRL
-\item CDEC - FRA
-\item interpolated
-}
-\strong Yuba River
-\itemize{
-\item CDEC - YR7
-\item interpolated
-}
-}
-@source USGS/CDEC/FWS. See \code{data-raw/pull_environmental_data.R} for more details.
+\source{
+USGS/CDEC/FWS. See \code{data-raw/pull_environmental_data.R} for more details.
 }
 \usage{
 environmental_data
@@ -111,5 +29,96 @@ Data includes flow and temperature measurements from gages located on tributarie
 Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type.
 Interpolation was performed to fill in data gaps where temperature data were missing or the time series was incomplete.
 For the Feather River and Yuba River, temperature values were interpolated using regression models based on nearby gages and historical data, allowing for consistent estimation across incomplete records.
+The temporal coverage of flow data ranges from 1930 to 2025, and temperature data ranges from 1994 to 2025.
+}
+\details{
+Gage Information
+\strong Deer creek
+\itemize{
+\itemize{flow gages - temporal coverage: 1986 - 2025
+\item USGS - 11383500
+\item CDEC - DCV
+}
+\itemize{temperature gages - temporal coverage: 1998 - 2025
+\item CDEC - DCV
+}
+}
+\strong Sacramento River
+\itemize{
+\itemize{flow gages - temporal coverage: 1994 - 2025
+\item USGS - 11383500
+\item USGS - 11377100
+}
+\itemize{temperature gages - temporal coverage: 1994 - 2023
+\item USGS - 11383500
+}
+}
+\strong Battle Creek
+\itemize{
+\itemize{flow gages - temporal coverage: 1995 - 2025
+\item USGS - 11376550
+\item USFWS - UBC
+}
+\itemize{temperature gages  - temporal coverage: 2003 - 2021
+\item USFWS - UBC
+}
+}
+\strong Butte Creek
+\itemize{
+\itemize{flow gages - temporal coverage: 1930 - 2025
+\item USGS - 11376550
+\item USGS - BCK
+}
+}
+\strong Clear Creek
+\itemize{
+\itemize{flow gages - temporal coverage: 1995 - 2025
+\item USFWS - UCC
+\item USGS - 11372000
+\item USFWS - LCC
+}
+\itemize{temperature gages - temporal coverage: 2001 - 2021
+\item USFWS - UCC
+\item USFWS - LCC
+}
+}
+\strong Mill Creek  - temporal coverage: 1995 - 2025
+\itemize{
+\itemize{flow gages
+\item USGS - 11381500
+\item CDEC - MLM
+}
+\itemize{temperature gages - temporal coverage: 1998 - 2025
+\item CDEC - MLM
+}
+}
+\strong Feather River
+\itemize{
+\itemize{flow gages - temporal coverage: 1969 - 2025
+\item USGS - 11407000
+\item CDEC - TFB
+\item CDEC - GRL
+\item CDEC - FSB
+\item CDEC - FRA
+\item interpolated
+}
+\itemize{temperature gages - temporal coverage: 1999 - 2025
+\item CDEC - GRL
+\item CDEC - FRA
+\item interpolated
+}
+}
+\strong Yuba River
+\itemize{
+\itemize{flow gages - temporal coverage: 1999 - 2025
+\item USGS - 11421000
+\item CDEC - YR7
+\item interpolated
+}
+\itemize{temperature gages - temporal coverage: 1998 - 2025
+\item CDEC - YR7
+\item interpolated
+}
+}
 }
 \keyword{datasets}

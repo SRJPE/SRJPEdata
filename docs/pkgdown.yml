@@ -1,5 +1,5 @@
-pandoc: '3.2'
-pkgdown: 2.1.0
+pandoc: 3.1.1
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   forecast_covariates: forecast_covariates.html
@@ -11,7 +11,8 @@ articles:
   temp_regression: temp_regression.html
   trap_effort: trap_effort.html
   years_to_include_analysis: years_to_include_analysis.html
-last_built: 2025-05-27T22:15Z
+last_built: 2025-06-06T20:21Z
 urls:
   reference: https://SRJPE.github.io/SRJPEdata/reference
   article: https://SRJPE.github.io/SRJPEdata/articles
+

@@ -31,9 +31,6 @@ See \code{data-raw/pull_acoustic_tagging_data.R} for more details.
 \item \code{release_location}: Location of release
 \item \code{year}: Year of release
 }
-@source Central Valley Enhanced Acoustic Tagging Project.
-This data package queries tagging data from many studies using the ERDDAP data server.
-See \code{data-raw/pull_acoustic_tagging_data.R} for more details.
 
 \itemize{
 \item \code{fish_id}: Unique identifier associated with each released fish
@@ -47,6 +44,11 @@ See \code{data-raw/pull_acoustic_tagging_data.R} for more details.
 \item \code{year}: Year of release
 }
 @source Central Valley Enhanced Acoustic Tagging Project.
+This data package queries tagging data from many studies using the ERDDAP data server.
+See \code{data-raw/pull_acoustic_tagging_data.R} for more details.
+}
+\source{
+Central Valley Enhanced Acoustic Tagging Project.
 This data package queries tagging data from many studies using the ERDDAP data server.
 See \code{data-raw/pull_acoustic_tagging_data.R} for more details.
 }
