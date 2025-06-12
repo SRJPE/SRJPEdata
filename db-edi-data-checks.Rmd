@@ -29,8 +29,8 @@ con <- dbConnect(
   dbname = "jpedb-staging",
   host = "jpe-db.postgres.database.azure.com",
   port = 5432,                
-  user = "AdminJPE",
-  password = "Food4Chinook"
+  user = Sys.getenv("jpe_db_user_id"),
+  password = Sys.getenv("jpe_db_password")
 )
 
 DBI::dbListTables(con)
