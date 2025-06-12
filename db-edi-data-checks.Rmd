@@ -129,9 +129,14 @@ range(recaptured_fish$date, na.rm = TRUE)
 
 #### catch
 
+  - Findings catch:
+  
+    - same date range, just off by a moth
+    - forklength max of EDI is higher 
+
   - Database date range
   
-```{r echo=FALSE}
+```{r include=FALSE}
 # pulling trap_location table to tie to a steam
 trap_location <- DBI::dbReadTable(con, "trap_location")
 trap_id <- trap_location |> 
@@ -140,11 +145,16 @@ trap_id <- trap_location |>
 
 catch_with_stream <- catch |>
   left_join(trap_id)
-  
+```
+
+
+```{r echo=FALSE}
 catch_with_stream |> 
   filter(stream %in% c("clear creek", "battle creek")) |> 
   summarize(min_date = min(date), max_date = max(date))
   
+catch_battle_db <- catch_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) 
 ```
   
   - EDI date range
@@ -152,11 +162,139 @@ catch_with_stream |>
 ```{r echo=FALSE}
 battle_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/58540ac4ed34ce05f3309510f4be91e5"
 # Read the catch table
-battle_catch_data <- read_csv(battle_catch_url, show_col_types = FALSE)
+catch_battle_edi <- read_csv(battle_catch_url, show_col_types = FALSE)
 
-range(battle_catch_data$sample_date)
+range(catch_battle_edi$sample_date)
 ```
 
+  - DB date range
+  
+```{r echo=FALSE}
+range(catch_battle_db$date)
+```
+  
+  
+Checking stations of EDI to be battle and clear
+
+```{r echo=FALSE}
+# streams EDI
+unique(catch_battle_edi$station_code)
+
+```
+
+*fork_length*
+
+EDI 
+
+```{r echo=FALSE}
+summary(catch_battle_edi$fork_length, na.rm = TRUE)
+```
+
+DB
+
+```{r echo=FALSE}
+summary(catch_battle_db$fork_length, na.rm = TRUE)
+```
+
+```{r echo=FALSE}
+catch_battle_edi_edited <- catch_battle_edi |> 
+  rename(date = sample_date,
+         life_stage_id = life_stage) |> 
+  mutate(source = "EDI") |> 
+  filter(date > ymd("1998-10-24"))
+
+catch_battle_db_edited <- catch_battle_db |> 
+  mutate(source = "DB") 
+
+# Combine both datasets
+combined_catch_battle <- bind_rows(catch_battle_edi_edited, catch_battle_db_edited)
+
+ggplot(combined_catch_battle, aes(x = date, y = fork_length, color = source)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal() +
+  labs(x = "date", y = "fork length", color = "Source")
+```
+
+
+
+```{r echo=FALSE}
+catch_battle_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip()
+
+catch_battle_edi |> 
+   ggplot(aes(x = as.factor(life_stage), y = fork_length, fill = as.factor(life_stage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip()
+
+```
+
+*count*
+
+```{r echo=FALSE}
+ggplot(combined_catch_battle, aes(x = date, y = count, color = source)) +
+  geom_jitter(alpha = 0.6, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(x = "date", y = "count", color = "Source")
+```
+
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+
+catch_battle_db |> 
+  filter(catch_raw_id == "{511A1464-8C0E-4CBC-83619A1F91634CBC}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{511A1464-8C0E-4CBC-83619A1F91634CBC}") |> 
+  glimpse()
+
+```
+
+test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_battle_db |> 
+  filter(catch_raw_id == "{29329E00-E17B-42A0-8049C108CC8CB18D}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{29329E00-E17B-42A0-8049C108CC8CB18D}") |> 
+  glimpse()
+```
+
+test 3
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_battle_db |> 
+  filter(catch_raw_id == "{2566D65B-9F77-43C7-9F77A072A899FD7D}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{2566D65B-9F77-43C7-9F77A072A899FD7D}") |> 
+  glimpse()
+```
+
+test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_battle_db |> 
+  filter(catch_raw_id == "{B21666EA-D802-4C28-A3B1372EDD715D97}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{B21666EA-D802-4C28-A3B1372EDD715D97}") |> 
+  glimpse()
+```
 
 #### trap
 
@@ -324,6 +462,10 @@ recapture_with_stream |>
   - Database date range
   
 ```{r echo=FALSE}
+catch_feather_db <- catch_with_stream |> 
+  filter(stream == "feather river") |> glimpse()
+
+
 catch_with_stream |> 
   filter(stream == "feather river") |> 
   summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
@@ -333,11 +475,12 @@ catch_with_stream |>
  - EDI date range
 
 ```{r echo=FALSE}
-feather_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/c142ed6d5527bb824d113c7d64b54215"
-# Read the catch table
-feather_catch_data <- read_csv(feather_catch_url, show_col_types = FALSE)
+# feather_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/c142ed6d5527bb824d113c7d64b54215"
+# # Read the catch table
+# feather_catch_data <- read_csv(feather_catch_url, show_col_types = FALSE)
+catch_feather_edi <- read_csv("data-raw/edi-zips/feather_catch.csv") |> glimpse()
 
-range(feather_catch_data$visitTime)
+range(catch_feather_edi$visitTime)
 ```
 
 #### trap
@@ -386,6 +529,7 @@ feather_release_data |>
   mutate(releaseTime = as.Date(releaseTime)) |>
   summarize(min_date = min(releaseTime), max_date = max(releaseTime))
 ```
+
 #### recapture
 
   - Database date range (`recaptured_fish`)
@@ -535,6 +679,8 @@ catch_yuba_edi |>
 ```
 
 #### trap
+
+Note: database has a temporal coverage of 2015 - 2025, and EDI has a data as early as 1999
 
   - Database date range (`trap_visit_time_end`)
 
