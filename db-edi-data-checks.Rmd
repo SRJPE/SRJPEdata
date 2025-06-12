@@ -478,6 +478,8 @@ catch_yuba_db |>
   labs(title = "Database Yuba catch")
 ```
 
+Random pick of data entry to compare between db and EDI
+
 ```{r echo=FALSE}
 # random pick to compare data 
 
@@ -491,6 +493,7 @@ catch_yuba_edi |>
   glimpse()
 
 ```
+
 test 2
 
 ```{r echo=FALSE}
@@ -536,21 +539,112 @@ catch_yuba_edi |>
   - Database date range (`trap_visit_time_end`)
 
 ```{r echo=FALSE}
-trap_with_stream |>  
-  filter(stream %in% c("yuba river")) |> 
-  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
-            max_date = max(trap_visit_time_end, na.rm = TRUE))
+trap_yuba_db <- trap_with_stream |>  
+  filter(stream %in% c("yuba river")) |> glimpse()
+
+range(trap_yuba_db$trap_visit_time_start, na.rm = TRUE)
+
+  # summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
+  #           max_date = max(trap_visit_time_end, na.rm = TRUE))
 ```
 
   - EDI date range (current_year_feather_catch.csv `visitTime`)
 
 ```{r echo=FALSE}
-yuba_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/09ccf28b4e8eaa3239026109b6e408e2"
+# yuba_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/09ccf28b4e8eaa3239026109b6e408e2"
+# 
+# # Read the trap table
+# yubar_trap_data <- read_csv(yuba_trap_url, show_col_types = FALSE)
 
-# Read the trap table
-yubar_trap_data <- read_csv(yuba_trap_url, show_col_types = FALSE)
+trap_yuba_edi <- read_csv("data-raw/edi-zips/yuba_trap.csv") |> glimpse()
 
-range(yubar_trap_data$visitTime)
+range(trap_yuba_edi$visitTime)
+```
+*water temp*
+
+```{r include=FALSE}
+trap_yuba_db |> 
+  ggplot(aes(trap_visit_time_start, water_temp)) +
+  geom_point()
+
+trap_yuba_edi |> 
+  ggplot(aes(visitTime, waterTemp)) +
+  geom_point()
+
+# edi filtering just 2015 - 2025
+trap_yuba_edi |> 
+  filter(visitTime > "2015-01-01") |> 
+  ggplot(aes(visitTime, waterTemp)) +
+  geom_point()
+```
+
+```{r echo=FALSE}
+trap_yuba_edi <- trap_yuba_edi |> 
+  filter(visitTime > "2015-01-01") |> 
+  mutate(source = "EDI") |> 
+  rename(time = visitTime, temp = waterTemp)
+
+trap_yuba_db <- trap_yuba_db |> 
+  mutate(source = "DB") |> 
+  rename(time = trap_visit_time_start, temp = water_temp)
+
+# Combine both datasets
+combined_trap_yuba <- bind_rows(trap_yuba_edi, trap_yuba_db)
+
+ggplot(combined_trap_yuba, aes(x = time, y = temp, color = source)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal() +
+  labs(x = "visit time", y = "water temp", color = "Source",
+       title = "water temp vs visitTime")
+```
+
+Random pick of data entry to compare between db and EDI
+
+```{r echo=FALSE}
+trap_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(id == "2044844") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "11") |> 
+  glimpse()
+```
+test 2
+
+```{r echo=FALSE}
+trap_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(id == "2045597") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "960") |> 
+  glimpse()
+```
+
+test 3
+
+```{r echo=FALSE}
+trap_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(id == "2045982") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "643") |> 
+  glimpse()
+```
+test 4
+
+```{r echo=FALSE}
+trap_yuba_db |> 
+  filter(id == "2044846") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "16") |> 
+  glimpse()
 ```
 
 #### release
