@@ -16,7 +16,7 @@ The purpose of this markdown is to compare the data that we have in jpe database
 
 Database tables are be viewed first, then data is compared by stream
 
-```{r}
+```{r include=FALSE}
 # con <- DBI::dbConnect(drv = RPostgres::Postgres(),
 #                       host = "jpe-db.postgres.database.azure.com",
 #                       dbname = "jpedb-prod",
@@ -301,7 +301,7 @@ catch_battle_edi |>
 
   - Findings:
     - overall date rage is similar, just off by a month 
-    - for random test 4, there are 4 data entries on database that seem dupicate, but with different id. Is this something we should check?
+    - for random test 4, there are 4 data entries on database that seem dupicate, but with different id. Is this something we should check?. they have the same `trap_visit_time_start`/`trap_start_date` 
     
 
   - Database date range
@@ -374,10 +374,12 @@ test 1 (hard to compare because many NAs)
 # random pick to compare data 
 trap_battle_db |> 
   filter(id == "2093106") |> 
+  mutate(source = "DB") |> 
   glimpse()
 
 trap_battle_edi |> 
   filter(sample_date == "2024-08-09") |> 
+  mutate(source = "EDI") |> 
   glimpse()
 ```
 
@@ -387,10 +389,12 @@ test 2
 # random pick to compare data 
 trap_battle_db |> 
   filter(id == "2013985") |> 
+  mutate(source = "DB") |> 
   glimpse()
 
 trap_battle_edi |> 
   filter(trap_start_date == "2013-11-09" & velocity == "3.67") |> 
+  mutate(source = "EDI") |> 
   glimpse()
 ```
 
@@ -400,10 +404,12 @@ test 3
 # random pick to compare data 
 trap_battle_db |> 
   filter(id == "2007291") |> 
+  mutate(source = "DB") |> 
   glimpse()
 
 trap_battle_edi |> 
   filter(trap_start_date == "2003-10-24" & velocity == "0.15") |> 
+  mutate(source = "EDI") |> 
   glimpse()
 ```
 
@@ -413,11 +419,13 @@ test 4
 # random pick to compare data 
 trap_battle_edi |> 
   filter(trap_start_date == "2012-01-20" & velocity == "3.75") |> 
+  mutate(source = "DB") |> 
   glimpse()
 
 trap_battle_db |> 
   mutate(date = as.Date(trap_visit_time_start)) |> 
   filter(water_velocity == "3.75" & date == "2012-01-20") |> 
+  mutate(source = "EDI") |> 
   glimpse()
 ```
 
@@ -426,6 +434,8 @@ trap_battle_db |>
 Findings: 
 
   - date range is the same
+  - fork length values seem the same as well 
+  - random checks are consistenet
 
 DB glimpse
 
@@ -555,19 +565,26 @@ recapture_battle_db <- recapture_with_stream |>
 range(recapture_battle_db$date)
 ```
 
-- EDI date range (`date_recaptured`)
+Database glimpse:
 
 ```{r echo=FALSE}
 battle_recapture_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/460853b8a4a0a2308c2bfb4d3dc2793c"
 
 recapture_battle_edi <- read_csv(battle_recapture_url, show_col_types = FALSE)
 
+glimpse(recapture_battle_edi)
+```
+
+
+- EDI date range (`date_recaptured`)
+
+```{r echo=FALSE}
 range(recapture_battle_edi$date_recaptured)
 ```
 
 *date vs count/number_recapture*
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 ggplot() +
   geom_jitter(data = recapture_battle_db,
               aes(x = date, y = count),
@@ -582,7 +599,7 @@ ggplot() +
 
 *date vs fork_length*
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE}
 ggplot() +
   geom_jitter(data = recapture_battle_db,
               aes(x = date, y = fork_length),
