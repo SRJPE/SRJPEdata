@@ -196,7 +196,7 @@ DB
 summary(catch_battle_db$fork_length, na.rm = TRUE)
 ```
 
-```{r echo=FALSE}
+```{r include=FALSE}
 catch_battle_edi_edited <- catch_battle_edi |> 
   rename(date = sample_date,
          life_stage_id = life_stage) |> 
@@ -208,14 +208,16 @@ catch_battle_db_edited <- catch_battle_db |>
 
 # Combine both datasets
 combined_catch_battle <- bind_rows(catch_battle_edi_edited, catch_battle_db_edited)
+```
 
+exploration plots 
+
+```{r echo=FALSE}
 ggplot(combined_catch_battle, aes(x = date, y = fork_length, color = source)) +
   geom_point(alpha = 0.6) +
   theme_minimal() +
   labs(x = "date", y = "fork length", color = "Source")
 ```
-
-
 
 ```{r echo=FALSE}
 catch_battle_db |> 
@@ -238,7 +240,6 @@ ggplot(combined_catch_battle, aes(x = date, y = count, color = source)) +
   theme_minimal() +
   labs(x = "date", y = "count", color = "Source")
 ```
-
 
 Random pick of data entry to compare between db and EDI
 
@@ -298,15 +299,21 @@ catch_battle_edi |>
 
 #### trap
 
+  - Findings:
+    - overall date rage is similar, just off by a month 
+    - for random test 4, there are 4 data entries on database that seem dupicate, but with different id. Is this something we should check?
+    
+
   - Database date range
 
 ```{r echo=FALSE}
 trap_with_stream <- trap |>
   left_join(trap_id)
   
-trap_with_stream |> 
-  filter(stream %in% c("clear creek", "battle creek")) |> 
-  summarize(min_date = min(trap_visit_time_start), max_date = max(trap_visit_time_start))
+trap_battle_db <- trap_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) 
+
+range(trap_battle_db$trap_visit_time_start, na.rm = TRUE)
 ```
 
  - EDI date range
@@ -314,49 +321,238 @@ trap_with_stream |>
 ```{r echo=FALSE}
 battle_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/eed3b61b7eb6030dafc9e4765f07a106"
 # Read the trap table
-battle_trap_data <- read_csv(battle_trap_url, show_col_types = FALSE)
+trap_battle_edi <- read_csv(battle_trap_url, show_col_types = FALSE)
 
-range(battle_trap_data$sample_date)
+range(trap_battle_edi$sample_date)
+```
 
+*water_velocity*
+
+Database:
+```{r echo=FALSE}
+summary(trap_battle_db$water_velocity)
+```
+
+EDI:
+```{r echo=FALSE}
+summary(trap_battle_edi$velocity)
+```
+
+```{r echo=FALSE}
+trap_battle_db |> 
+  ggplot(aes(trap_visit_time_start, water_velocity)) +
+  geom_line()
+
+trap_battle_edi |> 
+  ggplot(aes(sample_date, velocity)) +
+  geom_line()
+```
+
+```{r echo=FALSE}
+trap_battle_db_edited <- trap_battle_db |> 
+  mutate(source = "DB",
+         velocity = water_velocity,
+         trap_start_date = as.Date(trap_visit_time_start))
+
+trap_battle_edi_edited <- trap_battle_edi |> 
+  mutate(source = "EDI")
+
+combined_trap_battle <- bind_rows(trap_battle_db_edited, trap_battle_edi_edited)
+
+combined_trap_battle |> 
+  ggplot(aes(trap_start_date, velocity, color = source)) +
+  geom_jitter(alpha = 0.6, width = 0.3, height = 1) +
+  theme_minimal() 
+```
+
+
+Random pick of data entry to compare between db and EDI
+
+test 1 (hard to compare because many NAs)
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_db |> 
+  filter(id == "2093106") |> 
+  glimpse()
+
+trap_battle_edi |> 
+  filter(sample_date == "2024-08-09") |> 
+  glimpse()
+```
+
+test 2 
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_db |> 
+  filter(id == "2013985") |> 
+  glimpse()
+
+trap_battle_edi |> 
+  filter(trap_start_date == "2013-11-09" & velocity == "3.67") |> 
+  glimpse()
+```
+
+test 3 
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_db |> 
+  filter(id == "2007291") |> 
+  glimpse()
+
+trap_battle_edi |> 
+  filter(trap_start_date == "2003-10-24" & velocity == "0.15") |> 
+  glimpse()
+```
+
+test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_edi |> 
+  filter(trap_start_date == "2012-01-20" & velocity == "3.75") |> 
+  glimpse()
+
+trap_battle_db |> 
+  mutate(date = as.Date(trap_visit_time_start)) |> 
+  filter(water_velocity == "3.75" & date == "2012-01-20") |> 
+  glimpse()
 ```
 
 #### release
 
-  - Database date range (`date_released`)
+Findings: 
+
+  - date range is the same
+
+DB glimpse
 
 ```{r echo=FALSE}
 release_with_stream <- release |> # join to get stream names
   left_join(trap_id)
 
-release_with_stream |> 
-  filter(stream %in% c("clear creek", "battle creek")) |> 
-  summarize(min_date = min(date_released ), max_date = max(date_released ))
+release_battle_db <- release_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) |>  glimpse()
+```
+
+  - Database date range (`date_released`)
+
+```{r echo=FALSE}
+range(release_battle_db$date_released, na.rm = TRUE)
+```
+
+EDI glimpse
+
+```{r echo=FALSE}
+battle_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/414dd61cd26985641875fb194328f8a6"
+
+release_battle_edi <- read_csv(battle_release_url, show_col_types = FALSE)
+glimpse(release_battle_edi)
 ```
 
 - EDI date range (`date_released`)
 
-```{r include=FALSE}
-battle_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/414dd61cd26985641875fb194328f8a6"
-
-battle_release_data <- read_csv(battle_release_url, show_col_types = FALSE)
+```{r echi=FALSE}
+range(release_battle_edi$date_released)
 ```
 
+*median_fork_length_released*
+
+EDI:
+```{r echo=FALSE}
+summary(release_battle_edi$median_fork_length_released)
+```
+
+DB:
+```{r echo=FALSE}
+summary(release_battle_db$median_fork_length_released)
+```
 
 ```{r echo=FALSE}
-range(battle_release_data$date_released)
+ggplot() +
+  geom_jitter(data = release_battle_db,
+              aes(x = as.Date(date_released), y = median_fork_length_released),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_battle_edi,
+              aes(x = as.Date(date_released), y = median_fork_length_released),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Released",
+       y = "Median Fork Length Released")
+           
 ```
 
-#### recapture
+Random pick of data entry to compare between db and EDI
 
-  - Database date range (`recaptured_fish`)
+test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+release_battle_db |> 
+  filter(release_id == "CLR637") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+release_battle_edi |> 
+  filter(release_id == "CLR637") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+release_battle_db |> 
+  filter(release_id == "BAT187") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+release_battle_edi |> 
+  filter(release_id == "BAT187") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+release_battle_db |> 
+  filter(release_id == "CLR497") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+release_battle_edi |> 
+  filter(release_id == "CLR497") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+#### recapture (recapture_fish)
+
+Findings: 
+
+  - date ranges are the same
+  - overall forklength and recapture values look the same
+  - across the random tests there were 4 data entries on db with the same `release_id`, wondering if we should look into this
+
+Database glimpse:
 
 ```{r echo=FALSE}
 recapture_with_stream <- recaptured_fish |> # join to get stream names
   left_join(trap_id)
 
-recapture_with_stream |> 
+recapture_battle_db <- recapture_with_stream |> 
   filter(stream %in% c("clear creek", "battle creek")) |> 
-  summarize(min_date = min(date ), max_date = max(date ))
+  glimpse()
+```
+
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+range(recapture_battle_db$date)
 ```
 
 - EDI date range (`date_recaptured`)
@@ -364,12 +560,104 @@ recapture_with_stream |>
 ```{r echo=FALSE}
 battle_recapture_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/460853b8a4a0a2308c2bfb4d3dc2793c"
 
-battle_recapture_data <- read_csv(battle_recapture_url, show_col_types = FALSE)
+recapture_battle_edi <- read_csv(battle_recapture_url, show_col_types = FALSE)
 
-range(battle_recapture_data$date_recaptured)
+range(recapture_battle_edi$date_recaptured)
 ```
 
+*date vs count/number_recapture*
 
+```{r echo=FALSE}
+ggplot() +
+  geom_jitter(data = recapture_battle_db,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = recapture_battle_edi,
+              aes(x = date_recaptured, y = number_recaptured),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/number_recapture")
+```
+
+*date vs fork_length*
+
+```{r echo=FALSE}
+ggplot() +
+  geom_jitter(data = recapture_battle_db,
+              aes(x = date, y = fork_length),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = recapture_battle_edi,
+              aes(x = date_recaptured, y = median_fork_length_recaptured),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/fork_length")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_db |> 
+  filter(release_id == "CLR210" & date == "2004-04-13") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+recapture_battle_edi |> 
+  filter(release_id == "CLR210" & date_recaptured == "2004-04-13") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_edi |> 
+  filter(release_id == "CLR386" & date_recaptured == "2008-03-02") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+
+recapture_battle_db |> 
+  filter(release_id == "CLR386" & date == "2008-03-02") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+```
+
+test 3
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_edi |> 
+  filter(release_id == "CLR677" & date_recaptured == "2017-01-31") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+
+recapture_battle_db |> 
+  filter(release_id == "CLR677" & date == "2017-01-31") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+```
+
+test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_edi |> 
+  filter(release_id == "BAT371" & date_recaptured == "2024-04-03") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+
+
+
+recapture_battle_db |> 
+  filter(release_id == "BAT371" & date == "2024-04-03") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+```
 ### Butte
 
 #### catch
