@@ -413,6 +413,9 @@ range(feather_recapture_data$visitTime)
   - Database date range
   
 ```{r echo=FALSE}
+catch_yuba_db <- catch_with_stream |> 
+  filter(stream == "yuba river") |> glimpse()
+
 catch_with_stream |> 
   filter(stream == "yuba river") |> 
   summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
@@ -422,11 +425,110 @@ catch_with_stream |>
  - EDI date range
 
 ```{r echo=FALSE}
-yuba_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/5dc3db7932a98e185f9c4ae8b0490c1d"
-# Read the catch table
-yuba_catch_data <- read_csv(yuba_catch_url, show_col_types = FALSE)
+# yuba_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/5dc3db7932a98e185f9c4ae8b0490c1d"
+# # Read the catch table
+# yuba_catch_data <- read_csv(yuba_catch_url, show_col_types = FALSE)
+# 
+# range(yuba_catch_data$visitTime)
 
-range(yuba_catch_data$visitTime)
+catch_yuba_edi <- read_csv("data-raw/edi-zips/yuba_catch.csv") |> glimpse()
+
+range(catch_yuba_edi$visitTime)
+```
+
+*fork_length*
+
+EDI 
+
+```{r echo=FALSE}
+
+summary(catch_yuba_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+```{r echo=FALSE}
+summary(catch_yuba_db$fork_length, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE}
+catch_yuba_edi |> 
+  ggplot(aes(visitTime, forkLength)) +
+  geom_point()
+
+catch_yuba_db |> 
+  ggplot(aes(date, fork_length)) +
+  geom_point()
+
+```
+
+
+*edi - count* and *database - n*
+
+```{r echo=FALSE}
+catch_yuba_edi |> 
+  ggplot(aes(visitTime, n)) +
+  geom_point() +
+  labs(title = "EDI Yuba catch")
+
+catch_yuba_db |> 
+  ggplot(aes(date, count)) +
+  geom_point()+
+  labs(title = "Database Yuba catch")
+```
+
+```{r echo=FALSE}
+# random pick to compare data 
+
+catch_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(catch_raw_id == "16336.0") |> 
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "16336") |> 
+  glimpse()
+
+```
+test 2
+
+```{r echo=FALSE}
+catch_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(catch_raw_id == "21795.0") |> 
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "21795") |> 
+  glimpse()
+```
+test 3
+
+```{r echo=FALSE}
+catch_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(date == "2024-12-27" & catch_raw_id == "31918.0") |> 
+
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "31918") |> 
+  glimpse()
+```
+
+test 4
+
+```{r echo=FALSE}
+catch_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(date == "2023-04-24" & catch_raw_id == "8830.0") |> 
+
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "8830") |> 
+  glimpse()
 ```
 
 #### trap
