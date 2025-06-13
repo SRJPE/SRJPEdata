@@ -332,6 +332,15 @@ flow_list <- lapply(gage_ids, function(site) {
              startDate = start_date, endDate = end_date)
 })
 
+feather_post_2023 <- CDECRetrieve::cdec_query(station = "TFB", dur_code = "H", sensor_num = "20", start_date = "2023-10-01") |> 
+  mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+  group_by(date = as.Date(datetime)) |> 
+  summarise(flow_cfs = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE))) |> 
+  mutate(site_name = "feather river",  
+         month = month(date),
+         year = year(date),
+         water_year = ifelse(month >= 10, year + 1, year))
+
 combined_flow <- bind_rows(
   lapply(names(flow_list), function(name) {
     flow_list[[name]] |>
@@ -345,7 +354,10 @@ combined_flow <- bind_rows(
                             lubridate::year(date) + 1,
                             lubridate::year(date))) |>
       select(site_name, date, flow_cfs, month, year, water_year)
-  }))
+  })) |> 
+  bind_rows(feather_post_2023) |> 
+  filter(!is.na(date))
+  
 
 mean_discharge_by_site <- combined_flow |>
   group_by(site_name, water_year) |>
