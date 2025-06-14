@@ -783,7 +783,16 @@ catch_butte_edi |>
 
 * `r round(sum(is.na(catch_butte_edi$n))/nrow(catch_butte_edi), 3)*100` % of values in the `n` column in edi data are NA.
 
+```{r echo=FALSE}
+summary(catch_butte_edi$n)
+```
+
 * `r round(sum(is.na(catch_butte_db$count))/nrow(catch_butte_db), 3)*100` % of values in the `count` column in database data are NA.
+
+```{r echo=FALSE}
+summary(catch_butte_db$count)
+```
+
 
 ```{r echo=FALSE, warning=FALSE}
 ggplot(catch_butte_db_edited, aes(x = date, y = count, color = source)) +
@@ -883,67 +892,107 @@ catch_butte_db |>
 #### trap
 
 **- Findings catch:**
-   - 
+   - time ranges are different, database has 2020 data only (wondering if this is an error?)
 
-  - Database date range (`trap_visit_time_end`)
-
+  - Database glimpse
 ```{r echo=FALSE}
 trap_with_stream <- trap |>
   left_join(trap_id)
   
-trap_with_stream |>  #lots of NA's on trap_visit_time_start, so using trap_visit_time_end instead
+trap_butte_db <- trap_with_stream |>  #lots of NA's on trap_visit_time_start, so using trap_visit_time_end instead
   filter(stream %in% c("butte creek")) |> 
-  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
-            max_date = max(trap_visit_time_end, na.rm = TRUE))
+  glimpse()
+```
+
+  - Database date range (`trap_visit_time_end`)
+  
+```{r echo=FALSE}
+range(trap_butte_db$trap_visit_time_end, na.rm = TRUE)
+```
+
+  - Database glimpse
+```{r echo=FALSE}
+# Read the trap table
+trap_butte_edi <- read_csv("data-raw/edi-zips/butte_trap.csv") |> glimpse()
 ```
 
   - EDI date range (current_year_butte_trap.csv `visitTime`)
-
 ```{r echo=FALSE}
-butte_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1497/18/64d3ac3b7695992c8a2cf3cfca90a4ce"
-
-# Read the catch table
-butte_trap_data <- read_csv(butte_trap_url, show_col_types = FALSE)
-
-range(butte_trap_data$visitTime)
+range(trap_butte_edi$visitTime)
 ```
 
+
 #### release
+
+**- Findings catch:**
+   - time ranges are exactly the same
 
   - Database date range 
 
 ```{r echo=FALSE}
-release_with_stream |> 
-  filter(stream %in% c("butte creek")) |> 
-  summarize(min_date = min(date_released), max_date = max(date_released))
+release_butte_db <- release_with_stream |> 
+  filter(stream %in% c("butte creek")) 
+  
+range(release_butte_db$date_released)
 ```
 
 - EDI date range (`releaseTime`)
 
 ```{r include=FALSE}
-butte_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1497/18/a6be3d2d878b4c4bd2815b60fda8a0db"
+release_butte_edi <- read_csv("data-raw/edi-zips/butte_release.csv") 
 
-butte_release_data <- read_csv(butte_release_url, show_col_types = FALSE)
+range(release_butte_edi$releaseTime, na.rm = TRUE)
 ```
+
+*number_released and nReleased*
+
+* `r round(sum(is.na(release_butte_db$number_released))/nrow(release_butte_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+
+* `r round(sum(is.na(release_butte_edi$nReleased))/nrow(release_butte_edi), 3)*100` % of values in the `nReleased` column in the database dataset are NA.
 
 
 ```{r echo=FALSE}
-butte_release_data |> 
-mutate(releaseTime = as.Date(releaseTime)) |>
-  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+release_butte_edi_clean<- release_butte_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_butte_db_clean<- release_butte_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_jitter(data = release_butte_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_butte_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/fork_length")
 ```
 
 #### recapture
 
+**- Findings catch:**
+   - database eaarliest year is 2023, edi is 2021
+   
+
   - Database date range (`recaptured_fish`)
 
 ```{r echo=FALSE}
-recapture_with_stream |> 
-  filter(stream %in% c("butte creek")) |> 
-  summarize(min_date = min(date ), max_date = max(date ))
+recapture_butte_db <- recapture_with_stream |> 
+  filter(stream %in% c("butte creek")) |> glimpse()
+
+range(recapture_butte_db$date)
 ```
-  - No recapture on EDI
-  
+
+- EDI date range (`visitTime`) 
+
+```{r include=FALSE}
+recapture_butte_edi <- read_csv("data-raw/edi-zips/butte_recapture.csv") |> glimpse()
+
+range(recapture_butte_edi$visitTime, na.rm = TRUE)
+```
+#TODO - continue here
+
 ### Feather River
 
 #### catch
