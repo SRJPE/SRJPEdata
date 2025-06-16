@@ -1,5 +1,5 @@
 ---
-title: "RST Data checks - DBvs EDI"
+title: "RST Data checks - DB vs EDI"
 author: "Badhia Yunes Katz"
 output: html_document
 ---
@@ -891,7 +891,7 @@ catch_butte_db |>
 
 #### trap
 
-**- Findings catch:**
+**- Findings trap:**
    - time ranges are different, database has 2020 data only (wondering if this is an error?)
 
   - Database glimpse
@@ -921,6 +921,22 @@ trap_butte_edi <- read_csv("data-raw/edi-zips/butte_trap.csv") |> glimpse()
 range(trap_butte_edi$visitTime)
 ```
 
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# # random pick to compare data 
+# catch_butte_db |> 
+#   mutate(source = "DB") |> 
+#   filter(id == "45936875") |> 
+#   glimpse()
+# 
+# catch_butte_edi |> 
+#   mutate(source = "EDI") |> 
+#   filter(catchRawID == "55171") |> 
+#   glimpse()
+```
 
 #### release
 
@@ -972,14 +988,15 @@ ggplot() +
 #### recapture
 
 **- Findings catch:**
-   - database eaarliest year is 2023, edi is 2021
+   - database earliest year is 2023, edi is 2021
+   - all fork length values are NA on both datasets
    
 
   - Database date range (`recaptured_fish`)
 
 ```{r echo=FALSE}
 recapture_butte_db <- recapture_with_stream |> 
-  filter(stream %in% c("butte creek")) |> glimpse()
+  filter(stream %in% c("butte creek")) 
 
 range(recapture_butte_db$date)
 ```
@@ -991,7 +1008,102 @@ recapture_butte_edi <- read_csv("data-raw/edi-zips/butte_recapture.csv") |> glim
 
 range(recapture_butte_edi$visitTime, na.rm = TRUE)
 ```
-#TODO - continue here
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_butte_db$count))/nrow(recapture_butte_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_butte_edi$n))/nrow(recapture_butte_edi), 3)*100` % of values in the `n` column from EDI are NA.
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_jitter(data = recapture_butte_db,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = recapture_butte_edi,
+              aes(x = as.Date(visitTime), y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/number_recaptured")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_butte_db$fork_length))/nrow(recapture_butte_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_butte_edi$forkLength))/nrow(recapture_butte_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_butte_db$lifestage_id))/nrow(recapture_butte_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_butte_edi$lifeStage))/nrow(recapture_butte_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+# add a plot
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "48132") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "48132") |>
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "48250") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "48250") |>
+  glimpse()
+```
+
+  - test 3
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "46604") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "46604") |>
+  glimpse()
+```
+
+  - test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "45421") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "45421") |>
+  glimpse()
+```
 
 ### Feather River
 
