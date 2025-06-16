@@ -437,7 +437,7 @@ trap_battle_db |>
 
   - date range is the same
   - fork length values seem the same as well 
-  - random checks are consistenet
+  - random checks are consistent
 
 DB glimpse
 
@@ -733,7 +733,6 @@ DB
 summary(catch_butte_db$fork_length, na.rm = TRUE)
 ```
 
-
 ```{r include=FALSE}
 catch_butte_edi_edited <- catch_butte_edi |>
   clean_names() |>
@@ -792,7 +791,6 @@ summary(catch_butte_edi$n)
 ```{r echo=FALSE}
 summary(catch_butte_db$count)
 ```
-
 
 ```{r echo=FALSE, warning=FALSE}
 ggplot(catch_butte_db_edited, aes(x = date, y = count, color = source)) +
@@ -981,8 +979,8 @@ ggplot() +
               aes(x = date, y = nReleased),
               color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
   theme_minimal() +
-  labs(x = "Date Recaptured",
-       y = "count/fork_length")
+  labs(x = "Date",
+       y = "number_released or nReleased")
 ```
 
 #### recapture
@@ -1109,76 +1107,292 @@ recapture_butte_edi |>
 
 #### catch
 
+**- Findings catch:**
+    - date range is different, will filter EDI to start 1999 for this data comparison purpose 
+    
+
   - Database date range
   
 ```{r echo=FALSE}
 catch_feather_db <- catch_with_stream |> 
-  filter(stream == "feather river") |> glimpse()
+  filter(stream == "feather river") 
 
-
-catch_with_stream |> 
-  filter(stream == "feather river") |> 
-  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
-
+range(catch_feather_db$date)
 ```
   
  - EDI date range
 
 ```{r echo=FALSE}
-# feather_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/c142ed6d5527bb824d113c7d64b54215"
-# # Read the catch table
-# feather_catch_data <- read_csv(feather_catch_url, show_col_types = FALSE)
-catch_feather_edi <- read_csv("data-raw/edi-zips/feather_catch.csv") |> glimpse()
+catch_feather_edi <- read_csv("data-raw/edi-zips/feather_catch.csv") 
 
 range(catch_feather_edi$visitTime)
 ```
 
+*forkLength*
+
+EDI 
+
+* `r round(sum(is.na(catch_feather_edi$forkLength))/nrow(catch_feather_edi), 3)*100` % of values in the `forkLength` column are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+* `r round(sum(is.na(catch_feather_db$fork_length))/nrow(catch_feather_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_db$fork_length, na.rm = TRUE)
+```
+
+```{r include=FALSE}
+catch_feather_edi_edited <- catch_feather_edi |>
+  clean_names() |>
+  mutate(date = as.Date(visit_time)) |> 
+  mutate(source = "EDI") |>
+  filter(date > ymd("1999-06-04")) 
+ 
+catch_feather_db_edited <- catch_feather_db |>
+  mutate(source = "DB")
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+combined_catch_fether <- catch_feather_db_edited |> 
+  select(date, fork_length, source) |> 
+  bind_rows(catch_feather_edi_edited |> select(date, fork_length, source)) 
+
+ggplot(data = combined_catch_fether, aes(x = date, y = fork_length, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+* `r round(sum(is.na(catch_feather_db$lifestage_id))/nrow(catch_feather_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_feather_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_feather_edi$lifeStage))/nrow(catch_feather_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_feather_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+*count*
+
+* `r round(sum(is.na(catch_feather_edi$n))/nrow(catch_feather_edi), 3)*100` % of values in the `n` column in edi data are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_edi$n)
+```
+
+* `r round(sum(is.na(catch_feather_db$count))/nrow(catch_feather_db), 3)*100` % of values in the `count` column in database data are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_db$count)
+```
+
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_jitter(data = catch_feather_db_edited,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = catch_feather_edi_edited,
+              aes(x = date, y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "count/n")
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45467039") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76944151") |> 
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45477524") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76920264") |> 
+  glimpse()
+```
+
+  - test 3
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45442835") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76939998") |> 
+  glimpse()
+```
+
+  - test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45443080") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76868549") |> 
+  glimpse()
+```
+
 #### trap
 
+**- Findings trap:**
+    - date range is different
+    - db data has different time range on `trap_visit_time_start` and `trap_visit_time_end`, wondering which one we should be comparing to edi
+  
+Database
+```{r echo=FALSE}
+trap_feather_db <- trap_with_stream |>  
+  filter(stream %in% c("feather river")) |> glimpse()
+```
+
   - Database date range (`trap_visit_time_end`)
-
 ```{r echo=FALSE}
-trap_with_stream |>  
-  filter(stream %in% c("feather river")) |> 
-  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
-            max_date = max(trap_visit_time_end, na.rm = TRUE))
+range(trap_feather_db$trap_visit_time_end, na.rm = TRUE)
 ```
 
-  - EDI date range (current_year_feather_catch.csv `visitTime`)
-
+  - Database date range (`trap_visit_time_start`)
 ```{r echo=FALSE}
-feather_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/e13781ce693c968eb8954907c64b9666"
+range(trap_feather_db$trap_visit_time_start, na.rm = TRUE)
+```
 
+EDI
+```{r echo=FALSE}
 # Read the catch table
-feather_trap_data <- read_csv(feather_trap_url, show_col_types = FALSE)
-
-range(feather_trap_data$visitTime)
+trap_feather_edi <- read_csv("data-raw/edi-zips/feather_trap.csv") |> glimpse()
 ```
+
+  - EDI date range (`visitTime`)
+```{r echo=FALSE}
+# Read the catch table
+trap_feather_edi <- read_csv("data-raw/edi-zips/feather_trap.csv")
+
+range(trap_feather_edi$visitTime)
+```
+
+*water_temp*
+
+DB
+```{r echo=FALSE}
+summary(trap_feather_db$water_temp)
+```
+
+EDI
+```{r echo=FALSE}
+summary(trap_feather_edi$waterTemp)
+```
+*turbidity*
+
+DB
+```{r echo=FALSE}
+summary(trap_feather_db$turbidity)
+```
+
+EDI
+```{r echo=FALSE}
+summary(trap_feather_edi$turbidity)
+```
+
 
 #### release
+
+**- Findings release:**
+    - date range is different - edi has only two data entries earlier than 2011 (1999 and 1900). Wondering is these are worth keeping? (DB has one 1999 data entry)
+    - 
+  
 
   - Database date range 
 
 ```{r echo=FALSE}
-release_with_stream |> 
-  filter(stream %in% c("feather river")) |> 
-  summarize(min_date = min(date_released), max_date = max(date_released))
+release_feather_db <- release_with_stream |> 
+  filter(stream %in% c("feather river"))
+
+range(release_feather_db$date_released)
 ```
 
 - EDI date range (`releaseTime`)
 
 ```{r include=FALSE}
-feather_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/faaac9cea6a7050037d1ef92c1154ead"
-
-feather_release_data <- read_csv(feather_release_url, show_col_types = FALSE)
+release_feather_edi <- read_csv("data-raw/edi-zips/feather_release.csv")
+range(release_feather_edi$releaseTime)
 ```
+
+*number_released and nReleased*
+
+* `r round(sum(is.na(release_feather_db$number_released))/nrow(release_feather_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+
+* `r round(sum(is.na(release_feather_edi$nReleased))/nrow(release_feather_edi), 3)*100` % of values in the `nReleased` column in the database dataset are NA.
 
 
 ```{r echo=FALSE}
-feather_release_data |> 
-  mutate(releaseTime = as.Date(releaseTime)) |>
-  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+release_feather_edi_clean<- release_feather_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_feather_db_clean <- release_feather_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_jitter(data = release_feather_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_feather_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
 ```
+#TODO add plots here, add tests
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
 
 #### recapture
 
