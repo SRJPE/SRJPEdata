@@ -1038,7 +1038,7 @@ ggplot() +
 * `r round(sum(is.na(recapture_butte_edi$lifeStage))/nrow(recapture_butte_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
 
 ```{r echo=FALSE, warning=FALSE}
-# add a plot
+# plot
 ```
 
 Random pick of data entry to compare between db and EDI
@@ -1344,7 +1344,9 @@ summary(trap_feather_edi$turbidity)
 
 **- Findings release:**
     - date range is different - edi has only two data entries earlier than 2011 (1999 and 1900). Wondering is these are worth keeping? (DB has one 1999 data entry)
-    - 
+    - all `median_fork_length_released` values on DB are NA. No fork_length field on EDI
+    - all `lifestage_id` values on DB are NA. No lifestage field on EDI
+    - data fields seem different among the two datasets
   
 
   - Database date range 
@@ -1367,8 +1369,7 @@ range(release_feather_edi$releaseTime)
 
 * `r round(sum(is.na(release_feather_db$number_released))/nrow(release_feather_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
 
-* `r round(sum(is.na(release_feather_edi$nReleased))/nrow(release_feather_edi), 3)*100` % of values in the `nReleased` column in the database dataset are NA.
-
+* `r round(sum(is.na(release_feather_edi$nReleased))/nrow(release_feather_edi), 3)*100` % of values in the `nReleased` column in the EDI dataset are NA.
 
 ```{r echo=FALSE}
 release_feather_edi_clean<- release_feather_edi |> 
@@ -1387,33 +1388,243 @@ ggplot() +
   labs(x = "Date",
        y = "number_released or nReleased")
 ```
-#TODO add plots here, add tests
+
+Column names DB
+```{r echo=FALSE}
+colnames(release_feather_db)
+```
+
+Column names EDI
+```{r echo=FALSE}
+colnames(release_feather_edi)
+```
 
 Random pick of data entry to compare between db and EDI
 
   - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "341") |> 
+  glimpse()
 
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "341") |> 
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "910") |> 
+  glimpse()
+
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "910") |> 
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "696") |> 
+  glimpse()
+
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "696") |> 
+  glimpse()
+
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "606") |> 
+  glimpse()
+
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "606") |> 
+  glimpse()
+
+```
 
 #### recapture
 
+**- Findings trap:**
+    - date range is different (database start year is 2022, and EDI is 1999). Some filtering was done to focus data comparison within the same time period
+    - `fork_length` and `lifestage` values match between the two datasets
+    
   - Database date range (`recaptured_fish`)
 
 ```{r echo=FALSE}
-recapture_with_stream |> 
-  filter(stream %in% c("feather river")) |> 
-  summarize(min_date = min(date ), max_date = max(date ))
+recapture_feather_db <- recapture_with_stream |> 
+  filter(stream %in% c("feather river"))
+
+range(recapture_feather_db$date)
 ```
 
 - EDI date range (`current_year_feather_recapture.csv`)
 
-```{r echo=FALSE}
-feather_recapture_url <- "https://pasta.lternet.edu/package/data/eml/edi/1239/23/5135215c5b52b74193ccc83a93812ea9"
+```{r echo=FALSE, warning=FALSE}
+recapture_feather_edi <- read_csv("data-raw/edi-zips/feather_recapture.csv")
 
-feather_recapture_data <- read_csv(feather_recapture_url, show_col_types = FALSE)
-
-range(feather_recapture_data$visitTime)
+range(recapture_feather_edi$visitTime)
 ```
+
+column names DB
+```{r echo=FALSE}
+colnames(recapture_feather_db)
+```
+column names EDI
+```{r echo=FALSE}
+colnames(recapture_feather_edi)
+```
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_feather_db$count))/nrow(recapture_feather_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_feather_edi$n))/nrow(recapture_feather_edi), 3)*100` % of values in the `n` column from EDI are NA.
+```{r echo=FALSE, warning=FALSE}
+recapture_feather_db <- recapture_feather_db |>
+  mutate(source = "DB")
+
+recapture_feather_edi <- recapture_feather_edi |>
+  mutate(source = "EDI",
+         date = as.Date(visitTime),
+         count = n) 
+
+recapture_feather_combined <- bind_rows(recapture_feather_db, recapture_feather_edi)
+
+ggplot(recapture_feather_combined, aes(x = date, y = count, color = source, shape = source)) +
+  geom_jitter(alpha = 0.4, width = 10, height = 0.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "Count / Number Recaptured",
+       color = "Source",
+       shape = "Source",
+       title = "Recaptures by Source (Feather River)")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_feather_db$fork_length))/nrow(recapture_feather_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_feather_edi$forkLength))/nrow(recapture_feather_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_feather_db$lifestage_id))/nrow(recapture_feather_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_feather_edi$lifeStage))/nrow(recapture_feather_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_feather_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+
+recapture_feather_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage", y = "fork length", title = "EDI data - lifestage vs forkLength")
+```
+
+Note that EDI has been filtered to start date of 2022 to match database temporal coverage
+```{r echo=FALSE}
+recapture_feather_db |> 
+  ggplot(aes(x = date, y = count)) +
+  geom_point()+
+  theme_minimal() +
+  labs(title = "DB date vs count")
+
+# recapture_feather_edi |> 
+#   ggplot(aes(x = as.Date(visitTime), y = n)) +
+#   geom_point() +
+#   theme_minimal() +
+#   labs(title = "EDI visitTime vs n")
+
+recapture_feather_edi |> 
+  mutate(date = as.Date(visitTime)) |> 
+  filter(date > "2021-12-30") |> 
+  ggplot(aes(x = as.Date(visitTime), y = n)) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "EDI visitTime vs n")
   
+```
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76868063") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76868063") |> 
+  glimpse()
+```
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76901705") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76901705") |> 
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76918872") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76918872") |> 
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76880944") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76880944") |> 
+  glimpse()
+```
+
 ### Yuba
 
 #### catch
@@ -1683,13 +1894,13 @@ yuba_release_data |>
 
 #### recapture
 
-  - No Recapture on Database 
+  - Database
 
 ```{r echo=FALSE}
 recapture_with_stream |> 
   filter(stream %in% c("yuba river")) |>  glimpse()
 ```
-  - No recapture on EDI
+  - EDI
   
 ### Sacramento/Knights landing 
 
