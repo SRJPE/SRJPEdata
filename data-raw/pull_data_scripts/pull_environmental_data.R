@@ -242,21 +242,37 @@ feather_flow <- feather_flow_raw |>
 
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
+# From Casey: There is also side flow input from the hatchery that increases flow another ~100 cfs. 
+# There’s no publicly available single source to get the total flow downstream of the hatchery.
+# You can use ORF + TFB to get the total LFC flow downstream of the hatchery.
+
+# ORF
+feather_orf_river_data_query <- dataRetrieval::readNWISdv(11406930, "00060", startDate = "1997-01-01")
+
+feather_orf_river_daily_flows <- feather_orf_river_data_query |> 
+  select(Date, orf_value =  X_00060_00003) |> 
+  as_tibble() |> 
+  rename(date = Date)
+
+feather_orf_river_data_query2 <- CDECRetrieve::cdec_query(station = "ORF", dur_code = "D", sensor_num = "41", start_date = "2024-10-01")
+
+feather_orf <- feather_orf_river_daily_flows |> 
+  bind_rows(feather_orf_river_data_query2 |> 
+              select(date = datetime, orf_value = parameter_value))
+# TFB
 # USGS site is through 9/20/2023 so needed to add a CDEC site for continuity
 feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060", startDate = "1997-01-01")
 
 feather_lfc_river_daily_flows <- feather_lfc_river_data_query|> 
-         select(Date, value =  X_00060_00003) |> 
+         select(Date, tfb_value =  X_00060_00003) |> 
          as_tibble() |> 
-         rename(date = Date) |> 
-         mutate(stream = "feather river", 
-                site_group = "upper feather lfc",
-                gage_agency = "USGS",
-                gage_number = "11407000",
-                parameter = "flow",
-                statistic = "mean")
+  rename(date = Date)
 
-feather_lfc2_river_data_query <- CDECRetrieve::cdec_query(station = "TFB", dur_code = "H", sensor_num = "20", start_date = "2023-10-01")
+feather_lfc2_river_data_query <- CDECRetrieve::cdec_query(station = "TFB", dur_code = "D", sensor_num = "41", start_date = "2023-10-01")
+
+feather_tfb <- feather_lfc_river_daily_flows |> 
+  bind_rows(feather_lfc2_river_data_query |> 
+              select(date = datetime, tfb_value = parameter_value))
 
 feather_lfc2_river_daily_flows <- feather_lfc2_river_data_query |> 
   mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
@@ -270,6 +286,17 @@ feather_lfc2_river_daily_flows <- feather_lfc2_river_data_query |>
          gage_agency = "CDEC",
          gage_number = "TFB",
          parameter = "flow")
+
+
+feather_lfc <- full_join(feather_orf, feather_tfb) |> 
+  mutate(value = tfb_value + orf_value,
+         stream = "feather river", 
+         site_group = "upper feather lfc",
+         gage_agency = "USGS/CDEC",
+         gage_number = "11407000/TFB + 11406930/ORF",
+         parameter = "flow",
+         statistic = "mean") |> 
+  select(-c(tfb_value, orf_value))
 
 ### Flow Data Pull Tests 
 #Lower Feather data 
@@ -557,8 +584,7 @@ flow_daily <- rbindlist(list(battle_creek_daily_flows,
                   rbdd_daily_flows,
                   yuba_river_daily_flows,
                   feather_flow, # data from DWR
-                  feather_lfc_river_daily_flows,
-                  feather_lfc2_river_daily_flows,
+                  feather_lfc, # sum of TFB and ORF
                   lower_feather_river_daily_flows), use.names = TRUE, fill = TRUE) |> 
   glimpse()
 
