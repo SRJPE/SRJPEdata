@@ -891,6 +891,7 @@ catch_butte_db |>
 
 **- Findings:**
    - time ranges are different, database has 2020 data only (wondering if this is an error?)
+   - couldn't do random test checks since couldn't find field in common 
 
   - Database glimpse
 ```{r echo=FALSE}
@@ -925,12 +926,12 @@ Random pick of data entry to compare between db and EDI
 
 ```{r echo=FALSE}
 # # random pick to compare data 
-# catch_butte_db |> 
+# trap_butte_bd |> 
 #   mutate(source = "DB") |> 
-#   filter(id == "45936875") |> 
+#   filter(id == "2093136") |> 
 #   glimpse()
 # 
-# catch_butte_edi |> 
+# trap_butte_edi |> 
 #   mutate(source = "EDI") |> 
 #   filter(catchRawID == "55171") |> 
 #   glimpse()
@@ -2259,24 +2260,118 @@ catch_knights_edi |>
 
 #### trap
 
-  - Database date range (`trap_visit_time_end`)
+**- Findings trap:**
 
-```{r echo=FALSE}
-trap_with_stream |>  
-  filter(trap_location_id %in% c(51, 52, 53, 54)) |>  # trap id for Sacramento/Knights landing 
-  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
-            max_date = max(trap_visit_time_end, na.rm = TRUE))
+  - EDI has earlier date range, starting 2003. DB starts 2021
+
+```{r include=FALSE}
+trap_knights_db <- trap_with_stream |>  
+  filter(trap_location_id %in% c(51, 52, 53, 54))  #  trap id for Sacramento/Knights landing 
 ```
 
-  - EDI date range (current_year_feather_catch.csv `visitTime`)
+Column names database 
+```{r echo=FALSE}
+colnames(trap_knights_db)
+```
+
+  - Database date range (`trap_visit_time_end`)
+
+`trap_visit_time_start`
+```{r echo=FALSE}
+range(trap_knights_db$trap_visit_time_start)
+```
+
+`trap_visit_time_end`
+```{r echo=FALSE}
+range(trap_knights_db$trap_visit_time_end)
+```
+
+Column names EDI 
+```{r echo=FALSE}
+colnames(trap_knights_edi)
+```
+
+  - EDI date range (`visitTime`)
 
 ```{r echo=FALSE}
-knigts_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1501/9/104b1e3f236b495564ee77efda3392af"
-
 # Read the trap table
-knighs_trap_data <- read_csv(knigts_trap_url, show_col_types = FALSE)
+trap_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_trap.csv")
 
-range(knighs_trap_data$visitTime)
+range(trap_knights_edi$visitTime)
+```
+
+*water_temp*
+
+DB
+
+* `r round(sum(is.na(trap_knights_db$waterTemp))/nrow(trap_knights_db), 3)*100` % of values in the `waterTemp` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_db$waterTemp)
+```
+
+EDI
+
+* `r round(sum(is.na(trap_knights_edi$waterTemp))/nrow(trap_knights_edi), 3)*100` % of values in the `waterTemp` column in the EDI dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_edi$waterTemp)
+```
+
+*turbidity*
+
+DB
+* `r round(sum(is.na(trap_knights_db$turbidity))/nrow(trap_knights_db), 3)*100` % of values in the `turbidity` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_db$turbidity)
+```
+
+EDI
+* `r round(sum(is.na(trap_knights_edi$turbidity))/nrow(trap_knights_edi), 3)*100` % of values in the `turbidity` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_edi$turbidity)
+```
+
+test 1
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2067293") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "6903") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2067799") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "7932") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2068103") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "8557") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2069083") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "8627") |> 
+  glimpse()
 ```
 
 #### release
@@ -2284,22 +2379,106 @@ range(knighs_trap_data$visitTime)
   - Database date range 
 
 ```{r echo=FALSE}
-release_with_stream |> 
-  filter(trap_location_id %in% c(51, 52, 53, 54)) |> 
-  summarize(min_date = min(date_released, na.rm = TRUE),
-            max_date = max(date_released, na.rm = TRUE))
+release_knights_db <- release_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) 
+
+range(release_knights_db$date_released)
 ```
 
-- EDI date range (current_year_yuba_release.csv `releaseTime`)
+column names
+```{r echo=FALSE}
+colnames(release_knights_db)
+```
 
-```{r}
-knights_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1501/9/bed15fe599f379266fe4ca74ebba0b6a"
 
-knights_release_data <- read_csv(knights_release_url, show_col_types = FALSE)
+- EDI date range (`releaseTime`)
 
-knights_release_data |> 
-  mutate(releaseTime = as.Date(releaseTime)) |>
-  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+```{r echo=FALSE}
+release_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_release.csv")
+
+range(release_knights_edi$releaseTime, na.rm = TRUE)
+```
+
+column names
+```{r echo=FALSE}
+colnames(release_knights_edi)
+```
+
+*number_released or nReleased*
+
+DB
+* `r round(sum(is.na(release_knights_db$number_released))/nrow(release_knights_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(release_knights_db$number_released)
+```
+EDI
+* `r round(sum(is.na(release_knights_edi$nReleased))/nrow(release_knights_edi), 3)*100` % of values in the `nReleased` column in EDI dataset are NA.
+```{r echo=FALSE}
+summary(release_knights_edi$nReleased)
+```
+
+```{r echo=FALSE}
+release_knights_edi_clean<- release_knights_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_knights_db_clean<- release_knights_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_point(data = release_knights_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, shape = 16, size = 2) +
+  geom_point(data = release_knights_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "64024") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "293") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "63978") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "577") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "63991") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "602") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "64008") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "273") |> 
+  glimpse()
 ```
 
 #### recapture
@@ -2478,29 +2657,229 @@ catch_tisdale_edi |>
 
 #### trap
 
-  - Database date range
+**- Findings trap:**
+  - EDI has earlier date range, starting 2012. DB starts 2022
 
-```{r echo=FALSE}
-trap_with_stream |>  
-  filter(trap_location_id %in% c(55, 56, 57)) |>  # trap id for Sacramento/Knights landing 
-  summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
-            max_date = max(trap_visit_time_end, na.rm = TRUE))
+
+
+```{r include=FALSE}
+trap_tisdale_db <- trap_with_stream |>  
+  filter(trap_location_id %in% c(55, 56, 57))  # trap id for Sacramento/Knights landing
 ```
 
-  - EDI: 2010 - 2024
+Column names DB
+```{r echo=FALSE}
+colnames(trap_tisdale_db)
+```
+
+
+  - Database date range
+  
+`trap_visit_time_start`
+```{r echo=FALSE}
+range(trap_tisdale_db$trap_visit_time_start)
+```
+
+`trap_visit_time_end`
+```{r echo=FALSE}
+range(trap_tisdale_db$trap_visit_time_end)
+```
+
+Column names EDI
+```{r echo=FALSE}
+colnames(trap_tisdale_edi)
+```
+
+  - EDI date range (`visitTime`)
+
+```{r echo=FALSE}
+# Read the trap table
+trap_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_trap.csv")
+
+range(trap_tisdale_edi$visitTime)
+```
+
+*water_temp*
+
+DB
+
+* `r round(sum(is.na(trap_tisdale_db$water_temp))/nrow(trap_tisdale_db), 3)*100` % of values in the `water_temp` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_db$water_temp)
+```
+
+EDI
+
+* `r round(sum(is.na(trap_tisdale_edi$waterTemp))/nrow(trap_tisdale_edi), 3)*100` % of values in the `waterTemp` column in the EDI dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_edi$waterTemp)
+```
+
+*turbidity*
+
+DB
+* `r round(sum(is.na(trap_tisdale_db$turbidity))/nrow(trap_tisdale_db), 3)*100` % of values in the `turbidity` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_db$turbidity)
+```
+
+EDI
+* `r round(sum(is.na(trap_tisdale_edi$turbidity))/nrow(trap_tisdale_edi), 3)*100` % of values in the `turbidity` column in EDI dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_edi$turbidity)
+```
+
+test 1
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2069220") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "6675") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2069463") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "7175") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2069899") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "7409") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2070318") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "7735") |> 
+  glimpse()
+```
+  
   
 #### release
 
   - Database date range 
 
 ```{r echo=FALSE}
-release_with_stream |> 
-  filter(trap_location_id %in% c(55, 56, 57)) |> 
-  summarize(min_date = min(date_released, na.rm = TRUE),
-            max_date = max(date_released, na.rm = TRUE))
+release_tisdale_db <- release_with_stream |> 
+  filter(trap_location_id %in% c(55, 56, 57)) 
+
+range(release_tisdale_db$date_released)
 ```
 
-  - EDI: 2012 - 2024
+column names
+```{r echo=FALSE}
+colnames(release_tisdale_db)
+```
+
+
+- EDI date range (`releaseTime`)
+
+```{r echo=FALSE}
+release_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_release.csv")
+
+range(release_tisdale_edi$releaseTime, na.rm = TRUE)
+```
+
+column names
+```{r echo=FALSE}
+colnames(release_tisdale_edi)
+```
+
+*number_released or nReleased*
+
+DB
+* `r round(sum(is.na(release_tisdale_db$number_released))/nrow(release_tisdale_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(release_tisdale_db$number_released)
+```
+EDI
+* `r round(sum(is.na(release_tisdale_edi$nReleased))/nrow(release_tisdale_edi), 3)*100` % of values in the `nReleased` column in EDI dataset are NA.
+```{r echo=FALSE}
+summary(release_tisdale_edi$nReleased)
+```
+
+```{r echo=FALSE}
+release_tisdale_edi_clean<- release_tisdale_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_tisdale_db_clean<- release_tisdale_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_point(data = release_tisdale_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, shape = 16, size = 2) +
+  geom_point(data = release_tisdale_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+Random pick of data entry to compare between db and EDI
+ 
+test 1
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "303") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "303") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "294") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "294") |> 
+  glimpse()
+```
+  
+test 3
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "296") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "296") |> 
+  glimpse()
+```  
+
+test 4
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "318") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "318") |> 
+  glimpse()
+```  
   
 #### recapture
 
