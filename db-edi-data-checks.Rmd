@@ -299,7 +299,7 @@ catch_battle_edi |>
 
 #### trap
 
-  - Findings:
+**- Findings trap:**
     - overall date rage is similar, just off by a month 
     - for random test 4, there are 4 data entries on database that seem dupicate, but with different id. Is this something we should check?. they have the same `trap_visit_time_start`/`trap_start_date` 
     
@@ -889,7 +889,7 @@ catch_butte_db |>
 
 #### trap
 
-**- Findings trap:**
+**- Findings:**
    - time ranges are different, database has 2020 data only (wondering if this is an error?)
 
   - Database glimpse
@@ -938,7 +938,7 @@ Random pick of data entry to compare between db and EDI
 
 #### release
 
-**- Findings catch:**
+**- Findings:**
    - time ranges are exactly the same
 
   - Database date range 
@@ -985,7 +985,7 @@ ggplot() +
 
 #### recapture
 
-**- Findings catch:**
+**- Findings:**
    - database earliest year is 2023, edi is 2021
    - all fork length values are NA on both datasets
    
@@ -1461,7 +1461,7 @@ release_feather_db |>
 
 #### recapture
 
-**- Findings trap:**
+**- Findings:**
     - date range is different (database start year is 2022, and EDI is 1999). Some filtering was done to focus data comparison within the same time period
     - `fork_length` and `lifestage` values match between the two datasets
     
@@ -1629,6 +1629,9 @@ recapture_feather_edi |>
 
 #### catch
 
+**- Findings catch:**
+    - date range is different, will filter EDI to start 1999 for this data comparison purpose 
+ 
   - Database date range
   
 ```{r echo=FALSE}
@@ -1638,18 +1641,11 @@ catch_yuba_db <- catch_with_stream |>
 catch_with_stream |> 
   filter(stream == "yuba river") |> 
   summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
-
 ```
   
  - EDI date range
 
 ```{r echo=FALSE}
-# yuba_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/5dc3db7932a98e185f9c4ae8b0490c1d"
-# # Read the catch table
-# yuba_catch_data <- read_csv(yuba_catch_url, show_col_types = FALSE)
-# 
-# range(yuba_catch_data$visitTime)
-
 catch_yuba_edi <- read_csv("data-raw/edi-zips/yuba_catch.csv") |> glimpse()
 
 range(catch_yuba_edi$visitTime)
@@ -1714,7 +1710,6 @@ catch_yuba_edi |>
 ```
 
 test 2
-
 ```{r echo=FALSE}
 catch_yuba_db |> 
   # filter(date == "2024-01-25") |> 
@@ -1725,8 +1720,8 @@ catch_yuba_edi |>
   filter(catchRawID == "21795") |> 
   glimpse()
 ```
-test 3
 
+test 3
 ```{r echo=FALSE}
 catch_yuba_db |> 
   # filter(date == "2024-01-25") |> 
@@ -1740,7 +1735,6 @@ catch_yuba_edi |>
 ```
 
 test 4
-
 ```{r echo=FALSE}
 catch_yuba_db |> 
   # filter(date == "2024-01-25") |> 
@@ -1755,7 +1749,8 @@ catch_yuba_edi |>
 
 #### trap
 
-Note: database has a temporal coverage of 2015 - 2025, and EDI has a data as early as 1999
+**- Findings:**
+    - database has a temporal coverage of 2015 - 2025, and EDI has a data as early as 1999
 
   - Database date range (`trap_visit_time_end`)
 
@@ -1764,24 +1759,20 @@ trap_yuba_db <- trap_with_stream |>
   filter(stream %in% c("yuba river")) |> glimpse()
 
 range(trap_yuba_db$trap_visit_time_start, na.rm = TRUE)
-
-  # summarize(min_date = min(trap_visit_time_end, na.rm = TRUE),
-  #           max_date = max(trap_visit_time_end, na.rm = TRUE))
 ```
 
   - EDI date range (current_year_feather_catch.csv `visitTime`)
 
 ```{r echo=FALSE}
-# yuba_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/09ccf28b4e8eaa3239026109b6e408e2"
-# 
-# # Read the trap table
-# yubar_trap_data <- read_csv(yuba_trap_url, show_col_types = FALSE)
-
 trap_yuba_edi <- read_csv("data-raw/edi-zips/yuba_trap.csv") |> glimpse()
 
 range(trap_yuba_edi$visitTime)
 ```
 *water temp*
+
+* `r round(sum(is.na(trap_yuba_db$water_temp))/nrow(trap_yuba_db), 3)*100` % of values in the `water_temp` column in DB data are NA.
+
+* `r round(sum(is.na(trap_yuba_edi$waterTemp))/nrow(trap_yuba_edi), 3)*100` % of values in the `waterTemp` column in edi data are NA.
 
 ```{r include=FALSE}
 trap_yuba_db |> 
@@ -1821,6 +1812,7 @@ ggplot(combined_trap_yuba, aes(x = time, y = temp, color = source)) +
 
 Random pick of data entry to compare between db and EDI
 
+test 1
 ```{r echo=FALSE}
 trap_yuba_db |> 
   # filter(date == "2024-01-25") |> 
@@ -1831,8 +1823,8 @@ trap_yuba_edi |>
   filter(trapVisitID == "11") |> 
   glimpse()
 ```
-test 2
 
+test 2
 ```{r echo=FALSE}
 trap_yuba_db |> 
   # filter(date == "2024-01-25") |> 
@@ -1845,7 +1837,6 @@ trap_yuba_edi |>
 ```
 
 test 3
-
 ```{r echo=FALSE}
 trap_yuba_db |> 
   # filter(date == "2024-01-25") |> 
@@ -1856,8 +1847,8 @@ trap_yuba_edi |>
   filter(trapVisitID == "643") |> 
   glimpse()
 ```
-test 4
 
+test 4
 ```{r echo=FALSE}
 trap_yuba_db |> 
   filter(id == "2044846") |> 
@@ -1870,38 +1861,118 @@ trap_yuba_edi |>
 
 #### release
 
-  - Database date range - No Yuba release on DB
+**- Findings:**
+
+  - Date ranges are the same
+  - no fork_length or lifestage in EDI data
 
 ```{r echo=FALSE}
-release_with_stream |> 
+release_yuba_db <- release_with_stream |> 
   filter(stream %in% c("yuba river")) |> glimpse() 
+
+range(release_yuba_db$date_released)
 ```
 
 - EDI date range (current_year_yuba_release.csv `releaseTime`)
 
-```{r include=FALSE}
-yuba_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1529/24/356e130a4b70fbb91b768c87508432df"
+```{r include=FALSE, warning=FALSE}
+release_yuba_edi <- read_csv("data-raw/edi-zips/yuba_release.csv") |> glimpse()
 
-yuba_release_data <- read_csv(yuba_release_url, show_col_types = FALSE)
+range(release_yuba_edi$releaseTime, na.rm = TRUE)
 ```
 
+*number_released or nReleased*
+
+DB
+```{r echo=FALSE}
+summary(release_yuba_db$number_released)
+```
+EDI
+```{r echo=FALSE}
+summary(release_yuba_edi$nReleased)
+```
 
 ```{r echo=FALSE}
-yuba_release_data |> 
-  mutate(releaseTime = as.Date(releaseTime)) |>
-  summarize(min_date = min(releaseTime), max_date = max(releaseTime))
+release_yuba_edi_clean<- release_yuba_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_yuba_db_clean<- release_yuba_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_point(data = release_yuba_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, shape = 16, size = 2) +
+  geom_point(data = release_yuba_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "290") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "290") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "303") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "303") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "274") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "274") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "259") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "259") |> 
+  glimpse()
 ```
 
 #### recapture
 
+**- Findings:**
+
   - Database
 
 ```{r echo=FALSE}
-recapture_with_stream |> 
-  filter(stream %in% c("yuba river")) |>  glimpse()
+recapture_yuba_db <- recapture_with_stream |> 
+  filter(stream %in% c("yuba river")) 
+
+range(recapture_yuba_db$date)
 ```
   - EDI
-  
+ 
+```{r echo=FALSE}
+recapture_yuba_edi <- read_csv("data-raw/edi-zips/yuba_recapture.csv") |> glimpse()
+``` 
 ### Sacramento/Knights landing 
 
 #### catch
