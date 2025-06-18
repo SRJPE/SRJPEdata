@@ -274,9 +274,10 @@ peak_flow_monthly |>
 ```{r, include = F}
 # https://data.ca.gov/dataset/cdec-water-year-type-dataset/resource/301aaef5-940d-4915-8ed6-baada4e101f5). Add on more recent years (need to find where best to pull 2023-2025)
 #Process data into 3 categories: aggregate into 3 categories: C, D/BN/AN, W
-wy_url <- "https://data.ca.gov/datastore/dump/301aaef5-940d-4915-8ed6-baada4e101f5?format=csv"
-
-wy_raw <- read_csv(wy_url)
+wy_url <- "https://data.cnra.ca.gov/dataset/8f7c9792-652a-4f5e-95ad-707961dfc3f5/resource/da64051a-7751-48e1-ab59-39c73a3ea52d/download/cdec-water-year-type-jun-2025.xlsx"
+temp_file <- tempfile(fileext = ".xlsx")
+download.file(wy_url, temp_file, mode = "wb")
+wy_raw <- readxl::read_xlsx(temp_file)
 
 wy <- wy_raw |> 
   filter(!is.na(WY)) |> 

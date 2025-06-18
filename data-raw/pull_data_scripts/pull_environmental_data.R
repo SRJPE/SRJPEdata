@@ -289,7 +289,8 @@ feather_lfc2_river_daily_flows <- feather_lfc2_river_data_query |>
 
 
 feather_lfc <- full_join(feather_orf, feather_tfb) |> 
-  mutate(value = tfb_value + orf_value,
+  mutate(date = as_date(date),
+         value = tfb_value + orf_value,
          stream = "feather river", 
          site_group = "upper feather lfc",
          gage_agency = "USGS/CDEC",

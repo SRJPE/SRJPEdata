@@ -89,7 +89,7 @@ test_that("Annual adult counts data coverage at the tributary level has not chan
   current_coverage <- annual_adult$stream |> unique() |> sort()
   
   expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", "mill creek", 
-                         "yuba river")
+                         "feather river", "yuba river")
   expect_equal(current_coverage, expected_coverage)
 })
 
