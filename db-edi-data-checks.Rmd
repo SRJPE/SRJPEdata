@@ -1651,6 +1651,7 @@ range(catch_yuba_edi$visitTime)
 
 EDI 
 
+* `r round(sum(is.na(catch_yuba_edi$forkLength))/nrow(catch_yuba_edi), 3)*100` % of values in the `forkLength` column are NA.
 ```{r echo=FALSE}
 
 summary(catch_yuba_edi$forkLength, na.rm = TRUE)
@@ -1658,6 +1659,7 @@ summary(catch_yuba_edi$forkLength, na.rm = TRUE)
 
 DB
 
+* `r round(sum(is.na(catch_yuba_db$fork_length))/nrow(catch_yuba_db), 3)*100` % of values in the `fork_length` column are NA.
 ```{r echo=FALSE}
 summary(catch_yuba_db$fork_length, na.rm = TRUE)
 ```
@@ -1693,9 +1695,7 @@ Random pick of data entry to compare between db and EDI
 
 ```{r echo=FALSE}
 # random pick to compare data 
-
 catch_yuba_db |> 
-  # filter(date == "2024-01-25") |> 
   filter(catch_raw_id == "16336.0") |> 
   glimpse()
 
@@ -1708,7 +1708,6 @@ catch_yuba_edi |>
 test 2
 ```{r echo=FALSE}
 catch_yuba_db |> 
-  # filter(date == "2024-01-25") |> 
   filter(catch_raw_id == "21795.0") |> 
   glimpse()
 
@@ -1720,7 +1719,6 @@ catch_yuba_edi |>
 test 3
 ```{r echo=FALSE}
 catch_yuba_db |> 
-  # filter(date == "2024-01-25") |> 
   filter(date == "2024-12-27" & catch_raw_id == "31918.0") |> 
 
   glimpse()
@@ -1733,7 +1731,6 @@ catch_yuba_edi |>
 test 4
 ```{r echo=FALSE}
 catch_yuba_db |> 
-  # filter(date == "2024-01-25") |> 
   filter(date == "2023-04-24" & catch_raw_id == "8830.0") |> 
 
   glimpse()
@@ -2103,23 +2100,162 @@ recapture_yuba_edi |>
 ### Sacramento/Knights landing 
 
 #### catch
-
+**- Findings:**
+  - Date range is not the same (edi earliest year is 2003 and database is 2021)
+  - There are a lot of NA fork length values on EDI
+  - lifestage has more categories in EDI data
+  
+  
   - Database date range
 
 ```{r}
-catch_with_stream |> 
-  filter(trap_location_id %in% c(51, 52, 53, 54)) |>  # trap id for Sacramento/Knights landing
-  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+catch_knights_db <- catch_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) # trap id for Sacramento/Knights landing
+
+range(catch_knights_db$date)
 ```
- - EDI date range (current_year_knights_landing_catch.csv)
+ - EDI date range
 
 ```{r echo=FALSE}
-knights_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1501/9/98cc4ae4d068f0f1bd17560b65d83b44"
-# Read the catch table
-knights_catch_data <- read_csv(knights_catch_url, show_col_types = FALSE)
+catch_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_catch.csv")
 
-range(knights_catch_data$visitTime)
+range(catch_knights_edi$visitTime)
 ```
+
+*fork_length*
+
+EDI 
+
+
+* `r round(sum(is.na(catch_knights_edi$forkLength))/nrow(catch_knights_edi), 3)*100` % of values in the `forkLength` column are NA.
+```{r echo=FALSE}
+
+summary(catch_knights_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+
+* `r round(sum(is.na(catch_knights_db$fork_length))/nrow(catch_knights_db), 3)*100` % of values in the `fork_length` column are NA.
+```{r echo=FALSE}
+summary(catch_knights_db$fork_length, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE}
+catch_knights_edi |> 
+  ggplot(aes(visitTime, forkLength)) +
+  geom_point()
+
+catch_knights_db |> 
+  ggplot(aes(date, fork_length)) +
+  geom_point()
+```
+
+filtering only matching years (2021 onwards)
+```{r include=FALSE}
+catch_knights_edi_edited <- catch_knights_edi |>
+  clean_names() |>
+  mutate(date = as.Date(visit_time)) |> 
+  mutate(source = "EDI",
+         count = n) |>
+  filter(date > ymd("2020-12-30")) 
+ 
+catch_knights_db_edited <- catch_knights_db |>
+  mutate(source = "DB")
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+combined_catch_knights <- catch_knights_db_edited |> 
+  select(date, fork_length, source, count) |> 
+  bind_rows(catch_knights_edi_edited |> select(date, fork_length, source, count)) 
+
+ggplot(data = combined_catch_knights, aes(x = date, y = fork_length, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+*edi - count* and *database - n*
+
+```{r echo=FALSE}
+ggplot(data = combined_catch_knights, aes(date, count, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+* `r round(sum(is.na(catch_knights_db$lifestage_id))/nrow(catch_knights_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_knights_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_knights_edi$lifeStage))/nrow(catch_knights_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_knights_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+Random pick of data entry to compare between db and EDI
+
+Test 1
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "144738") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "144738") |> 
+  glimpse()
+```
+test 2
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "171057") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "171057") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "156696") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "156696") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "167894") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "167894") |> 
+  glimpse()
+```
+
 
 #### trap
 
@@ -2182,20 +2318,163 @@ recapture_with_stream |>
 
 #### catch
 
+**- Findings:**
+  - Date range is different (edi's earliest year us 2010)
+  - there is an outline fork length value on EDI in 2020
+  - lifestage has more categories in EDI data
+
+
   - Database date range
 
 ```{r echo=FALSE}
-catch_with_stream |> 
-  filter(trap_location_id %in% c(55,56,57)) |>  # trap id for Sacramento/Knights landing
-  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+catch_tisdale_db <- catch_with_stream |> 
+  filter(trap_location_id %in% c(55,56,57))  # trap id for Sacramento/Knights landing
+  
+range(catch_tisdale_db$date)
 ```
-  - EDI: note that EDI download was done through a zip file. It is showing off on EDI
-
-Checked manually and interval is 2010 - 2024
+ - EDI date range
 
 ```{r echo=FALSE}
-sacramento_tisdale <- "edi.1499.5"
+catch_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_catch.csv")
+
+range(catch_tisdale_edi$visitTime)
 ```
+
+*fork_length*
+
+EDI 
+
+* `r round(sum(is.na(catch_tisdale_edi$forkLength))/nrow(catch_tisdale_edi), 3)*100` % of values in the `forkLength` column are NA.
+```{r echo=FALSE}
+
+summary(catch_tisdale_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+* `r round(sum(is.na(catch_tisdale_db$fork_length))/nrow(catch_tisdale_db), 3)*100` % of values in the `fork_length` column are NA.
+```{r echo=FALSE}
+summary(catch_tisdale_db$fork_length, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE}
+catch_tisdale_edi |> 
+  ggplot(aes(visitTime, forkLength)) +
+  geom_point() +
+  labs(title = "EDI")
+  
+
+catch_tisdale_db |> 
+  ggplot(aes(date, fork_length)) +
+  geom_point() +
+  labs(title = "database")
+```
+filtering only matching years (2022 onwards)
+```{r include=FALSE}
+catch_tisdale_edi_edited <- catch_tisdale_edi |>
+  clean_names() |>
+  mutate(date = as.Date(visit_time)) |> 
+  mutate(source = "EDI",
+         count = n) |>
+  filter(date > ymd("2021-12-30")) 
+ 
+catch_tisdale_db_edited <- catch_tisdale_db |>
+  mutate(source = "DB")
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+combined_catch_tisdale <- catch_tisdale_db_edited |> 
+  select(date, fork_length, source, count) |> 
+  bind_rows(catch_tisdale_edi_edited |> select(date, fork_length, source, count)) 
+
+ggplot(data = combined_catch_tisdale, aes(x = date, y = fork_length, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+*edi - count* and *database - n*
+
+```{r echo=FALSE}
+ggplot(data = combined_catch_tisdale, aes(date, count, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+* `r round(sum(is.na(catch_tisdale_db$lifestage_id))/nrow(catch_tisdale_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_tisdale_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_tisdale_edi$lifeStage))/nrow(catch_tisdale_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_tisdale_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "73027") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "73027") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "79378") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "79378") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "81039") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "81039") |> 
+  glimpse()
+```
+	
+test 4
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "83735") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "83735") |> 
+  glimpse()
+```
+
 
 #### trap
 
