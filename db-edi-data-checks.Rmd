@@ -2040,7 +2040,6 @@ recapture_yuba_edi |>
 
 Random pick of data entry to compare between DB and EDI
 
-
   - test 1
 ```{r echo=FALSE}
 # random pick to compare data 
@@ -2482,7 +2481,7 @@ release_knights_edi |>
 ```
 
 #### recapture
-
+(pending)
   - Database date range
 
 ```{r echo=FALSE}
@@ -2882,7 +2881,7 @@ release_tisdale_edi |>
 ```  
   
 #### recapture
-
+(pending)
   - Database date range
 
 ```{r echo=FALSE}
