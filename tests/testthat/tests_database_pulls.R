@@ -88,8 +88,8 @@ test_that("No NA values in identifying recapture data variables", {
 test_that("Annual adult counts data coverage at the tributary level has not changed", {
   current_coverage <- annual_adult$stream |> unique() |> sort()
   
-  expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", "mill creek", 
-                         "yuba river")
+  expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", "feather river",
+                         "mill creek", "yuba river")
   expect_equal(current_coverage, expected_coverage)
 })
 

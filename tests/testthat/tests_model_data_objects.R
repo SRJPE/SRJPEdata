@@ -30,6 +30,7 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
   current_site_year <- sort(current_site_year_raw$site_year)
   chosen_site_year_raw <- years_to_include_rst_data |> 
     mutate(site_year = paste0(site, "-", run_year)) |> 
+    filter(!site_year %in% c("live oak-2002", "steep riffle-2015")) |> 
     filter(!(run_year == 2025)) # make sure to remove this next year!
   chosen_site_year <- sort(chosen_site_year_raw$site_year)
   expect_equal(current_site_year, chosen_site_year)
@@ -120,6 +121,12 @@ test_that("test that there is data for each site week combo", {
                 mutate(include = T)) |> 
     filter(include == T) |> 
     select(-include) |> 
+    mutate(feather_multisite_filter = case_when(run_year == 2015 & week %in% c(1:9, 18:47, 52:53) & site %in% c("steep riffle") ~ "remove", # few weeks where steep used for gateway
+           run_year == 2015 & week %in% c(10:17, 48:51) & site %in% c("gateway riffle") ~ "remove",# few weeks where steep used for gateway
+           run_year == 2002 & week %in% 1:2 & site == "herringer riffle" ~ "remove",# few weeks where live oak used for herringer
+           run_year == 2002 & week %in% 3:44 & site == "live oak" ~ "remove",
+           T ~ "keep")) |> 
+    filter(feather_multisite_filter == "keep") |> 
     filter(run_year != 2025) # TODO remove once we want to include 2025 data
   
   catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 

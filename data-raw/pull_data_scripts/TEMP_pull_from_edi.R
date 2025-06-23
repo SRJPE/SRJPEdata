@@ -263,10 +263,10 @@ deer_mill_recapture_edi <- recapture_edi |>
 # raw <- read_data_entity(packageId = "edi.1239.13", entityId = res$entityId[4])
 # trap_edi <- read_csv(file = raw)
 
-catch_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_catch.xlsx")
-recapture_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_recapture.xlsx")
-release_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_release.xlsx")
-trap_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_trap.xlsx")
+catch_edi <- read_csv("data-raw/TEMP_data/feather_catch.csv")
+recapture_edi <- read_csv("data-raw/TEMP_data/feather_recapture.csv")
+release_edi <- read_csv("data-raw/TEMP_data/feather_release.csv")
+trap_edi <- read_csv("data-raw/TEMP_data/feather_trap.csv")
 
 lfc <- c("eye riffle_north", "eye riffle_side channel", "gateway main 400' up river", "gateway_main1", "gateway_rootball", "gateway_rootball_river_left", "#steep riffle_rst", "steep riffle_10' ext", "steep side channel")
 hfc <- c("herringer_east", "herringer_upper_west", "herringer_west", "live oak", "shawns_east", "shawns_west", "sunset east bank", "sunset west bank")
@@ -364,10 +364,10 @@ feather_release_edi <- release_edi |>
          number_released, run, life_stage, origin)
 
 # Yuba --------------------------------------------------------------------
-catch_edi <- pull_edi("1529", 1, 11)
-recapture_edi <- pull_edi("1529", 2, 11)
-release_edi <- pull_edi("1529", 3, 11)
-trap_edi <- pull_edi("1529", 4, 11)
+catch_edi <- read_csv("data-raw/TEMP_data/yuba_catch.csv")
+recapture_edi <- read_csv("data-raw/TEMP_data/yuba_recapture.csv")
+release_edi <- read_csv("data-raw/TEMP_data/yuba_release.csv")
+trap_edi <- read_csv("data-raw/TEMP_data/yuba_trap.csv")
 
 yuba_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
