@@ -263,10 +263,10 @@ deer_mill_recapture_edi <- recapture_edi |>
 # raw <- read_data_entity(packageId = "edi.1239.13", entityId = res$entityId[4])
 # trap_edi <- read_csv(file = raw)
 
-catch_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_catch.xlsx")
-recapture_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_recapture.xlsx")
-release_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_release.xlsx")
-trap_edi <- readxl::read_xlsx("data-raw/TEMP_data/feather_trap.xlsx")
+catch_edi <- read_csv("data-raw/TEMP_data/feather_catch.csv")
+recapture_edi <- read_csv("data-raw/TEMP_data/feather_recapture.csv")
+release_edi <- read_csv("data-raw/TEMP_data/feather_release.csv")
+trap_edi <- read_csv("data-raw/TEMP_data/feather_trap.csv")
 
 lfc <- c("eye riffle_north", "eye riffle_side channel", "gateway main 400' up river", "gateway_main1", "gateway_rootball", "gateway_rootball_river_left", "#steep riffle_rst", "steep riffle_10' ext", "steep side channel")
 hfc <- c("herringer_east", "herringer_upper_west", "herringer_west", "live oak", "shawns_east", "shawns_west", "sunset east bank", "sunset west bank")
