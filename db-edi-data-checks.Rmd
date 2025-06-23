@@ -2481,16 +2481,153 @@ release_knights_edi |>
 ```
 
 #### recapture
-(pending)
-  - Database date range
+
+**- Findings:**
+   - EDI temporal coverage starts at earlier year than DB. Earliest year is 2007
+   - there are only 9 data entries on DB
+   - DB lifestages are mostly just "5" and some "6"
+   
+   
+  - Database date range (`recaptured_fish`)
 
 ```{r echo=FALSE}
-recapture_with_stream |> 
-  filter(trap_location_id %in% c(51, 52, 53, 54)) |>
-  summarize(min_date = min(date), max_date = max(date))
+recapture_knights_db <- recapture_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) # trap id for Sacramento/Knights landing 
+
+range(recapture_knights_db$date)
 ```
-  - No recapture on EDI
-  
+
+- EDI date range (`visitTime`) 
+
+```{r include=FALSE}
+recapture_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_recapture.csv") |> glimpse()
+
+range(recapture_knights_edi$visitTime, na.rm = TRUE)
+```
+
+column names DB
+```{r echo=FALSE}
+colnames(recapture_knights_db)
+```
+
+column names EDI
+```{r echo=FALSE}
+colnames(recapture_knights_edi)
+```
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_knights_db$count))/nrow(recapture_knights_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_knights_edi$n))/nrow(recapture_knights_edi), 3)*100` % of values in the `n` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_knights_db <- recapture_knights_db |>
+  mutate(source = "DB")
+
+recapture_knights_edi <- recapture_knights_edi |>
+  mutate(source = "EDI",
+         date = as.Date(visitTime),
+         count = n) 
+
+recapture_knights_combined <- bind_rows(recapture_knights_edi, recapture_knights_db)
+
+ggplot(recapture_knights_combined, aes(x = date, y = count, color = source, shape = source)) +
+  geom_point(alpha = 0.4, width = 10, height = 0.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "Count - Number Recaptured",
+       color = "Source",
+       shape = "Source",
+       title = "Recaptures by Source (Sacramento River - Knights Landing)")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_knights_db$fork_length))/nrow(recapture_knights_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_knights_edi$forkLength))/nrow(recapture_knights_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_knights_db$lifestage_id))/nrow(recapture_knights_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_knights_edi$lifeStage))/nrow(recapture_knights_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_knights_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+
+recapture_knights_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage", y = "fork length", title = "EDI data - lifestage vs forkLength")
+```
+
+Random pick of data entry to compare between DB and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "160190") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "160190") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "160506") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "160506") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "152127") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "152127") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "152129") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "152129") |>
+  glimpse()
+```
+
   
 ### Sacramento/Tisdale
 
