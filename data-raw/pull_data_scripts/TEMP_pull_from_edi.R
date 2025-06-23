@@ -364,10 +364,10 @@ feather_release_edi <- release_edi |>
          number_released, run, life_stage, origin)
 
 # Yuba --------------------------------------------------------------------
-catch_edi <- pull_edi("1529", 1, 11)
-recapture_edi <- pull_edi("1529", 2, 11)
-release_edi <- pull_edi("1529", 3, 11)
-trap_edi <- pull_edi("1529", 4, 11)
+catch_edi <- read_csv("data-raw/TEMP_data/yuba_catch.csv")
+recapture_edi <- read_csv("data-raw/TEMP_data/yuba_recapture.csv")
+release_edi <- read_csv("data-raw/TEMP_data/yuba_release.csv")
+trap_edi <- read_csv("data-raw/TEMP_data/yuba_trap.csv")
 
 yuba_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
