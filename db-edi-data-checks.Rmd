@@ -2285,11 +2285,6 @@ range(trap_knights_db$trap_visit_time_start)
 range(trap_knights_db$trap_visit_time_end)
 ```
 
-Column names EDI 
-```{r echo=FALSE}
-colnames(trap_knights_edi)
-```
-
   - EDI date range (`visitTime`)
 
 ```{r echo=FALSE}
@@ -2297,6 +2292,11 @@ colnames(trap_knights_edi)
 trap_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_trap.csv")
 
 range(trap_knights_edi$visitTime)
+```
+
+Column names EDI 
+```{r echo=FALSE}
+colnames(trap_knights_edi)
 ```
 
 *water_temp*
@@ -2643,7 +2643,7 @@ recapture_knights_edi |>
 
 ```{r echo=FALSE}
 catch_tisdale_db <- catch_with_stream |> 
-  filter(trap_location_id %in% c(55,56,57))  # trap id for Sacramento/Knights landing
+  filter(trap_location_id %in% c(55,56,57))  # trap id for Sacramento/Tisdale landing
   
 range(catch_tisdale_db$date)
 ```
@@ -2821,10 +2821,6 @@ range(trap_tisdale_db$trap_visit_time_start)
 range(trap_tisdale_db$trap_visit_time_end)
 ```
 
-Column names EDI
-```{r echo=FALSE}
-colnames(trap_tisdale_edi)
-```
 
   - EDI date range (`visitTime`)
 
@@ -2833,6 +2829,11 @@ colnames(trap_tisdale_edi)
 trap_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_trap.csv")
 
 range(trap_tisdale_edi$visitTime)
+```
+
+Column names EDI
+```{r echo=FALSE}
+colnames(trap_tisdale_edi)
 ```
 
 *water_temp*
@@ -3018,14 +3019,151 @@ release_tisdale_edi |>
 ```  
   
 #### recapture
-(pending)
-  - Database date range
+
+**- Findings:**
+   - All fork length values are NA in database
+   - there are only 8 data entries in database
+   
+   
+  - Database date range (`recaptured_fish`)
 
 ```{r echo=FALSE}
-recapture_with_stream |> 
-  filter(trap_location_id %in% c(55, 56, 57)) |>
-  summarize(min_date = min(date), max_date = max(date))
+recapture_tisdale_db <- recapture_with_stream |> 
+  filter(trap_location_id %in% c(55,56,57))  # trap id for Sacramento/Tisdale landing
+
+range(recapture_tisdale_db$date)
 ```
 
-  - EDI: 2010 - 2024 
+- EDI date range (`visitTime`) 
+
+```{r include=FALSE}
+recapture_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_recapture.csv") |> glimpse()
+
+range(recapture_tisdale_edi$visitTime, na.rm = TRUE)
+```
+
+column names DB
+```{r echo=FALSE}
+colnames(recapture_tisdale_db)
+```
+
+column names EDI
+```{r echo=FALSE}
+colnames(recapture_tisdale_edi)
+```
+
   
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_tisdale_db$count))/nrow(recapture_tisdale_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_tisdale_edi$n))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `n` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_tisdale_db <- recapture_tisdale_db |>
+  mutate(source = "DB")
+
+recapture_tisdale_edi <- recapture_tisdale_edi |>
+  mutate(source = "EDI",
+         date = as.Date(visitTime),
+         count = n) 
+
+recapture_tisdale_combined <- bind_rows(recapture_tisdale_edi, recapture_tisdale_db)
+
+ggplot(recapture_tisdale_combined, aes(x = date, y = count, color = source, shape = source)) +
+  geom_point(alpha = 0.4, width = 10, height = 0.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "Count - Number Recaptured",
+       color = "Source",
+       shape = "Source",
+       title = "Recaptures by Source (Sacramento River - Tisdale)")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_tisdale_db$fork_length))/nrow(recapture_tisdale_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_tisdale_edi$forkLength))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_tisdale_db$lifestage_id))/nrow(recapture_tisdale_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_tisdale_edi$lifeStage))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_tisdale_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+
+recapture_tisdale_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage", y = "fork length", title = "EDI data - lifestage vs forkLength")
+```
+
+
+Random pick of data entry to compare between DB and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88918") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88918") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88914") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88914") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88906") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88906") |>
+  glimpse()
+```
+
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88904") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88904") |>
+  glimpse()
+```
