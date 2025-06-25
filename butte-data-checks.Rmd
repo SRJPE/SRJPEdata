@@ -189,7 +189,7 @@ catch_butte_edi |>
 summary(catch_butte_edi$n)
 ```
 
-* DB `count`*
+*DB `count`*
 
 * `r round(sum(is.na(catch_butte_db$count))/nrow(catch_butte_db), 3)*100` % of values in the `count` column in database data are NA.
 
@@ -263,7 +263,7 @@ catch_butte_edi |>
   glimpse()
 ```
 
-
+## TODO 
 ## trap
 
 **- Findings:**
