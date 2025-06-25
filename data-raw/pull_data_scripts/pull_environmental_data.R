@@ -210,36 +210,37 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
 
 # Kassie sent their flow database
 # I wanted to update you on the Feather flow data- specifically the gage at Gridley. It has been historically unreliable and we use the gage at Fish Barrier Dam (FRB) + Hatchery (ORF) + Thermalito Afterbay Outlet (which we get monthly via email). They have recalibrated it (not sure when) so I think moving forward we can use it but for historical flow data maybe we use our database. I’ve attached our flow database that Katie updates regularly. She also updates our temperature database from our Vemco receivers and we can provide that data as well just let me know.
-# library(googleCloudStorageR)
-library(Hmisc)
+# # library(googleCloudStorageR)
+# library(Hmisc)
 # gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
 # gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
 # gcs_get_object(object_name = "environmental/data-raw/feather_Flows_4.9.25.accdb",
 #                bucket = gcs_get_global_bucket(),
 #                saveToDisk = "data-raw/TEMP_data/feather_flow_db.accdb",
 #                overwrite = TRUE)
-feather_flow_db <- here::here("data-raw", "TEMP_data", "feather_flow_db.accdb")
-mdb.get(feather_flow_db, tables = T)
-feather_flow_raw <- mdb.get(feather_flow_db, tables = "Flows Master")
-feather_gage_raw <- mdb.get(feather_flow_db, tables = "Gauge Locations")
-# Assume that Hatch.Oroville is FRB+ORF then need to add TAO
-detach(package:Hmisc)
-feather_flow <- feather_flow_raw |> 
-  group_by(Date) |> 
-  summarize(hatch_oroville = mean(Hatch.Oroville, na.rm = T),
-            TAO = mean(TAO, na.rm = T)) |> 
-  mutate(value = hatch_oroville+TAO) |> 
-  select(-c(hatch_oroville, TAO)) |> 
-  rename(date = Date) |> 
-  filter(date <= "2025-03-31") |> 
-  mutate(stream = "feather river", 
-         site_group = "upper feather hfc",
-         gage_agency = "DWR Feather",
-         gage_number = "FRB+ORF+TAO",
-         parameter = "flow",
-         statistic = "mean")
+# feather_flow_db <- here::here("data-raw", "TEMP_data", "feather_flow_db.accdb")
+# mdb.get(feather_flow_db, tables = T)
+# feather_flow_raw <- mdb.get(feather_flow_db, tables = "Flows Master")
+# feather_gage_raw <- mdb.get(feather_flow_db, tables = "Gauge Locations")
+# # Assume that Hatch.Oroville is FRB+ORF then need to add TAO
+# detach(package:Hmisc)
+# feather_flow <- feather_flow_raw |> 
+#   group_by(Date) |> 
+#   summarize(hatch_oroville = mean(Hatch.Oroville, na.rm = T),
+#             TAO = mean(TAO, na.rm = T)) |> 
+#   mutate(value = hatch_oroville+TAO) |> 
+#   select(-c(hatch_oroville, TAO)) |> 
+#   rename(date = Date) |> 
+#   filter(date <= "2025-03-31") |> 
+#   mutate(stream = "feather river", 
+#          site_group = "upper feather hfc",
+#          gage_agency = "DWR Feather",
+#          gage_number = "FRB+ORF+TAO",
+#          parameter = "flow",
+#          statistic = "mean")
+# write_csv(feather_flow, "data-raw/helper-tables/feather_flow_db.csv")
 
-
+feather_flow <- read_csv("data-raw/helper-tables/feather_flow_db.csv")
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
 # From Casey: There is also side flow input from the hatchery that increases flow another ~100 cfs. 
