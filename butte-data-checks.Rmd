@@ -43,16 +43,14 @@ catch_with_stream <- catch |>
   left_join(trap_id)
 ```
 
-# Butte
+## Butte {.tabset}
 
-## catch
+### catch
 
 **- Findings catch:**
-    - date range is different, will filter EDI to start 1999 for this data comparison purpose 
-    - It seems like the database only has a few data entires from 1999, 2017 and 2020. Then it jumps to 2022 onwards
-    - lifestage on EDI data are repetitive (e.g. Parr vs parr, Smolt va smolt)
-    - test 2: catch_raw_id == "15924" was not found in Data (called catchRawID on EDI)
-    - test 4: date of 2022-02-22 does not match any data entries on database (there seems to be a gap between 1999 and 2022, check if this is expected)
+
+  - date range is the same 
+  - life stage in edi data has not gone through wrangling
 
 ```{r echo=FALSE}
 catch_butte_edi <- read_csv("data-raw/edi-zips/butte_catch.csv") |> 
@@ -94,7 +92,7 @@ for (param in filter_params_butte){
 }
 ```
 
-### Date Range Check
+#### Date Range Check
 *EDI `visitTime`*
 ```{r}
 range(catch_butte_edi$visitTime)
@@ -109,7 +107,7 @@ catch_butte_db <- catch_with_stream |>
 range(catch_butte_db$date)
 ```
 
-### ForkLength
+#### ForkLength
 *EDI `forkLength`*
 
 * `r round(sum(is.na(catch_butte_edi$forkLength))/nrow(catch_butte_edi), 3)*100` % of values in the `forkLength` column are NA.
@@ -149,7 +147,7 @@ ggplot(data = combined_catch_butte, aes(x = date, y = fork_length, color = sourc
   facet_wrap(~source)
 ```
 
-### Lifestage
+#### Lifestage
 (life stage in edi data has not gone through wrangling)
 
 *EDI `lifeStage`*
@@ -179,7 +177,7 @@ catch_butte_edi |>
   labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
 ```
 
-### Count
+#### Count
 
 *EDI `n`*
 
@@ -198,21 +196,17 @@ summary(catch_butte_db$count)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
-ggplot(catch_butte_db_edited, aes(x = date, y = count, color = source)) +
-  geom_jitter(alpha = 0.6, width = 0.3, height = 0) +
-  theme_minimal() +
-  labs(x = "date", y = "count", color = "Source")
-
 ggplot() +
   geom_jitter(data = catch_butte_db_edited,
-              aes(x = date, y = count),
-              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+              aes(x = date, y = count, color = "Database"),
+              alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
   geom_jitter(data = catch_butte_edi_edited,
-              aes(x = date, y = n),
-              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+              aes(x = date, y = n, color = "EDI"),
+              alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  scale_color_manual(values = c("Database" = "blue", "EDI" = "red")) +
   theme_minimal() +
-  labs(x = "Date",
-       y = "count/n")
+  labs(x = "Date", y = "Count", color = "Source")
+
 ```
 
 Random pick of data entry to compare between db and EDI
@@ -263,12 +257,11 @@ catch_butte_edi |>
   glimpse()
 ```
 
-## TODO 
-## trap
+### trap
 
 **- Findings:**
-   - time ranges are different, database has 2020 data only (wondering if this is an error?)
-   - couldn't do random test checks since couldn't find field in common
+
+ - All water velocity values are NA in DB, and 92% are NA in EDI
 
 ```{r echo=FALSE}
 trap_with_stream <- trap_visit |>
@@ -277,6 +270,7 @@ trap_with_stream <- trap_visit |>
 trap_butte_db <- trap_with_stream |> 
   filter(stream == "butte creek") 
 ```
+
 ```{r echo=FALSE}
 trap_butte_edi <- read_csv("data-raw/edi-zips/butte_trap.csv") |>
   mutate(siteName = tolower(siteName),
@@ -315,45 +309,115 @@ for (param in filter_params_butte){
 }
 ```
 
-## TODO
-<!--   - Database date range (`trap_visit_time_end`) -->
+#### Date Range Check
 
-<!-- ```{r echo=FALSE} -->
-<!-- range(trap_butte_db$trap_visit_time_end, na.rm = TRUE) -->
-<!-- ``` -->
+*DB `trap_visit_time_start`* 
+```{r echo=FALSE}
+range(trap_butte_db$trap_visit_time_start, na.rm = TRUE)
+```
+*EDI `visitTime`*
+```{r}
+range(trap_butte_edi$visitTime)
+```
 
-<!--   - Database glimpse -->
-<!-- ```{r echo=FALSE} -->
-<!-- # Read the trap table -->
-<!-- trap_butte_edi <- read_csv("data-raw/edi-zips/butte_trap.csv") |> glimpse() -->
-<!-- ``` -->
+#### water_velocity
 
-<!--   - EDI date range (current_year_butte_trap.csv `visitTime`) -->
-<!-- ```{r echo=FALSE} -->
-<!-- range(trap_butte_edi$visitTime) -->
-<!-- ``` -->
+*DB `water_velocity`*
 
-<!-- Random pick of data entry to compare between db and EDI -->
+* `r round(sum(is.na(trap_butte_db$water_velocity))/nrow(trap_butte_db), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_butte_db$water_velocity)
+```
 
-<!--   - test 1 -->
+*EDI `waterVel`*
+* `r round(sum(is.na(trap_butte_edi$waterVel))/nrow(trap_butte_edi), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_butte_edi$waterVel)
+```
 
-<!-- ```{r echo=FALSE} -->
-<!-- # # random pick to compare data  -->
-<!-- # trap_butte_bd |>  -->
-<!-- #   mutate(source = "DB") |>  -->
-<!-- #   filter(id == "2093136") |>  -->
-<!-- #   glimpse() -->
-<!-- #  -->
-<!-- # trap_butte_edi |>  -->
-<!-- #   mutate(source = "EDI") |>  -->
-<!-- #   filter(catchRawID == "55171") |>  -->
-<!-- #   glimpse() -->
-<!-- ``` -->
+#### fishProcessed
 
-## release
+*DB `fish_processed_id`*
+
+* `r round(sum(is.na(trap_butte_db$fish_processed_id))/nrow(trap_butte_db), 3)*100` % of values in the `fish_processed_id` column are NA.
+```{r echo=FALSE}
+table(trap_butte_db$fish_processed_id)
+```
+
+*EDI `fishProcessed`*
+* `r round(sum(is.na(trap_butte_edi$fishProcessed))/nrow(trap_butte_edi), 3)*100` % of values in the `fishProcessed` column are NA.
+```{r echo=FALSE}
+table(trap_butte_edi$fishProcessed)
+```
+
+Random pick of data entry by date to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+trap_butte_db |>
+  mutate(source = "DB",
+         trap_visit_time_start = as.Date(trap_visit_time_start)) |>
+  # filter(id == "2217421") |>
+  filter(trap_visit_time_start == "2017-11-10") |>
+  glimpse()
+
+trap_butte_edi |>
+  mutate(source = "EDI",
+         visitTime = as.Date(visitTime)) |>
+  filter(visitTime == "2017-11-10") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+trap_butte_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "2144") |>
+  glimpse()
+
+trap_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "2144") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+trap_butte_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "2327") |>
+  glimpse()
+
+trap_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "2327") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+trap_butte_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "3151") |>
+  glimpse()
+
+trap_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "3151") |>
+  glimpse()
+```
+
+### release
 
 **- Findings:**
+
    - time ranges are exactly the same
+   - all lifestage_id's are NA in DB
+   
 ```{r echo=FALSE}
 release_with_stream <- release |>
   left_join(trap_id)
@@ -400,48 +464,127 @@ for (param in filter_params_butte){
 }
 ```
 
-## TODO
-<!-- range(release_butte_db$date_released) -->
-<!-- ``` -->
+#### Date Range Check
 
-<!-- - EDI date range (`releaseTime`) -->
-
-<!-- ```{r include=FALSE} -->
-<!-- release_butte_edi <- read_csv("data-raw/edi-zips/butte_release.csv")  -->
-
-<!-- range(release_butte_edi$releaseTime, na.rm = TRUE) -->
-<!-- ``` -->
-
-<!-- *number_released and nReleased* -->
-
-<!-- * `r round(sum(is.na(release_butte_db$number_released))/nrow(release_butte_db), 3)*100` % of values in the `number_released` column in the database dataset are NA. -->
-
-<!-- * `r round(sum(is.na(release_butte_edi$nReleased))/nrow(release_butte_edi), 3)*100` % of values in the `nReleased` column in the database dataset are NA. -->
+*DB `date_released`* 
+```{r echo=FALSE}
+range(release_butte_db$date_released, na.rm = TRUE)
+```
+*EDI `releaseTime`*
+```{r}
+range(release_butte_edi$releaseTime)
+```
 
 
-<!-- ```{r echo=FALSE} -->
-<!-- release_butte_edi_clean<- release_butte_edi |>  -->
-<!--   mutate(date = as.Date(releaseTime))  -->
-<!-- release_butte_db_clean<- release_butte_db |>  -->
-<!--   mutate(date = as.Date(date_released))  -->
+#### markedLifeStage
 
-<!-- ggplot() + -->
-<!--   geom_jitter(data = release_butte_db_clean, -->
-<!--               aes(x = date, y = number_released), -->
-<!--               color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) + -->
-<!--   geom_jitter(data = release_butte_edi_clean, -->
-<!--               aes(x = date, y = nReleased), -->
-<!--               color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) + -->
-<!--   theme_minimal() + -->
-<!--   labs(x = "Date", -->
-<!--        y = "number_released or nReleased") -->
-<!-- ``` -->
+*EDI `markedLifeStage`*
 
-## recapture
+* `r round(sum(is.na(release_butte_edi$markedLifeStage))/nrow(release_butte_edi), 3)*100` % of values in the `markedLifeStage` column are NA.
+
+```{r echo=FALSE}
+table(release_butte_edi$markedLifeStage)
+```
+
+*DB `lifestage_id`*
+
+* `r round(sum(is.na(release_butte_db$lifestage_id))/nrow(release_butte_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(release_butte_db$lifestage_id, na.rm = TRUE)
+```
+
+#### nReleased
+
+*EDI `nReleased`*
+
+* `r round(sum(is.na(release_butte_edi$nReleased))/nrow(release_butte_edi), 3)*100` % of values in the `nReleased` column are NA.
+
+```{r echo=FALSE}
+summary(release_butte_edi$nReleased)
+```
+
+*DB `number_released`*
+
+* `r round(sum(is.na(release_butte_db$number_released))/nrow(release_butte_db), 3)*100` % of values in the `number_released` column are NA.
+
+```{r echo=FALSE}
+summary(release_butte_db$number_released, na.rm = TRUE)
+```
+
+*Exploration Plots* 
+
+```{r echo=FALSE}
+release_butte_edi_clean<- release_butte_edi |>
+  mutate(date = as.Date(releaseTime),
+         source = "EDI")
+release_butte_db_clean <- release_butte_db |>
+  mutate(date = as.Date(date_released),
+         source = "DB")
+
+ggplot() +
+  geom_jitter(data = release_butte_db_clean,
+              aes(x = date, y = number_released, color = source),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_butte_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased",
+       color = "Source"
+       )
+```
+
+Random pick of data entry by date to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+release_butte_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "267") |>
+  glimpse()
+
+release_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "267") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+release_butte_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "284") |>
+  glimpse()
+
+release_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "284") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+release_butte_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "256") |>
+  glimpse()
+
+release_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "256") |>
+  glimpse()
+```
+
+### recapture
 
 **- Findings:**
-   - database earliest year is 2023, edi is 2021
-   - all fork length values are NA on both datasets
+
+   - folk length values all are NA in both DB and EDI
 
 ```{r echo=FALSE}
 recapture_with_stream <- recaptured_fish |>
@@ -488,112 +631,133 @@ for (param in filter_params_butte){
     )
 }
 ```
-  <!-- - Database date range (`recaptured_fish`) -->
 
-<!-- ```{r echo=FALSE} -->
-<!-- recapture_butte_db <- recapture_with_stream |>  -->
-<!--   filter(stream %in% c("butte creek"))  -->
+#### Date Range Check
 
-<!-- range(recapture_butte_db$date) -->
-<!-- ``` -->
+*DB `date`* 
+```{r echo=FALSE}
+range(recapture_butte_db$date)
+```
+*EDI `date`*
+```{r}
+range(recapture_butte_edi$date)
+```
 
-<!-- - EDI date range (`visitTime`)  -->
+#### Count
 
-<!-- ```{r include=FALSE} -->
-<!-- recapture_butte_edi <- read_csv("data-raw/edi-zips/butte_recapture.csv") |> glimpse() -->
+*DB `count`* 
 
-<!-- range(recapture_butte_edi$visitTime, na.rm = TRUE) -->
-<!-- ``` -->
+* `r round(sum(is.na(recapture_butte_db$count))/nrow(recapture_butte_db), 3)*100` % of values in the `count` column are NA.
+```{r echo=FALSE}
+summary(recapture_butte_db$count, na.rm = TRUE)
+```
 
-<!-- *date vs count/number_recapture* -->
+*EDI `n`*
 
-<!-- * `r round(sum(is.na(recapture_butte_db$count))/nrow(recapture_butte_db), 3)*100` % of values in the `count` column from the database are NA. -->
+* `r round(sum(is.na(recapture_butte_edi$n))/nrow(recapture_butte_edi), 3)*100` % of values in the `n` column are NA.
+```{r}
+summary(recapture_butte_edi$n)
+```
 
-<!-- * `r round(sum(is.na(recapture_butte_edi$n))/nrow(recapture_butte_edi), 3)*100` % of values in the `n` column from EDI are NA. -->
-<!-- ```{r echo=FALSE, warning=FALSE} -->
-<!-- ggplot() + -->
-<!--   geom_jitter(data = recapture_butte_db, -->
-<!--               aes(x = date, y = count), -->
-<!--               color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) + -->
-<!--   geom_jitter(data = recapture_butte_edi, -->
-<!--               aes(x = as.Date(visitTime), y = n), -->
-<!--               color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) + -->
-<!--   theme_minimal() + -->
-<!--   labs(x = "Date Recaptured", -->
-<!--        y = "count/number_recaptured") -->
-<!-- ``` -->
 
-<!-- *fork_length* -->
 
-<!-- * `r round(sum(is.na(recapture_butte_db$fork_length))/nrow(recapture_butte_db), 3)*100` % of values in the `fork_length` column from the database are NA. -->
+#### lifeStage
 
-<!-- * `r round(sum(is.na(recapture_butte_edi$forkLength))/nrow(recapture_butte_edi), 3)*100` % of values in the `forkLength` column from EDI are NA. -->
+*EDI `lifeStage`*
 
-<!-- *lifestage* -->
+* `r round(sum(is.na(recapture_butte_edi$lifeStage))/nrow(recapture_butte_edi), 3)*100` % of values in the `lifeStage` column are NA.
 
-<!-- * `r round(sum(is.na(recapture_butte_db$lifestage_id))/nrow(recapture_butte_db), 3)*100` % of values in the `lifestage_id` column from the database are NA. -->
+```{r echo=FALSE}
+table(recapture_butte_edi$lifeStage)
+```
 
-<!-- * `r round(sum(is.na(recapture_butte_edi$lifeStage))/nrow(recapture_butte_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA. -->
+*DB `lifestage_id`*
 
-<!-- ```{r echo=FALSE, warning=FALSE} -->
-<!-- # plot -->
-<!-- ``` -->
+* `r round(sum(is.na(recapture_butte_db$lifestage_id))/nrow(recapture_butte_db), 3)*100` % of values in the `lifestage_id` column are NA.
 
-<!-- Random pick of data entry to compare between db and EDI -->
+```{r echo=FALSE}
+summary(recapture_butte_db$lifestage_id, na.rm = TRUE)
+```
 
-<!--   - test 1 -->
-<!-- ```{r echo=FALSE} -->
-<!-- # random pick to compare data  -->
-<!-- recapture_butte_db |>  -->
-<!--   mutate(source = "DB") |> -->
-<!--   filter(catch_raw_id == "48132") |> -->
-<!--   glimpse() -->
 
-<!-- recapture_butte_edi |>  -->
-<!--   mutate(source = "EDI") |> -->
-<!--   filter(catchRawID == "48132") |> -->
-<!--   glimpse() -->
-<!-- ``` -->
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_point(data = recapture_butte_db,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_point(data = recapture_butte_edi,
+              aes(x = as.Date(visitTime), y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/number_recaptured")
+```
 
-<!--   - test 2 -->
-<!-- ```{r echo=FALSE} -->
-<!-- # random pick to compare data  -->
-<!-- recapture_butte_db |>  -->
-<!--   mutate(source = "DB") |> -->
-<!--   filter(catch_raw_id == "48250") |> -->
-<!--   glimpse() -->
+#### forkLength
 
-<!-- recapture_butte_edi |>  -->
-<!--   mutate(source = "EDI") |> -->
-<!--   filter(catchRawID == "48250") |> -->
-<!--   glimpse() -->
-<!-- ``` -->
+*EDI `forkLength`*
 
-<!--   - test 3 -->
-<!-- ```{r echo=FALSE} -->
-<!-- # random pick to compare data  -->
-<!-- recapture_butte_db |>  -->
-<!--   mutate(source = "DB") |> -->
-<!--   filter(catch_raw_id == "46604") |> -->
-<!--   glimpse() -->
+* `r round(sum(is.na(recapture_butte_edi$forkLength))/nrow(recapture_butte_edi), 3)*100` % of values in the `forkLength` column are NA.
 
-<!-- recapture_butte_edi |>  -->
-<!--   mutate(source = "EDI") |> -->
-<!--   filter(catchRawID == "46604") |> -->
-<!--   glimpse() -->
-<!-- ``` -->
+*DB `fork_length`*
 
-<!--   - test 4 -->
-<!-- ```{r echo=FALSE} -->
-<!-- # random pick to compare data  -->
-<!-- recapture_butte_db |>  -->
-<!--   mutate(source = "DB") |> -->
-<!--   filter(catch_raw_id == "45421") |> -->
-<!--   glimpse() -->
+* `r round(sum(is.na(recapture_butte_db$fork_length))/nrow(recapture_butte_db), 3)*100` % of values in the `fork_length` column are NA.
 
-<!-- recapture_butte_edi |>  -->
-<!--   mutate(source = "EDI") |> -->
-<!--   filter(catchRawID == "45421") |> -->
-<!--   glimpse() -->
-<!-- ``` -->
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+recapture_butte_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "48132") |>
+  glimpse()
+
+recapture_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "48132") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+recapture_butte_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "48250") |>
+  glimpse()
+
+recapture_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "48250") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+recapture_butte_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "46604") |>
+  glimpse()
+
+recapture_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "46604") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+recapture_butte_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "45421") |>
+  glimpse()
+
+recapture_butte_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "45421") |>
+  glimpse()
+```
 
