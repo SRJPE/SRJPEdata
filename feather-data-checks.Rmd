@@ -296,15 +296,14 @@ Random pick of data entry by date to compare between db and EDI
 
   - test 1
 ```{r echo=FALSE}
-# random pick to compare data
 trap_feather_db |>
-  mutate(source = "DB",
-         trap_visit_time_start = as.Date(trap_visit_time_start)) |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "23") |>
   glimpse()
 
 trap_feather_edi |>
-  mutate(source = "EDI",
-         visitTime = as.Date(visitTime)) |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "23") |>
   glimpse()
 ```
 
