@@ -1,6 +1,6 @@
 ---
 title: "feather-data-checks"
-author: "Inigo Peng"
+author: "Inigo Peng, edited by Badhia Yunes-Katz"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -45,9 +45,9 @@ catch_with_stream <- catch |>
   left_join(trap_id)
 ```
 
-# Feather
+## Feather {.tabset}
 
-## catch
+### catch
 
 **- Findings catch:**
 
@@ -62,7 +62,7 @@ catch_feather_edi <- read_csv("data-raw/edi-zips/feather_catch.csv") |>
          date = as.Date(visitTime))
 ```
 
-### Date Range Check
+#### Date Range Check
 *EDI `date`*
 ```{r}
 range(catch_feather_edi$date)
@@ -77,7 +77,7 @@ catch_feather_db <- catch_with_stream |>
 range(catch_feather_db$date)
 ```
 
-### ForkLength
+#### ForkLength
 *EDI `forkLength`*
 
 * `r round(sum(is.na(catch_feather_edi$forkLength))/nrow(catch_feather_edi), 3)*100` % of values in the `forkLength` column are NA.
@@ -116,7 +116,7 @@ ggplot(data = combined_catch_feather, aes(x = date, y = fork_length, color = sou
   facet_wrap(~source)
 ```
 
-### Lifestage
+#### Lifestage
 (life stage in edi data has not gone through wrangling)
 
 *EDI `lifeStage`*
@@ -146,7 +146,7 @@ catch_feather_edi |>
   labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
 ```
 
-### Count
+#### Count
 TODO: EDI data contains lifestage value "mixed" but not in lifestage lookuptable
 
 *EDI `n`*
@@ -231,7 +231,7 @@ catch_feather_edi |>
   glimpse()
 ```
 
-## trap
+### trap
 
 **- Findings trap:**
 
@@ -336,7 +336,7 @@ trap_feather_edi |>
   glimpse()
 ```
 
-## recapture
+### recapture
 
 **- Findings recapture:**
 
@@ -490,7 +490,7 @@ recapture_feather_edi |>
   glimpse()
 ```
 
-## release
+### release
 
 **- Findings release:**
 
@@ -639,7 +639,7 @@ release_feather_edi |>
   glimpse()
 ```
 
-## releasefish
+### releasefish
 
 **- Findings releasefish:**
 
@@ -655,6 +655,18 @@ release_fish_feather_db <- release_fish_with_stream |>
 release_fish_feather_edi <- read_csv("data-raw/edi-zips/feather_releasefish.csv") |>
   # filter(commonName == "Chinook salmon") |>
   mutate(stream="feather river")
+```
+
+#### column names
+
+*EDI*
+```{r echo=FALSE}
+colnames(release_fish_feather_edi)
+```
+
+*DB*
+```{r echo=FALSE}
+colnames(release_fish_feather_db)
 ```
 
 #### forkLength
