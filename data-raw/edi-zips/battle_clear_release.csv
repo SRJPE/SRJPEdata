@@ -1,0 +1,855 @@
+release_id,date_released,time_released,release_site,site,number_released,median_fork_length_released,days_held_post_mark,day_or_night_release,release_temp,release_flow,release_turbidity,origin_released
+CLR171,2003-12-03,16:12:00,vulture bar,lower clear creek,14,34,0,night,51.3,227,NA,NA
+CLR172,2003-12-03,16:12:00,clear creek road bridge,upper clear creek,20,33.5,0,night,49.59,227,NA,NA
+CLR173,2003-12-13,15:13:00,vulture bar,lower clear creek,259,35,0,night,49.1,333,NA,NA
+CLR174,2003-12-13,15:13:00,clear creek road bridge,upper clear creek,259,35,0,day,48.76,333,NA,NA
+CLR175,2003-12-17,15:46:00,vulture bar,lower clear creek,105,35,0,night,48.2,252,NA,NA
+CLR176,2003-12-17,15:46:00,clear creek road bridge,upper clear creek,60,33,0,night,47.37,252,NA,NA
+CLR177,2003-12-19,14:38:00,vulture bar,lower clear creek,241,35,0,day,47.1,238,NA,NA
+CLR178,2003-12-19,14:56:00,clear creek road bridge,upper clear creek,409,35,0,day,46.544,241,NA,NA
+CLR179,2004-01-13,10:04:00,clear creek road bridge,upper clear creek,248,36,1,day,44.33,323,NA,NA
+CLR180,2004-01-13,12:37:00,vulture bar,lower clear creek,247,36,1,night,46,323,NA,NA
+CLR181,2004-01-30,18:41:00,vulture bar,lower clear creek,398,38,1,NA,46.3,267,NA,NA
+CLR182,2004-01-30,19:03:00,clear creek road bridge,upper clear creek,400,37.5,1,night,45.99,267,NA,NA
+CLR183,2004-02-06,18:33:00,vulture bar,lower clear creek,395,37,1,night,46.3,323,NA,NA
+CLR184,2004-02-06,18:53:00,clear creek road bridge,upper clear creek,400,37,1,night,45.99,323,NA,NA
+CLR185,2004-02-10,17:20:00,clear creek road bridge,upper clear creek,397,37,1,night,45.99,270,NA,NA
+CLR186,2004-02-10,17:46:00,vulture bar,lower clear creek,398,37,1,night,47.1,270,NA,NA
+CLR187,2004-02-13,15:13:00,vulture bar,lower clear creek,447,37.5,1,night,45.4,258,NA,NA
+CLR188,2004-02-13,19:20:00,clear creek road bridge,upper clear creek,367,38,1,night,45.45,264,NA,NA
+CLR189,2004-02-24,14:03:00,vulture bar,lower clear creek,398,38,1,day,50.5,401,NA,NA
+CLR190,2004-02-24,14:27:00,clear creek road bridge,upper clear creek,406,37,1,day,48.49,401,NA,NA
+CLR191,2004-03-02,17:30:00,vulture bar,lower clear creek,402,37,1,night,50.7,614,NA,NA
+CLR192,2004-03-02,17:46:00,clear creek road bridge,upper clear creek,405,38,1,night,49.87,614,NA,NA
+CLR193,2004-03-05,17:32:00,vulture bar,lower clear creek,397,38,1,night,49.9,397,NA,NA
+CLR194,2004-03-05,17:48:00,clear creek road bridge,upper clear creek,389,38,1,night,49.59,397,NA,NA
+CLR195,2004-03-05,17:48:00,clear creek road bridge,upper clear creek,54,44.5,1,night,49.59,397,NA,NA
+CLR196,2004-03-09,13:35:00,vulture bar,lower clear creek,296,39.5,1,day,53.8,323,NA,NA
+CLR197,2004-03-09,13:55:00,clear creek road bridge,upper clear creek,298,38,1,day,50.72,304,NA,NA
+CLR198,2004-03-12,15:09:00,vulture bar,lower clear creek,397,38,1,day,54.6,290,NA,NA
+CLR199,2004-03-12,15:23:00,clear creek road bridge,upper clear creek,368,37,1,day,51.28,290,NA,NA
+CLR200,2004-03-12,15:23:00,clear creek road bridge,upper clear creek,24,49,1,day,51.28,290,NA,NA
+CLR201,2004-03-16,14:45:00,vulture bar,lower clear creek,385,38,1,day,55.2,270,NA,NA
+CLR202,2004-03-16,15:10:00,clear creek road bridge,upper clear creek,384,37,1,day,51.57,270,NA,NA
+CLR203,2004-03-16,15:10:00,clear creek road bridge,upper clear creek,8,63,1,day,51.57,270,NA,NA
+CLR204,2004-03-26,14:20:00,vulture bar,lower clear creek,368,37,1,day,50.7,267,NA,NA
+CLR205,2004-03-26,14:35:00,clear creek road bridge,upper clear creek,358,38,1,day,48.49,267,NA,NA
+CLR206,2004-03-26,14:35:00,clear creek road bridge,upper clear creek,30,70,1,day,48.49,267,NA,NA
+CLR207,2004-04-02,11:55:00,clear creek road bridge,upper clear creek,402,39,1,day,49.32,250,NA,NA
+CLR208,2004-04-02,11:55:00,clear creek road bridge,upper clear creek,27,52,1,day,49.32,253,NA,NA
+CLR209,2004-04-09,14:00:00,clear creek road bridge,upper clear creek,153,37,1,day,53.49,241,NA,NA
+CLR210,2004-04-09,14:00:00,clear creek road bridge,upper clear creek,33,54,1,day,53.49,241,NA,NA
+CLR211,2004-04-16,11:10:00,clear creek road bridge,upper clear creek,272,37,1,day,49.59,239,NA,NA
+CLR212,2004-04-16,11:10:00,clear creek road bridge,upper clear creek,81,64.5,1,day,49.59,239,NA,NA
+CLR213,2005-01-04,19:30:00,vulture bar,lower clear creek,422,36.5,1,night,45.2,284,NA,NA
+CLR214,2005-01-04,19:50:00,clear creek road bridge,upper clear creek,437,35.5,1,night,46.56,284,NA,NA
+CLR215,2005-01-07,22:45:00,vulture bar,lower clear creek,240,34.5,1,night,44.9,319,NA,NA
+CLR216,2005-01-07,23:24:00,clear creek road bridge,upper clear creek,240,35,1,night,45.16,319,NA,NA
+CLR217,2005-01-11,23:22:00,vulture bar,lower clear creek,409,37,1,night,45.7,344,NA,NA
+CLR218,2005-01-11,23:46:00,clear creek road bridge,upper clear creek,414,37,1,night,46,344,NA,NA
+CLR219,2005-01-13,23:47:00,vulture bar,lower clear creek,281,37,1,night,44.6,273,NA,NA
+CLR220,2005-01-14,00:12:00,clear creek road bridge,upper clear creek,400,36,1,night,45.45,287,NA,NA
+CLR221,2005-01-17,18:35:00,vulture bar,lower clear creek,52,43,1,night,47.4,258,NA,NA
+CLR222,2005-01-17,18:58:00,clear creek road bridge,upper clear creek,53,36,1,night,47.68,258,NA,NA
+CLR223,2005-01-21,18:19:00,vulture bar,lower clear creek,400,36.5,1,night,46.8,247,NA,NA
+CLR224,2005-01-21,18:35:00,clear creek road bridge,upper clear creek,400,37,1,night,47.1,247,NA,NA
+CLR225,2005-01-25,17:43:00,vulture bar,lower clear creek,431,37,1,night,47.4,241,NA,NA
+CLR226,2005-01-25,18:05:00,clear creek road bridge,upper clear creek,401,38,1,night,47.39,241,NA,NA
+CLR227,2005-01-28,16:52:00,vulture bar,lower clear creek,424,NA,1,night,48.5,458,NA,NA
+CLR228,2005-01-28,17:09:00,clear creek road bridge,upper clear creek,398,36,1,night,48.51,454,NA,NA
+CLR229,2005-02-01,17:30:00,vulture bar,lower clear creek,411,38,1,night,48.2,278,NA,NA
+CLR230,2005-02-01,17:49:00,clear creek road bridge,upper clear creek,411,36,1,night,47.95,278,NA,NA
+CLR231,2005-02-04,17:53:00,vulture bar,lower clear creek,424,37,1,night,47.7,261,NA,NA
+CLR232,2005-02-04,18:11:00,clear creek road bridge,upper clear creek,459,37,1,night,47.95,261,NA,NA
+CLR233,2005-02-08,18:48:00,vulture bar,lower clear creek,418,38,1,night,47.9,247,NA,NA
+CLR234,2005-02-08,19:12:00,clear creek road bridge,upper clear creek,464,37,1,night,47.95,247,NA,NA
+CLR235,2005-02-11,18:29:00,vulture bar,lower clear creek,402,37,1,night,47.9,241,NA,NA
+CLR236,2005-02-11,18:47:00,clear creek road bridge,upper clear creek,399,37,1,night,47.95,241,NA,NA
+CLR237,2005-02-15,18:02:00,vulture bar,lower clear creek,380,38,1,night,47.4,225,NA,NA
+CLR238,2005-02-15,18:19:00,clear creek road bridge,upper clear creek,412,36,1,night,47.68,225,NA,NA
+CLR239,2005-02-18,17:51:00,vulture bar,lower clear creek,379,37,1,night,47.9,223,NA,NA
+CLR240,2005-02-18,18:10:00,clear creek road bridge,upper clear creek,348,37,1,night,47.68,223,NA,NA
+CLR241,2005-02-22,17:32:00,vulture bar,lower clear creek,411,35,1,night,50.8,308,NA,NA
+CLR242,2005-02-22,17:57:00,clear creek road bridge,upper clear creek,405,37,1,night,50.18,308,NA,NA
+CLR243,2005-02-25,18:05:00,vulture bar,lower clear creek,398,36,1,night,50.5,270,NA,NA
+CLR244,2005-02-25,18:20:00,clear creek road bridge,upper clear creek,400,36,1,night,49.62,270,NA,NA
+CLR245,2005-03-01,14:01:00,vulture bar,lower clear creek,418,37,1,day,49.9,359,NA,NA
+CLR246,2005-03-01,14:33:00,clear creek road bridge,upper clear creek,422,36,1,day,49.33,355,NA,NA
+CLR247,2005-03-04,17:43:00,vulture bar,lower clear creek,306,36,1,night,52.4,319,NA,NA
+CLR248,2005-03-04,18:02:00,clear creek road bridge,upper clear creek,384,36,1,night,51.3,319,NA,NA
+CLR249,2005-03-08,18:28:00,vulture bar,lower clear creek,214,37,1,night,53.5,270,NA,NA
+CLR250,2005-03-08,18:47:00,clear creek road bridge,upper clear creek,212,36,1,night,52.41,270,NA,NA
+CLR251,2005-03-11,18:20:00,vulture bar,lower clear creek,261,37.5,1,night,53.8,258,NA,NA
+CLR252,2005-03-11,18:45:00,clear creek road bridge,upper clear creek,229,37,1,night,52.68,258,NA,NA
+CLR253,2005-03-15,17:27:00,vulture bar,lower clear creek,92,33,1,night,52.4,247,NA,NA
+CLR254,2005-03-15,17:43:00,clear creek road bridge,upper clear creek,97,35,1,night,51.03,247,NA,NA
+CLR255,2005-03-25,17:11:00,vulture bar,lower clear creek,319,NA,1,night,52.1,421,NA,NA
+CLR256,2005-03-25,17:27:00,clear creek road bridge,upper clear creek,398,36,1,night,51.85,421,NA,NA
+CLR257,2005-03-29,16:13:00,vulture bar,lower clear creek,388,38,1,day,54.1,386,NA,NA
+CLR258,2005-03-29,16:32:00,clear creek road bridge,upper clear creek,401,43,1,day,52.14,386,NA,NA
+CLR259,2005-04-01,15:37:00,clear creek road bridge,upper clear creek,212,38.5,1,day,51.85,319,NA,NA
+CLR260,2005-04-01,15:37:00,vulture bar,lower clear creek,253,36,1,day,52.7,319,NA,NA
+CLR261,2005-04-05,15:04:00,vulture bar,lower clear creek,398,36,1,day,55.5,308,NA,NA
+CLR262,2005-04-05,15:21:00,clear creek road bridge,upper clear creek,396,36,1,day,53.53,308,NA,NA
+CLR263,2005-04-08,18:45:00,vulture bar,lower clear creek,202,37,1,night,50.5,421,NA,NA
+CLR264,2005-04-08,19:15:00,clear creek road bridge,upper clear creek,202,39,1,night,50.47,417,NA,NA
+CLR265,2005-04-12,18:18:00,clear creek road bridge,upper clear creek,363,53,1,night,52.14,312,NA,NA
+CLR266,2005-04-12,18:46:00,vulture bar,lower clear creek,364,44,1,night,52.4,312,NA,NA
+CLR267,2005-04-15,17:40:00,vulture bar,lower clear creek,218,48.5,1,night,56.6,284,NA,NA
+CLR268,2005-04-15,18:02:00,clear creek road bridge,upper clear creek,106,62,1,night,54.93,284,NA,NA
+CLR269,2005-04-19,18:42:00,vulture bar,lower clear creek,273,48,1,night,56.3,267,NA,NA
+CLR270,2005-04-19,18:54:00,clear creek road bridge,upper clear creek,242,53,1,night,54.93,267,NA,NA
+CLR271,2005-04-22,18:24:00,clear creek road bridge,upper clear creek,131,57,1,night,56.05,261,NA,NA
+CLR272,2005-04-26,17:32:00,vulture bar,lower clear creek,120,69,1,night,58.8,261,NA,NA
+CLR273,2005-04-29,16:35:00,clear creek road bridge,upper clear creek,62,62,1,day,54.93,255,NA,NA
+CLR274,2005-05-03,15:03:00,vulture bar,lower clear creek,81,65,1,day,59.4,250,NA,NA
+CLR275,2005-05-06,16:44:00,clear creek road bridge,upper clear creek,116,63,1,day,53.82,281,NA,NA
+CLR276,2005-05-06,17:01:00,vulture bar,lower clear creek,110,62,1,day,56.3,281,NA,NA
+CLR277,2005-05-13,15:32:00,vulture bar,lower clear creek,96,64,1,day,60.5,319,NA,NA
+CLR278,2005-05-13,16:00:00,clear creek road bridge,upper clear creek,107,59,1,day,57.99,319,NA,NA
+CLR279,2005-12-23,17:25:00,vulture bar,lower clear creek,186,35.5,0,night,52.3,359,NA,NA
+CLR280,2005-12-23,18:01:00,clear creek road bridge,upper clear creek,173,36,0,night,52.14,355,NA,NA
+CLR281,2006-01-06,21:20:00,clear creek road bridge,upper clear creek,392,35,0,night,50.74,417,NA,NA
+CLR282,2006-01-11,17:00:00,clear creek road bridge,upper clear creek,177,37.5,1,night,50.47,337,NA,NA
+CLR283,2006-01-14,18:28:00,clear creek road bridge,upper clear creek,198,36,1,night,49.62,378,NA,NA
+CLR284,2006-01-20,17:40:00,vulture bar,lower clear creek,392,35,1,night,46.8,378,NA,NA
+CLR285,2006-01-20,18:00:00,clear creek road bridge,upper clear creek,390,36,1,night,47.68,382,NA,NA
+CLR286,2006-01-24,00:07:00,vulture bar,lower clear creek,395,37,1,night,46.8,299,NA,NA
+CLR287,2006-01-24,00:30:00,clear creek road bridge,upper clear creek,399,37,1,night,47.1,299,NA,NA
+CLR288,2006-01-27,16:50:00,vulture bar,lower clear creek,408,37,1,night,NA,281,NA,NA
+CLR289,2006-01-27,17:00:00,clear creek road bridge,upper clear creek,410,36,1,night,47.39,287,NA,NA
+CLR290,2006-01-31,13:45:00,vulture bar,lower clear creek,406,37,1,day,47,437,NA,NA
+CLR291,2006-01-31,14:04:00,clear creek road bridge,upper clear creek,401,37,1,day,47.68,433,NA,NA
+CLR292,2006-02-03,17:45:00,clear creek road bridge,upper clear creek,354,37,1,night,51.3,425,NA,NA
+CLR293,2006-02-03,18:00:00,vulture bar,lower clear creek,359,36,1,night,51,425,NA,NA
+CLR294,2006-02-07,16:10:00,vulture bar,lower clear creek,315,36,1,night,50.1,326,NA,NA
+CLR295,2006-02-07,16:30:00,clear creek road bridge,upper clear creek,315,36,1,night,49.33,326,NA,NA
+CLR296,2006-02-10,19:02:00,vulture bar,lower clear creek,372,36.5,1,night,49,293,NA,NA
+CLR297,2006-02-10,19:24:00,clear creek road bridge,upper clear creek,412,36,1,night,49.62,293,NA,NA
+CLR298,2006-02-17,16:48:00,vulture bar,lower clear creek,393,37,1,night,47.3,267,NA,NA
+CLR299,2006-02-17,17:06:00,clear creek road bridge,upper clear creek,399,37,1,night,47.1,267,NA,NA
+CLR300,2006-02-24,19:26:00,vulture bar,lower clear creek,407,37,1,night,48.1,253,NA,NA
+CLR301,2006-02-24,19:45:00,clear creek road bridge,upper clear creek,417,36,1,night,48.51,253,NA,NA
+CLR302,2006-03-03,18:15:00,vulture bar,lower clear creek,396,37,1,night,47,405,NA,NA
+CLR303,2006-03-03,18:33:00,clear creek road bridge,upper clear creek,401,38,1,night,47.1,405,NA,NA
+CLR304,2006-03-10,18:18:00,vulture bar,lower clear creek,415,37,1,night,45.9,409,NA,NA
+CLR305,2006-03-10,18:34:00,clear creek road bridge,upper clear creek,425,37,1,night,46,405,NA,NA
+CLR306,2006-03-17,18:14:00,vulture bar,lower clear creek,412,37,1,night,50.4,521,NA,NA
+CLR307,2006-03-17,18:27:00,clear creek road bridge,upper clear creek,408,36,1,night,50.47,516,NA,NA
+CLR308,2006-03-21,16:30:00,vulture bar,lower clear creek,299,36,1,day,47.9,441,NA,NA
+CLR309,2006-03-21,16:45:00,clear creek road bridge,upper clear creek,297,37,1,day,48.22,441,NA,NA
+CLR310,2006-03-29,18:40:00,vulture bar,lower clear creek,140,37.5,1,night,49,409,NA,NA
+CLR311,2006-03-29,18:55:00,clear creek road bridge,upper clear creek,135,37,1,night,49.06,409,NA,NA
+CLR312,2006-04-04,20:00:00,vulture bar,lower clear creek,177,36,1,night,50.1,547,NA,NA
+CLR313,2006-04-04,20:16:00,clear creek road bridge,upper clear creek,177,36.5,1,night,50.18,547,NA,NA
+CLR314,2006-04-18,18:12:00,vulture bar,lower clear creek,135,36.5,1,night,54.3,450,NA,NA
+CLR315,2006-12-13,16:33:00,clear creek road bridge,upper clear creek,485,35,0,night,51.03,278,NA,NA
+CLR316,2006-12-19,16:30:00,clear creek road bridge,upper clear creek,361,35,1,night,NA,231,NA,NA
+CLR317,2006-12-28,16:10:00,clear creek road bridge,upper clear creek,401,35,1,night,NA,275,NA,NA
+CLR318,2007-01-08,17:13:00,clear creek road bridge,upper clear creek,353,37,1,night,48.72,220,NA,NA
+CLR319,2007-01-08,17:55:00,vulture bar,lower clear creek,340,36.5,1,night,47.3,220,NA,NA
+CLR320,2007-01-18,16:50:00,clear creek road bridge,upper clear creek,401,37,1,night,43.72,215,NA,NA
+CLR321,2007-01-25,17:00:00,clear creek road bridge,upper clear creek,398,37,1,night,43.26,217,NA,NA
+CLR322,2007-01-25,17:30:00,vulture bar,lower clear creek,401,38,1,night,44.4,217,NA,NA
+CLR323,2007-01-31,16:30:00,vulture bar,lower clear creek,399,38,1,night,44.7,215,NA,NA
+CLR324,2007-01-31,17:30:00,clear creek road bridge,upper clear creek,408,37,1,night,43.12,215,NA,NA
+CLR325,2007-02-06,17:54:00,vulture bar,lower clear creek,378,39,1,night,45.8,215,NA,NA
+CLR326,2007-02-09,18:20:00,clear creek road bridge,upper clear creek,409,38,1,night,44.95,267,NA,NA
+CLR327,2007-02-09,19:15:00,vulture bar,lower clear creek,400,38,2,night,45.7,267,NA,NA
+CLR328,2007-02-13,17:19:00,vulture bar,lower clear creek,389,37,1,night,48,270,NA,NA
+CLR329,2007-02-13,17:48:00,clear creek road bridge,upper clear creek,399,38,1,night,46.21,267,NA,NA
+CLR330,2007-02-21,16:35:00,vulture bar,lower clear creek,432,39,1,night,46,417,NA,NA
+CLR331,2007-02-22,16:13:00,vulture bar,lower clear creek,400,38,0,day,48.2,458,NA,NA
+CLR332,2007-02-28,16:31:00,vulture bar,lower clear creek,405,38,1,night,47.3,312,NA,NA
+CLR333,2007-02-28,17:07:00,clear creek road bridge,upper clear creek,393,38,1,night,NA,312,NA,NA
+CLR334,2007-03-07,17:35:00,clear creek road bridge,upper clear creek,382,38,1,night,NA,255,NA,NA
+CLR335,2007-03-07,18:30:00,vulture bar,lower clear creek,398,38,1,night,48,255,NA,NA
+CLR336,2007-03-13,18:12:00,clear creek road bridge,upper clear creek,382,38,1,night,NA,236,NA,NA
+CLR337,2007-03-13,18:55:00,vulture bar,lower clear creek,398,38,1,night,53.7,236,NA,NA
+CLR338,2007-03-20,17:30:00,clear creek road bridge,upper clear creek,319,38,0,night,NA,231,NA,NA
+CLR339,2007-03-20,18:00:00,vulture bar,lower clear creek,410,37.5,1,night,54.1,231,NA,NA
+CLR340,2007-03-28,18:35:00,clear creek road bridge,upper clear creek,380,38,1,night,50,225,NA,NA
+CLR341,2007-03-28,19:30:00,vulture bar,lower clear creek,396,38,1,night,51.7,225,NA,NA
+CLR342,2007-04-03,17:15:00,clear creek road bridge,upper clear creek,394,38,1,night,51.06,203,NA,NA
+CLR343,2007-04-03,18:00:00,vulture bar,lower clear creek,413,37,1,night,54.5,203,NA,NA
+CLR344,2007-04-10,17:25:00,clear creek road bridge,upper clear creek,383,38,1,night,51.19,236,NA,NA
+CLR345,2007-04-10,20:05:00,vulture bar,lower clear creek,396,38,1,night,52.5,236,NA,NA
+CLR346,2007-04-17,19:40:00,vulture bar,lower clear creek,397,38,0,night,52.5,236,NA,NA
+CLR347,2007-04-25,19:59:00,vulture bar,lower clear creek,415,40,1,night,55.5,241,NA,NA
+CLR348,2007-05-03,19:15:00,clear creek road bridge,upper clear creek,85,65,1,night,50.92,231,NA,NA
+CLR349,2007-05-03,19:48:00,vulture bar,lower clear creek,343,38,1,night,NA,NA,NA,NA
+CLR350,2007-05-15,18:00:00,clear creek road bridge,upper clear creek,136,59.5,1,night,56.25,225,NA,NA
+CLR351,2007-05-15,18:45:00,vulture bar,lower clear creek,302,42,1,night,NA,NA,NA,NA
+CLR352,2007-12-16,21:23:00,clear creek road bridge,upper clear creek,191,34,1,night,47.83,247,NA,NA
+CLR353,2007-12-22,20:07:00,vulture bar,lower clear creek,402,35,1,night,46.5,225,NA,NA
+CLR354,2007-12-22,21:01:00,clear creek road bridge,upper clear creek,400,35,1,night,47.38,223,NA,NA
+CLR355,2007-12-29,21:24:00,clear creek road bridge,upper clear creek,325,36,1,night,45.13,217,NA,NA
+CLR356,2007-12-31,19:15:00,vulture bar,lower clear creek,398,37,0,night,44.7,215,NA,NA
+CLR357,2008-01-03,21:38:00,clear creek road bridge,upper clear creek,496,38,0,night,44.58,752,NA,NA
+CLR358,2008-01-08,21:10:00,clear creek road bridge,upper clear creek,391,37,1,night,43.58,439,NA,NA
+CLR359,2008-01-08,23:30:00,vulture bar,lower clear creek,397,39,1,night,43.9,408,NA,NA
+CLR360,2008-01-12,22:08:00,clear creek road bridge,upper clear creek,318,37,1,night,45.35,270,NA,NA
+CLR361,2008-01-12,00:00:00,vulture bar,lower clear creek,401,37,1,night,45.3,287,NA,NA
+CLR362,2008-01-15,18:08:00,vulture bar,lower clear creek,399,38,1,night,44.3,239,NA,NA
+CLR363,2008-01-15,18:39:00,clear creek road bridge,upper clear creek,402,38,1,night,44.49,239,NA,NA
+CLR364,2008-01-19,22:10:00,clear creek road bridge,upper clear creek,401,38,1,night,44.13,225,NA,NA
+CLR365,2008-01-19,23:32:00,vulture bar,lower clear creek,398,37,1,night,43.3,225,NA,NA
+CLR366,2008-01-23,21:35:00,vulture bar,lower clear creek,417,37,1,night,43.7,220,NA,NA
+CLR367,2008-01-23,21:55:00,clear creek road bridge,upper clear creek,394,38,1,night,43.94,220,NA,NA
+CLR368,2008-01-26,22:45:00,vulture bar,lower clear creek,405,39,1,night,45.9,443,NA,NA
+CLR369,2008-01-26,23:04:00,clear creek road bridge,upper clear creek,399,39,1,night,45.22,443,NA,NA
+CLR370,2008-01-29,22:30:00,vulture bar,lower clear creek,401,39,1,night,42.3,317,NA,NA
+CLR371,2008-01-29,22:45:00,clear creek road bridge,upper clear creek,406,37,1,night,42.71,317,NA,NA
+CLR372,2008-02-05,19:00:00,vulture bar,lower clear creek,408,39,1,night,45.2,327,NA,NA
+CLR373,2008-02-05,19:20:00,clear creek road bridge,upper clear creek,405,39,1,night,45.08,327,NA,NA
+CLR374,2008-02-09,18:18:00,vulture bar,lower clear creek,418,39,1,night,46.3,276,NA,NA
+CLR375,2008-02-09,18:45:00,clear creek road bridge,upper clear creek,410,39,1,night,45.67,276,NA,NA
+CLR376,2008-02-12,17:45:00,vulture bar,lower clear creek,407,38,1,night,47.1,273,NA,NA
+CLR377,2008-02-12,18:15:00,clear creek road bridge,upper clear creek,401,38,1,night,45.17,270,NA,NA
+CLR378,2008-02-16,17:35:00,vulture bar,lower clear creek,410,39,1,night,46.5,247,NA,NA
+CLR379,2008-02-16,17:50:00,clear creek road bridge,upper clear creek,402,38,1,night,45.58,247,NA,NA
+CLR380,2008-02-20,17:30:00,clear creek road bridge,upper clear creek,399,38,1,night,45.26,241,NA,NA
+CLR381,2008-02-20,17:55:00,vulture bar,lower clear creek,402,38,1,night,46.6,241,NA,NA
+CLR382,2008-02-22,20:10:00,vulture bar,lower clear creek,402,39,0,night,46.3,327,NA,NA
+CLR383,2008-02-22,20:30:00,clear creek road bridge,upper clear creek,402,38,0,night,46.17,327,NA,NA
+CLR384,2008-02-26,17:30:00,vulture bar,lower clear creek,396,38,0,night,49.1,425,NA,NA
+CLR385,2008-02-26,17:45:00,clear creek road bridge,upper clear creek,397,38,0,night,48.67,425,NA,NA
+CLR386,2008-03-01,18:05:00,vulture bar,lower clear creek,402,37,1,night,48.8,296,NA,NA
+CLR387,2008-03-01,18:20:00,clear creek road bridge,upper clear creek,405,38,1,night,47.06,296,NA,NA
+CLR388,2008-03-04,18:34:00,clear creek road bridge,upper clear creek,374,38,1,night,47.74,270,NA,NA
+CLR389,2008-03-04,18:47:00,vulture bar,lower clear creek,371,38,1,night,48.8,270,NA,NA
+CLR390,2008-03-08,18:00:00,clear creek road bridge,upper clear creek,402,38,1,night,47.83,253,NA,NA
+CLR391,2008-03-08,18:13:00,vulture bar,lower clear creek,401,38,1,night,49.2,253,NA,NA
+CLR392,2008-03-11,19:17:00,clear creek road bridge,upper clear creek,405,37,1,night,48.94,244,NA,NA
+CLR393,2008-03-11,19:34:00,vulture bar,lower clear creek,404,38,1,night,51,247,NA,NA
+CLR394,2008-03-15,18:25:00,clear creek road bridge,upper clear creek,406,37,1,night,47.42,241,NA,NA
+CLR395,2008-03-15,19:10:00,vulture bar,lower clear creek,405,38,1,night,49.1,241,NA,NA
+CLR396,2008-03-18,19:02:00,clear creek road bridge,upper clear creek,402,38,1,night,50.31,236,NA,NA
+CLR397,2008-03-18,19:17:00,vulture bar,lower clear creek,401,38,1,night,53,236,NA,NA
+CLR398,2008-03-22,19:00:00,clear creek road bridge,upper clear creek,410,37,1,night,49.91,231,NA,NA
+CLR399,2008-03-25,19:00:00,clear creek road bridge,upper clear creek,394,38,1,night,50.93,231,NA,NA
+CLR400,2008-03-25,19:25:00,vulture bar,lower clear creek,397,37,1,night,53.5,231,NA,NA
+CLR401,2008-03-29,19:00:00,vulture bar,lower clear creek,405,37,1,night,51,228,NA,NA
+CLR402,2008-04-01,19:10:00,vulture bar,lower clear creek,404,37,1,night,52.7,225,NA,NA
+CLR403,2008-04-05,18:35:00,vulture bar,lower clear creek,401,36,1,night,54.1,225,NA,NA
+CLR404,2008-04-08,19:00:00,vulture bar,lower clear creek,411,37,1,night,54,225,NA,NA
+CLR405,2008-12-06,16:45:00,clear creek road bridge,upper clear creek,334,34,1,night,49.69,194,0.9,NA
+CLR406,2008-12-08,16:52:00,clear creek road bridge,upper clear creek,405,35,1,night,50.27,194,1.05,NA
+CLR407,2008-12-11,16:55:00,clear creek road bridge,upper clear creek,404,35,1,night,50.18,265,1.05,NA
+CLR408,2008-12-15,17:05:00,clear creek road bridge,upper clear creek,402,34,1,night,48.36,204,1.03,NA
+CLR409,2008-12-18,16:58:00,clear creek road bridge,upper clear creek,403,35,1,night,47.51,204,0.99,NA
+CLR410,2008-12-18,17:20:00,vulture bar,lower clear creek,402,34,1,night,46.1,204,1.37,NA
+CLR411,2008-12-22,17:15:00,clear creek road bridge,upper clear creek,418,34,1,night,47.38,204,0.98,NA
+CLR412,2008-12-22,17:55:00,vulture bar,lower clear creek,398,36,1,night,47.3,204,0.73,NA
+CLR413,2008-12-25,17:47:00,clear creek road bridge,upper clear creek,300,35,1,night,46.03,223,4.69,NA
+CLR414,2008-12-25,18:04:00,vulture bar,lower clear creek,310,36,1,night,45.9,223,6.23,NA
+CLR415,2008-12-29,17:45:00,clear creek road bridge,upper clear creek,413,35,1,night,46.53,215,10.88,NA
+CLR416,2009-01-01,17:50:00,clear creek road bridge,upper clear creek,428,35,1,night,46.3,207,1.25,NA
+CLR417,2009-01-01,18:10:00,vulture bar,lower clear creek,395,36,1,night,46.5,207,1.05,NA
+CLR418,2009-01-04,17:10:00,clear creek road bridge,upper clear creek,399,36,1,night,45.17,204,0.76,NA
+CLR419,2009-01-04,17:30:00,vulture bar,lower clear creek,400,36,1,night,44.9,204,1.63,NA
+CLR420,2009-01-07,17:28:00,clear creek road bridge,upper clear creek,415,37,1,night,46.39,217,1.05,NA
+CLR421,2009-01-07,17:49:00,vulture bar,lower clear creek,404,36,1,night,47,217,1.13,NA
+CLR422,2009-01-11,17:53:00,vulture bar,lower clear creek,402,37,1,night,47,217,0.99,NA
+CLR423,2009-01-11,18:00:00,clear creek road bridge,upper clear creek,401,36,1,night,46.75,217,1.09,NA
+CLR424,2009-01-14,17:47:00,clear creek road bridge,upper clear creek,401,37,1,night,46.71,217,1.03,NA
+CLR425,2009-01-14,18:02:00,vulture bar,lower clear creek,385,37,1,night,47.2,215,1.15,NA
+CLR426,2009-01-18,17:40:00,vulture bar,lower clear creek,400,37,1,night,46.8,215,1.2,NA
+CLR427,2009-01-18,18:00:00,clear creek road bridge,upper clear creek,404,37,1,night,46.48,217,0.92,NA
+CLR428,2009-01-21,17:52:00,vulture bar,lower clear creek,409,36,1,night,46.9,215,0.89,NA
+CLR429,2009-01-21,18:05:00,clear creek road bridge,upper clear creek,408,37,1,night,46.71,215,0.83,NA
+CLR430,2009-01-25,17:15:00,vulture bar,lower clear creek,400,37,1,night,47.7,217,1.86,NA
+CLR431,2009-01-25,17:30:00,clear creek road bridge,upper clear creek,401,37,1,night,46.44,217,0.94,NA
+CLR432,2009-01-28,17:25:00,vulture bar,lower clear creek,399,37,1,night,46.8,217,1.09,NA
+CLR433,2009-01-28,17:52:00,clear creek road bridge,upper clear creek,400,36,1,night,46.03,218,0.99,NA
+CLR434,2009-02-01,17:40:00,clear creek road bridge,upper clear creek,404,37,1,night,46.93,218,1.25,NA
+CLR435,2009-02-01,17:55:00,vulture bar,lower clear creek,402,36,1,night,48,218,1.26,NA
+CLR436,2009-02-04,17:17:00,clear creek road bridge,upper clear creek,405,37,1,night,47.24,218,0.83,NA
+CLR437,2009-02-04,17:34:00,vulture bar,lower clear creek,409,38,1,night,48,215,0.68,NA
+CLR438,2009-02-11,17:50:00,vulture bar,lower clear creek,410,37,1,night,45.2,326,2.87,NA
+CLR439,2009-02-11,17:50:00,clear creek road bridge,upper clear creek,406,37,1,night,44.36,326,2.87,NA
+CLR440,2009-02-19,17:45:00,vulture bar,lower clear creek,800,37,1,night,47.6,313,2.81,NA
+CLR441,2009-02-25,17:45:00,vulture bar,lower clear creek,418,38,0,night,47.8,440,32.7,NA
+CLR442,2009-03-04,18:05:00,vulture bar,lower clear creek,433,38,1,night,48.2,449,7.25,NA
+CLR443,2009-03-11,18:50:00,vulture bar,lower clear creek,507,37,1,night,50,260,3.28,NA
+CLR444,2009-03-18,19:00:00,vulture bar,lower clear creek,511,37,1,night,52.6,340,3.46,NA
+CLR445,2009-03-25,20:03:00,vulture bar,lower clear creek,500,37,1,night,52.4,257,3.34,NA
+CLR446,2009-03-28,19:48:00,vulture bar,lower clear creek,503,37,1,night,54.7,245,2.22,NA
+CLR447,2009-04-01,19:37:00,vulture bar,lower clear creek,491,38,1,night,55,242,2.21,NA
+CLR448,2009-04-15,19:45:00,vulture bar,lower clear creek,308,37,1,night,54.8,263,1.56,NA
+CLR449,2009-04-18,19:50:00,vulture bar,lower clear creek,501,37,1,night,58.6,254,1.18,NA
+CLR450,2009-04-20,19:32:00,vulture bar,lower clear creek,144,36,1,night,60,251,1.8,NA
+CLR451,2009-04-25,20:00:00,vulture bar,lower clear creek,297,36,1,night,57,242,1.06,NA
+CLR452,2009-04-29,20:05:00,vulture bar,lower clear creek,497,36,1,night,56,240,1.11,NA
+CLR453,2009-05-06,20:05:00,vulture bar,lower clear creek,318,35,0,night,57,428,6.13,NA
+CLR454,2009-05-13,20:55:00,vulture bar,lower clear creek,233,36,1,night,58.3,260,1.21,NA
+CLR455,2009-12-19,15:35:00,clear creek road bridge,upper clear creek,481,36,1,day,48,240,1.77,NA
+CLR456,2009-12-25,15:30:00,clear creek road bridge,upper clear creek,501,37,1,day,46.89,231,1.32,NA
+CLR457,2009-12-31,22:30:00,clear creek road bridge,upper clear creek,440,37,1,night,46.93,257,1.96,NA
+CLR458,2009-12-31,22:30:00,clear creek road bridge,upper clear creek,533,37,1,night,46.93,257,1.96,NA
+CLR459,2009-12-31,22:30:00,clear creek road bridge,upper clear creek,505,37,1,night,46.93,257,1.96,NA
+CLR460,2010-01-07,16:45:00,vulture bar,lower clear creek,484,37,1,night,48.1,237,1.84,NA
+CLR461,2010-01-07,16:45:00,vulture bar,lower clear creek,481,37,1,night,48.1,237,1.84,NA
+CLR462,2010-01-07,16:45:00,vulture bar,lower clear creek,500,36,1,night,48.1,237,1.84,NA
+CLR463,2010-01-18,04:42:00,vulture bar,lower clear creek,803,36,1,night,48.2,991,NA,NA
+CLR464,2010-01-28,17:15:00,clear creek road bridge,upper clear creek,399,39,1,night,48.94,436,4.79,NA
+CLR465,2010-01-28,17:30:00,vulture bar,lower clear creek,404,36,1,night,48.9,440,5.8,NA
+CLR466,2010-02-04,17:45:00,vulture bar,lower clear creek,610,38,1,night,48,548,9.27,NA
+CLR467,2010-02-11,18:45:00,vulture bar,lower clear creek,285,37,1,night,48.5,479,1.57,NA
+CLR468,2010-02-11,18:45:00,vulture bar,lower clear creek,274,39,1,night,48.5,479,1.57,NA
+CLR469,2010-03-04,18:05:00,vulture bar,lower clear creek,334,38,1,night,48.9,453,5.55,NA
+CLR470,2010-03-04,18:05:00,vulture bar,lower clear creek,325,38,1,night,48.9,453,5.55,NA
+CLR471,2010-04-18,19:34:00,vulture bar,lower clear creek,194,37,1,night,57.6,323,3.51,NA
+CLR472,2010-11-30,19:17:00,clear creek road bridge,upper clear creek,135,34,0,night,50.44,240,1.27,NA
+CLR473,2010-12-07,17:35:00,clear creek road bridge,upper clear creek,251,35,1,night,51.02,301,2,NA
+CLR474,2010-12-07,17:35:00,clear creek road bridge,upper clear creek,247,35,1,night,51.02,301,2,NA
+CLR475,2010-12-11,16:22:00,clear creek road bridge,upper clear creek,128,35,0,night,51.94,301,2.23,NA
+CLR476,2010-12-11,16:27:00,clear creek road bridge,upper clear creek,124,35,0,night,51.94,301,2.23,NA
+CLR477,2010-12-11,16:32:00,clear creek road bridge,upper clear creek,79,35,0,night,51.98,301,2.23,NA
+CLR478,2010-12-15,18:22:00,clear creek road bridge,upper clear creek,210,36,1,night,49.07,294,1.36,NA
+CLR479,2010-12-15,18:27:00,clear creek road bridge,upper clear creek,185,35,1,night,49.07,298,1.36,NA
+CLR480,2010-12-15,18:32:00,clear creek road bridge,upper clear creek,166,35,1,night,49.07,298,1.36,NA
+CLR481,2010-12-21,22:32:00,clear creek road bridge,upper clear creek,234,36,0,night,48.58,393,1.79,NA
+CLR482,2010-12-21,22:37:00,clear creek road bridge,upper clear creek,202,36,0,night,48.58,393,1.79,NA
+CLR483,2010-12-21,22:42:00,clear creek road bridge,upper clear creek,211,35,0,night,48.58,397,1.79,NA
+CLR484,2010-12-23,16:48:00,clear creek road bridge,upper clear creek,155,37,0,night,49.2,397,1.89,NA
+CLR485,2010-12-23,16:53:00,clear creek road bridge,upper clear creek,158,36,0,night,49.2,393,1.89,NA
+CLR486,2010-12-23,16:58:00,clear creek road bridge,upper clear creek,151,37,0,night,49.2,393,1.89,NA
+CLR487,2011-01-02,19:03:00,vulture bar,lower clear creek,148,35,1,night,47.3,355,2.47,NA
+CLR488,2011-01-02,19:10:00,vulture bar,lower clear creek,149,37,1,night,47.3,355,2.47,NA
+CLR489,2011-01-02,19:15:00,vulture bar,lower clear creek,148,36,1,night,47.3,355,2.47,NA
+CLR490,2011-01-05,19:48:00,vulture bar,lower clear creek,197,38,1,night,45.1,291,1.75,NA
+CLR491,2011-01-05,20:00:00,vulture bar,lower clear creek,198,37,1,night,44.9,291,1.75,NA
+CLR492,2011-01-05,20:10:00,vulture bar,lower clear creek,200,37,1,night,44.9,288,1.75,NA
+CLR493,2011-01-08,16:42:00,vulture bar,lower clear creek,153,36,1,night,44.5,271,1.31,NA
+CLR494,2011-01-08,16:47:00,vulture bar,lower clear creek,153,35,1,night,44.5,271,1.31,NA
+CLR495,2011-01-08,16:52:00,vulture bar,lower clear creek,154,37,1,night,44.5,271,1.31,NA
+CLR496,2011-01-12,18:05:00,vulture bar,lower clear creek,296,37,1,night,46.4,265,NA,NA
+CLR497,2011-01-12,18:10:00,vulture bar,lower clear creek,299,37,1,night,46.4,265,NA,NA
+CLR498,2011-01-15,17:10:00,vulture bar,lower clear creek,299,37,1,night,48.7,271,1.43,NA
+CLR499,2011-01-15,17:15:00,vulture bar,lower clear creek,300,37,1,night,48.7,271,1.43,NA
+CLR500,2011-01-19,14:48:00,vulture bar,lower clear creek,308,36,1,day,47.2,259,1.28,NA
+CLR501,2011-01-19,16:56:00,vulture bar,lower clear creek,311,37,1,night,47.8,259,1.28,NA
+CLR502,2011-01-22,17:15:00,vulture bar,lower clear creek,318,36,1,night,48.6,249,1.6,NA
+CLR503,2011-01-22,17:20:00,vulture bar,lower clear creek,326,36,1,night,48.6,249,1.6,NA
+CLR504,2011-01-26,17:25:00,vulture bar,lower clear creek,286,37,1,night,48.8,243,0.95,NA
+CLR505,2011-01-26,17:35:00,vulture bar,lower clear creek,300,38,1,night,48.6,243,0.95,NA
+CLR506,2011-01-29,16:45:00,vulture bar,lower clear creek,305,37,1,night,45.5,243,1.7,NA
+CLR507,2011-01-29,16:50:00,vulture bar,lower clear creek,300,37,1,night,45.5,243,1.7,NA
+CLR508,2011-02-02,17:35:00,vulture bar,lower clear creek,285,37,1,night,47.1,231,0.82,NA
+CLR509,2011-02-02,17:40:00,vulture bar,lower clear creek,295,37,1,night,47.1,231,0.82,NA
+CLR510,2011-02-05,17:19:00,vulture bar,lower clear creek,293,37,1,night,50.4,228,0.92,NA
+CLR511,2011-02-05,17:25:00,vulture bar,lower clear creek,301,38,1,night,50.4,228,0.92,NA
+CLR512,2011-02-09,17:30:00,vulture bar,lower clear creek,302,36,1,night,47.9,225,1.21,NA
+CLR513,2011-02-09,17:35:00,vulture bar,lower clear creek,303,37,1,night,47.7,225,1.21,NA
+CLR514,2011-02-12,17:30:00,vulture bar,lower clear creek,300,36,1,night,48.9,225,1.08,NA
+CLR515,2011-02-12,17:35:00,vulture bar,lower clear creek,301,37,1,night,48.7,225,1.08,NA
+CLR516,2011-02-16,19:06:00,vulture bar,lower clear creek,298,37,0,night,46.3,389,3.36,NA
+CLR517,2011-02-16,19:11:00,vulture bar,lower clear creek,296,36,0,night,46.3,385,3.36,NA
+CLR518,2011-02-19,17:40:00,vulture bar,lower clear creek,301,35,1,night,46.4,418,3.44,NA
+CLR519,2011-02-19,17:45:00,vulture bar,lower clear creek,297,37,1,night,46.4,418,3.44,NA
+CLR520,2011-02-23,17:50:00,vulture bar,lower clear creek,293,36,1,night,47.7,308,2.11,NA
+CLR521,2011-02-23,17:55:00,vulture bar,lower clear creek,295,34,1,night,47.7,308,2.11,NA
+CLR522,2011-02-26,17:35:00,vulture bar,lower clear creek,249,35,1,night,47,284,1.88,NA
+CLR523,2011-02-26,17:40:00,vulture bar,lower clear creek,253,34,1,night,47,284,1.88,NA
+CLR524,2011-02-26,17:45:00,vulture bar,lower clear creek,250,35,1,night,47,284,1.88,NA
+CLR525,2011-03-02,20:15:00,vulture bar,lower clear creek,303,36,1,night,47.2,642,17.1,NA
+CLR526,2011-03-02,20:15:00,vulture bar,lower clear creek,303,35,1,night,47.2,642,17.1,NA
+CLR527,2011-03-05,17:51:00,vulture bar,lower clear creek,250,35,1,night,48.9,355,2.42,NA
+CLR528,2011-03-05,17:56:00,vulture bar,lower clear creek,251,35,1,night,48.9,359,2.42,NA
+CLR529,2011-03-05,18:01:00,vulture bar,lower clear creek,317,36,1,night,48.8,359,2.42,NA
+CLR530,2011-03-09,18:10:00,vulture bar,lower clear creek,257,35,1,night,50.1,311,1.3,NA
+CLR531,2011-03-09,18:15:00,vulture bar,lower clear creek,261,35,1,night,50.1,311,1.3,NA
+CLR532,2011-03-12,18:41:00,vulture bar,lower clear creek,302,35,1,night,49.2,294,1.51,NA
+CLR533,2011-03-30,19:50:00,vulture bar,lower clear creek,109,37,0,night,54.3,464,4.88,NA
+CLR534,2011-03-30,19:55:00,vulture bar,lower clear creek,118,36,0,night,54.3,477,4.88,NA
+CLR535,2011-04-23,19:00:00,vulture bar,lower clear creek,93,37,0,night,52.4,288,2.11,NA
+CLR536,2012-01-05,18:30:00,clear creek road bridge,upper clear creek,195,36,1,night,46.39,217,1.86,NA
+CLR537,2012-01-05,18:30:00,clear creek road bridge,upper clear creek,200,35,1,night,46.39,217,1.86,NA
+CLR538,2012-01-05,18:30:00,clear creek road bridge,upper clear creek,205,35,1,night,46.39,217,1.86,NA
+CLR539,2012-01-10,18:30:00,vulture bar,lower clear creek,201,36,1,night,45.5,217,1.28,NA
+CLR540,2012-01-10,18:30:00,vulture bar,lower clear creek,208,36,1,night,45.5,217,1.28,NA
+CLR541,2012-01-10,18:30:00,vulture bar,lower clear creek,206,37,1,night,45.5,217,1.28,NA
+CLR542,2012-01-13,18:21:00,clear creek road bridge,upper clear creek,208,37,1,night,45.62,214,1.2,NA
+CLR543,2012-01-13,18:26:00,clear creek road bridge,upper clear creek,200,37,1,night,45.62,217,1.2,NA
+CLR544,2012-01-13,18:31:00,clear creek road bridge,upper clear creek,202,37,1,night,45.67,217,1.2,NA
+CLR545,2012-01-17,21:07:00,vulture bar,lower clear creek,228,37,1,night,42.8,214,0.76,NA
+CLR546,2012-01-17,21:10:00,vulture bar,lower clear creek,203,36,1,night,42.8,214,0.76,NA
+CLR547,2012-01-17,21:13:00,vulture bar,lower clear creek,199,36,1,night,42.8,214,0.76,NA
+CLR548,2012-01-21,23:33:00,clear creek road bridge,upper clear creek,203,37,2,night,43.53,256,3.04,NA
+CLR549,2012-01-21,23:38:00,clear creek road bridge,upper clear creek,202,37,1,night,43.53,256,3.04,NA
+CLR550,2012-01-21,23:45:00,clear creek road bridge,upper clear creek,211,37,1,night,43.53,256,3.04,NA
+CLR551,2012-01-24,18:55:00,vulture bar,lower clear creek,207,37,1,night,45.8,252,2.76,NA
+CLR552,2012-01-24,19:00:00,vulture bar,lower clear creek,207,37,1,night,45.8,252,2.76,NA
+CLR553,2012-01-24,19:05:00,vulture bar,lower clear creek,206,36,1,night,45.6,252,2.76,NA
+CLR554,2012-01-27,18:50:00,clear creek road bridge,upper clear creek,301,36,1,night,43.9,243,2.32,NA
+CLR555,2012-01-27,18:55:00,clear creek road bridge,upper clear creek,297,37,1,night,43.9,243,2.32,NA
+CLR556,2012-01-31,20:12:00,vulture bar,lower clear creek,293,37,1,night,44.6,228,1.83,NA
+CLR557,2012-01-31,20:20:00,vulture bar,lower clear creek,307,37,1,night,44.6,228,1.83,NA
+CLR558,2012-02-03,20:02:00,clear creek road bridge,upper clear creek,307,37,1,night,44.54,228,1.95,NA
+CLR559,2012-02-03,20:07:00,clear creek road bridge,upper clear creek,300,37,1,night,44.54,228,1.95,NA
+CLR560,2012-02-07,18:20:00,vulture bar,lower clear creek,306,36,1,night,44.9,234,1.65,NA
+CLR561,2012-02-07,18:25:00,vulture bar,lower clear creek,303,36,1,night,44.9,234,1.65,NA
+CLR562,2012-02-10,20:14:00,clear creek road bridge,upper clear creek,299,36,1,night,45.31,231,1.5,NA
+CLR563,2012-02-10,20:19:00,clear creek road bridge,upper clear creek,296,36,1,night,45.31,231,1.5,NA
+CLR564,2012-02-14,18:03:00,vulture bar,lower clear creek,299,36,1,night,46.9,234,1.35,NA
+CLR565,2012-02-14,18:08:00,vulture bar,lower clear creek,295,36,1,night,46.9,234,1.35,NA
+CLR566,2012-02-21,18:36:00,vulture bar,lower clear creek,308,36,1,night,47.8,225,1.13,NA
+CLR567,2012-02-21,18:41:00,vulture bar,lower clear creek,311,37,1,night,47.8,228,1.13,NA
+CLR568,2012-02-28,20:49:00,vulture bar,lower clear creek,309,36,1,night,45.4,225,0.96,NA
+CLR569,2012-02-28,20:54:00,vulture bar,lower clear creek,308,36,1,night,45.4,225,0.96,NA
+CLR570,2012-03-06,20:11:00,vulture bar,lower clear creek,302,36,1,night,47.2,225,0.85,NA
+CLR571,2012-03-06,20:17:00,vulture bar,lower clear creek,306,35,1,night,47.2,225,0.85,NA
+CLR572,2012-03-15,22:40:00,vulture bar,lower clear creek,303,36,1,night,50.7,1650,93.8,NA
+CLR573,2012-03-15,22:45:00,vulture bar,lower clear creek,300,NA,1,night,50.7,1650,93.8,NA
+CLR574,2012-03-17,20:20:00,vulture bar,lower clear creek,302,36,0,night,49.1,385,6.34,NA
+CLR575,2012-03-17,20:25:00,vulture bar,lower clear creek,299,35,0,night,49.1,385,6.34,NA
+CLR576,2012-03-21,18:53:00,vulture bar,lower clear creek,306,35,1,night,48.8,265,1.54,NA
+CLR577,2012-03-21,19:00:00,vulture bar,lower clear creek,306,35,1,night,48.8,265,1.54,NA
+CLR578,2012-03-29,19:35:00,vulture bar,lower clear creek,271,37,1,night,48.8,674,6.56,NA
+CLR579,2012-03-29,19:40:00,vulture bar,lower clear creek,269,37,1,night,48.8,674,6.56,NA
+CLR580,2012-04-04,19:42:00,vulture bar,lower clear creek,291,35,1,night,49.9,362,4.98,NA
+CLR581,2012-04-04,19:47:00,vulture bar,lower clear creek,296,35,1,night,49.9,362,4.98,NA
+CLR582,2012-04-12,21:20:00,vulture bar,lower clear creek,161,37,1,night,49.4,509,5.53,NA
+CLR583,2012-04-12,21:25:00,vulture bar,lower clear creek,143,37,1,night,49.4,509,5.53,NA
+CLR584,2012-04-12,21:30:00,vulture bar,lower clear creek,165,37,1,night,49.3,509,5.53,NA
+CLR585,2012-12-26,22:07:00,clear creek road bridge,upper clear creek,412,35,1,night,45.58,426,19.8,NA
+CLR586,2013-01-02,22:45:00,clear creek road bridge,upper clear creek,348,36,2,night,43.67,278,3.21,NA
+CLR587,2013-01-02,22:50:00,clear creek road bridge,upper clear creek,332,35,2,night,43.67,278,3.21,NA
+CLR588,2013-01-09,22:39:00,vulture bar,lower clear creek,422,36,1,night,45.4,265,1.44,NA
+CLR589,2013-01-09,22:45:00,vulture bar,lower clear creek,424,36,1,night,45.4,265,1.44,NA
+CLR590,2013-01-15,22:30:00,vulture bar,lower clear creek,425,37,1,night,43.2,249,1.52,NA
+CLR591,2013-01-15,22:35:00,vulture bar,lower clear creek,415,36,1,night,43.2,249,1.52,NA
+CLR592,2013-01-22,18:16:00,vulture bar,lower clear creek,315,36,1,night,44.3,243,1.35,NA
+CLR593,2013-01-22,18:21:00,vulture bar,lower clear creek,308,37,1,night,44.3,243,1.35,NA
+CLR594,2013-02-05,18:16:00,vulture bar,lower clear creek,409,37,2,night,46.8,234,1.3,NA
+CLR595,2013-02-05,18:21:00,vulture bar,lower clear creek,428,38,2,night,46.8,234,1.3,NA
+CLR596,2013-02-14,18:06:00,vulture bar,lower clear creek,420,37,1,night,48.9,217,1.15,NA
+CLR597,2013-02-14,18:11:00,vulture bar,lower clear creek,418,37,1,night,48.9,217,1.15,NA
+CLR598,2013-02-21,18:30:00,vulture bar,lower clear creek,406,36,1,night,47.7,217,0.95,NA
+CLR599,2013-02-21,18:35:00,vulture bar,lower clear creek,389,37,1,night,47.7,217,0.95,NA
+CLR600,2013-02-28,17:00:00,vulture bar,lower clear creek,410,37,1,night,50.3,217,1.13,NA
+CLR601,2013-02-28,17:07:00,vulture bar,lower clear creek,414,37,1,night,50.3,217,1.13,NA
+CLR602,2013-03-07,18:15:00,vulture bar,lower clear creek,398,37,1,night,49.8,224,1.1,NA
+CLR603,2013-03-07,18:23:00,vulture bar,lower clear creek,402,37,1,night,49.8,224,1.1,NA
+CLR604,2013-03-14,19:00:00,vulture bar,lower clear creek,393,37,1,night,51.5,218,1.05,NA
+CLR605,2013-03-14,19:05:00,vulture bar,lower clear creek,399,37,1,night,51.3,218,1.05,NA
+CLR606,2013-03-21,19:45:00,vulture bar,lower clear creek,244,37,1,night,51.1,230,1.06,NA
+CLR607,2013-03-28,19:31:00,vulture bar,lower clear creek,224,37,1,night,51.1,218,0.97,NA
+CLR608,2013-04-04,19:36:00,vulture bar,lower clear creek,168,35,1,night,50.4,227,6.5,NA
+CLR609,2013-04-04,19:41:00,vulture bar,lower clear creek,168,38,1,night,50.4,227,6.5,NA
+CLR610,2013-04-11,19:45:00,vulture bar,lower clear creek,371,35,1,night,52.5,896,7.3,NA
+CLR611,2013-04-18,19:42:00,vulture bar,lower clear creek,206,36,1,night,56.8,218,1,NA
+CLR612,2013-12-09,16:20:00,clear creek road bridge,upper clear creek,497,34,1,night,47.56,210,0.66,NA
+CLR613,2013-12-10,16:30:00,clear creek road bridge,upper clear creek,507,34,1,night,47.6,210,0.94,NA
+CLR614,2013-12-19,17:25:00,clear creek road bridge,upper clear creek,360,35,1,night,46.12,212,1.3,NA
+CLR615,2013-12-19,17:30:00,clear creek road bridge,upper clear creek,384,34,1,night,46.12,212,1.3,NA
+CLR616,2013-12-26,16:30:00,clear creek road bridge,upper clear creek,516,34,1,night,46.26,212,0.58,NA
+CLR617,2013-12-26,16:30:00,clear creek road bridge,upper clear creek,499,34,1,night,46.26,212,0.58,NA
+CLR618,2014-01-02,16:30:00,vulture bar,lower clear creek,528,37,1,night,47.1,210,1.57,NA
+CLR619,2014-01-02,16:50:00,clear creek road bridge,upper clear creek,513,36,1,night,46.62,210,1.67,NA
+CLR620,2014-01-08,16:30:00,clear creek road bridge,upper clear creek,495,37,1,night,46.21,207,0.86,NA
+CLR621,2014-01-08,16:45:00,vulture bar,lower clear creek,493,37,1,night,46.5,207,0.93,NA
+CLR622,2014-01-23,17:35:00,vulture bar,lower clear creek,530,37,1,night,48.3,204,0.95,NA
+CLR623,2014-01-23,17:40:00,vulture bar,lower clear creek,519,37,1,night,48.3,204,0.95,NA
+CLR624,2014-02-06,17:10:00,vulture bar,lower clear creek,518,37,1,night,45.9,207,1,NA
+CLR625,2014-02-06,17:15:00,vulture bar,lower clear creek,522,37,1,night,45.9,207,1,NA
+CLR626,2014-02-20,17:10:00,vulture bar,lower clear creek,509,36,1,night,50.4,207,2.68,NA
+CLR627,2014-02-20,17:15:00,vulture bar,lower clear creek,505,36,1,night,50.4,207,2.68,NA
+CLR628,2014-03-14,18:40:00,vulture bar,lower clear creek,524,37,1,night,54.3,207,1.24,NA
+CLR629,2014-03-14,18:45:00,vulture bar,lower clear creek,506,37,1,night,54.3,207,1.24,NA
+CLR630,2014-12-30,17:05:00,clear creek road bridge,upper clear creek,503,35,1,night,47.51,242,1.25,NA
+CLR631,2015-01-06,17:16:00,clear creek road bridge,upper clear creek,504,36,1,night,48.94,221,1.52,NA
+CLR632,2015-01-13,17:27:00,vulture bar,lower clear creek,519,36,1,night,50,210,1.18,NA
+CLR633,2015-01-13,17:47:00,clear creek road bridge,upper clear creek,532,36,1,night,49.47,210,1.15,NA
+CLR634,2015-01-27,17:15:00,vulture bar,lower clear creek,316,37,1,night,50.7,199,1.31,NA
+CLR635,2015-01-27,17:40:00,clear creek road bridge,upper clear creek,314,37,1,night,50,201,1.59,NA
+CLR636,2015-02-17,17:50:00,vulture bar,lower clear creek,521,37,1,night,52.9,277,1.64,NA
+CLR637,2015-03-03,18:10:00,vulture bar,lower clear creek,390,37,1,night,52.2,227,1.67,NA
+CLR638,2015-11-18,16:45:00,clear creek road bridge,upper clear creek,330,34,1,night,55.04,223,1.56,NA
+CLR639,2015-11-18,17:03:00,vulture bar,lower clear creek,149,33,1,night,55,222,1.24,NA
+CLR640,2015-11-24,17:24:00,vulture bar,lower clear creek,156,32,1,night,53.7,242,1.46,NA
+CLR641,2015-11-24,17:41:00,clear creek road bridge,upper clear creek,227,33,1,night,53.69,242,1.16,NA
+CLR642,2015-11-30,NA,clear creek road bridge,upper clear creek,NA,NA,NA,NA,NA,NA,NA,NA
+CLR643,2015-12-01,18:28:00,vulture bar,lower clear creek,267,33,1,night,51.1,242,1.19,NA
+CLR644,2015-12-08,18:28:00,vulture bar,lower clear creek,510,35,1,night,52.1,245,1.78,NA
+CLR645,2015-12-08,18:45:00,clear creek road bridge,upper clear creek,479,34,1,night,51.41,245,1.37,NA
+CLR646,2015-12-15,16:50:00,vulture bar,lower clear creek,509,34,1,night,48.7,251,1.68,NA
+CLR647,2015-12-15,17:10:00,clear creek road bridge,upper clear creek,376,34,1,night,49.29,251,1.69,NA
+CLR648,2015-12-22,16:45:00,vulture bar,lower clear creek,519,34,1,night,50.2,331,5.77,NA
+CLR649,2015-12-22,NA,clear creek road bridge,upper clear creek,NA,NA,NA,NA,NA,NA,NA,NA
+CLR650,2015-12-29,16:55:00,vulture bar,lower clear creek,501,36,1,night,NA,NA,NA,NA
+CLR651,2015-12-29,17:15:00,clear creek road bridge,upper clear creek,516,37,1,night,NA,NA,NA,NA
+CLR652,2016-01-05,18:35:00,vulture bar,lower clear creek,462,35,1,night,NA,NA,NA,NA
+CLR653,2016-01-05,18:55:00,clear creek road bridge,upper clear creek,465,35,1,night,47.11,398,3.91,NA
+CLR654,2016-01-12,17:15:00,clear creek road bridge,upper clear creek,502,35,1,night,47.87,262,1.7,NA
+CLR655,2016-01-12,17:35:00,vulture bar,lower clear creek,536,36,1,night,48.5,262,2.4,NA
+CLR656,2016-01-26,17:14:00,vulture bar,lower clear creek,502,36,1,night,49.8,407,3.4,NA
+CLR657,2016-01-26,17:33:00,clear creek road bridge,upper clear creek,511,37,1,night,49.65,402,2.82,NA
+CLR658,2016-02-02,17:05:00,vulture bar,lower clear creek,507,NA,1,night,47.8,332,2.43,NA
+CLR659,2016-02-02,17:28:00,clear creek road bridge,upper clear creek,498,37,1,night,47.33,332,1.65,NA
+CLR660,2016-02-09,17:55:00,vulture bar,lower clear creek,506,36,1,night,50.2,264,2.24,NA
+CLR661,2016-02-09,18:18:00,clear creek road bridge,upper clear creek,517,36,1,night,49.25,264,2.21,NA
+CLR662,2016-02-23,17:34:00,clear creek road bridge,upper clear creek,507,36,1,night,50.18,254,1.49,NA
+CLR663,2016-02-23,17:48:00,vulture bar,lower clear creek,499,36,1,night,51.1,254,1.58,NA
+CLR664,2016-03-08,18:15:00,vulture bar,lower clear creek,488,36,1,night,50,382,2.93,NA
+CLR665,2016-03-08,18:34:00,clear creek road bridge,upper clear creek,480,37,1,night,49.74,382,1.92,NA
+CLR666,2016-11-22,16:45:00,clear creek road bridge,upper clear creek,264,33.5,0,night,54.73,303,1.37,NA
+CLR667,2016-11-28,16:30:00,clear creek road bridge,upper clear creek,268,33.5,0,night,53.34,320,1.5,NA
+CLR668,2016-12-02,16:38:00,clear creek road bridge,upper clear creek,323,33.5,0,night,52.07,283,0.9,NA
+CLR669,2016-12-05,16:40:00,clear creek road bridge,upper clear creek,322,34,1,night,51.32,273,1.95,NA
+CLR670,2016-12-08,16:35:00,clear creek road bridge,upper clear creek,467,34,0,night,50.22,276,0.8,NA
+CLR671,2016-12-12,16:36:00,clear creek road bridge,upper clear creek,286,34.5,0,night,49.16,451,1.54,NA
+CLR672,2016-12-20,16:56:00,vulture bar,lower clear creek,642,35,1,night,47.7,310,3.27,NA
+CLR673,2016-12-27,17:01:00,vulture bar,lower clear creek,360,36,1,night,46.1,313,3,NA
+CLR674,2016-12-31,16:40:00,vulture bar,lower clear creek,383,36.5,1,night,46.3,289,1.94,NA
+CLR675,2017-01-04,17:10:00,vulture bar,lower clear creek,500,36,1,night,46,375,3.96,NA
+CLR676,2017-01-25,16:55:00,vulture bar,lower clear creek,552,37.5,1,night,46.8,554,7.54,NA
+CLR677,2017-01-29,17:25:00,vulture bar,lower clear creek,769,36,1,night,46.9,434,5.53,NA
+CLR678,2017-12-07,16:30:00,clear creek road bridge,upper clear creek,130,35,1,night,50.49,211,1.33,NA
+CLR679,2017-12-12,16:28:00,clear creek road bridge,upper clear creek,179,35,1,night,49.6,211,1.21,NA
+CLR680,2017-12-15,16:36:00,clear creek road bridge,upper clear creek,135,36,1,night,49.87,211,1.13,NA
+CLR681,2017-12-19,16:19:00,clear creek road bridge,upper clear creek,237,35,1,night,49.2,214,1.25,NA
+CLR682,2018-01-12,17:04:00,vulture bar,lower clear creek,272,34,1,night,49.8,217,2.04,NA
+CLR683,2018-01-16,17:09:00,vulture bar,lower clear creek,509,33,1,night,50.7,217,1.48,NA
+CLR684,2018-01-22,20:00:00,vulture bar,lower clear creek,504,33,0,night,48.2,237,2.13,NA
+CLR685,2018-02-01,17:28:00,vulture bar,lower clear creek,494,33,1,night,51.1,214,1.98,NA
+CLR686,2018-02-07,17:35:00,vulture bar,lower clear creek,496,33,1,night,51.2,209,1.39,NA
+CLR687,2018-02-14,17:44:00,vulture bar,lower clear creek,491,33,1,night,49.5,209,1.55,NA
+CLR688,2018-03-17,19:09:00,vulture bar,lower clear creek,466,37,1,night,49.7,242,1.6,NA
+CLR689,2019-01-02,16:55:00,clear creek road bridge,upper clear creek,392,36,1,night,48.36,239,3.29,NA
+CLR690,2019-01-23,17:14:00,grand matthews permanent turbidity monitoring site,lower clear creek,420,37,1,night,48.5,321,11.3,NA
+CLR691,2019-01-29,17:11:00,vulture bar,lower clear creek,600,37,1,night,50.8,275,7.61,NA
+CLR692,2019-02-05,17:07:00,vulture bar,lower clear creek,832,35,1,night,47.6,398,15.4,NA
+CLR693,2019-02-19,17:10:00,vulture bar,lower clear creek,806,35,0,night,46.8,345,3.99,NA
+CLR694,2019-12-12,17:00:00,vulture bar,lower clear creek,416,34,1,night,51.5,309,3.39,NA
+CLR695,2019-12-12,17:22:00,clear creek road bridge,upper clear creek,218,33,1,night,51.32,309,3.65,NA
+CLR696,2019-12-26,17:39:00,clear creek road bridge,upper clear creek,204,35,1,night,48.58,226,NA,NA
+CLR697,2019-12-30,19:01:00,clear creek road bridge,upper clear creek,355,35,1,night,48.58,313,3.65,NA
+CLR698,2020-01-04,16:50:00,clear creek road bridge,upper clear creek,248,35,1,night,48.36,305,3.52,NA
+CLR699,2020-01-08,16:44:00,vulture bar,lower clear creek,494,36,1,night,47.3,309,2.31,NA
+CLR700,2020-01-15,18:05:00,vulture bar,lower clear creek,405,35,1,night,46.5,309,2.38,NA
+CLR701,2020-01-23,17:16:00,vulture bar,lower clear creek,537,35,1,night,47.8,351,2.42,NA
+CLR702,2020-01-31,17:45:00,vulture bar,lower clear creek,500,35,1,night,50,340,3.61,NA
+CLR703,2020-02-07,18:03:00,vulture bar,lower clear creek,530,36,1,night,49.2,316,1.4,NA
+CLR704,2020-02-19,17:49:00,vulture bar,lower clear creek,650,36,1,night,49.7,309,1.38,NA
+CLR705,2020-03-03,18:04:00,vulture bar,lower clear creek,545,37,3,night,53.2,302,2.49,NA
+CLR706,2020-12-08,17:03:00,clear creek road bridge,upper clear creek,301,34,1,night,51.37,221,1.38,NA
+CLR707,2020-12-15,17:48:00,clear creek road bridge,upper clear creek,296,35,1,night,49.91,306,1.43,NA
+CLR708,2020-12-22,17:45:00,clear creek road bridge,upper clear creek,296,33,1,night,NA,405,1.18,NA
+CLR709,2020-12-25,16:51:00,vulture bar,lower clear creek,437,38,1,night,47.6,225,3.1,NA
+CLR710,2020-12-28,18:06:00,clear creek road bridge,upper clear creek,365,36,0,night,NA,222,1.7,NA
+CLR711,2021-01-05,17:10:00,vulture bar,lower clear creek,426,38,0,night,48,234,2.04,NA
+CLR712,2021-01-11,17:34:00,vulture bar,lower clear creek,397,36,1,night,48.3,229.5,3.16,NA
+CLR713,2021-01-19,18:35:00,vulture bar,lower clear creek,412,38,0,night,47.7,223.5,1.24,NA
+CLR714,2021-01-19,19:00:00,clear creek road bridge,upper clear creek,336,37,0,night,NA,223.5,0.66,NA
+CLR715,2021-02-16,18:50:00,clear creek road bridge,upper clear creek,326,38,1,night,48.32,228,2.58,NA
+CLR716,2021-03-02,18:17:00,vulture bar,lower clear creek,490,38,1,night,51.4,222,1,NA
+CLR717,2021-03-16,19:20:00,vulture bar,lower clear creek,499,38,0,night,51,231,1.08,NA
+CLR718,2021-11-16,16:35:00,clear creek road bridge,upper clear creek,306,33,1,night,55,235,2.28,NA
+CLR719,2021-11-16,17:37:00,vulture bar,lower clear creek,583,34,1,night,54.9,236.5,3.34,NA
+CLR720,2021-11-22,18:32:00,clear creek road bridge,upper clear creek,342,34,1,night,54.13,227,NA,NA
+CLR721,2021-11-30,16:52:00,vulture bar,lower clear creek,452,33,1,night,54,224,1.16,NA
+CLR722,2021-11-30,17:17:00,clear creek road bridge,upper clear creek,358,34,1,night,53.86,224,1.48,NA
+CLR723,2021-12-05,17:25:00,vulture bar,lower clear creek,409,34,1,night,52.9,224,1.12,NA
+CLR724,2021-12-05,18:04:00,clear creek road bridge,upper clear creek,310,32,1,night,53.91,224,1.63,NA
+CLR725,2021-12-27,19:32:00,vulture bar,lower clear creek,452,35,1,night,47,290,2,NA
+CLR726,2021-12-27,20:05:00,clear creek road bridge,upper clear creek,314,36,1,night,47.38,290,2.25,NA
+CLR727,2022-01-20,17:10:00,vulture bar,lower clear creek,499,36,1,night,49.5,252,1.63,NA
+CLR728,2022-01-20,17:35:00,clear creek road bridge,upper clear creek,283,38,1,night,49.25,252,1.39,NA
+CLR729,2022-02-01,17:55:00,vulture bar,lower clear creek,508,0,1,night,47,233,1.67,NA
+CLR730,2022-02-08,17:46:00,vulture bar,lower clear creek,604,0,1,night,50.3,199,1.52,NA
+CLR731,2022-02-16,18:03:00,grand matthews permanent turbidity monitoring site,lower clear creek,476,33,1,night,50.4,227,1.02,NA
+CLR732,2022-12-29,16:50:00,clear creek road bridge,upper clear creek,742,35,1,night,48.45,284,5.42,NA
+CLR733,2022-12-29,17:00:00,vulture bar,lower clear creek,594,38,1,night,48.5,284,NA,NA
+CLR734,2023-02-08,15:00:00,vulture bar,lower clear creek,486,37,1,night,48.4,233,NA,NA
+CLR735,2024-01-02,16:45:00,vulture bar,lower clear creek,489,36,1,night,NA,369,2.24,NA
+CLR736,2024-01-02,17:09:00,clear creek road bridge,upper clear creek,288,36,1,night,NA,369,2.37,NA
+CLR737,2024-01-09,17:13:00,vulture bar,lower clear creek,445,36,1,night,49,251,2.23,NA
+CLR738,2024-01-09,NA,clear creek road bridge,upper clear creek,NA,NA,1,NA,NA,NA,NA,NA
+CLR739,2024-01-16,17:42:00,vulture bar,lower clear creek,1035,36,1,night,47.1,337,NA,NA
+CLR740,2024-01-16,18:03:00,clear creek road bridge,upper clear creek,328,36,1,night,47.56,341,NA,NA
+CLR741,2024-02-08,17:45:00,vulture bar,lower clear creek,680,36,1,night,NA,424,3.83,NA
+CLR742,2025-01-16,NA,clear creek road bridge,upper clear creek,155,NA,1,night,47.56,NA,NA,NA
+CLR743,2025-01-19,NA,clear creek road bridge,upper clear creek,207,NA,1,night,47.56,NA,NA,NA
+CLR744,2025-01-23,NA,clear creek road bridge,upper clear creek,261,NA,1,night,47.56,NA,NA,NA
+CLR745,2025-01-03,NA,vulture bar,lower clear creek,350,NA,1,night,47.2,NA,NA,NA
+CLR746,2025-01-19,NA,vulture bar,lower clear creek,392,NA,1,night,47.2,NA,NA,NA
+CLR747,2025-01-29,NA,vulture bar,lower clear creek,491,NA,1,night,47.2,NA,NA,NA
+BAT96,2004-01-14,15:46:00,NA,upper battle creek,147,35,1,night,46.5,445,NA,natural
+BAT97,2004-01-27,23:23:00,NA,upper battle creek,428,38,1,night,45.1,750,NA,natural
+BAT98,2004-01-30,17:02:00,NA,upper battle creek,387,36,1,night,48.7,490,NA,natural
+BAT99,2004-02-06,17:00:00,NA,upper battle creek,390,37,1,night,47.1,495,NA,natural
+BAT100,2004-02-10,19:12:00,NA,upper battle creek,399,37,1,night,47.6,432,NA,natural
+BAT101,2004-02-13,18:05:00,NA,upper battle creek,400,37,1,night,47.4,407,NA,natural
+BAT102,2004-02-24,14:28:00,NA,upper battle creek,282,37,1,day,49.3,892,NA,natural
+BAT103,2004-03-05,18:49:00,NA,upper battle creek,300,37,1,night,49.9,690,NA,natural
+BAT104,2004-03-09,17:13:00,NA,upper battle creek,425,37,1,night,56,657,NA,natural
+BAT105,2004-03-12,17:40:00,NA,upper battle creek,450,36,1,night,54.9,668,NA,natural
+BAT106,2004-03-26,18:05:00,NA,upper battle creek,269,37,1,night,49.3,722,NA,natural
+BAT107,2004-04-02,18:10:00,NA,upper battle creek,272,65,1,night,54,578,NA,natural
+BAT108,2004-04-09,15:35:00,NA,upper battle creek,157,70,1,day,57.7,593,NA,natural
+BAT109,2004-04-16,14:06:00,NA,upper battle creek,597,56,1,day,51.8,542,NA,natural
+BAT110,2005-01-04,21:00:00,NA,upper battle creek,105,36,1,night,45.4,391,NA,natural
+BAT111,2005-01-11,13:30:00,NA,upper battle creek,91,37,1,day,46.5,601,NA,natural
+BAT112,2005-01-14,14:27:00,NA,upper battle creek,130,37,1,day,45.4,345,NA,natural
+BAT113,2005-01-21,19:50:00,NA,upper battle creek,380,36,1,night,49.3,310,NA,natural
+BAT114,2005-01-25,19:29:00,NA,upper battle creek,388,37,1,night,51.3,321,NA,natural
+BAT115,2005-01-28,18:35:00,NA,upper battle creek,403,38,0,night,49.6,605,NA,natural
+BAT116,2005-02-01,19:05:00,NA,upper battle creek,413,37,1,night,48.5,363,NA,natural
+BAT117,2005-02-04,19:38:00,NA,upper battle creek,448,37,1,night,49.6,340,NA,natural
+BAT118,2005-02-08,17:39:00,NA,upper battle creek,399,37,1,night,49.3,321,NA,natural
+BAT119,2005-02-11,19:58:00,NA,upper battle creek,415,37,1,night,49.3,307,NA,natural
+BAT120,2005-02-15,19:38:00,NA,upper battle creek,440,36,1,night,49.6,370,NA,natural
+BAT121,2005-02-18,19:50:00,NA,upper battle creek,408,37,1,night,50.7,363,NA,natural
+BAT122,2005-02-22,19:21:00,NA,upper battle creek,431,37,1,night,52.9,402,NA,natural
+BAT123,2005-02-25,19:40:00,NA,upper battle creek,408,36,1,night,53.2,367,NA,natural
+BAT124,2005-03-01,17:52:00,NA,upper battle creek,403,37,1,night,52.9,414,NA,natural
+BAT125,2005-03-04,18:46:00,NA,upper battle creek,273,36,1,night,53.8,430,NA,natural
+BAT126,2005-03-08,20:05:00,NA,upper battle creek,525,35,1,night,55.7,374,NA,natural
+BAT127,2005-03-11,19:50:00,NA,upper battle creek,387,35,1,night,56.8,382,NA,natural
+BAT128,2005-03-15,18:37:00,NA,upper battle creek,318,34,1,night,53.8,355,NA,natural
+BAT129,2005-03-22,18:22:00,NA,upper battle creek,114,41,1,night,53.2,592,NA,natural
+BAT130,2005-03-25,20:31:00,NA,upper battle creek,111,37,1,night,51.8,390,NA,natural
+BAT131,2005-04-01,18:10:00,NA,upper battle creek,237,45,1,night,53.8,398,NA,natural
+BAT132,2005-04-05,18:57:00,NA,upper battle creek,152,37,1,night,55.4,394,NA,natural
+BAT133,2005-04-08,18:45:00,NA,upper battle creek,198,39,1,night,51.8,588,NA,natural
+BAT134,2005-04-12,19:24:00,NA,upper battle creek,171,42,1,night,54.9,438,NA,natural
+BAT135,2005-04-15,19:11:00,NA,upper battle creek,383,36,1,night,55.7,402,NA,natural
+BAT136,2005-04-19,19:56:00,NA,upper battle creek,89,39,1,night,55.4,414,NA,natural
+BAT137,2005-04-29,17:27:00,NA,upper battle creek,100,35,1,day,58.8,458,NA,natural
+BAT138,2005-05-06,15:46:00,NA,upper battle creek,113,36,1,day,55.4,623,NA,natural
+BAT139,2005-03-15,16:54:00,NA,upper battle creek,65,41,1,day,56.6,668,NA,natural
+BAT140,2006-01-31,16:00:00,NA,upper battle creek,197,36,1,day,45.4,944,NA,natural
+BAT141,2006-02-07,18:30:00,NA,upper battle creek,209,37,0,night,49,905,NA,natural
+BAT142,2006-02-10,17:25:00,NA,upper battle creek,298,NA,1,night,49.9,767,NA,natural
+BAT143,2006-02-17,14:15:00,NA,upper battle creek,410,37,1,day,45.1,627,NA,natural
+BAT144,2006-02-24,18:15:00,NA,upper battle creek,425,37,1,night,49.6,561,NA,natural
+BAT145,2006-03-21,18:21:00,NA,upper battle creek,464,36,1,night,49,772,NA,natural
+BAT146,2007-12-29,17:40:00,NA,upper battle creek,249,38,1,night,43.8,371,NA,NA
+BAT147,2008-01-01,19:35:00,NA,upper battle creek,254,38,1,night,44.9,248,NA,NA
+BAT148,2008-01-09,02:05:00,NA,upper battle creek,503,38,1,night,44.9,599,NA,NA
+BAT149,2008-01-09,02:05:00,NA,upper battle creek,481,36,1,night,44.9,599,NA,natural
+BAT150,2008-01-12,19:37:00,NA,upper battle creek,291,38,1,night,48.8,468,NA,NA
+BAT151,2008-01-12,19:37:00,NA,upper battle creek,303,37,1,night,48.8,468,NA,natural
+BAT152,2008-01-15,20:19:00,NA,upper battle creek,301,38,1,night,45.7,320,NA,NA
+BAT153,2008-01-15,20:19:00,NA,upper battle creek,305,37,1,night,45.7,320,NA,natural
+BAT154,2008-01-19,20:36:00,NA,upper battle creek,304,38,1,night,46.6,298,NA,NA
+BAT155,2008-01-19,20:36:00,NA,upper battle creek,335,38,1,night,46.6,298,NA,natural
+BAT156,2008-01-23,19:15:00,NA,upper battle creek,299,39,1,night,44.9,343,NA,NA
+BAT157,2008-01-23,19:15:00,NA,upper battle creek,286,37,1,night,44.9,343,NA,natural
+BAT158,2008-01-27,21:30:00,NA,upper battle creek,182,40,2,night,48.2,678,NA,NA
+BAT159,2008-01-27,21:30:00,NA,upper battle creek,266,38,2,night,48.2,678,NA,natural
+BAT160,2008-01-29,19:40:00,NA,upper battle creek,299,41,0,night,44.1,556,NA,NA
+BAT161,2008-01-29,19:40:00,NA,upper battle creek,303,37,0,night,44.1,556,NA,natural
+BAT162,2008-02-03,08:40:00,NA,upper battle creek,308,39,2,day,44.1,565,NA,NA
+BAT163,2008-02-03,08:40:00,NA,upper battle creek,308,37,2,day,44.1,565,NA,natural
+BAT164,2008-02-05,20:30:00,NA,upper battle creek,301,39,1,night,45.7,391,NA,NA
+BAT165,2008-02-05,20:30:00,NA,upper battle creek,303,37,1,night,45.7,391,NA,natural
+BAT166,2008-02-09,19:35:00,NA,upper battle creek,302,39,1,night,49.1,343,NA,NA
+BAT167,2008-02-09,19:35:00,NA,upper battle creek,299,37,1,night,49.1,343,NA,natural
+BAT168,2008-02-12,19:36:00,NA,upper battle creek,305,39,1,night,51.3,324,NA,NA
+BAT169,2008-02-12,19:36:00,NA,upper battle creek,302,38,1,night,51.3,324,NA,natural
+BAT170,2008-02-16,19:00:00,NA,upper battle creek,300,36,0,night,49.6,328,NA,NA
+BAT171,2008-02-16,19:00:00,NA,upper battle creek,302,38,0,night,49.6,328,NA,natural
+BAT172,2008-02-20,19:00:00,NA,upper battle creek,301,38,1,night,51,332,NA,NA
+BAT173,2008-02-20,19:00:00,NA,upper battle creek,296,38,1,night,51,332,NA,natural
+BAT174,2008-02-22,19:00:00,NA,upper battle creek,306,38,0,night,49.4,727,NA,NA
+BAT175,2008-02-22,19:00:00,NA,upper battle creek,301,38,0,night,49.4,727,NA,natural
+BAT176,2008-02-26,18:50:00,NA,upper battle creek,307,38,0,night,50.8,477,NA,NA
+BAT177,2008-02-26,18:50:00,NA,upper battle creek,296,37,0,night,50.8,477,NA,natural
+BAT178,2008-03-01,19:12:00,NA,upper battle creek,309,40,1,night,52.1,411,NA,NA
+BAT179,2008-03-01,19:12:00,NA,upper battle creek,309,38,1,night,52.1,411,NA,natural
+BAT180,2008-03-04,19:35:00,NA,upper battle creek,303,38,1,night,51.6,383,NA,NA
+BAT181,2008-03-04,19:35:00,NA,upper battle creek,70,37,1,night,51.6,383,NA,natural
+BAT182,2008-03-08,19:02:00,NA,upper battle creek,302,39,1,night,52.7,351,NA,NA
+BAT183,2008-03-08,19:02:00,NA,upper battle creek,306,37,1,night,52.7,351,NA,natural
+BAT184,2008-03-11,20:30:00,NA,upper battle creek,309,40,1,night,54.9,383,NA,NA
+BAT185,2008-03-11,20:30:00,NA,upper battle creek,299,37,1,night,54.9,383,NA,natural
+BAT186,2008-03-15,19:55:00,NA,upper battle creek,303,41,1,night,50.2,423,NA,NA
+BAT187,2008-03-15,19:55:00,NA,upper battle creek,304,37,1,night,50.2,423,NA,natural
+BAT188,2008-03-18,18:55:00,NA,upper battle creek,563,43,1,night,54.9,367,NA,NA
+BAT189,2008-03-18,18:55:00,NA,upper battle creek,523,37,1,night,54.9,367,NA,natural
+BAT190,2008-03-22,20:06:00,NA,upper battle creek,306,46,1,night,53.5,391,NA,NA
+BAT191,2008-03-25,20:30:00,NA,upper battle creek,304,47,0,night,55.2,435,NA,NA
+BAT192,2008-03-25,20:30:00,NA,upper battle creek,148,35,0,night,55.2,435,NA,natural
+BAT193,2008-03-29,19:50:00,NA,upper battle creek,302,52,1,night,52.4,407,NA,NA
+BAT194,2008-04-01,19:52:00,NA,upper battle creek,300,51,1,night,53.5,363,NA,NA
+BAT195,2008-04-05,19:00:00,NA,upper battle creek,307,52,1,night,54.4,359,NA,NA
+BAT196,2008-04-08,20:05:00,NA,upper battle creek,309,53,1,night,54.1,379,NA,NA
+BAT197,2008-12-28,17:00:00,NA,upper battle creek,506,36,1,night,46.4,259,2.33,NA
+BAT198,2009-01-03,16:45:00,NA,upper battle creek,508,38,1,night,44.3,280,2.85,NA
+BAT199,2009-01-06,17:15:00,NA,upper battle creek,504,36,1,night,47.6,262,2.23,NA
+BAT200,2009-01-10,17:01:00,NA,upper battle creek,503,36,1,night,46.5,252,1.86,NA
+BAT201,2009-01-13,17:10:00,NA,upper battle creek,503,36,1,night,49.5,227,2.69,NA
+BAT202,2009-01-17,19:15:00,NA,upper battle creek,502,37,1,night,48,262,4.1,NA
+BAT203,2009-01-20,17:30:00,NA,upper battle creek,510,36,1,night,48.4,230,2.25,NA
+BAT204,2009-01-24,17:30:00,NA,upper battle creek,472,47,1,night,51.4,823,36.4,NA
+BAT205,2009-01-24,17:30:00,NA,upper battle creek,512,37,1,night,51.4,823,36.4,natural
+BAT206,2009-01-24,17:30:00,NA,upper battle creek,510,37,1,night,51.4,823,36.4,NA
+BAT207,2009-01-27,17:45:00,NA,upper battle creek,507,37,1,night,44.8,336,3.1,natural
+BAT208,2009-01-27,17:45:00,NA,upper battle creek,489,39,1,night,44.8,336,3.1,NA
+BAT209,2009-01-31,17:33:00,NA,upper battle creek,418,37,1,night,49.2,295,2.53,natural
+BAT210,2009-01-31,17:33:00,NA,upper battle creek,495,49,1,night,49.2,295,2.53,NA
+BAT211,2009-01-31,17:33:00,NA,upper battle creek,482,37,1,night,49.2,295,2.53,NA
+BAT212,2009-02-03,18:45:00,NA,upper battle creek,514,36,1,night,49.8,255,2.8,natural
+BAT213,2009-02-03,18:45:00,NA,upper battle creek,508,47,1,night,49.8,255,2.8,NA
+BAT214,2009-02-03,18:45:00,NA,upper battle creek,505,38,1,night,49.8,255,2.8,NA
+BAT215,2009-02-07,22:16:00,NA,upper battle creek,503,37,1,night,49.6,309,3.07,natural
+BAT216,2009-02-07,22:16:00,NA,upper battle creek,511,49,1,night,49.6,309,3.07,NA
+BAT217,2009-02-07,22:16:00,NA,upper battle creek,505,39,1,night,49.6,309,3.07,NA
+BAT218,2009-02-10,18:15:00,NA,upper battle creek,528,50,1,night,44.9,284,3.38,NA
+BAT219,2009-02-10,18:15:00,NA,upper battle creek,555,40,1,night,44.9,284,3.38,NA
+BAT220,2009-02-10,18:15:00,NA,upper battle creek,512,37,1,night,44.9,284,3.38,natural
+BAT221,2009-02-18,17:48:00,NA,upper battle creek,500,50,0,night,48.8,556,7.49,NA
+BAT222,2009-02-18,17:48:00,NA,upper battle creek,501,39,0,night,48.8,556,7.49,NA
+BAT223,2009-02-19,18:30:00,NA,upper battle creek,502,36,0,night,49.4,411,4.52,natural
+BAT224,2009-02-25,18:45:00,NA,upper battle creek,510,38,0,night,48.7,709,7.63,NA
+BAT225,2009-02-25,18:45:00,NA,upper battle creek,483,53,0,night,48.7,709,7.63,NA
+BAT226,2009-02-25,18:45:00,NA,upper battle creek,325,37,0,night,48.7,709,7.63,natural
+BAT227,2009-03-07,18:50:00,NA,upper battle creek,495,41,1,night,49,625,5.27,NA
+BAT228,2009-03-07,18:50:00,NA,upper battle creek,523,55,1,night,49,625,5.27,NA
+BAT229,2009-03-10,19:11:00,NA,upper battle creek,493,60,1,night,47.6,510,4.09,NA
+BAT230,2009-03-10,19:11:00,NA,upper battle creek,236,37,1,night,47.6,510,4.09,natural
+BAT231,2009-03-10,19:11:00,NA,upper battle creek,505,39,1,night,47.6,510,4.09,NA
+BAT232,2009-03-14,19:10:00,NA,upper battle creek,493,60,1,night,50.7,456,2.99,NA
+BAT233,2009-03-14,19:10:00,NA,upper battle creek,509,40,1,night,50.7,456,2.99,NA
+BAT234,2009-03-17,19:37:00,NA,upper battle creek,513,42,1,night,53.8,481,2.72,NA
+BAT235,2009-03-17,19:37:00,NA,upper battle creek,512,61,1,night,53.8,481,2.72,NA
+BAT236,2009-03-17,19:37:00,NA,upper battle creek,197,37,1,night,53.8,481,2.72,natural
+BAT237,2009-03-21,19:40:00,NA,upper battle creek,496,45,1,night,52.1,456,2.25,NA
+BAT238,2009-03-21,19:40:00,NA,upper battle creek,124,37,1,night,52.1,456,2.25,natural
+BAT239,2009-03-21,19:40:00,NA,upper battle creek,493,64,1,night,52.1,456,2.25,NA
+BAT240,2009-03-24,19:32:00,NA,upper battle creek,507,46,1,night,52.3,407,2.07,NA
+BAT241,2009-03-24,19:32:00,NA,upper battle creek,501,64,1,night,52.3,407,2.07,NA
+BAT242,2009-03-28,20:45:00,NA,upper battle creek,505,48,1,night,56.3,435,2.23,NA
+BAT243,2009-03-28,20:45:00,NA,upper battle creek,504,68,1,night,56.3,435,2.23,NA
+BAT244,2009-03-31,20:12:00,NA,upper battle creek,501,65,1,night,54.3,423,2.05,NA
+BAT245,2009-03-31,20:12:00,NA,upper battle creek,499,50,1,night,54.3,423,2.05,NA
+BAT246,2009-04-04,19:45:00,NA,upper battle creek,504,53,1,night,52.9,391,2.12,NA
+BAT247,2009-04-04,19:45:00,NA,upper battle creek,526,67,1,night,52.9,391,2.12,NA
+BAT248,2009-04-07,19:54:00,NA,upper battle creek,495,55,1,night,53.7,399,2.27,NA
+BAT249,2009-04-07,19:54:00,NA,upper battle creek,500,74,1,night,53.7,399,2.27,NA
+BAT250,2010-01-05,17:00:00,NA,upper battle creek,506,38,1,night,48.9,241,1.67,NA
+BAT251,2010-01-05,17:00:00,NA,upper battle creek,504,38,1,night,48.9,241,1.67,NA
+BAT252,2010-01-05,17:00:00,NA,upper battle creek,501,38,1,night,48.9,241,1.67,NA
+BAT253,2010-01-12,17:10:00,NA,upper battle creek,516,37,1,night,50.7,472,NA,natural
+BAT254,2010-01-23,17:20:00,NA,upper battle creek,505,37,0,night,45.9,514,5.25,natural
+BAT255,2010-02-02,18:25:00,NA,upper battle creek,488,37,1,night,48,552,13.3,natural
+BAT256,2010-02-02,18:25:00,NA,upper battle creek,520,37,1,night,48,552,13.3,natural
+BAT257,2010-02-09,18:45:00,NA,upper battle creek,422,37,0,night,50,779,8.1,natural
+BAT258,2010-02-09,18:45:00,NA,upper battle creek,424,37,0,night,50,779,8.1,natural
+BAT259,2010-02-14,18:15:00,NA,upper battle creek,512,37,1,night,50.4,448,3.29,natural
+BAT260,2010-02-14,18:15:00,NA,upper battle creek,500,37,1,night,50.4,448,3.29,natural
+BAT261,2010-02-22,18:20:00,NA,upper battle creek,497,36,0,night,48.7,452,5.16,natural
+BAT262,2010-02-22,18:20:00,NA,upper battle creek,389,36,0,night,48.7,452,5.16,natural
+BAT263,2010-02-22,18:20:00,NA,upper battle creek,508,36,0,night,48.7,452,5.16,natural
+BAT264,2011-01-12,19:15:00,NA,upper battle creek,518,37,1,night,47,440,2.57,NA
+BAT265,2011-01-12,19:20:00,NA,upper battle creek,500,37,1,night,47,440,2.57,NA
+BAT266,2011-01-19,18:40:00,NA,upper battle creek,248,37,1,night,47.6,548,4.1,natural
+BAT267,2011-01-19,18:32:00,NA,upper battle creek,498,38,1,night,47.6,548,4.1,NA
+BAT268,2011-01-22,18:22:00,NA,upper battle creek,281,35,1,night,49.5,427,2.59,natural
+BAT269,2011-01-22,18:22:00,NA,upper battle creek,269,36,1,night,49.5,427,2.59,natural
+BAT270,2011-01-26,18:55:00,NA,upper battle creek,507,38,1,night,49.4,399,2.79,hatchery
+BAT271,2011-01-26,18:50:00,NA,upper battle creek,498,37,1,night,49.4,407,2.79,natural
+BAT272,2011-01-29,17:50:00,NA,upper battle creek,504,37,1,night,46.8,395,1.94,natural
+BAT273,2011-01-29,17:55:00,NA,upper battle creek,506,37,1,night,46.8,403,1.94,natural
+BAT274,2011-02-02,18:43:00,NA,upper battle creek,499,38,1,night,46.3,367,3.44,hatchery
+BAT275,2011-02-02,18:48:00,NA,upper battle creek,501,37,1,night,46.3,367,3.44,natural
+BAT276,2011-02-05,18:15:00,NA,upper battle creek,501,40,1,night,51.1,395,2.44,NA
+BAT277,2011-02-05,18:15:00,NA,upper battle creek,494,37,1,night,51.1,395,2.44,natural
+BAT278,2011-02-19,18:45:00,NA,upper battle creek,504,37,1,night,45.4,709,10.4,natural
+BAT279,2011-02-19,18:50:00,NA,upper battle creek,483,39,1,night,45.4,709,10.4,hatchery
+BAT280,2011-02-26,19:05:00,NA,upper battle creek,553,38,1,night,45.8,647,6.98,hatchery
+BAT281,2011-02-26,19:10:00,NA,upper battle creek,570,37,1,night,45.8,647,6.98,natural
+BAT282,2011-03-05,19:05:00,NA,upper battle creek,487,43,1,night,50.5,460,3.75,hatchery
+BAT283,2011-03-05,19:10:00,NA,upper battle creek,508,36,1,night,50.5,464,3.75,natural
+BAT284,2012-01-13,19:35:00,NA,upper battle creek,207,36,1,night,46.2,224,2.44,natural
+BAT285,2012-01-13,19:49:00,NA,upper battle creek,206,35,1,night,46.2,232,2.44,natural
+BAT286,2012-01-13,19:42:00,NA,upper battle creek,212,36,1,night,46.2,232,2.44,natural
+BAT287,2012-01-20,05:54:00,NA,upper battle creek,195,36,1,day,45.3,335,8.91,natural
+BAT288,2012-01-20,05:59:00,NA,upper battle creek,188,36,1,day,45.3,335,8.91,natural
+BAT289,2012-01-25,17:53:00,NA,upper battle creek,200,36,0,night,50,445,7.51,natural
+BAT290,2012-01-25,18:04:00,NA,upper battle creek,198,36,0,night,50,445,7.51,natural
+BAT291,2012-01-25,17:59:00,NA,upper battle creek,209,35,0,night,50,445,7.51,natural
+BAT292,2012-01-28,20:30:00,NA,upper battle creek,305,35,1,night,45.9,356,2.88,natural
+BAT293,2012-01-28,20:35:00,NA,upper battle creek,305,35,1,night,45.9,356,2.88,natural
+BAT294,2012-02-01,17:21:00,NA,upper battle creek,311,36,1,night,50.9,322,2.61,natural
+BAT295,2012-02-01,17:31:00,NA,upper battle creek,312,36,1,night,50.9,322,2.61,natural
+BAT296,2012-02-04,20:06:00,NA,upper battle creek,305,36,1,night,47.3,288,2.6,natural
+BAT297,2012-02-04,20:11:00,NA,upper battle creek,301,37,1,night,47.3,284,2.6,natural
+BAT298,2012-02-09,19:30:00,NA,upper battle creek,314,37,1,night,51.1,288,3.05,natural
+BAT299,2012-02-09,19:35:00,NA,upper battle creek,341,37,1,night,50.9,288,3.05,natural
+BAT300,2012-02-15,18:00:00,NA,upper battle creek,305,36,1,night,48.3,330,2.35,natural
+BAT301,2012-02-15,18:05:00,NA,upper battle creek,302,37,1,night,48.1,330,2.35,natural
+BAT302,2012-02-22,19:22:00,NA,upper battle creek,299,37,1,night,50.8,301,2.46,natural
+BAT303,2012-02-22,19:28:00,NA,upper battle creek,303,36,1,night,50.8,309,2.46,natural
+BAT304,2012-02-29,20:04:00,NA,upper battle creek,306,36,1,night,47.3,317,2.86,natural
+BAT305,2012-02-29,20:09:00,NA,upper battle creek,314,35,1,night,47.3,322,2.86,natural
+BAT306,2012-03-07,20:57:00,NA,upper battle creek,299,35,1,night,49.1,288,1.58,natural
+BAT307,2012-03-07,21:03:00,NA,upper battle creek,291,35,1,night,49.1,288,1.58,natural
+BAT308,2012-03-21,19:58:00,NA,upper battle creek,281,36,1,night,50,506,3.51,natural
+BAT309,2012-03-21,20:03:00,NA,upper battle creek,215,37,1,night,50,506,3.51,natural
+BAT310,2013-01-23,18:35:00,NA,upper battle creek,212,36,1,night,48.1,513,3.05,natural
+BAT311,2013-01-23,18:30:00,NA,upper battle creek,194,35,1,night,48.1,513,3.05,natural
+BAT312,2013-01-30,19:15:00,NA,upper battle creek,160,36,1,night,48.8,530,2.82,natural
+BAT313,2013-01-30,19:20:00,NA,upper battle creek,213,36,1,night,48.8,530,2.82,natural
+BAT314,2013-02-06,18:35:00,NA,upper battle creek,251,37,1,night,47.6,495,2.82,natural
+BAT315,2013-02-06,18:40:00,NA,upper battle creek,258,36,1,night,47.6,495,2.82,natural
+BAT316,2013-02-14,19:10:00,NA,upper battle creek,186,37,1,night,50.2,379,3.02,natural
+BAT317,2013-02-14,19:05:00,NA,upper battle creek,202,37,1,night,50.2,379,3.02,natural
+BAT318,2013-02-21,18:06:00,NA,upper battle creek,175,37,1,night,48,369,3.1,natural
+BAT319,2013-02-21,18:11:00,NA,upper battle creek,176,36,1,night,48,363,3.1,natural
+BAT320,2013-02-28,17:55:00,NA,upper battle creek,179,37,1,night,52.2,322,3.21,natural
+BAT321,2013-02-28,18:00:00,NA,upper battle creek,166,37,1,night,52.2,322,3.21,natural
+BAT322,2014-02-04,19:05:00,NA,upper battle creek,492,36,1,night,46.5,202,NA,natural
+BAT323,2014-02-04,19:05:00,NA,upper battle creek,488,38,1,night,46.5,202,NA,natural
+BAT324,2014-02-20,18:00:00,NA,upper battle creek,283,37,1,night,51.7,234,3.98,natural
+BAT325,2014-02-20,18:05:00,NA,upper battle creek,253,37,1,night,51.7,234,3.98,natural
+BAT326,2015-12-15,18:05:00,NA,upper battle creek,134,33,1,night,45.3,313,4.19,natural
+BAT327,2016-01-15,16:20:00,NA,upper battle creek,271,34,0,night,47.6,635,9.93,natural
+BAT328,2016-03-15,18:50:00,NA,upper battle creek,996,45,1,night,51.5,1160,11.9,NA
+BAT329,2016-12-27,18:00:00,NA,upper battle creek,475,37,1,night,44.4,643,4.06,NA
+BAT330,2016-12-31,17:36:00,NA,upper battle creek,506,38,1,night,46.2,555,3.74,NA
+BAT331,2017-01-27,17:22:00,NA,upper battle creek,523,39,1,night,45.9,813,6.21,NA
+BAT332,2017-01-31,17:45:00,NA,upper battle creek,554,40,1,night,47.5,639,7,NA
+BAT333,2018-01-16,18:05:00,NA,upper battle creek,333,37,0,night,52.9,393,3.79,NA
+BAT334,2018-02-01,18:22:00,NA,upper battle creek,411,37,2,night,51.7,433,3.07,NA
+BAT335,2018-02-14,18:40:00,NA,upper battle creek,299,35,1,night,48.6,388,2,NA
+BAT336,2018-03-14,12:35:00,NA,upper battle creek,402,70,2,night,46.9,1173,11.6,NA
+BAT337,2018-04-05,09:18:00,NA,upper battle creek,499,78,1,unknown,54,577,2.68,NA
+BAT338,2019-01-02,12:21:00,NA,upper battle creek,224,35,0,night,43.5,295,2.54,natural
+BAT339,2019-02-05,17:58:00,NA,upper battle creek,300,38,NA,night,45,714,8.14,natural
+BAT340,2019-03-26,11:45:00,NA,upper battle creek,299,NA,NA,night,50.6,1176,NA,NA
+BAT341,2020-01-28,17:33:00,NA,upper battle creek,208,40,1,night,51.5,806,6.2,NA
+BAT342,2020-02-07,19:23:00,NA,upper battle creek,906,38,1,night,49.7,325,2.16,NA
+BAT343,2020-02-19,19:16:00,NA,upper battle creek,1143,39,1,night,49.9,306,2.27,NA
+BAT344,2020-11-06,17:03:00,NA,upper battle creek,332,40,1,night,54.3,257,1.98,NA
+BAT345,2020-11-13,17:05:00,NA,upper battle creek,336,41,1,night,48.9,260,1.61,NA
+BAT346,2020-12-19,17:10:00,NA,upper battle creek,295,44,1,night,47.1,238,1.57,NA
+BAT347,2021-02-02,19:46:00,NA,upper battle creek,404,40,1,night,50.7,609,20.4,NA
+BAT348,2021-02-09,17:44:00,NA,upper battle creek,298,40,1,night,51.9,258,1.8,NA
+BAT349,2021-03-02,20:33:00,NA,upper battle creek,320,54,1,night,51.3,232,2.2,NA
+BAT350,2021-03-08,14:29:00,NA,upper battle creek,449,NA,1,day,51.5,325,2.3,NA
+BAT351,2021-04-12,20:00:00,NA,upper battle creek,287,66,1,night,60.3,288,3.79,NA
+BAT352,2021-12-28,19:28:00,NA,upper battle creek,299,38,1,night,44.7,557,5.1,NA
+BAT353,2022-01-15,17:10:00,NA,upper battle creek,309,40,1,night,48.3,356,2.3,NA
+BAT354,2022-01-23,17:17:00,NA,upper battle creek,311,42,1,night,49,333,2.3,NA
+BAT355,2022-02-04,18:36:00,NA,upper battle creek,306,44,1,night,48.5,318,2.46,NA
+BAT356,2022-02-10,17:35:00,NA,upper battle creek,422,45,1,night,53.3,318,2.05,NA
+BAT357,2022-04-11,19:50:00,NA,upper battle creek,311,64,1,night,55.8,288,1.73,NA
+BAT358,2022-04-23,19:16:00,NA,upper battle creek,252,71,2,night,57.7,376,2.88,NA
+BAT359,2022-10-24,19:05:00,NA,upper battle creek,438,31,1,night,54.6,175,3.41,NA
+BAT360,2022-11-08,18:25:00,NA,upper battle creek,350,37,1,night,49.1,229,4.04,NA
+BAT361,2022-11-15,18:20:00,NA,upper battle creek,553,35,1,night,48.6,194,3.69,NA
+BAT362,2023-02-07,18:38:00,NA,upper battle creek,509,43,1,night,48.2,384,3.29,NA
+BAT363,2023-03-02,19:27:00,NA,upper battle creek,306,45,1,night,47.2,453,6.14,NA
+BAT364,2023-03-06,19:58:00,NA,upper battle creek,414,60,1,night,44.7,552,4.96,NA
+BAT365,2023-04-14,19:55:00,NA,upper battle creek,408,64,1,night,53.6,715,3.6,NA
+BAT366,2023-10-04,19:25:00,NA,upper battle creek,429,38,1,night,62.2,245,2.37,NA
+BAT367,2023-10-13,18:39:00,NA,upper battle creek,410,40,1,night,55.8,248,6.4,NA
+BAT368,2023-10-26,18:15:00,NA,upper battle creek,444,50,1,night,54,254,2.69,NA
+BAT369,2024-03-15,19:30:00,NA,upper battle creek,523,55,1,night,52.8,539,4.48,NA
+BAT370,2024-03-26,19:48:00,NA,upper battle creek,496,59,1,night,54.6,549,3.32,NA
+BAT371,2024-04-02,20:20:00,NA,upper battle creek,504,64,1,night,57,601,NA,NA
+BAT372,2025-01-28,NA,NA,upper battle creek,461,NA,NA,night,56.7,NA,NA,NA
