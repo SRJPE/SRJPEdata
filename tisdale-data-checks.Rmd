@@ -1,6 +1,6 @@
 ---
 title: "tisdale-data-checks"
-author: "Inigo Peng"
+author: "Inigo Peng, edited by Badhia Yunes-Katz"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -44,11 +44,15 @@ catch_with_stream <- catch |>
 ```
 
 
-# tisdale
+## tisdale {.tabset}
 
-## catch
+### catch
 
 **- Findings catch:**
+
+  - date range is the same 
+  - potential outlier value on folk_length
+  - life stage in edi data has not gone through wrangling
 
 ```{r echo=FALSE}
 catch_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_catch.csv") |>
@@ -63,7 +67,7 @@ catch_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_catch.csv") |>
          date = as.Date(visitTime))
 ```
 
-### Date Range Check
+#### Date Range Check
 *EDI `date`*
 ```{r}
 range(catch_tisdale_edi$date)
@@ -78,7 +82,8 @@ catch_tisdale_db <- catch_with_stream |>
 range(catch_tisdale_db$date)
 ```
 
-### ForkLength
+#### ForkLength
+
 *EDI `forkLength`*
 
 * `r round(sum(is.na(catch_tisdale_edi$forkLength))/nrow(catch_tisdale_edi), 3)*100` % of values in the `forkLength` column are NA.
@@ -98,9 +103,7 @@ summary(catch_tisdale_db$fork_length, na.rm = TRUE)
 ```{r include=FALSE}
 catch_tisdale_edi_edited <- catch_tisdale_edi |>
   clean_names() |>
-  # mutate(date = as.Date(visit_time)) |> 
   mutate(source = "EDI")
-  # filter(date > ymd("1999-06-04")) 
  
 catch_tisdale_db_edited <- catch_tisdale_db |>
   mutate(source = "DB")
@@ -118,8 +121,7 @@ ggplot(data = combined_catch_tisdale, aes(x = date, y = fork_length, color = sou
   facet_wrap(~source)
 ```
 
-### Lifestage
-(life stage in edi data has not gone through wrangling)
+#### Lifestage
 
 *EDI `lifeStage`*
 
@@ -148,7 +150,7 @@ catch_tisdale_edi |>
   labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
 ```
 
-### Count
+#### Count
 
 *EDI `n`*
 
@@ -202,7 +204,6 @@ catch_tisdale_edi |>
 ```
 
 - test 2
-
 ```{r echo=FALSE}
 # random pick to compare data
 catch_tisdale_db |>
@@ -232,19 +233,20 @@ catch_tisdale_edi |>
   glimpse()
 ```
 
-## TODO 
-## trap
+### trap
 
 **- Findings:**
 
-```{r echo=FALSE}
+  - All water velocity values are NA in DB
+
+```{r include=FALSE}
 trap_with_stream <- trap_visit |>
   left_join(trap_id)
 
 trap_tisdale_db <- trap_with_stream |> 
   filter(site == "tisdale") 
 ```
-```{r echo=FALSE}
+```{r include=FALSE}
 trap_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_trap.csv") |>
   mutate(siteName = tolower(siteName),
          subSiteName = tolower(subSiteName)) |> 
@@ -257,52 +259,153 @@ trap_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_trap.csv") |>
 
 ```
 
-## TODO
-<!--   - Database date range (`trap_visit_time_end`) -->
+#### Date Range Check
 
-<!-- ```{r echo=FALSE} -->
-<!-- range(trap_tisdale_db$trap_visit_time_end, na.rm = TRUE) -->
-<!-- ``` -->
+*DB `trap_visit_time_start`* 
+```{r echo=FALSE}
+range(trap_tisdale_db$trap_visit_time_start, na.rm = TRUE)
+```
+*EDI `visitTime`*
+```{r}
+range(trap_tisdale_edi$visitTime)
+```
 
-<!--   - Database glimpse -->
-<!-- ```{r echo=FALSE} -->
-<!-- # Read the trap table -->
-<!-- trap_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_trap.csv") |> glimpse() -->
-<!-- ``` -->
+#### water_velocity
 
-<!--   - EDI date range (current_year_tisdale_trap.csv `visitTime`) -->
-<!-- ```{r echo=FALSE} -->
-<!-- range(trap_tisdale_edi$visitTime) -->
-<!-- ``` -->
+*DB `water_velocity`*
 
-<!-- Random pick of data entry to compare between db and EDI -->
+* `r round(sum(is.na(trap_tisdale_db$water_velocity))/nrow(trap_tisdale_db), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_db$water_velocity)
+```
 
-<!--   - test 1 -->
+*EDI `waterVel`*
+* `r round(sum(is.na(trap_tisdale_edi$waterVel))/nrow(trap_tisdale_edi), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_edi$waterVel)
+```
 
-<!-- ```{r echo=FALSE} -->
-<!-- # # random pick to compare data  -->
-<!-- # trap_tisdale_bd |>  -->
-<!-- #   mutate(source = "DB") |>  -->
-<!-- #   filter(id == "2093136") |>  -->
-<!-- #   glimpse() -->
-<!-- #  -->
-<!-- # trap_tisdale_edi |>  -->
-<!-- #   mutate(source = "EDI") |>  -->
-<!-- #   filter(catchRawID == "55171") |>  -->
-<!-- #   glimpse() -->
-<!-- ``` -->
+```{r echo=FALSE, warning=FALSE}
+trap_tisdale_edi_clean <- trap_tisdale_edi |>
+  mutate(date = as.Date(visitTime),
+         source = "EDI")
+trap_tisdale_db_clean <- trap_tisdale_db |>
+  mutate(date = as.Date(trap_visit_time_start),
+         source = "DB")
 
-## release
+ggplot() +
+  geom_jitter(data = trap_tisdale_db_clean,
+              aes(x = date, y = water_velocity, color = source),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = trap_tisdale_edi_clean,
+              aes(x = date, y = waterVel),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "water_velocity or waterVel",
+       color = "Source"
+       )
+```
+
+#### fishProcessed
+
+*DB `fish_processed_id`*
+
+* `r round(sum(is.na(trap_tisdale_db$fish_processed_id))/nrow(trap_tisdale_db), 3)*100` % of values in the `fish_processed_id` column are NA.
+```{r echo=FALSE}
+table(trap_tisdale_db$fish_processed_id)
+```
+
+*EDI `fishProcessed`*
+* `r round(sum(is.na(trap_tisdale_edi$fishProcessed))/nrow(trap_tisdale_edi), 3)*100` % of values in the `fishProcessed` column are NA.
+```{r echo=FALSE}
+table(trap_tisdale_edi$fishProcessed)
+```
+Random pick of data entry by date to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+trap_tisdale_db |>
+  mutate(source = "DB",
+         trap_visit_time_start = as.Date(trap_visit_time_start)) |>
+  # filter(id == "2217421") |>
+  filter(trap_visit_id == "380") |>
+  glimpse()
+
+trap_tisdale_edi |>
+  mutate(source = "EDI",
+         visitTime = as.Date(visitTime)) |>
+  filter(trapVisitID == "380") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+trap_tisdale_db |>
+  mutate(source = "DB",
+         trap_visit_time_start = as.Date(trap_visit_time_start)) |>
+  # filter(id == "2217421") |>
+  filter(trap_visit_id == "2037") |>
+  glimpse()
+
+trap_tisdale_edi |>
+  mutate(source = "EDI",
+         visitTime = as.Date(visitTime)) |>
+  filter(trapVisitID == "2037") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+trap_tisdale_db |>
+  mutate(source = "DB",
+         trap_visit_time_start = as.Date(trap_visit_time_start)) |>
+  # filter(id == "2217421") |>
+  filter(trap_visit_id == "2015") |>
+  glimpse()
+
+trap_tisdale_edi |>
+  mutate(source = "EDI",
+         visitTime = as.Date(visitTime)) |>
+  filter(trapVisitID == "2015") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+trap_tisdale_db |>
+  mutate(source = "DB",
+         trap_visit_time_start = as.Date(trap_visit_time_start)) |>
+  # filter(id == "2217421") |>
+  filter(trap_visit_id == "6919") |>
+  glimpse()
+
+trap_tisdale_edi |>
+  mutate(source = "EDI",
+         visitTime = as.Date(visitTime)) |>
+  filter(trapVisitID == "6919") |>
+  glimpse()
+```
+
+### release
 
 **- Findings:**
-```{r echo=FALSE}
+
+  - date range is the same  
+  - most markedLifeStage values in EDI are NA, but no values are NA in DB
+
+```{r include=FALSE}
 release_with_stream <- release |>
   left_join(trap_id)
 
 release_tisdale_db <- release_with_stream |> 
   filter(site == "tisdale") 
 ```
-```{r echo=FALSE}
+```{r include=FALSE}
 release_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_release.csv") |> 
   filter(commonName == "Chinook salmon") |>
   mutate(releaseSite = tolower(releaseSite),
@@ -315,56 +418,150 @@ release_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_release.csv") |>
          date = as.Date(releaseTime))
 ```
 
-## TODO
-<!-- range(release_tisdale_db$date_released) -->
-<!-- ``` -->
+#### Date Range Check
 
-<!-- - EDI date range (`releaseTime`) -->
-
-<!-- ```{r include=FALSE} -->
-<!-- release_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_release.csv")  -->
-
-<!-- range(release_tisdale_edi$releaseTime, na.rm = TRUE) -->
-<!-- ``` -->
-
-<!-- *number_released and nReleased* -->
-
-<!-- * `r round(sum(is.na(release_tisdale_db$number_released))/nrow(release_tisdale_db), 3)*100` % of values in the `number_released` column in the database dataset are NA. -->
-
-<!-- * `r round(sum(is.na(release_tisdale_edi$nReleased))/nrow(release_tisdale_edi), 3)*100` % of values in the `nReleased` column in the database dataset are NA. -->
+*DB `date_released`* 
+```{r echo=FALSE}
+range(release_tisdale_db$date_released, na.rm = TRUE)
+```
+*EDI `releaseTime`*
+```{r}
+range(release_tisdale_edi$releaseTime)
+```
 
 
-<!-- ```{r echo=FALSE} -->
-<!-- release_tisdale_edi_clean<- release_tisdale_edi |>  -->
-<!--   mutate(date = as.Date(releaseTime))  -->
-<!-- release_tisdale_db_clean<- release_tisdale_db |>  -->
-<!--   mutate(date = as.Date(date_released))  -->
+#### markedLifeStage
 
-<!-- ggplot() + -->
-<!--   geom_jitter(data = release_tisdale_db_clean, -->
-<!--               aes(x = date, y = number_released), -->
-<!--               color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) + -->
-<!--   geom_jitter(data = release_tisdale_edi_clean, -->
-<!--               aes(x = date, y = nReleased), -->
-<!--               color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) + -->
-<!--   theme_minimal() + -->
-<!--   labs(x = "Date", -->
-<!--        y = "number_released or nReleased") -->
-<!-- ``` -->
+*EDI `markedLifeStage`*
 
-##TODO
-## recapture
+* `r round(sum(is.na(release_tisdale_edi$markedLifeStage))/nrow(release_tisdale_edi), 3)*100` % of values in the `markedLifeStage` column are NA.
+
+```{r echo=FALSE}
+table(release_tisdale_edi$markedLifeStage)
+```
+
+*DB `lifestage_id`*
+
+* `r round(sum(is.na(release_tisdale_db$lifestage_id))/nrow(release_tisdale_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(release_tisdale_db$lifestage_id, na.rm = TRUE)
+```
+
+#### nReleased
+
+*EDI `nReleased`*
+
+* `r round(sum(is.na(release_tisdale_edi$nReleased))/nrow(release_tisdale_edi), 3)*100` % of values in the `nReleased` column are NA.
+
+```{r echo=FALSE}
+summary(release_tisdale_edi$nReleased)
+```
+
+*DB `number_released`*
+
+* `r round(sum(is.na(release_tisdale_db$number_released))/nrow(release_tisdale_db), 3)*100` % of values in the `number_released` column are NA.
+
+```{r echo=FALSE}
+summary(release_tisdale_db$number_released, na.rm = TRUE)
+```
+
+*Exploration Plots* 
+
+```{r echo=FALSE}
+release_tisdale_edi_clean<- release_tisdale_edi |>
+  mutate(date = as.Date(releaseTime),
+         source = "EDI")
+release_tisdale_db_clean <- release_tisdale_db |>
+  mutate(date = as.Date(date_released),
+         source = "DB")
+
+ggplot() +
+  geom_jitter(data = release_tisdale_db_clean,
+              aes(x = date, y = number_released, color = source),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_tisdale_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased",
+       color = "Source"
+       )
+```
+
+Random pick of data entry by date to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+release_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "297") |>
+  glimpse()
+
+release_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "297") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+release_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "297") |>
+  glimpse()
+
+release_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "297") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+release_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "322") |>
+  glimpse()
+
+release_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "322") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+release_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "295") |>
+  glimpse()
+
+release_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "295") |>
+  glimpse()
+```
+
+### recapture
 
 **- Findings:**
 
-```{r echo=FALSE}
+- date range is the same  
+
+```{r include=FALSE}
 recapture_with_stream <- recaptured_fish |>
   left_join(trap_id)
 
 recapture_tisdale_db <- recapture_with_stream |> 
   filter(site == "tisdale") 
 ```
-```{r echo=FALSE}
+```{r include=FALSE}
 recapture_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_recapture.csv") |>
   filter(commonName == "Chinook salmon") |>
   mutate(siteName = tolower(siteName),
@@ -375,4 +572,132 @@ recapture_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_recapture.csv") |>
       TRUE ~ siteName)) |> 
   mutate(stream="sacramento river",
          date = as.Date(visitTime))
+```
+
+#### Date Range Check
+
+*DB `date`* 
+```{r echo=FALSE}
+range(recapture_tisdale_db$date)
+```
+*EDI `date`*
+```{r}
+range(recapture_tisdale_edi$date)
+```
+
+#### Count
+
+*DB `count`* 
+
+* `r round(sum(is.na(recapture_tisdale_db$count))/nrow(recapture_tisdale_db), 3)*100` % of values in the `count` column are NA.
+```{r echo=FALSE}
+summary(recapture_tisdale_db$count, na.rm = TRUE)
+```
+
+*EDI `n`*
+
+* `r round(sum(is.na(recapture_tisdale_edi$n))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `n` column are NA.
+```{r}
+summary(recapture_tisdale_edi$n)
+```
+
+#### lifeStage
+
+*EDI `lifeStage`*
+
+* `r round(sum(is.na(recapture_tisdale_edi$lifeStage))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `lifeStage` column are NA.
+
+```{r echo=FALSE}
+table(recapture_tisdale_edi$lifeStage)
+```
+
+*DB `lifestage_id`*
+
+* `r round(sum(is.na(recapture_tisdale_db$lifestage_id))/nrow(recapture_tisdale_db), 3)*100` % of values in the `lifestage_id` column are NA.
+
+```{r echo=FALSE}
+summary(recapture_tisdale_db$lifestage_id, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_point(data = recapture_tisdale_db,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_point(data = recapture_tisdale_edi,
+              aes(x = as.Date(visitTime), y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/number_recaptured")
+```
+
+#### forkLength
+
+*EDI `forkLength`*
+
+* `r round(sum(is.na(recapture_tisdale_edi$forkLength))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `forkLength` column are NA.
+
+*DB `fork_length`*
+
+* `r round(sum(is.na(recapture_tisdale_db$fork_length))/nrow(recapture_tisdale_db), 3)*100` % of values in the `fork_length` column are NA.
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+recapture_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "55215") |>
+  glimpse()
+
+recapture_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "55215") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+recapture_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "12772") |>
+  glimpse()
+
+recapture_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "12772") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+recapture_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "41490") |>
+  glimpse()
+
+recapture_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "41490") |>
+  glimpse()
+```
+
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+recapture_tisdale_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88918") |>
+  glimpse()
+
+recapture_tisdale_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88918") |>
+  glimpse()
 ```
