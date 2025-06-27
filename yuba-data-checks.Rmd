@@ -1,6 +1,6 @@
 ---
 title: "yuba-data-checks"
-author: "Inigo Peng"
+author: "Inigo Peng, edited by Badhia Yunes-Katz"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -45,11 +45,16 @@ catch_with_stream <- catch |>
   left_join(trap_id)
 ```
 
-# Yuba
+## Yuba {.tabset}
 
-## catch
+### catch
 
 **- Findings catch:**
+
+  - Date ranges are different, database has an earlier start year (1999 vd 2022 in DB)
+  - there are only a few data entries on database with year == 1999 and one data entry with year 2020, wondering if this is expected
+  - life stage in edi data has not gone through wrangling
+  - catch_raw_id in database has a decimal number (e.g 302.0)
 
 ```{r echo=FALSE}
 catch_yuba_edi <- read_csv("data-raw/edi-zips/yuba_catch.csv") |>
@@ -87,7 +92,7 @@ for (param in filter_params_yuba){
 
 ```
 
-### Date Range Check
+#### Date Range Check
 *EDI `date`*
 ```{r}
 range(catch_yuba_edi$date)
@@ -102,7 +107,7 @@ catch_yuba_db <- catch_with_stream |>
 range(catch_yuba_db$date)
 ```
 
-### ForkLength
+#### ForkLength
 *EDI `forkLength`*
 
 * `r round(sum(is.na(catch_yuba_edi$forkLength))/nrow(catch_yuba_edi), 3)*100` % of values in the `forkLength` column are NA.
@@ -122,9 +127,7 @@ summary(catch_yuba_db$fork_length, na.rm = TRUE)
 ```{r include=FALSE}
 catch_yuba_edi_edited <- catch_yuba_edi |>
   clean_names() |>
-  # mutate(date = as.Date(visit_time)) |> 
   mutate(source = "EDI")
-  # filter(date > ymd("1999-06-04")) 
  
 catch_yuba_db_edited <- catch_yuba_db |>
   mutate(source = "DB")
@@ -142,7 +145,7 @@ ggplot(data = combined_catch_yuba, aes(x = date, y = fork_length, color = source
   facet_wrap(~source)
 ```
 
-### Lifestage
+#### Lifestage
 (life stage in edi data has not gone through wrangling)
 
 *EDI `lifeStage`*
@@ -172,7 +175,7 @@ catch_yuba_edi |>
   labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
 ```
 
-### Count
+#### Count
 
 *EDI `n`*
 
@@ -256,12 +259,11 @@ catch_yuba_edi |>
   glimpse()
 ```
 
-## TODO 
-## trap
+### trap
 
 **- Findings:**
-   - time ranges are different, database has 2020 data only (wondering if this is an error?)
-   - couldn't do random test checks since couldn't find field in common
+   - time ranges are the same, but time does vary (on "max" value)
+   - all water_velocity values in database are NA. There is no data entry row with similar name in EDI
 
 ```{r echo=FALSE}
 trap_with_stream <- trap_visit |>
@@ -304,44 +306,111 @@ for (param in filter_params_yuba){
 }
 ```
 
-## TODO
-<!--   - Database date range (`trap_visit_time_end`) -->
+#### Date Range Check
 
-<!-- ```{r echo=FALSE} -->
-<!-- range(trap_yuba_db$trap_visit_time_end, na.rm = TRUE) -->
-<!-- ``` -->
+*DB `trap_visit_time_start`* 
+```{r echo=FALSE}
+range(trap_yuba_db$trap_visit_time_start, na.rm = TRUE)
+```
+*EDI `visitTime`*
+```{r}
+range(trap_yuba_edi$visitTime)
+```
 
-<!--   - Database glimpse -->
-<!-- ```{r echo=FALSE} -->
-<!-- # Read the trap table -->
-<!-- trap_yuba_edi <- read_csv("data-raw/edi-zips/yuba_trap.csv") |> glimpse() -->
-<!-- ``` -->
+#### water_velocity
 
-<!--   - EDI date range (current_year_yuba_trap.csv `visitTime`) -->
-<!-- ```{r echo=FALSE} -->
-<!-- range(trap_yuba_edi$visitTime) -->
-<!-- ``` -->
+*DB `water_velocity`*
 
-<!-- Random pick of data entry to compare between db and EDI -->
+* `r round(sum(is.na(trap_yuba_db$water_velocity))/nrow(trap_yuba_db), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_yuba_db$water_velocity)
+```
 
-<!--   - test 1 -->
+*EDI `waterVel`* - no column present
+* `r round(sum(is.na(trap_yuba_edi$waterVel))/nrow(trap_yuba_edi), 3)*100` % of values in the `water_velocity` column are NA.
 
-<!-- ```{r echo=FALSE} -->
-<!-- # # random pick to compare data  -->
-<!-- # trap_yuba_bd |>  -->
-<!-- #   mutate(source = "DB") |>  -->
-<!-- #   filter(id == "2093136") |>  -->
-<!-- #   glimpse() -->
-<!-- #  -->
-<!-- # trap_yuba_edi |>  -->
-<!-- #   mutate(source = "EDI") |>  -->
-<!-- #   filter(catchRawID == "55171") |>  -->
-<!-- #   glimpse() -->
-<!-- ``` -->
 
-## release
+#### fishProcessed
+
+*DB `fish_processed_id`*
+
+* `r round(sum(is.na(trap_yuba_db$fish_processed_id))/nrow(trap_yuba_db), 3)*100` % of values in the `fish_processed_id` column are NA.
+```{r echo=FALSE}
+table(trap_yuba_db$fish_processed_id)
+```
+
+*EDI `fishProcessed`*
+* `r round(sum(is.na(trap_yuba_edi$fishProcessed))/nrow(trap_yuba_edi), 3)*100` % of values in the `fishProcessed` column are NA.
+```{r echo=FALSE}
+table(trap_yuba_edi$fishProcessed)
+```
+
+Random pick of data entry by date to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+trap_yuba_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "986") |>
+  glimpse()
+
+trap_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "986") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+trap_yuba_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "1270") |>
+  glimpse()
+
+trap_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "1270") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+trap_yuba_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "549") |>
+  glimpse()
+
+trap_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "549") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+trap_yuba_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "1071") |>
+  glimpse()
+
+trap_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(trapVisitID == "1071") |>
+  glimpse()
+```
+
+### release
 
 **- Findings:**
+
+  - date and time range are the same
+  - there is not markedLifeStage column in EDI
+  
+  
 ```{r echo=FALSE}
 release_with_stream <- release |>
   left_join(trap_id)
@@ -384,47 +453,136 @@ for (param in filter_params_yuba){
 }
 ```
 
-## TODO
-<!-- range(release_yuba_db$date_released) -->
-<!-- ``` -->
+#### Date Range Check
 
-<!-- - EDI date range (`releaseTime`) -->
+*DB `date_released`* 
+```{r echo=FALSE}
+range(release_yuba_db$date_released, na.rm = TRUE)
+```
+*EDI `releaseTime`*
+```{r}
+range(release_yuba_edi$releaseTime)
+```
 
-<!-- ```{r include=FALSE} -->
-<!-- release_yuba_edi <- read_csv("data-raw/edi-zips/yuba_release.csv")  -->
+#### markedLifeStage
 
-<!-- range(release_yuba_edi$releaseTime, na.rm = TRUE) -->
-<!-- ``` -->
-
-<!-- *number_released and nReleased* -->
-
-<!-- * `r round(sum(is.na(release_yuba_db$number_released))/nrow(release_yuba_db), 3)*100` % of values in the `number_released` column in the database dataset are NA. -->
-
-<!-- * `r round(sum(is.na(release_yuba_edi$nReleased))/nrow(release_yuba_edi), 3)*100` % of values in the `nReleased` column in the database dataset are NA. -->
+*EDI `markedLifeStage`* - no column name found
 
 
-<!-- ```{r echo=FALSE} -->
-<!-- release_yuba_edi_clean<- release_yuba_edi |>  -->
-<!--   mutate(date = as.Date(releaseTime))  -->
-<!-- release_yuba_db_clean<- release_yuba_db |>  -->
-<!--   mutate(date = as.Date(date_released))  -->
+*DB `lifestage_id`*
 
-<!-- ggplot() + -->
-<!--   geom_jitter(data = release_yuba_db_clean, -->
-<!--               aes(x = date, y = number_released), -->
-<!--               color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) + -->
-<!--   geom_jitter(data = release_yuba_edi_clean, -->
-<!--               aes(x = date, y = nReleased), -->
-<!--               color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) + -->
-<!--   theme_minimal() + -->
-<!--   labs(x = "Date", -->
-<!--        y = "number_released or nReleased") -->
-<!-- ``` -->
+* `r round(sum(is.na(release_yuba_db$lifestage_id))/nrow(release_yuba_db), 3)*100` % of values in the `fork_length` column are NA.
 
-##TODO
-## recapture
+```{r echo=FALSE}
+summary(release_yuba_db$lifestage_id, na.rm = TRUE)
+```
+
+#### nReleased
+
+*EDI `nReleased`*
+
+* `r round(sum(is.na(release_yuba_edi$nReleased))/nrow(release_yuba_edi), 3)*100` % of values in the `nReleased` column are NA.
+
+```{r echo=FALSE}
+summary(release_yuba_edi$nReleased)
+```
+
+*DB `number_released`*
+
+* `r round(sum(is.na(release_yuba_db$number_released))/nrow(release_yuba_db), 3)*100` % of values in the `number_released` column are NA.
+
+```{r echo=FALSE}
+summary(release_yuba_db$number_released, na.rm = TRUE)
+```
+
+*Exploration Plots* 
+
+```{r echo=FALSE}
+release_yuba_edi_clean<- release_yuba_edi |>
+  mutate(date = as.Date(releaseTime),
+         source = "EDI")
+release_yuba_db_clean <- release_yuba_db |>
+  mutate(date = as.Date(date_released),
+         source = "DB")
+
+ggplot() +
+  geom_point(data = release_yuba_db_clean,
+              aes(x = date, y = number_released, color = source),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_point(data = release_yuba_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased",
+       color = "Source"
+       )
+```
+
+Random pick of data entry by date to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+release_yuba_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "297") |>
+  glimpse()
+
+release_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "297") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+release_yuba_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "257") |>
+  glimpse()
+
+release_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "257") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+release_yuba_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "259") |>
+  glimpse()
+
+release_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "259") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+release_yuba_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "262") |>
+  glimpse()
+
+release_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(releaseID == "262") |>
+  glimpse()
+```
+
+### recapture
 
 **- Findings:**
+
+  - Same date range
+
 
 ```{r echo=FALSE}
 recapture_with_stream <- recaptured_fish |>
@@ -468,4 +626,129 @@ for (param in filter_params_yuba){
 }
 ```
 
+#### Date Range Check
 
+*DB `date`* 
+```{r echo=FALSE}
+range(recapture_yuba_db$date)
+```
+*EDI `date`*
+```{r}
+range(recapture_yuba_edi$date)
+```
+
+#### Count
+
+*DB `count`* 
+
+* `r round(sum(is.na(recapture_yuba_db$count))/nrow(recapture_yuba_db), 3)*100` % of values in the `count` column are NA.
+```{r echo=FALSE}
+summary(recapture_yuba_db$count, na.rm = TRUE)
+```
+
+*EDI `n`*
+
+* `r round(sum(is.na(recapture_yuba_edi$n))/nrow(recapture_yuba_edi), 3)*100` % of values in the `n` column are NA.
+```{r}
+summary(recapture_yuba_edi$n)
+```
+
+#### lifeStage
+
+*EDI `lifeStage`*
+
+* `r round(sum(is.na(recapture_yuba_edi$lifeStage))/nrow(recapture_yuba_edi), 3)*100` % of values in the `lifeStage` column are NA.
+
+```{r echo=FALSE}
+table(recapture_yuba_edi$lifeStage)
+```
+
+*DB `lifestage_id`*
+
+* `r round(sum(is.na(recapture_yuba_db$lifestage_id))/nrow(recapture_yuba_db), 3)*100` % of values in the `lifestage_id` column are NA.
+
+```{r echo=FALSE}
+summary(recapture_yuba_db$lifestage_id, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_point(data = recapture_yuba_db,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_point(data = recapture_yuba_edi,
+              aes(x = as.Date(visitTime), y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/number_recaptured")
+```
+
+#### forkLength
+
+*EDI `forkLength`*
+
+* `r round(sum(is.na(recapture_yuba_edi$forkLength))/nrow(recapture_yuba_edi), 3)*100` % of values in the `forkLength` column are NA.
+
+*DB `fork_length`*
+
+* `r round(sum(is.na(recapture_yuba_db$fork_length))/nrow(recapture_yuba_db), 3)*100` % of values in the `fork_length` column are NA.
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data
+recapture_yuba_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "6045") |>
+  glimpse()
+
+recapture_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "6045") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data
+recapture_yuba_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "16612") |>
+  glimpse()
+
+recapture_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "16612") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data
+recapture_yuba_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "19678") |>
+  glimpse()
+
+recapture_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "19678") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data
+recapture_yuba_db |>
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "26312") |>
+  glimpse()
+
+recapture_yuba_edi |>
+  mutate(source = "EDI") |>
+  filter(catchRawID == "26312") |>
+  glimpse()
+```
