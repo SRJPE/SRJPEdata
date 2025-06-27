@@ -1,6 +1,6 @@
 ---
 title: "battle_clear-clear-data-checks"
-author: "Inigo Peng"
+author: "Inigo Peng, edited by Badhia Yunes-Katz"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -45,11 +45,13 @@ catch_with_stream <- catch |>
   left_join(trap_id)
 ```
 
-# battle_clear
+## battle_clear {.tabset}
 
-## catch
+### catch
 
 **- Findings catch:**
+
+  - a lot of "not provided" values on EDI lifestage
 
 ```{r echo=FALSE}
 catch_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_catch.csv") |>
@@ -58,8 +60,8 @@ catch_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_catch.csv") |
          date = as.Date(sample_date))
 ```
 
-### Date Range Check
-NOTE TODO: 
+#### Date Range Check
+ 
 *EDI `date`*
 ```{r}
 range(catch_battle_clear_edi$date)
@@ -74,10 +76,10 @@ catch_battle_clear_db <- catch_with_stream |>
 range(catch_battle_clear_db$date)
 ```
 
-### ForkLength
-*EDI `forkLength`*
+#### ForkLength
+*EDI `fork_length`*
 
-* `r round(sum(is.na(catch_battle_clear_edi$forkLength))/nrow(catch_battle_clear_edi), 3)*100` % of values in the `forkLength` column are NA.
+* `r round(sum(is.na(catch_battle_clear_edi$fork_length))/nrow(catch_battle_clear_edi), 3)*100` % of values in the `fork_length` column are NA.
 
 ```{r echo=FALSE}
 summary(catch_battle_clear_edi$fork_length, na.rm = TRUE)
@@ -93,14 +95,13 @@ summary(catch_battle_clear_db$fork_length, na.rm = TRUE)
 
 ```{r include=FALSE}
 catch_battle_clear_edi_edited <- catch_battle_clear_edi |>
-  clean_names() |>
-  # mutate(date = as.Date(visit_time)) |> 
-  mutate(source = "EDI")
-  # filter(date > ymd("1999-06-04")) 
+  clean_names() |> 
+  mutate(source = "EDI") 
  
 catch_battle_clear_db_edited <- catch_battle_clear_db |>
   mutate(source = "DB")
 ```
+
 *Forklength Exploration Plots* 
 
 ```{r echo=FALSE, warning=FALSE}
@@ -113,12 +114,12 @@ ggplot(data = combined_catch_battle_clear, aes(x = date, y = fork_length, color 
   facet_wrap(~source)
 ```
 
-### Lifestage
+#### Lifestage
 (life stage in edi data has not gone through wrangling)
 
-*EDI `lifeStage`*
+*EDI `life_stage`*
 
-* `r round(sum(is.na(catch_battle_clear_edi$lifeStage))/nrow(catch_battle_clear_edi), 3)*100` % of values in the `lifeStage` column from the EDI data are NA.
+* `r round(sum(is.na(catch_battle_clear_edi$life_stage))/nrow(catch_battle_clear_edi), 3)*100` % of values in the `life_stage` column from the EDI data are NA.
 
 *DB `lifestage_id`*
 
@@ -136,19 +137,19 @@ catch_battle_clear_db |>
 
 ```{r echo=FALSE, warning=FALSE}
 catch_battle_clear_edi |>
-   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+   ggplot(aes(x = as.factor(life_stage), y = fork_length, fill = as.factor(life_stage))) +
   geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
   coord_flip() +
   theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+  labs(x = "life_stage", y = "fork_length", title = "EDI data - life_stage vs forklength")
 ```
 
-### Count
+#### Count
 TODO: EDI data contains lifestage value "mixed" but not in lifestage lookuptable
 
-*EDI `n`*
+*EDI `count`*
 
-* `r round(sum(is.na(catch_battle_clear_edi$n))/nrow(catch_battle_clear_edi), 3)*100` % of values in the `n` column in edi data are NA.
+* `r round(sum(is.na(catch_battle_clear_edi$count))/nrow(catch_battle_clear_edi), 3)*100` % of values in the `count` column in edi data are NA.
 
 ```{r echo=FALSE}
 summary(catch_battle_clear_edi$count)
@@ -173,7 +174,7 @@ ggplot() +
               aes(x = date, y = count),
               color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
   geom_jitter(data = catch_battle_clear_edi_edited,
-              aes(x = date, y = n),
+              aes(x = date, y = count),
               color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
   theme_minimal() +
   labs(x = "Date",
@@ -224,12 +225,14 @@ catch_battle_clear_db |>
 
 catch_battle_clear_edi |>
   mutate(source = "EDI") |>
-  filter(catchRawID == "{4B85B5E1-9066-496A-A7F52185657FBFDE}") |>
+  filter(catch_row_id == "{4B85B5E1-9066-496A-A7F52185657FBFDE}") |>
   glimpse()
 ```
 
-## Trap
+### Trap
+
 **- Findings trap:**
+
 
 ```{r echo=FALSE}
 trap_with_stream <- trap_visit |>
@@ -245,10 +248,62 @@ trap_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_trap.csv") |>
          date = as.Date(sample_date))
 ```
 
-## TODO
-## release
+#### Date Range Check
+
+*DB `trap_visit_time_start`* 
+```{r echo=FALSE}
+range(trap_battle_clear_db$trap_visit_time_start, na.rm = TRUE)
+```
+*EDI `sample_date`*
+```{r}
+range(trap_battle_clear_edi$sample_date)
+```
+
+#### water_velocity
+
+*DB `water_velocity`*
+
+* `r round(sum(is.na(trap_battle_clear_db$water_velocity))/nrow(trap_battle_clear_db), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_battle_clear_db$water_velocity)
+```
+
+*EDI `velocity`*
+* `r round(sum(is.na(trap_battle_clear_edi$velocity))/nrow(trap_battle_clear_edi), 3)*100` % of values in the `velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_battle_clear_edi$velocity)
+```
+
+```{r}
+trap_battle_clear_edi_clean<- trap_battle_clear_edi |>
+  mutate(date = as.Date(sample_date),
+         source = "EDI")
+trap_battle_clear_db_clean <- trap_battle_clear_db |>
+  mutate(date = as.Date(trap_visit_time_start),
+         source = "DB")
+
+ggplot() +
+  geom_jitter(data = trap_battle_clear_db_clean,
+              aes(x = date, y = water_velocity, color = source),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = trap_battle_clear_edi_clean,
+              aes(x = date, y = velocity),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "water_velocity or velocity",
+       color = "Source"
+       )
+
+
+```
+
+### release
 
 **- Findings release:**
+
+  - date ranges are the same
+  - all lifestage_id are NA in DB, and no similar field in EDI
 
 ```{r echo=FALSE}
 release_with_stream <- release |>
@@ -264,16 +319,93 @@ release_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_release.csv
   mutate(stream="battle clear creek",
          date = as.Date(date_released)) 
 ```
-<!-- ## TODO -->
-<!-- ## releasefish -->
 
-<!-- **- Findings releasefish:** -->
+#### Date Range Check
 
-<!-- ```{r echo=FALSE} -->
-<!-- release_fish_with_stream <- released_fish |> -->
-<!--   left_join(trap_id) -->
+*DB `date_released`* 
+```{r echo=FALSE}
+range(release_battle_clear_db$date_released, na.rm = TRUE)
+```
+*EDI `releaseTime`*
+```{r}
+range(release_battle_clear_edi$date)
+```
 
-<!-- release_fish_battle_clear_db <- release_fish_with_stream |>  -->
-<!--   filter(stream == "battle_clear river")  -->
-<!-- ``` -->
 
+#### markedLifeStage
+
+*EDI `* - no similar field
+
+*DB `lifestage_id`*
+
+* `r round(sum(is.na(release_battle_clear_db$lifestage_id))/nrow(release_battle_clear_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(release_battle_clear_db$lifestage_id, na.rm = TRUE)
+```
+
+#### nReleased
+
+*EDI `number_released` * 
+
+* `r round(sum(is.na(release_battle_clear_edi$number_released))/nrow(release_battle_clear_edi), 3)*100` % of values in the `number_released` column are NA.
+
+```{r echo=FALSE}
+summary(release_battle_clear_edi$number_released, na.rm = TRUE)
+```
+
+*DB `number_released`*
+
+* `r round(sum(is.na(release_battle_clear_db$number_released))/nrow(release_battle_clear_db), 3)*100` % of values in the `number_released` column are NA.
+
+```{r echo=FALSE}
+summary(release_battle_clear_db$number_released, na.rm = TRUE)
+```
+
+#### median_fork_length_released
+
+*EDI `median_fork_length_released`*
+
+* `r round(sum(is.na(release_battle_clear_edi$median_fork_length_released))/nrow(release_battle_clear_edi), 3)*100` % of values in the `median_fork_length_released` column are NA.
+
+```{r echo=FALSE}
+summary(release_battle_clear_edi$median_fork_length_released)
+```
+
+*DB `median_fork_length_released`*
+
+* `r round(sum(is.na(release_battle_clear_db$median_fork_length_released))/nrow(release_battle_clear_db), 3)*100` % of values in the `median_fork_length_released` column are NA.
+
+```{r echo=FALSE}
+summary(release_battle_clear_db$median_fork_length_released, na.rm = TRUE)
+```
+
+*Exploration Plots* 
+
+```{r echo=FALSE, warning=FALSE}
+release_battle_clear_edi_clean <- release_battle_clear_edi |>
+  mutate(date = as.Date(date_released),
+         source = "EDI")
+release_battle_clear_db_clean <- release_battle_clear_db |>
+  mutate(date = as.Date(date_released),
+         source = "DB")
+
+ggplot() +
+  geom_jitter(data = release_battle_clear_db_clean,
+              aes(x = date, y = number_released, color = source),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_battle_clear_edi_clean,
+              aes(x = date, y = number_released),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased",
+       color = "Source"
+       )
+```
+
+### releasefish
+
+**- Findings releasefish:**
+
+  - no release fish table on EDI or DB
