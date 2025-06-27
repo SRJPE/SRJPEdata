@@ -40,7 +40,7 @@ trap_id <- trap_location |>
   select(trap_location_id, stream, site, subsite) 
 
 catch_with_stream <- catch |>
-  left_join(trap_id)
+  left_join(trap_id) 
 ```
 
 ## Butte {.tabset}
@@ -51,6 +51,7 @@ catch_with_stream <- catch |>
 
   - date range is the same 
   - life stage in edi data has not gone through wrangling
+  - TODO: current battle/clear site=NA subsite=NA gets joined to butte
 
 ```{r echo=FALSE}
 catch_butte_edi <- read_csv("data-raw/edi-zips/butte_catch.csv") |> 
@@ -102,7 +103,8 @@ range(catch_butte_edi$visitTime)
   
 ```{r echo=FALSE}
 catch_butte_db <- catch_with_stream |> 
-  filter(stream == "butte creek") 
+  filter(stream == "butte creek") |> 
+  filter(!is.na(site) & !is.na(subsite))
 
 range(catch_butte_db$date)
 ```
@@ -196,16 +198,16 @@ summary(catch_butte_db$count)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
-ggplot() +
-  geom_jitter(data = catch_butte_db_edited,
-              aes(x = date, y = count, color = "Database"),
-              alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
-  geom_jitter(data = catch_butte_edi_edited,
-              aes(x = date, y = n, color = "EDI"),
-              alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
-  scale_color_manual(values = c("Database" = "blue", "EDI" = "red")) +
-  theme_minimal() +
-  labs(x = "Date", y = "Count", color = "Source")
+# ggplot() +
+  # geom_jitter(data = catch_butte_db_edited,
+  #             aes(x = date, y = count, color = "Database"),
+  #             alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  # geom_jitter(data = catch_butte_edi_edited,
+  #             aes(x = date, y = n, color = "EDI"),
+  #             alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  # scale_color_manual(values = c("Database" = "blue", "EDI" = "red")) +
+  # theme_minimal() +
+  # labs(x = "Date", y = "Count", color = "Source")
 
 ```
 
@@ -268,7 +270,8 @@ trap_with_stream <- trap_visit |>
   left_join(trap_id)
 
 trap_butte_db <- trap_with_stream |> 
-  filter(stream == "butte creek") 
+  filter(stream == "butte creek") |> 
+  filter(!is.na(site) & !is.na(subsite))
 ```
 
 ```{r echo=FALSE}
@@ -423,7 +426,7 @@ release_with_stream <- release |>
   left_join(trap_id)
 
 release_butte_db <- release_with_stream |> 
-  filter(stream == "butte creek") 
+  filter(stream == "butte creek")
 ```
 ```{r echo=FALSE}
 release_butte_edi <- read_csv("data-raw/edi-zips/butte_release.csv") |>
