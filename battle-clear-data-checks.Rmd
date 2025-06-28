@@ -46,6 +46,8 @@ catch_with_stream <- catch |>
 ```
 
 ## battle_clear {.tabset}
+ 
+ #TODO, add recapture?
 
 ### catch
 
