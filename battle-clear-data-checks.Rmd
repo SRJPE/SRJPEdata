@@ -47,7 +47,11 @@ catch_with_stream <- catch |>
 
 ## battle_clear {.tabset}
  
- #TODO, add recapture?
+```{r eval=FALSE, include=FALSE}
+#TODO, there is no recapture in database
+recapture_with_stream <- recaptured_fish |>
+  left_join(trap_id)
+``` 
 
 ### catch
 
@@ -411,3 +415,9 @@ ggplot() +
 **- Findings releasefish:**
 
   - no release fish table on EDI or DB
+  
+### releasefish
+
+**- Findings recapture:**
+
+  - no release recapture table in DB  
