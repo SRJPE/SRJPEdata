@@ -18,14 +18,16 @@ adult_data <- annual_adult |>
   mutate(passage = ifelse(upstream_estimate == "NULL", F, T),
          redd = ifelse(redd == "NULL", F, T),
          holding = ifelse(holding == "NULL", F, T),
-         carcass = ifelse(carcass_estimate == "NULL", F, T)) |> 
-  select(year, stream, passage, redd, holding, carcass) |> 
+         carcass = ifelse(carcass_estimate == "NULL", F, T),
+         broodstock_tag = ifelse(broodstock_tag == "NULL", F, T)) |> 
+  select(year, stream, passage, redd, holding, carcass, broodstock_tag) |> 
   rename(brood_year = year)
 
 stock_recruit_year_lookup <- full_join(rst_data, adult_data) |> 
   rowwise() |> 
   mutate(rst = ifelse(is.na(rst), FALSE, rst),
-         adult = ifelse((is.na(carcass) & is.na(passage) & is.na(redd) & is.na(holding)), FALSE, TRUE), 
+         adult = ifelse((is.na(carcass) & is.na(passage) & 
+                           is.na(redd) & is.na(holding) & is.na(broodstock_tag)), FALSE, TRUE), 
          sr_possible = ifelse((isTRUE(rst) & isTRUE(adult)), TRUE, FALSE)) |> 
   filter(sr_possible) |> 
   select(-sr_possible) |> # SHOULD REMOVE ALL OF SACRAMENTO
@@ -44,12 +46,14 @@ stock_recruit_year_lookup <- full_join(rst_data, adult_data) |>
   filter(site != "yuba river") |> 
   mutate(recommended_adult_data = case_when(stream %in% c("battle creek", "clear creek", "mill creek") ~ "redd", 
                                            stream == "deer creek" ~ "holding", 
-                                           stream %in% c("butte creek", "feather river") ~ "carcass", 
-                                           stream == "yuba river" ~ "passage")) |> 
+                                           stream == "butte creek" ~ "carcass", 
+                                           stream == "yuba river" ~ "passage",
+                                           stream == "feather river" ~ "broodstock_tag")) |> 
   mutate(have_recommended_adult_data = case_when(stream %in% c("battle creek", "clear creek", "mill creek") & redd ~ TRUE, 
                                                  stream == "deer creek" & holding ~ TRUE, 
-                                                 stream %in% c("butte creek", "feather river") & carcass ~ TRUE, 
+                                                 stream == "butte creek" & carcass ~ TRUE, 
                                                  stream == "yuba river" &  passage ~ TRUE,
+                                                 stream == "feather river" & broodstock_tag ~ TRUE,
                                                  TRUE ~ FALSE)) |> 
   glimpse()
 
