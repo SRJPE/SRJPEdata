@@ -46,6 +46,11 @@ catch_with_stream <- catch |>
 ```
 
 ## battle_clear {.tabset}
+
+### TODOS:
+ - there are data with site=NA and subsite=NA - we do not know which stream it belongs to
+ - edi column trap_functioning contains NAs; trap_functioning lookup table does not contain NA
+ - map if site == lbc, subsite == lbc; if site ==powerhouse, subsite ==powerhouse (fixed - need to confirm)
  
 ```{r eval=FALSE, include=FALSE}
 #TODO, there is no recapture in database

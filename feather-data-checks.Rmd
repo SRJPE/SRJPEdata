@@ -46,6 +46,8 @@ catch_with_stream <- catch |>
 ```
 
 ## Feather {.tabset}
+### TODOS
+  - EDI data contains lifestage value "mixed" but not in lifestage lookuptable
 
 ### catch
 
@@ -53,7 +55,6 @@ catch_with_stream <- catch |>
 
   - Date ranges are the same
   - life stage in edi data has not gone through wrangling
-  - EDI data contains lifestage value "mixed" but not in lifestage lookuptable
 
 ```{r echo=FALSE}
 catch_feather_edi <- read_csv("data-raw/edi-zips/feather_catch.csv") |>  
