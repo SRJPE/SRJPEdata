@@ -51,7 +51,7 @@ catch_with_stream <- catch |>
 **- Findings catch:**
 
   - date range is the same 
-  - potential outlier value on folk_length
+  - potential outlier value on folk_length (consistent in both DB and EDI)
   - life stage in edi data has not gone through wrangling
 
 ```{r echo=FALSE}
@@ -237,7 +237,6 @@ catch_tisdale_edi |>
 
 **- Findings:**
 
-  - All water velocity values are NA in DB
 
 ```{r include=FALSE}
 trap_with_stream <- trap_visit |>
@@ -396,7 +395,6 @@ trap_tisdale_edi |>
 **- Findings:**
 
   - date range is the same  
-  - most markedLifeStage values in EDI are NA, but no values are NA in DB
 
 ```{r include=FALSE}
 release_with_stream <- release |>
@@ -446,6 +444,7 @@ table(release_tisdale_edi$markedLifeStage)
 
 ```{r echo=FALSE}
 summary(release_tisdale_db$lifestage_id, na.rm = TRUE)
+table(release_tisdale_db$lifestage_id)
 ```
 
 #### nReleased
@@ -617,6 +616,7 @@ table(recapture_tisdale_edi$lifeStage)
 
 ```{r echo=FALSE}
 summary(recapture_tisdale_db$lifestage_id, na.rm = TRUE)
+table(recapture_tisdale_db$lifestage_id)
 ```
 
 
@@ -639,9 +639,17 @@ ggplot() +
 
 * `r round(sum(is.na(recapture_tisdale_edi$forkLength))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `forkLength` column are NA.
 
+```{r echo=FALSE}
+summary(recapture_tisdale_edi$forkLength, na.rm = TRUE)
+```
+
 *DB `fork_length`*
 
 * `r round(sum(is.na(recapture_tisdale_db$fork_length))/nrow(recapture_tisdale_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(recapture_tisdale_db$fork_length, na.rm = TRUE)
+```
 
 Random pick of data entry to compare between db and EDI
 
