@@ -149,25 +149,6 @@ ggplot(data = combined_catch_knights, aes(x = date, y = fork_length, color = sou
 
 * `r round(sum(is.na(catch_knights_db$lifestage_id))/nrow(catch_knights_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
 
-```{r echo=FALSE, warning=FALSE}
-catch_knights_db |>
-   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
-```
-
-
-```{r echo=FALSE, warning=FALSE}
-catch_knights_edi |>
-   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
-```
-
 #### Count
 
 *EDI `n`*
@@ -252,8 +233,6 @@ catch_knights_edi |>
 **- Findings:**
 
    - date ranges are the same
-   - all water_velocity in DB are NA
-   
    
 ```{r echo=FALSE}
 trap_with_stream <- trap_visit |>
@@ -744,6 +723,9 @@ release_knights_edi |>
 ### releasefish
 
 **- Findings:**
+
+  - folk_length values are different between DB and EDI
+  
 ```{r echo=FALSE}
 releasefish_with_stream <- released_fish |>
   left_join(trap_id)
