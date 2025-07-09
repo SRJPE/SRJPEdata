@@ -125,25 +125,6 @@ ggplot(data = combined_catch_feather, aes(x = date, y = fork_length, color = sou
 
 * `r round(sum(is.na(catch_feather_db$lifestage_id))/nrow(catch_feather_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
 
-```{r echo=FALSE, warning=FALSE}
-catch_feather_db |>
-   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
-```
-
-
-```{r echo=FALSE, warning=FALSE}
-catch_feather_edi |>
-   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
-```
-
 #### Count
 *EDI `n`*
 
