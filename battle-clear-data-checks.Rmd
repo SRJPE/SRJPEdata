@@ -131,25 +131,6 @@ ggplot(data = combined_catch_battle_clear, aes(x = date, y = fork_length, color 
 
 * `r round(sum(is.na(catch_battle_clear_db$lifestage_id))/nrow(catch_battle_clear_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
 
-```{r echo=FALSE, warning=FALSE}
-catch_battle_clear_db |>
-   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
-```
-
-
-```{r echo=FALSE, warning=FALSE}
-catch_battle_clear_edi |>
-   ggplot(aes(x = as.factor(life_stage), y = fork_length, fill = as.factor(life_stage))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "life_stage", y = "fork_length", title = "EDI data - life_stage vs forklength")
-```
-
 #### Count
 TODO: EDI data contains lifestage value "mixed" but not in lifestage lookuptable (resolved)
 
