@@ -51,7 +51,7 @@ catch_with_stream <- catch |>
 
 **- Findings catch:**
 
-  - Date ranges are different, database has an earlier start year (1999 vd 2022 in DB)
+  - Date ranges are different, database has an earlier start year (1999 vs 2022 in DB)
   - there are only a few data entries on database with year == 1999 and one data entry with year 2020, wondering if this is expected
   - life stage in edi data has not gone through wrangling
   - catch_raw_id in database has a decimal number (e.g 302.0)
@@ -157,24 +157,6 @@ ggplot(data = combined_catch_yuba, aes(x = date, y = fork_length, color = source
 
 * `r round(sum(is.na(catch_yuba_db$lifestage_id))/nrow(catch_yuba_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
 
-```{r echo=FALSE, warning=FALSE}
-catch_yuba_db |>
-   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
-```
-
-
-```{r echo=FALSE, warning=FALSE}
-catch_yuba_edi |>
-   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
-  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
-  coord_flip() +
-  theme_minimal() +
-  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
-```
 
 #### Count
 
@@ -195,11 +177,6 @@ summary(catch_yuba_db$count)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
-ggplot(catch_yuba_db_edited, aes(x = date, y = count, color = source)) +
-  geom_jitter(alpha = 0.6, width = 0.3, height = 0) +
-  theme_minimal() +
-  labs(x = "date", y = "count", color = "Source")
-
 ggplot() +
   geom_jitter(data = catch_yuba_db_edited,
               aes(x = date, y = count),
@@ -263,7 +240,7 @@ catch_yuba_edi |>
 ### trap
 
 **- Findings:**
-   - time ranges are the same, but time does vary (on "max" value)
+   - time ranges vary (on "max" value). db max 2025-05-23 vs EDI 2025-05-27
    - all water_velocity values in database are NA. There is no data entry row with similar name in EDI
 
 ```{r echo=FALSE}
@@ -328,7 +305,6 @@ summary(trap_yuba_db$water_velocity)
 ```
 
 *EDI `waterVel`* - no column present
-* `r round(sum(is.na(trap_yuba_edi$waterVel))/nrow(trap_yuba_edi), 3)*100` % of values in the `water_velocity` column are NA.
 
 
 #### fishProcessed
