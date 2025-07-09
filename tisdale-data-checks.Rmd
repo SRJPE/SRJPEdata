@@ -46,10 +46,6 @@ catch_with_stream <- catch |>
 
 ## tisdale {.tabset}
 
-### TODOS
-  - map tisdale trap water_vel to water_velocity (done)
-  - release_subsite == "1 rm up" this is not in lookup table
-  
 ### catch
 
 **- Findings catch:**

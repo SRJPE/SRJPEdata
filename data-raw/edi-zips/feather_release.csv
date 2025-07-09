@@ -1,6 +1,330 @@
 projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin,sourceOfFishSite,releaseSite,releaseSubSite,nReleased,testDays,appliedMarkType,appliedMarkColor,appliedMarkPosition,appliedMarkCode,IncludeInAnalysis
 2,1,1999-02-04T17:00:00Z,Chinook salmon,Fall,Natural,Not recorded,Eye riffle_release site,Eye Pool Left & Right RM 60.5,3181,2,Fin clip,Not applicable (n/a),Adipose fin,,No
+2,2,1999-02-16T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1091,2,Fin clip,Not applicable (n/a),Adipose fin,,Yes
+2,3,1999-03-16T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),990,3,Pigment / dye,Brown,Whole body,,Yes
+2,4,1999-02-25T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),3151,4,Fin clip,Not applicable (n/a),Adipose fin,,Yes
+2,5,1999-03-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),999,4,Pigment / dye,Brown,Whole body,,Yes
+2,6,1999-03-23T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),999,3,Pigment / dye,Brown,Whole body,,Yes
+2,7,1999-12-31T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,8,2000-01-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,9,2000-01-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1123,3,Pigment / dye,Brown,Whole body,,Yes
+2,10,2000-01-18T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),895,3,Pigment / dye,Brown,Whole body,,Yes
+2,11,2000-01-24T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1025,4,Pigment / dye,Brown,Whole body,,Yes
+2,12,2000-01-31T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),940,3,Pigment / dye,Brown,Whole body,,Yes
+2,13,2000-02-07T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),978,3,Pigment / dye,Brown,Whole body,,Yes
+2,14,2000-02-28T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),410,2,Pigment / dye,Brown,Whole body,,Yes
+2,15,1999-12-21T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),999,2,Pigment / dye,Brown,Whole body,,Yes
+2,16,2000-01-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),990,2,Pigment / dye,Brown,Whole body,,Yes
+2,17,2000-01-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),1167,3,Pigment / dye,Brown,Whole body,,Yes
+2,18,2000-01-18T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),959,2,Pigment / dye,Brown,Whole body,,Yes
+2,19,2000-01-31T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),1093,2,Pigment / dye,Brown,Whole body,,Yes
+2,20,2000-02-07T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),930,2,Pigment / dye,Brown,Whole body,,Yes
+2,21,2001-01-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),549,4,Pigment / dye,Brown,Whole body,,Yes
+2,22,2001-01-24T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),470,3,Pigment / dye,Brown,Whole body,,Yes
+2,23,2001-02-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),485,2,Pigment / dye,Flourescent red,Not recorded,,Yes
+2,24,2001-02-15T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),863,2,Pigment / dye,Flourescent blue,Not recorded,,Yes
+2,25,2001-02-20T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),340,7,Pigment / dye,Flourescent red,Not recorded,,Yes
+2,26,2001-02-26T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),2980,7,Pigment / dye,Brown,Whole body,,Yes
+2,27,2001-03-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),500,6,Pigment / dye,Brown,Whole body,,Yes
+2,28,2001-03-12T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),498,2,Pigment / dye,Brown,Whole body,,Yes
+2,29,2001-01-17T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),996,7,Pigment / dye,Brown,Whole body,,Yes
+2,30,2001-01-25T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),390,7,Pigment / dye,Brown,Whole body,,Yes
+2,31,2001-02-06T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),400,7,Pigment / dye,Flourescent blue,Whole body,,Yes
+2,32,2001-02-14T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),593,7,Pigment / dye,Flourescent red,Whole body,,Yes
+2,33,2001-02-21T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),500,7,Pigment / dye,Flourescent blue,Whole body,,Yes
+2,34,2001-03-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),1000,7,Pigment / dye,Brown,Whole body,,Yes
+2,35,2001-03-12T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),998,7,Pigment / dye,Brown,Whole body,,Yes
+2,36,2001-03-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),305,7,Pigment / dye,Brown,Whole body,,Yes
+2,37,2001-04-16T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Live Oak_release site,Not applicable (n/a),595,7,Pigment / dye,Brown,Whole body,,Yes
+2,38,2002-01-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),996,2,Pigment / dye,Brown,Whole body,,Yes
+2,39,2002-01-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,40,2002-01-14T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1495,4,Pigment / dye,Brown,Whole body,,Yes
+2,41,2002-01-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,4,Pigment / dye,Brown,Whole body,,Yes
+2,42,2002-01-28T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),998,4,Pigment / dye,Brown,Whole body,,Yes
+2,43,2002-02-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,44,2002-02-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),996,3,Pigment / dye,Brown,Whole body,,Yes
+2,45,2002-02-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),998,3,Pigment / dye,Brown,Whole body,,Yes
+2,46,2002-02-26T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),996,4,Pigment / dye,Brown,Whole body,,Yes
+2,47,2002-03-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),988,3,Pigment / dye,Brown,Whole body,,Yes
+2,48,2002-03-07T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,49,2002-03-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),986,2,Pigment / dye,Brown,Whole body,,Yes
+2,50,2002-03-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),178,3,Pigment / dye,Brown,Whole body,,Yes
+2,51,2002-01-17T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,4000,3,Pigment / dye,Brown,Whole body,,Yes
+2,52,2002-01-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,998,4,Pigment / dye,Brown,Whole body,,Yes
+2,53,2002-01-28T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,54,2002-02-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,997,6,Pigment / dye,Brown,Whole body,,Yes
+2,55,2002-02-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Not applicable (n/a),998,3,Pigment / dye,Brown,Whole body,,Yes
+2,56,2002-02-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,998,2,Pigment / dye,Brown,Whole body,,Yes
+2,57,2002-02-26T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,992,2,Pigment / dye,Brown,Whole body,,Yes
+2,58,2002-03-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,998,3,Pigment / dye,Brown,Whole body,,Yes
+2,59,2002-03-07T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,984,3,Pigment / dye,Brown,Whole body,,Yes
+2,60,2002-03-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Not applicable (n/a),999,2,Pigment / dye,Brown,Whole body,,Yes
+2,61,2002-03-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,766,3,Pigment / dye,Brown,Whole body,,Yes
+2,62,2002-12-30T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,4,Pigment / dye,Brown,Whole body,,Yes
+2,63,2003-01-07T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),692,3,Pigment / dye,Orange,Nose,,Yes
+2,64,2003-01-10T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),980,2,Pigment / dye,Green,Nose,,Yes
+2,65,2003-01-15T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1178,2,Pigment / dye,Orange,Nose,,Yes
+2,66,2003-01-18T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),975,2,Pigment / dye,Brown,Whole body,,Yes
+2,67,2003-01-21T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1020,4,Pigment / dye,Yellow,Nose,,Yes
+2,68,2003-01-23T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1923,3,Pigment / dye,Orange,Nose,,Yes
+2,69,2003-01-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1482,2,Pigment / dye,Red,Nose,,Yes
+2,70,2003-02-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),992,2,Pigment / dye,Orange,Nose,,Yes
+2,71,2003-02-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,72,2003-02-21T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1084,2,Pigment / dye,Yellow,Nose,,Yes
+2,73,2003-02-27T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),994,3,Pigment / dye,Brown,Whole body,,Yes
+2,74,2003-03-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),572,3,Pigment / dye,Brown,Whole body,,Yes
+2,75,2002-12-30T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,995,2,Pigment / dye,Brown,Whole body,,Yes
+2,76,2003-01-09T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1052,5,Pigment / dye,Yellow,Nose,,Yes
+2,77,2003-01-14T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,922,3,Pigment / dye,Blue,Nose,,Yes
+2,78,2003-01-17T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,758,3,Pigment / dye,Red,Nose,,Yes
+2,79,2003-01-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,80,2003-01-25T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1015,2,Pigment / dye,Green,Nose,,Yes
+2,81,2003-01-30T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1245,2,Pigment / dye,Green,Nose,,Yes
+2,82,2003-02-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,993,2,Pigment / dye,Red,Nose,,Yes
+2,83,2003-02-20T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,486,8,Pigment / dye,Brown,Whole body,,Yes
+2,84,2003-03-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,998,5,Pigment / dye,Brown,Whole body,,Yes
+2,85,2003-03-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,819,3,Pigment / dye,Brown,Whole body,,Yes
+2,86,2003-12-23T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),693,2,Pigment / dye,Orange,Nose,,Yes
+2,87,2003-12-27T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),738,3,Pigment / dye,Green,Nose,,Yes
+2,88,2004-01-02T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1074,2,Pigment / dye,Orange,Nose,,Yes
+2,89,2004-01-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),925,3,Pigment / dye,Yellow,Nose,,Yes
+2,90,2004-01-14T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1012,2,Pigment / dye,Blue,Nose,,Yes
+2,91,2004-01-23T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1059,2,Pigment / dye,Orange,Nose,,Yes
+2,92,2004-01-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),982,2,Pigment / dye,Brown,Whole body,,Yes
+2,93,2004-02-01T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1000,4,Pigment / dye,Brown,Whole body,,Yes
+2,94,2004-02-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),999,2,Pigment / dye,Brown,Whole body,,Yes
+2,95,2004-02-09T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),995,3,Pigment / dye,Brown,Whole body,,Yes
+2,96,2004-02-12T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1291,7,Pigment / dye,Red,Nose,,Yes
+2,97,2004-02-16T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1188,2,Pigment / dye,Brown,Whole body,,Yes
+2,98,2004-02-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1134,2,Pigment / dye,Brown,Whole body,,Yes
+2,99,2004-02-23T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),997,2,Pigment / dye,Brown,Whole body,,Yes
+2,100,2004-02-28T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1085,4,Pigment / dye,Orange,Nose,,Yes
+2,101,2004-03-03T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1601,2,Pigment / dye,Yellow,Nose,,Yes
+2,102,2004-03-06T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1030,2,Pigment / dye,Red,Nose,,Yes
+2,103,2004-03-10T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),1191,2,Pigment / dye,Brown,Whole body,,Yes
+2,104,2004-03-15T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),725,3,Pigment / dye,Brown,Whole body,,Yes
+2,105,2004-03-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),850,3,Pigment / dye,Pink,Nose,,Yes
+2,106,2004-03-25T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Not applicable (n/a),492,2,Pigment / dye,Red,Nose,,Yes
+2,107,2003-12-30T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,686,2,Pigment / dye,Brown,Whole body,,Yes
+2,108,2004-01-07T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,540,4,Pigment / dye,Brown,Whole body,,Yes
+2,109,2004-01-12T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1995,3,Pigment / dye,Brown,Whole body,,Yes
+2,110,2004-01-17T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1309,3,Pigment / dye,Brown,Whole body,,Yes
+2,111,2004-01-24T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,995,3,Pigment / dye,Brown,Whole body,,Yes
+2,112,2004-01-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,113,2004-02-02T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,988,4,Pigment / dye,Brown,Whole body,,Yes
+2,114,2004-02-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Not applicable (n/a),991,5,Pigment / dye,Brown,Whole body,,Yes
+2,115,2004-02-09T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,116,2004-02-12T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,992,5,Pigment / dye,Brown,Whole body,,Yes
+2,117,2004-02-16T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Not applicable (n/a),1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,118,2004-02-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,997,2,Pigment / dye,Brown,Whole body,,Yes
+2,119,2004-03-02T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,992,3,Pigment / dye,Brown,Whole body,,Yes
+2,120,2004-03-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,999,4,Pigment / dye,Brown,Whole body,,Yes
+2,121,2004-03-14T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,122,2004-03-24T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,995,2,Pigment / dye,Brown,Whole body,,Yes
+2,123,2004-03-30T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Herringer Release boxes,1089,3,Pigment / dye,Brown,Whole body,,Yes
+2,124,2004-04-17T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,Not applicable (n/a),629,3,Pigment / dye,Brown,Whole body,,Yes
+2,125,2004-12-26T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Steep Pool RM 60.9,998,4,Pigment / dye,Brown,Whole body,,Yes
+2,126,2004-12-30T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Steep Pool RM 60.9,653,4,Pigment / dye,Green,Nose,,Yes
+2,127,2005-01-06T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Steep Pool RM 60.9,740,2,Pigment / dye,Brown,Whole body,,Yes
+2,128,2005-01-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Steep Pool RM 60.9,1044,2,Pigment / dye,Orange,Nose,,Yes
+2,129,2005-01-20T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Steep Pool RM 60.9,997,11,Pigment / dye,Pink,Nose,,Yes
+2,130,2005-01-28T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Steep Pool RM 60.9,993,4,Pigment / dye,Green,Nose,,Yes
+2,131,2005-02-01T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Eye riffle_release site,Steep Pool RM 60.9,996,2,Pigment / dye,White,Nose,,Yes
+2,132,2005-02-09T11:30:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Right RM 60.9,996,2,Pigment / dye,Orange,Nose,,Yes
+2,133,2005-02-17T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Right RM 60.9,998,4,Pigment / dye,Orange,Nose,,Yes
+2,134,2005-02-24T11:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Robinson Side RM 61.6,996,4,Pigment / dye,Orange,Nose,,Yes
+2,135,2005-03-08T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Left RM 60.9,985,4,Elastomer,Red,Nose,,Yes
+2,136,2005-03-16T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Left RM 60.9,936,4,Elastomer,Yellow,Nose,,Yes
+2,137,2005-03-25T10:30:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Left Middle Right RM 60.9,788,3,Elastomer,Green,Nose,,Yes
+2,138,2005-04-05T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Eye Pool RM 60.5,633,2,Pigment / dye,Pink,Nose,,Yes
+2,139,2004-12-21T10:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,770,5,Pigment / dye,Brown,Whole body,,Yes
+2,140,2004-12-29T13:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1328,6,Elastomer,Orange,Nose,,Yes
+2,141,2005-01-04T14:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,717,7,Pigment / dye,Brown,Whole body,,Yes
+2,142,2005-01-11T14:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1169,6,Elastomer,Orange,Nose,,Yes
+2,143,2005-01-17T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,996,3,Pigment / dye,Brown,Whole body,,Yes
+2,144,2005-01-23T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,999,4,Pigment / dye,Brown,Whole body,,Yes
+2,145,2005-01-28T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,996,4,Pigment / dye,Brown,Whole body,,Yes
+2,146,2005-02-02T14:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1000,4,Pigment / dye,Brown,Whole body,,Yes
+2,147,2005-02-09T13:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,996,6,Pigment / dye,Brown,Whole body,,Yes
+2,148,2005-02-14T13:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,995,5,Pigment / dye,Brown,Whole body,,Yes
+2,149,2005-02-18T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,982,6,Pigment / dye,Brown,Whole body,,Yes
+2,150,2005-02-28T14:37:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,997,4,Pigment / dye,Brown,Whole body,,Yes
+2,151,2005-03-06T13:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,999,4,Pigment / dye,Brown,Whole body,,Yes
+2,152,2005-03-09T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,153,2005-03-15T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,998,6,Pigment / dye,Brown,Whole body,,Yes
+2,154,2005-03-20T12:00:00Z,Chinook salmon,Not recorded,Unknown,,Herringer_release site,half mile above trap RM,1524,4,Pigment / dye,Brown,Whole body,,Yes
+2,155,2005-03-25T14:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,990,4,Pigment / dye,Brown,Whole body,,Yes
+2,156,2005-04-01T12:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1049,5,Pigment / dye,Brown,Whole body,,Yes
+2,157,2005-04-14T14:20:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,257,4,Pigment / dye,Brown,Whole body,,Yes
+2,158,2005-04-19T12:25:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,403,2,Pigment / dye,Brown,Whole body,,Yes
+2,159,2005-04-23T13:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),314,3,Pigment / dye,Brown,Whole body,,Yes
+2,160,2005-05-12T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,346,2,Pigment / dye,Brown,Whole body,,Yes
+2,161,2005-12-16T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),466,4,Pigment / dye,Brown,Whole body,,Yes
+2,162,2005-12-20T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),990,2,Pigment / dye,Brown,Whole body,,Yes
+2,163,2006-01-19T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1200,2,Pigment / dye,Brown,Whole body,,Yes
+2,164,2006-01-22T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),999,3,Pigment / dye,Brown,Whole body,,Yes
+2,165,2006-01-30T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1081,2,Pigment / dye,Brown,Whole body,,Yes
+2,166,2006-02-02T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1503,3,Pigment / dye,Brown,Whole body,,Yes
+2,167,2006-02-06T12:20:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1004,3,Pigment / dye,Brown,Whole body,,Yes
+2,168,2006-02-09T13:50:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1015,3,Elastomer,Pink,Nose,,Yes
+2,169,2006-02-15T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1010,4,Pigment / dye,Brown,Whole body,,Yes
+2,170,2006-02-22T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1012,3,Elastomer,Pink,Nose,,Yes
+2,171,2006-02-25T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1027,2,Elastomer,Blue,Nose,,Yes
+2,172,2006-03-05T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),686,14,Elastomer,Orange,Nose,,Yes
+2,173,2006-03-20T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),1063,2,Pigment / dye,Brown,Whole body,,Yes
+2,174,2006-03-27T17:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Not applicable (n/a),594,3,Elastomer,Orange,Nose,,Yes
+2,175,2006-01-08T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,416,2,Pigment / dye,Brown,Whole body,,Yes
+2,176,2006-01-11T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),292,5,Pigment / dye,Brown,Whole body,,Yes
+2,177,2006-01-22T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,941,4,Elastomer,Green,Nose,,Yes
+2,178,2006-01-26T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,605,6,Elastomer,Pink,Nose,,Yes
+2,179,2006-02-01T14:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1017,2,Elastomer,White,Nose,,Yes
+2,180,2006-02-06T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1019,2,Elastomer,Green,Nose,,Yes
+2,181,2006-02-09T11:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,2178,3,Pigment / dye,Brown,Whole body,,Yes
+2,182,2006-02-18T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1175,2,Elastomer,Green,Nose,,Yes
+2,183,2006-02-25T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,1339,3,Pigment / dye,Brown,Whole body,,Yes
+2,184,2006-12-22T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),997,4,Pigment / dye,Brown,Whole body,,Yes
+2,185,2006-12-26T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),989,4,Pigment / dye,Brown,Whole body,,Yes
+2,186,2006-12-31T11:40:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),996,6,Pigment / dye,Brown,Whole body,,Yes
+2,187,2007-01-07T10:45:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1000,4,Pigment / dye,Brown,Whole body,,Yes
+2,188,2007-01-12T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),998,5,Pigment / dye,Brown,Whole body,,Yes
+2,189,2007-01-21T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),998,2,Pigment / dye,Brown,Whole body,,Yes
+2,190,2007-01-28T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),955,5,Pigment / dye,Brown,Whole body,,Yes
+2,191,2007-02-03T11:40:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),998,4,Pigment / dye,Brown,Whole body,,Yes
+2,192,2007-02-10T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),994,2,Pigment / dye,Brown,Whole body,,Yes
+2,193,2007-02-17T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),996,4,Pigment / dye,Brown,Whole body,,Yes
+2,194,2007-03-01T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1114,3,Pigment / dye,Brown,Whole body,,Yes
+2,195,2007-03-04T17:00:00Z,Chinook salmon,Fall,Unknown,,Steep Riffle_release site,Not applicable (n/a),993,2,Pigment / dye,Brown,Whole body,,Yes
+2,196,2007-03-11T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),991,4,Pigment / dye,Brown,Whole body,,Yes
+2,197,2007-03-15T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1095,2,Pigment / dye,Brown,Whole body,,Yes
+2,198,2007-03-19T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),988,5,Pigment / dye,Brown,Whole body,,Yes
+2,199,2007-03-27T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),993,3,Pigment / dye,Brown,Whole body,,Yes
+2,200,2007-04-04T15:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),992,3,Pigment / dye,Brown,Whole body,,Yes
+2,201,2007-03-13T17:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),981,2,Pigment / dye,Brown,Whole body,,Yes
+2,202,2007-04-01T17:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),782,2,Pigment / dye,Brown,Whole body,,Yes
+2,203,2007-12-06T13:50:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1021,5,Elastomer,Yellow,Whole body,,Yes
+2,204,2007-12-10T16:27:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),955,4,Elastomer,Green,Nose,,Yes
+2,205,2007-12-12T10:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1016,3,Elastomer,Blue,Nose,,Yes
+2,206,2007-12-13T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1032,3,Elastomer,Pink,Nose,,Yes
+2,207,2007-12-18T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),752,3,Elastomer,Yellow,Nose,,Yes
+2,208,2007-12-19T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),767,2,Elastomer,Blue,Nose,,Yes
+2,209,2007-12-20T11:10:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),745,2,Elastomer,Green,Nose,,Yes
+2,210,2007-12-27T13:40:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),997,3,Pigment / dye,Brown,Whole body,,Yes
+2,211,2008-01-03T10:15:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),991,2,Pigment / dye,Brown,Whole body,,Yes
+2,212,2008-01-08T10:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),993,3,Elastomer,Green,Nose,,Yes
+2,213,2008-01-10T09:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1033,4,Elastomer,Purple / Violet,Nose,,Yes
+2,214,2008-01-15T14:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),997,3,Elastomer,Red,Nose,,Yes
+2,215,2008-01-17T10:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),953,4,Elastomer,Green,Nose,,Yes
+2,216,2008-01-23T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),865,4,Elastomer,Yellow,Nose,,No
+2,217,2008-01-26T15:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1021,2,Elastomer,Blue,Nose,,Yes
+2,218,2008-01-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),983,2,Pigment / dye,Pink,Not recorded,,Yes
+2,219,2008-01-31T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),920,2,Elastomer,Green,Nose,,Yes
+2,220,2008-02-05T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),922,3,Elastomer,Pink,Nose,,Yes
+2,221,2008-02-07T10:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1008,1,Elastomer,Yellow,Nose,,Yes
+2,222,2008-02-13T12:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),907,2,Elastomer,Red,Nose,,Yes
+2,223,2008-02-15T15:45:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),949,3,Elastomer,Yellow,Nose,,Yes
+2,224,2008-02-20T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),986,3,Elastomer,Green,Nose,,Yes
+2,225,2008-02-21T10:15:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),748,7,Elastomer,Red,Nose,,Yes
+2,226,2008-02-26T10:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),909,4,Elastomer,Yellow,Nose,,Yes
+2,227,2008-02-28T15:25:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),997,13,Elastomer,Red,Nose,,Yes
+2,228,2008-03-04T11:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),983,6,Elastomer,Green,Nose,,Yes
+2,229,2008-03-06T12:30:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),997,15,Elastomer,Red,Nose,,Yes
+2,230,2008-03-10T10:40:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),989,18,Elastomer,Yellow,Nose,,Yes
+2,231,2008-03-13T10:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1019,4,Elastomer,Green,Nose,,Yes
+2,232,2008-03-19T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),990,6,Elastomer,Orange,Nose,,Yes
+2,233,2008-03-25T09:45:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),998,3,Elastomer,Blue,Nose,,Yes
+2,234,2008-03-27T10:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1043,5,Elastomer,Green,Nose,,Yes
+2,235,2008-04-03T13:10:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),520,4,Elastomer,Orange,Nose,,Yes
+2,236,2008-04-08T11:15:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),936,7,Elastomer,Green,Nose,,Yes
+2,237,2008-04-10T17:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),956,3,Elastomer,Red,Nose,,Yes
+2,238,2008-01-28T15:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),990,2,Pigment / dye,Brown,Whole body,,Yes
+2,239,2008-01-31T13:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,240,2008-02-04T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1000,4,Pigment / dye,Brown,Whole body,,Yes
+2,241,2008-02-08T17:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1206,3,Pigment / dye,Brown,Whole body,,Yes
+2,242,2008-02-13T16:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),999,4,Pigment / dye,Brown,Whole body,,Yes
+2,243,2008-02-17T13:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),996,3,Pigment / dye,Brown,Whole body,,Yes
+2,244,2008-02-20T13:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1058,3,Pigment / dye,Brown,Whole body,,Yes
+2,245,2008-02-24T12:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),996,2,Pigment / dye,Brown,Whole body,,Yes
+2,246,2008-02-27T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),984,3,Pigment / dye,Brown,Whole body,,Yes
+2,247,2008-03-02T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1053,2,Pigment / dye,Brown,Whole body,,Yes
+2,248,2008-03-05T12:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1086,3,Pigment / dye,Brown,Whole body,,Yes
+2,249,2008-03-09T14:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1001,3,Pigment / dye,Brown,Whole body,,Yes
+2,250,2008-03-12T16:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1183,3,Pigment / dye,Brown,Whole body,,Yes
+2,251,2008-03-16T13:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),991,2,Pigment / dye,Brown,Whole body,,Yes
+2,252,2008-03-20T17:20:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),997,4,Pigment / dye,Brown,Whole body,,Yes
+2,253,2008-03-24T15:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,254,2008-03-27T15:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),1073,4,Pigment / dye,Brown,Whole body,,Yes
 2,255,1900-01-01T00:00:00Z,Not applicable (n/a),Not recorded,Unknown,Not applicable,Not applicable,,0,0,,,,,No
+2,256,2008-12-15T17:00:00Z,Chinook salmon,Not recorded,Natural,,Steep Riffle_release site,Not applicable (n/a),995,3,Pigment / dye,Brown,Whole body,,Yes
+2,257,2008-12-22T11:45:00Z,Chinook salmon,Not recorded,Natural,,Steep Riffle_release site,Not applicable (n/a),1056,2,Pigment / dye,Brown,Whole body,,Yes
+2,258,2008-12-30T12:17:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1008,2,Pigment / dye,Brown,Whole body,,Yes
+2,259,2009-01-05T12:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),998,4,Pigment / dye,Brown,Whole body,,Yes
+2,260,2009-01-12T12:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,261,2009-01-21T14:05:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1032,4,Elastomer,Red,Nose,,Yes
+2,262,2009-01-27T09:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1002,10,Elastomer,Orange,Nose,,Yes
+2,263,2009-02-03T15:15:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),995,4,Pigment / dye,Brown,Whole body,,Yes
+2,264,2009-02-09T12:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),1000,5,Pigment / dye,Brown,Whole body,,Yes
+2,265,2009-02-18T13:05:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),996,8,Pigment / dye,Brown,Whole body,,Yes
+2,266,2009-02-26T11:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),997,3,Pigment / dye,Brown,Whole body,,Yes
+2,267,2009-03-03T11:25:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),993,2,Pigment / dye,Brown,Whole body,,Yes
+2,268,2009-03-12T15:50:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),1000,4,Pigment / dye,Brown,Whole body,,Yes
+2,269,2009-01-28T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),515,3,Pigment / dye,Yellow,Not recorded,,Yes
+2,270,2009-02-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),506,2,Pigment / dye,Pink,Not recorded,,Yes
+2,271,2009-02-10T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),520,2,Pigment / dye,Green,Not recorded,,Yes
+2,272,2009-02-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),507,2,Pigment / dye,Green,Not recorded,,Yes
+2,273,2009-02-25T12:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),518,7,Elastomer,Orange,Nose,,Yes
+2,274,2009-03-04T12:10:00Z,Chinook salmon,Not recorded,Natural,,Sunset_release site,Not applicable (n/a),599,4,Elastomer,Green,Nose,,Yes
+2,275,2009-03-11T09:45:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),688,5,Elastomer,Orange,Nose,,Yes
+2,276,2009-03-19T11:30:00Z,Chinook salmon,Not recorded,Natural,,Sunset_release site,Not applicable (n/a),271,3,Elastomer,Pink,Nose,,Yes
+2,277,2009-03-24T14:45:00Z,Chinook salmon,Not recorded,Natural,,Sunset_release site,release_100m above falls,303,2,Elastomer,Yellow,Nose,,Yes
+2,278,2009-12-15T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),998,4,Pigment / dye,Brown,Whole body,,Yes
+2,279,2009-12-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),999,3,Pigment / dye,Brown,Whole body,,Yes
+2,280,2009-12-31T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),493,7,Elastomer,Red,Nose,,Yes
+2,281,2010-01-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),999,4,Pigment / dye,Brown,Whole body,,Yes
+2,282,2010-01-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),996,4,Pigment / dye,Brown,Whole body,,Yes
+2,283,2010-01-15T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),990,3,Pigment / dye,Brown,Whole body,,Yes
+2,284,2010-01-18T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),825,3,Pigment / dye,Brown,Whole body,,Yes
+2,285,2010-01-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,286,2010-01-25T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),681,4,Pigment / dye,Brown,Whole body,,Yes
+2,287,2010-01-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,288,2010-02-01T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),996,3,Pigment / dye,Brown,Whole body,,Yes
+2,289,2010-02-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,290,2010-02-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),983,3,Pigment / dye,Brown,Whole body,,Yes
+2,291,2010-02-13T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),999,3,Pigment / dye,Brown,Whole body,,Yes
+2,292,2010-02-16T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),995,3,Pigment / dye,Brown,Whole body,,Yes
+2,293,2010-02-20T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,294,2010-02-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),522,2,Elastomer,Green,Nose,,Yes
+2,295,2010-02-24T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),522,2,Elastomer,Orange,Nose,,Yes
+2,296,2010-03-01T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),505,3,Elastomer,Yellow,Nose,,Yes
+2,297,2010-03-03T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),499,3,Elastomer,Pink,Nose,,Yes
+2,298,2010-03-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),510,2,Elastomer,Green,Nose,,Yes
+2,299,2010-03-10T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),504,2,Elastomer,Red,Nose,,Yes
+2,300,2010-03-15T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),499,3,Elastomer,Green,Nose,,Yes
+2,301,2010-03-17T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),500,3,Elastomer,Pink,Nose,,Yes
+2,302,2010-03-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),498,2,Elastomer,Yellow,Nose,,Yes
+2,303,2010-03-25T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),100,3,Elastomer,Red,Nose,,Yes
+2,304,2010-03-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),100,15,Elastomer,Green,Nose,,Yes
+2,305,2010-04-07T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),178,5,Elastomer,Pink,Nose,,Yes
+2,306,2010-04-13T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),157,5,Elastomer,Yellow,Nose,,Yes
+2,307,2010-04-19T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Steep Riffle_release site,Not applicable (n/a),107,2,Elastomer,Pink,Nose,,Yes
+2,308,2010-01-14T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),317,2,Pigment / dye,Green,Nose,,Yes
+2,309,2010-01-21T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),508,2,Pigment / dye,Orange,Nose,,Yes
+2,310,2010-01-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),796,2,Pigment / dye,Green,Nose,,Yes
+2,311,2010-02-03T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),618,2,Pigment / dye,Pink,Nose,,Yes
+2,312,2010-02-05T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),600,4,Pigment / dye,Orange,Nose,,Yes
+2,313,2010-02-11T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),662,15,Pigment / dye,Green,Nose,,Yes
+2,314,2010-02-17T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),987,3,Pigment / dye,Pink,Nose,,Yes
+2,315,2010-02-21T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),584,3,Pigment / dye,Red,Nose,,Yes
+2,316,2010-02-25T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),1000,2,Pigment / dye,Brown,Whole body,,Yes
+2,317,2010-03-01T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),998,3,Pigment / dye,Brown,Whole body,,Yes
+2,318,2010-03-04T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),998,3,Pigment / dye,Brown,Whole body,,Yes
+2,319,2010-03-08T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),996,4,Pigment / dye,Brown,Whole body,,Yes
+2,320,2010-03-11T10:45:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),999,3,Pigment / dye,Brown,Whole body,,Yes
+2,321,2010-03-15T11:15:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),996,4,Pigment / dye,Brown,Whole body,,Yes
+2,322,2010-03-18T12:30:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),995,3,Pigment / dye,Brown,Whole body,,Yes
+2,323,2010-03-22T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),495,3,Pigment / dye,Brown,Whole body,,Yes
+2,324,2010-03-29T17:00:00Z,Chinook salmon,Not recorded,Unknown,,Sunset_release site,Not applicable (n/a),648,2,Pigment / dye,Brown,Whole body,,Yes
+2,325,2010-04-08T17:00:00Z,Chinook salmon,Not recorded,Natural,,Sunset_release site,Not applicable (n/a),243,3,Pigment / dye,Brown,Whole body,,Yes
+2,326,2008-04-08T16:10:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Not applicable (n/a),261,5,Pigment / dye,Brown,Whole body,,Yes
 2,327,2011-12-05T11:30:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Steep Riffle_release site,Not applicable (n/a),1093,7,Pigment / dye,Brown,Whole body,,Yes
 2,328,2011-12-13T11:45:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Steep Riffle_release site,Not applicable (n/a),211,7,Elastomer,Red,Nose,,Yes
 2,329,2011-12-20T13:30:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Steep Riffle_release site,Not applicable (n/a),318,7,Elastomer,Red,Nose,,Yes
@@ -69,6 +393,90 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,393,2012-03-22T12:00:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Herringer_release site,Not applicable (n/a),453,7,Pigment / dye,Brown,Whole body,,Yes
 2,394,2012-03-29T14:30:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Herringer_release site,Not applicable (n/a),556,7,Pigment / dye,Brown,Whole body,,Yes
 2,395,2012-04-04T14:00:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Herringer_release site,Not applicable (n/a),123,7,Elastomer,Red,Nose,,Yes
+2,402,2012-12-28T10:10:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,504,7,Elastomer,Orange,Nose,,No
+2,403,2013-01-03T11:47:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,517,7,Elastomer,Blue,Nose,,No
+2,404,2013-01-08T11:35:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,499,7,Elastomer,White,Nose,,No
+2,405,2013-01-09T10:10:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,587,7,Elastomer,Purple / Violet,Nose,,No
+2,406,2013-01-10T09:42:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,517,7,Elastomer,Red,Nose,,No
+2,407,2013-01-15T10:45:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,497,7,Elastomer,Green,Nose,,No
+2,408,2013-01-17T13:30:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,516,7,Elastomer,Purple / Violet,Nose,,Yes
+2,409,2013-01-22T10:30:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,496,7,Elastomer,Red,Nose,,Yes
+2,410,2013-01-23T10:28:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,539,6,Elastomer,Green,Nose,,Yes
+2,411,2013-01-24T10:50:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,493,7,Elastomer,Orange,Nose,,Yes
+2,412,2013-02-01T15:55:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,494,7,Elastomer,Green,Nose,,Yes
+2,413,2013-02-04T15:45:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,480,8,Elastomer,Orange,Nose,,Yes
+2,414,2013-02-06T13:20:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,479,7,Elastomer,Red,Nose,,Yes
+2,415,2013-02-12T10:05:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,543,7,Elastomer,Green,Nose,,Yes
+2,416,2013-02-13T13:10:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,499,7,Elastomer,Orange,Nose,,Yes
+2,417,2013-02-15T11:15:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,497,7,Elastomer,Purple / Violet,Nose,,Yes
+2,418,2013-02-19T12:00:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,520,7,Elastomer,Red,Nose,,Yes
+2,419,2013-02-20T10:45:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,495,7,Elastomer,Green,Nose,,Yes
+2,420,2013-02-21T15:15:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,503,7,Elastomer,Orange,Nose,,Yes
+2,421,2013-02-27T12:48:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,480,6,Elastomer,Purple / Violet,Nose,,Yes
+2,422,2013-02-28T15:15:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,483,7,Elastomer,Green,Nose,,Yes
+2,423,2013-03-05T11:53:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,490,7,Elastomer,Orange,Nose,,Yes
+2,424,2013-03-06T12:00:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,359,7,Elastomer,Purple / Violet,Nose,,Yes
+2,425,2013-03-07T10:15:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,314,7,Elastomer,Red,Nose,,Yes
+2,426,2013-03-12T10:48:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,49,7,Elastomer,Green,Nose,,Yes
+2,427,2013-03-15T10:50:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,98,4,Elastomer,Purple / Violet,Nose,,Yes
+2,428,2013-03-19T09:45:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,203,7,Elastomer,Red,Nose,,Yes
+2,429,2013-03-21T13:45:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,243,7,Elastomer,Orange,Nose,,Yes
+2,430,2013-03-26T10:45:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,236,7,Elastomer,Purple / Violet,Nose,,Yes
+2,431,2012-12-12T10:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,360,5,Pigment / dye,Brown,Whole body,,Yes
+2,432,2012-12-18T11:03:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,566,7,Pigment / dye,Brown,Whole body,,Yes
+2,433,2012-12-28T15:10:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,1004,5,Pigment / dye,Brown,Whole body,,Yes
+2,434,2013-01-03T11:55:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,990,6,Pigment / dye,Brown,Whole body,,Yes
+2,435,2013-01-08T10:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,802,7,Elastomer,Green,Nose,,Yes
+2,436,2013-01-10T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,1136,6,Pigment / dye,Brown,Whole body,,Yes
+2,437,2013-01-15T12:10:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,357,7,Elastomer,Blue,Nose,,Yes
+2,438,2013-01-17T14:20:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,1049,6,Pigment / dye,Brown,Whole body,,Yes
+2,439,2013-01-22T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,1007,7,Elastomer,White,Nose,,Yes
+2,440,2013-01-24T10:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,763,5,Pigment / dye,Brown,Whole body,,Yes
+2,441,2013-01-30T16:15:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,993,5,Pigment / dye,Brown,Whole body,,Yes
+2,442,2013-02-05T13:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,344,6,Pigment / dye,Brown,Whole body,,Yes
+2,443,2013-02-07T15:05:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,1039,7,Elastomer,Blue,Nose,,Yes
+2,444,2013-02-12T12:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,1008,2,Pigment / dye,Brown,Whole body,,Yes
+2,445,2013-02-13T10:59:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,499,7,Elastomer,White,Nose,,Yes
+2,446,2013-02-15T15:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,891,3,Pigment / dye,Brown,Whole body,,Yes
+2,447,2013-02-19T11:35:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,952,6,Pigment / dye,Brown,Whole body,,Yes
+2,448,2013-02-21T15:30:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,504,7,Elastomer,Yellow,Nose,,Yes
+2,449,2013-02-26T12:54:00Z,Chinook salmon,Fall,Unknown,,Herringer_release site,next to Herringer Release boxes,937,6,Pigment / dye,Brown,Whole body,,Yes
+2,450,2013-02-28T13:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,503,5,Elastomer,White,Nose,,Yes
+2,451,2013-03-05T15:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,1008,7,Pigment / dye,Brown,Whole body,,Yes
+2,452,2013-03-06T11:15:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,421,3,Elastomer,White,Nose,,Yes
+2,453,2013-03-19T14:15:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,100,2,Pigment / dye,Brown,Whole body,,Yes
+2,454,2013-03-20T12:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,213,7,Elastomer,Green,Nose,,Yes
+2,455,2013-03-22T11:50:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,322,3,Pigment / dye,Brown,Whole body,,Yes
+2,456,2013-03-26T12:20:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,213,7,Pigment / dye,Brown,Whole body,,Yes
+2,457,2013-03-28T11:36:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,170,7,Elastomer,Blue,Nose,,Yes
+2,458,2013-04-09T13:00:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Herringer Release boxes,28,7,Pigment / dye,Brown,Whole body,,No
+2,459,2013-04-23T15:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Herringer Release boxes,154,7,Elastomer,Pink,Nose,,No
+2,460,2013-04-09T15:45:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,43,7,Elastomer,Red,Nose,,No
+2,461,2013-04-16T12:09:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,42,7,Elastomer,Green,Nose,,No
+2,465,2013-03-13T10:15:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,122,5,Pigment / dye,Brown,Whole body,,Yes
+2,466,2013-03-14T11:45:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,313,7,Elastomer,White,Nose,,Yes
+2,467,2013-02-05T12:00:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,Gateway release boxes,491,7,Elastomer,Purple / Violet,Nose,,Yes
+2,468,2010-12-07T11:35:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,#Steep Riffle_RST,995,5,Pigment / dye,Brown,Whole body,,Yes
+2,469,2010-12-27T10:55:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,999,5,Pigment / dye,Brown,Whole body,,Yes
+2,470,2011-01-03T13:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,990,5,Pigment / dye,Brown,Whole body,,Yes
+2,471,2011-01-06T11:15:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,995,7,Elastomer,Red,Nose,,Yes
+2,472,2011-01-10T13:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,990,7,Pigment / dye,Brown,Whole body,,Yes
+2,473,2011-01-12T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),997,7,Elastomer,Blue,Nose,,Yes
+2,474,2011-01-26T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),492,5,Elastomer,Yellow,Nose,,Yes
+2,475,2011-01-27T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,499,5,Elastomer,Red,Nose,,Yes
+2,476,2011-02-01T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),491,5,Elastomer,Green,Nose,,Yes
+2,477,2011-02-02T15:15:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),245,6,Elastomer,Yellow,Nose,,Yes
+2,478,2011-02-03T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,494,6,Elastomer,Red,Nose,,Yes
+2,479,2011-02-08T12:15:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),496,7,Elastomer,Green,Nose,,Yes
+2,480,2011-02-09T15:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),500,7,Elastomer,Yellow,Nose,,Yes
+2,481,2011-02-10T10:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,494,6,Elastomer,Red,Nose,,Yes
+2,482,2011-02-17T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,496,7,Elastomer,Red,Nose,,Yes
+2,483,2011-02-20T11:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),248,8,Elastomer,Green,Nose,,Yes
+2,484,2011-02-26T13:45:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),494,7,Elastomer,Red,Nose,,Yes
+2,485,2011-03-03T13:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),466,7,Elastomer,Yellow,Nose,,Yes
+2,486,2011-03-07T14:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,240,7,Elastomer,Red,Nose,,Yes
+2,487,2011-03-09T10:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,,483,7,Elastomer,White,Nose,,Yes
+2,488,2011-03-14T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),241,2,Elastomer,Green,Nose,,No
 2,489,2014-01-08T12:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,next to Gateway release boxes,506,8,Elastomer,Green,Nose,,Yes
 2,490,2014-01-09T21:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,Gateway release boxes,494,6,Elastomer,Orange,Nose,,Yes
 2,491,2014-01-15T21:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,Gateway release boxes,442,3,Elastomer,Purple / Violet,Nose,,Yes
@@ -93,6 +501,23 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,511,2014-02-13T21:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Herringer_release site,Herringer Release boxes,500,3,Elastomer,White,Nose,,Yes
 2,512,2014-02-12T12:11:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,next to Gateway release boxes,497,3,Elastomer,Orange,Nose,,Yes
 2,513,2014-02-13T21:00:00Z,Chinook salmon,Fall,Natural,Herringer Riffle,Gateway_release site,Gateway release boxes,551,3,Elastomer,Green,Nose,,Yes
+2,514,2011-01-11T12:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),499,4,Elastomer,Orange,Nose,,Yes
+2,515,2011-01-13T13:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,798,4,Elastomer,White,Nose,,Yes
+2,516,2011-01-17T12:30:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,994,4,Pigment / dye,Brown,Whole body,,Yes
+2,517,2011-01-19T11:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,983,4,Elastomer,Blue,Nose,,Yes
+2,518,2011-01-24T10:20:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,999,4,Pigment / dye,Brown,Whole body,,Yes
+2,519,2011-01-26T11:30:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),1015,4,Elastomer,Blue,Nose,,Yes
+2,520,2011-01-27T14:30:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),1010,5,Pigment / dye,Brown,Whole body,,Yes
+2,521,2011-01-31T11:55:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,999,2,Pigment / dye,Brown,Whole body,,Yes
+2,522,2011-02-02T12:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),500,4,Pigment / dye,Brown,Whole body,,Yes
+2,523,2011-02-07T12:10:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),1000,3,Pigment / dye,Brown,Whole body,,Yes
+2,524,2011-02-23T11:30:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),500,7,Pigment / dye,Brown,Whole body,,Yes
+2,525,2011-03-01T15:15:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),485,5,Elastomer,Green,Nose,,Yes
+2,526,2011-03-03T12:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,993,4,Pigment / dye,Brown,Whole body,,Yes
+2,527,2011-03-06T11:45:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),480,4,Elastomer,Green,Nose,,Yes
+2,528,2011-03-07T10:53:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,Not applicable (n/a),1293,4,Pigment / dye,Brown,Whole body,,Yes
+2,529,2011-03-09T12:45:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,484,4,Elastomer,Yellow,Nose,,No
+2,530,2011-03-10T12:45:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,1496,3,Pigment / dye,Brown,Whole body,,Yes
 2,531,2014-02-20T21:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Herringer_release site,Herringer Release boxes,473,3,Elastomer,Red,Nose,,Yes
 2,532,2014-02-25T13:15:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Herringer_release site,next to Herringer Release boxes,465,3,Elastomer,Red,Nose,,Yes
 2,533,2014-02-26T12:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Herringer_release site,next to Herringer Release boxes,476,3,Elastomer,White,Nose,,Yes
@@ -117,6 +542,36 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,552,2014-03-20T10:05:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,next to Gateway release boxes,488,3,Elastomer,Purple / Violet,Nose,,Yes
 2,553,2014-03-21T12:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,next to Gateway release boxes,181,3,Elastomer,Orange,Nose,,Yes
 2,554,2014-03-25T12:00:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,next to Gateway release boxes,63,3,Elastomer,Green,Nose,,No
+2,555,2013-02-15T11:15:00Z,Chinook salmon,Fall,Natural,,Gateway_release site,next to Gateway release boxes,249,9,Elastomer,Pink,Nose,,No
+2,556,2013-04-09T15:15:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,next to Herringer Release boxes,28,3,Pigment / dye,Brown,Whole body,,No
+2,558,2011-03-15T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),215,0,Pigment / dye,Brown,Whole body,,No
+2,559,2011-04-07T12:00:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),419,5,Pigment / dye,Brown,Whole body,,Yes
+2,560,2011-04-20T13:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),147,1,Pigment / dye,Brown,Whole body,,No
+2,561,2011-01-06T12:45:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_100m above falls,196,0,Elastomer,Yellow,Nose,,No
+2,562,2005-02-09T11:30:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Left RM 60.9,998,4,Elastomer,Pink,Nose,,Yes
+2,563,2005-02-17T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Left RM 60.9,989,4,Elastomer,Green,Nose,,Yes
+2,564,2005-02-24T11:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Robinson Main RM 61.6,985,4,Elastomer,White,Nose,,Yes
+2,565,2005-03-08T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Right RM 60.9,969,5,Elastomer,Green,Nose,,Yes
+2,566,2005-03-16T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Steep Pool Right RM 60.9,799,4,Elastomer,Pink,Nose,,Yes
+2,567,2005-02-09T11:40:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Eye Pool Right RM60.5,996,3,Elastomer,Yellow,Nose,,No
+2,568,2005-02-09T11:40:00Z,Not applicable (n/a),Fall,Natural,,Eye riffle_release site,Eye Pool Left RM 60.5,1075,3,Elastomer,Red,Nose,,No
+2,569,2005-02-09T11:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Robinson Main RM 61.6,1004,3,Elastomer,Green,Nose,,No
+2,570,2005-02-09T10:45:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Robinson Side RM 61.6,1025,3,Elastomer,White,Nose,,No
+2,571,2005-02-17T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Robinson Main RM 61.6,1113,3,Elastomer,Red,Nose,,No
+2,572,2005-02-17T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Robinson Side RM 61.6,1027,3,Elastomer,Yellow,Nose,,No
+2,573,2005-03-02T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Lower Robinson RM 61.4,1001,3,Elastomer,Orange,Nose,,No
+2,574,2005-03-02T12:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Robinson Side RM 61.6,998,3,Elastomer,Pink,Nose,,No
+2,575,2009-01-13T14:30:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_below falls,506,4,Pigment / dye,Brown,Whole body,,Yes
+2,576,2009-01-22T12:00:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_below falls,559,4,Pigment / dye,Brown,Whole body,,Yes
+2,577,2009-01-27T12:15:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_below falls,652,2,Elastomer,Green,Nose,,Yes
+2,578,2009-02-12T10:30:00Z,Chinook salmon,Fall,Natural,,Sunset_release site,release_below falls,534,3,Elastomer,Orange,Nose,,Yes
+2,579,2009-03-17T14:25:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),542,3,Pigment / dye,Brown,Whole body,,Yes
+2,580,2009-03-23T11:30:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),603,4,Pigment / dye,Brown,Whole body,,Yes
+2,581,2008-04-16T12:45:00Z,Chinook salmon,Fall,Natural,,Steep Riffle_release site,Not applicable (n/a),749,3,Pigment / dye,Brown,Whole body,,Yes
+2,582,2015-01-06T14:12:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,245,7,Elastomer,Red,Nose,,No
+2,583,2015-01-07T15:52:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,479,7,Elastomer,White,Nose,,No
+2,584,2015-01-13T15:41:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,484,7,Elastomer,Blue,Nose,,No
+2,585,2015-01-14T15:05:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,half mile above trap RM,998,7,Elastomer,Red,Nose,,No
 2,586,2015-01-06T10:30:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,Gateway release_RL & RR,513,3,Elastomer,Green,Nose,,No
 2,587,2015-01-07T13:11:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,Gateway release_RL & RR,485,7,Elastomer,Orange,Nose,,No
 2,588,2015-01-13T13:01:00Z,Chinook salmon,Fall,Natural,Gateway Riffle,Gateway_release site,Gateway release_RL & RR,482,7,Elastomer,Purple / Violet,Nose,,No
@@ -161,6 +616,8 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,627,2015-03-27T12:30:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Steep Riffle_release site,Steep release_RR & RL,328,3,Elastomer,Orange,Nose,,Yes
 2,628,2015-03-04T12:10:00Z,Chinook salmon,Fall,Natural,Herringer Riffle,Herringer_release site,Herringer release_ RL & RR,278,5,Elastomer,Blue,Nose,,Yes
 2,629,2015-03-06T12:17:00Z,Chinook salmon,Fall,Natural,Herringer Riffle,Herringer_release site,Herringer release_ RL & RR,496,29,Elastomer,Red,Nose,,Yes
+2,630,2015-03-10T13:16:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Herringer release_ RL & RR,508,6,Elastomer,White,Nose,,No
+2,631,2015-03-11T13:05:00Z,Chinook salmon,Fall,Natural,,Herringer_release site,Herringer release_ RL & RR,509,6,Elastomer,Blue,Nose,,Yes
 2,632,2015-03-27T10:00:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Herringer_release site,Herringer release_ RL & RR,254,7,Pigment / dye,Brown,Whole body,,No
 2,633,2015-03-31T12:00:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Steep Riffle_release site,Steep release_RR & RL,251,20,Elastomer,Orange,Nose,,Yes
 2,634,2015-03-24T15:40:00Z,Chinook salmon,Fall,Natural,Steep Riffle,Herringer_release site,Herringer release_ RL & RR,244,6,Elastomer,White,Nose,,Yes
@@ -232,6 +689,7 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,701,2018-01-24T09:30:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,1137,7,Elastomer,Green,Nose,,Yes
 2,702,2018-01-25T14:12:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,496,7,Elastomer,Blue,Nose,,Yes
 2,703,2018-01-30T09:30:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,972,7,Elastomer,Red,Nose,,Yes
+2,704,2018-01-31T10:00:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Below Weir Riffle,994,7,Elastomer,Orange,Nose,,Yes
 2,705,2018-02-01T10:28:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,449,5,Elastomer,Blue,Nose,,Yes
 2,706,2018-02-06T09:05:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,908,9,Elastomer,Orange,Nose,,Yes
 2,707,2018-02-07T09:28:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,502,5,Elastomer,Red,Nose,,Yes
@@ -375,7 +833,9 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,845,2020-04-17T11:07:00Z,Chinook salmon,Fall,Natural,Herringer Riffle,Herringer_release site,Herringer release_ RL & RR,275,7,Elastomer,White,Nose,,Yes
 2,846,2020-04-21T11:58:00Z,Chinook salmon,Fall,Natural,Herringer Riffle,Herringer_release site,Herringer release_ RL & RR,280,7,Elastomer,Red,Nose,,Yes
 2,847,2020-04-29T09:31:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,487,7,Elastomer,Yellow,Nose,,Yes
+2,848,2020-05-07T13:10:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Below Weir Riffle,889,10,Elastomer,Orange,Nose,,Yes
 2,849,2020-05-09T10:45:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,882,7,Elastomer,Yellow,Nose,,Yes
+2,850,2020-05-14T13:19:00Z,Chinook salmon,Fall,Natural,,Eye riffle_release site,Below Weir Riffle,187,7,Elastomer,Pink,Nose,,Yes
 2,851,2020-04-28T13:30:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Herringer_release site,Herringer release_ RL & RR,786,13,Elastomer,Green,Nose,,Yes
 2,852,2020-05-01T09:55:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Herringer_release site,Herringer release_ RL & RR,868,10,Elastomer,White,Nose,,Yes
 2,853,2020-05-08T11:30:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Herringer_release site,Herringer release_ RL & RR,477,7,Elastomer,Red,Nose,,Yes
@@ -442,6 +902,7 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,915,2024-01-24T09:00:00Z,Chinook salmon,Fall,Natural,Herringer Riffle,Herringer_release site,Herringer release_ RL & RR,350,7,Elastomer,Green,Nose,,Yes
 2,916,2024-01-26T10:32:00Z,Chinook salmon,Fall,Natural,Herringer Riffle,Herringer_release site,Herringer release_ RL & RR,343,7,Elastomer,Pink,Nose,,Yes
 2,917,2024-02-09T12:39:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,1013,7,Elastomer,Pink,Nose,,Yes
+2,918,2024-02-14T13:15:00Z,Chinook salmon,Fall,Hatchery,,Eye riffle_release site,Below Weir Riffle,4998,7,Elastomer,Orange,Nose,,Yes
 2,919,2024-02-23T12:17:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,970,7,Elastomer,Yellow,Nose,,Yes
 2,920,2024-02-28T14:33:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,1169,7,Elastomer,Pink,Nose,,Yes
 2,921,2024-03-08T12:00:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Eye riffle_release site,Below Weir Riffle,100,7,Elastomer,Yellow,Nose,,Yes
@@ -474,3 +935,11 @@ projectDescriptionID,releaseID,releaseTime,commonName,markedRun,markedFishOrigin
 2,948,2025-02-14T13:30:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Herringer_release site,half mile above trap RM,988,7,Elastomer,White,Nose,,Yes
 2,949,2025-02-26T10:39:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Herringer_release site,half mile above trap RM,1896,7,Pigment / dye,Brown,Whole body,,Yes
 2,950,2025-03-05T10:06:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Herringer_release site,half mile above trap RM,701,7,Elastomer,Green,Nose,,Yes
+2,951,2011-03-17T11:32:00Z,Chinook salmon,Fall,Hatchery,,Sunset_release site,release_100m above falls,2498,7,Elastomer,Pink,Nose,,Yes
+2,952,2011-03-27T11:32:00Z,Chinook salmon,Fall,Hatchery,,Sunset_release site,release_100m above falls,2921,7,Elastomer,Green,Nose,,Yes
+2,953,2025-03-28T12:23:00Z,Chinook salmon,Fall,Hatchery,,Eye riffle_release site,Below Weir Riffle,952,7,Elastomer,Orange,Nose,,Yes
+2,954,2025-03-12T12:03:00Z,Chinook salmon,Fall,Natural,Eye Riffle,Herringer_release site,half mile above trap RM,1195,7,Elastomer,Blue,Nose,,Yes
+2,955,2025-03-19T11:25:00Z,Chinook salmon,Fall,Hatchery,Herringer Riffle,Herringer_release site,half mile above trap RM,1795,7,Elastomer,Yellow,Nose,,Yes
+2,956,2025-03-28T10:29:00Z,Chinook salmon,Fall,Hatchery,Herringer Riffle,Herringer_release site,half mile above trap RM,1998,7,Elastomer,White,Nose,,Yes
+2,957,2025-04-10T10:12:00Z,Chinook salmon,Fall,Hatchery,,Herringer_release site,half mile above trap RM,2003,7,Elastomer,Orange,Nose,,Yes
+2,958,2011-03-20T11:32:00Z,Chinook salmon,Fall,Hatchery,,Sunset_release site,release_100m above falls,2498,7,Elastomer,Pink,Nose,,Yes

@@ -46,9 +46,6 @@ catch_with_stream <- catch |>
 
 ## knights landing {.tabset}
 
-### TODOS
-  - trap_visit wate_vel map to water_velocity(done)
-
 ### catch
 
 **- Findings catch:**
