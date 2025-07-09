@@ -51,8 +51,6 @@ catch_with_stream <- catch |>
 
 **- Findings catch:**
 
-  - Date ranges are different, database has an earlier start year (1999 vs 2022 in DB)
-  - there are only a few data entries on database with year == 1999 and one data entry with year 2020, wondering if this is expected
   - life stage in edi data has not gone through wrangling
   - catch_raw_id in database has a decimal number (e.g 302.0)
 
