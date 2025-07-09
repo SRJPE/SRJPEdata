@@ -46,20 +46,18 @@ catch_with_stream <- catch |>
 ```
 
 ## Feather {.tabset}
-
 ### catch
 
 **- Findings catch:**
 
   - Date ranges are the same
   - life stage in edi data has not gone through wrangling
-  - EDI data contains lifestage value "mixed" but not in lifestage lookuptable
 
 ```{r echo=FALSE}
 catch_feather_edi <- read_csv("data-raw/edi-zips/feather_catch.csv") |>  
   filter(commonName == "Chinook salmon") |>
   mutate(stream="feather river",
-         date = as.Date(visitTime))
+         date = as.Date(visitTime)) 
 ```
 
 #### Date Range Check
@@ -147,8 +145,6 @@ catch_feather_edi |>
 ```
 
 #### Count
-TODO: EDI data contains lifestage value "mixed" but not in lifestage lookuptable
-
 *EDI `n`*
 
 * `r round(sum(is.na(catch_feather_edi$n))/nrow(catch_feather_edi), 3)*100` % of values in the `n` column in edi data are NA.

@@ -51,7 +51,6 @@ catch_with_stream <- catch |>
 
   - date range is the same 
   - life stage in edi data has not gone through wrangling
-  - TODO: current battle/clear site=NA subsite=NA gets joined to butte
 
 ```{r echo=FALSE}
 catch_butte_edi <- read_csv("data-raw/edi-zips/butte_catch.csv") |> 
@@ -103,8 +102,8 @@ range(catch_butte_edi$visitTime)
   
 ```{r echo=FALSE}
 catch_butte_db <- catch_with_stream |> 
-  filter(stream == "butte creek") |> 
-  filter(!is.na(site) & !is.na(subsite))
+  filter(stream == "butte creek") 
+  # filter(is.na(site) & is.na(subsite)) |> glimpse() 
 
 range(catch_butte_db$date)
 ```
@@ -232,8 +231,6 @@ catch_butte_edi |>
 ### trap
 
 **- Findings:**
-
- - All water velocity values are NA in DB, and 92% are NA in EDI
 
 ```{r echo=FALSE}
 trap_with_stream <- trap_visit |>

@@ -151,7 +151,7 @@ catch_battle_clear_edi |>
 ```
 
 #### Count
-TODO: EDI data contains lifestage value "mixed" but not in lifestage lookuptable
+TODO: EDI data contains lifestage value "mixed" but not in lifestage lookuptable (resolved)
 
 *EDI `count`*
 
@@ -251,7 +251,12 @@ trap_battle_clear_db <- trap_with_stream |>
 ```{r}
 trap_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_trap.csv") |> 
   mutate(stream="battle clear creek",
-         date = as.Date(sample_date))
+         date = as.Date(sample_date)) |>
+  filter(!is.na(station_code)) |> 
+  arrange(trap_start_date) |>          
+  group_by(sample_id, station_code) |>
+  slice_tail(n = 1)  |>                   
+  ungroup() |> glimpse()
 ```
 
 #### Date Range Check
@@ -344,7 +349,7 @@ range(release_battle_clear_edi$date)
 
 *DB `lifestage_id`*
 
-* `r round(sum(is.na(release_battle_clear_db$lifestage_id))/nrow(release_battle_clear_db), 3)*100` % of values in the `fork_length` column are NA.
+* `r round(sum(is.na(release_battle_clear_db$lifestage_id))/nrow(release_battle_clear_db), 3)*100` % of values in the `lifestage_id` column are NA.
 
 ```{r echo=FALSE}
 summary(release_battle_clear_db$lifestage_id, na.rm = TRUE)
