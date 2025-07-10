@@ -293,16 +293,21 @@ range(trap_yuba_db$trap_visit_time_start, na.rm = TRUE)
 range(trap_yuba_edi$visitTime)
 ```
 
-#### water_velocity
+#### counteratend/total_revolution
 
-*DB `water_velocity`*
+*DB `total_revolutions`*
 
-* `r round(sum(is.na(trap_yuba_db$water_velocity))/nrow(trap_yuba_db), 3)*100` % of values in the `water_velocity` column are NA.
+* `r round(sum(is.na(trap_yuba_db$total_revolutions))/nrow(trap_yuba_db), 3)*100` % of values in the `total_revolutions` column are NA.
 ```{r echo=FALSE}
-summary(trap_yuba_db$water_velocity)
+summary(trap_yuba_db$total_revolutions)
 ```
 
-*EDI `waterVel`* - no column present
+*EDI `counterAtEnd`*
+
+* `r round(sum(is.na(trap_yuba_edi$counterAtEnd))/nrow(trap_yuba_edi), 3)*100` % of values in the `counterAtEnd` column are NA.
+```{r echo=FALSE}
+summary(trap_yuba_edi$counterAtEnd)
+```
 
 
 #### fishProcessed
@@ -315,6 +320,7 @@ table(trap_yuba_db$fish_processed_id)
 ```
 
 *EDI `fishProcessed`*
+
 * `r round(sum(is.na(trap_yuba_edi$fishProcessed))/nrow(trap_yuba_edi), 3)*100` % of values in the `fishProcessed` column are NA.
 ```{r echo=FALSE}
 table(trap_yuba_edi$fishProcessed)
@@ -439,19 +445,22 @@ range(release_yuba_db$date_released, na.rm = TRUE)
 range(release_yuba_edi$releaseTime)
 ```
 
-#### markedLifeStage
+#### origin_id
 
-*EDI `markedLifeStage`* - no column name found
+*EDI `markedFishOrigin`*
 
-
-*DB `lifestage_id`*
-
-* `r round(sum(is.na(release_yuba_db$lifestage_id))/nrow(release_yuba_db), 3)*100` % of values in the `fork_length` column are NA.
+* `r round(sum(is.na(release_yuba_edi$markedFishOrigin))/nrow(release_yuba_edi), 3)*100` % of values in the `markedFishOrigin` column are NA.
 
 ```{r echo=FALSE}
-summary(release_yuba_db$lifestage_id, na.rm = TRUE)
+table(release_yuba_edi$markedFishOrigin)
 ```
+*DB `origin_id`*
 
+* `r round(sum(is.na(release_yuba_db$origin_id))/nrow(release_yuba_db), 3)*100` % of values in the `origin_id` column are NA.
+
+```{r echo=FALSE}
+table(release_yuba_db$origin_id)
+```
 #### nReleased
 
 *EDI `nReleased`*
@@ -643,7 +652,7 @@ table(recapture_yuba_edi$lifeStage)
 * `r round(sum(is.na(recapture_yuba_db$lifestage_id))/nrow(recapture_yuba_db), 3)*100` % of values in the `lifestage_id` column are NA.
 
 ```{r echo=FALSE}
-summary(recapture_yuba_db$lifestage_id, na.rm = TRUE)
+table(recapture_yuba_db$lifestage_id)
 ```
 
 

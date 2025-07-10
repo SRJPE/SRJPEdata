@@ -138,16 +138,22 @@ ggplot(data = combined_catch_knights, aes(x = date, y = fork_length, color = sou
   facet_wrap(~source)
 ```
 
-#### Lifestage
-(life stage in edi data has not gone through wrangling)
+#### Run
 
-*EDI `lifeStage`*
+*EDI `run`*
 
-* `r round(sum(is.na(catch_knights_edi$lifeStage))/nrow(catch_knights_edi), 3)*100` % of values in the `lifeStage` column from the EDI data are NA.
+* `r round(sum(is.na(catch_knights_edi$run))/nrow(catch_knights_edi), 3)*100` % of values in the `run` column from the EDI data are NA.
+```{r echo=FALSE}
+table(catch_knights_edi$run)
+```
 
-*DB `lifestage_id`*
+*DB `run`_id`*
 
-* `r round(sum(is.na(catch_knights_db$lifestage_id))/nrow(catch_knights_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+* `r round(sum(is.na(catch_knights_db$run_id))/nrow(catch_knights_db), 3)*100` % of values in the `run_id` column from the database are NA.
+
+```{r echo=FALSE}
+table(catch_knights_db$run_id)
+```
 
 #### Count
 
@@ -294,6 +300,7 @@ summary(trap_knights_db$water_velocity)
 ```
 
 *EDI `waterVel`*
+
 * `r round(sum(is.na(trap_knights_edi$waterVel))/nrow(trap_knights_edi), 3)*100` % of values in the `water_velocity` column are NA.
 ```{r echo=FALSE}
 summary(trap_knights_edi$waterVel)
@@ -309,6 +316,7 @@ table(trap_knights_db$fish_processed_id)
 ```
 
 *EDI `fishProcessed`*
+
 * `r round(sum(is.na(trap_knights_edi$fishProcessed))/nrow(trap_knights_edi), 3)*100` % of values in the `fishProcessed` column are NA.
 ```{r echo=FALSE}
 table(trap_knights_edi$fishProcessed)
@@ -444,22 +452,22 @@ summary(recapture_knights_db$count, na.rm = TRUE)
 summary(recapture_knights_edi$n)
 ```
 
-#### lifeStage
+#### Run
 
-*EDI `lifeStage`*
+*EDI `run`*
 
-* `r round(sum(is.na(recapture_knights_edi$lifeStage))/nrow(recapture_knights_edi), 3)*100` % of values in the `lifeStage` column are NA.
+* `r round(sum(is.na(recapture_knights_edi$run))/nrow(recapture_knights_edi), 3)*100` % of values in the `run` column are NA.
 
 ```{r echo=FALSE}
-table(recapture_knights_edi$lifeStage)
+table(recapture_knights_edi$run)
 ```
 
-*DB `lifestage_id`*
+*DB `run`_id`*
 
-* `r round(sum(is.na(recapture_knights_db$lifestage_id))/nrow(recapture_knights_db), 3)*100` % of values in the `lifestage_id` column are NA.
+* `r round(sum(is.na(recapture_knights_db$run_id))/nrow(recapture_knights_db), 3)*100` % of values in the `run_id` column are NA.
 
 ```{r echo=FALSE}
-summary(recapture_knights_db$lifestage_id, na.rm = TRUE)
+table(recapture_knights_db$run_id)
 ```
 
 ```{r echo=FALSE, warning=FALSE}
@@ -615,7 +623,6 @@ table(release_knights_edi$markedLifeStage)
 * `r round(sum(is.na(release_knights_db$lifestage_id))/nrow(release_knights_db), 3)*100` % of values in the `fork_length` column are NA.
 
 ```{r echo=FALSE}
-summary(release_knights_db$lifestage_id, na.rm = TRUE)
 table(release_knights_db$lifestage_id)
 ```
 
@@ -734,7 +741,11 @@ releasefish_knights_db <- releasefish_with_stream |>
   filter(site == "knights landing") 
 ```
 ```{r echo=FALSE}
-releasefish_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_releasefish.csv") |>glimpse() 
+releasefish_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_releasefish.csv") |>
+  mutate(releaseID = as.character(releaseID)) |>
+  inner_join(
+    release |> filter(trap_location_id >= 51, trap_location_id <= 54), by=c("releaseID" = "release_id")
+  )
 ```
 
 #### column names

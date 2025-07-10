@@ -300,6 +300,7 @@ summary(trap_butte_db$water_velocity)
 ```
 
 *EDI `waterVel`*
+
 * `r round(sum(is.na(trap_butte_edi$waterVel))/nrow(trap_butte_edi), 3)*100` % of values in the `water_velocity` column are NA.
 ```{r echo=FALSE}
 summary(trap_butte_edi$waterVel)
@@ -315,6 +316,7 @@ table(trap_butte_db$fish_processed_id)
 ```
 
 *EDI `fishProcessed`*
+
 * `r round(sum(is.na(trap_butte_edi$fishProcessed))/nrow(trap_butte_edi), 3)*100` % of values in the `fishProcessed` column are NA.
 ```{r echo=FALSE}
 table(trap_butte_edi$fishProcessed)
@@ -446,22 +448,22 @@ range(release_butte_edi$releaseTime)
 ```
 
 
-#### markedLifeStage
+#### Run
 
-*EDI `markedLifeStage`*
+*EDI `marked_run`*
 
-* `r round(sum(is.na(release_butte_edi$markedLifeStage))/nrow(release_butte_edi), 3)*100` % of values in the `markedLifeStage` column are NA.
+* `r round(sum(is.na(release_butte_edi$marked_run))/nrow(release_butte_edi), 3)*100` % of values in the `marked_run` column are NA.
 
 ```{r echo=FALSE}
-table(release_butte_edi$markedLifeStage)
+table(release_butte_edi$markedRun)
 ```
 
-*DB `lifestage_id`*
+*DB `run_id`*
 
-* `r round(sum(is.na(release_butte_db$lifestage_id))/nrow(release_butte_db), 3)*100` % of values in the `fork_length` column are NA.
+* `r round(sum(is.na(release_butte_db$run_id))/nrow(release_butte_db), 3)*100` % of values in the `run_id` column are NA.
 
 ```{r echo=FALSE}
-summary(release_butte_db$lifestage_id, na.rm = TRUE)
+table(release_butte_db$run_id)
 ```
 
 #### nReleased
@@ -646,7 +648,7 @@ table(recapture_butte_edi$lifeStage)
 * `r round(sum(is.na(recapture_butte_db$lifestage_id))/nrow(recapture_butte_db), 3)*100` % of values in the `lifestage_id` column are NA.
 
 ```{r echo=FALSE}
-summary(recapture_butte_db$lifestage_id, na.rm = TRUE)
+table(recapture_butte_db$lifestage_id)
 ```
 
 
@@ -665,7 +667,7 @@ ggplot() +
 
 #### forkLength
 
-*EDI `forkLength`*
+*EDI `forkLength`*k
 
 * `r round(sum(is.na(recapture_butte_edi$forkLength))/nrow(recapture_butte_edi), 3)*100` % of values in the `forkLength` column are NA.
 

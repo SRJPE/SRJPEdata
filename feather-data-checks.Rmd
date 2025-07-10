@@ -212,8 +212,6 @@ catch_feather_edi |>
 
 **- Findings trap:**
 
-  - there is no waterVel in EDI data
-
 ```{r echo=FALSE}
 trap_with_stream <- trap_visit |>
   left_join(trap_id)
@@ -239,19 +237,20 @@ range(trap_feather_db$trap_visit_time_start, na.rm = TRUE)
 range(trap_feather_edi$visitTime)
 ```
 
-#### water_velocity
+#### counteratend/total_revolution
 
-*DB `water_velocity`*
+*DB `total_revolutions`*
 
-* `r round(sum(is.na(trap_feather_db$water_velocity))/nrow(trap_feather_db), 3)*100` % of values in the `water_velocity` column are NA.
+* `r round(sum(is.na(trap_feather_db$total_revolutions))/nrow(trap_feather_db), 3)*100` % of values in the `total_revolutions` column are NA.
 ```{r echo=FALSE}
-summary(trap_feather_db$water_velocity)
+summary(trap_feather_db$total_revolutions)
 ```
 
-*EDI `waterVel`* - no column present
-* `r round(sum(is.na(trap_feather_edi$waterVel))/nrow(trap_feather_edi), 3)*100` % of values in the `water_velocity` column are NA.
+*EDI `counterAtEnd`*
+
+* `r round(sum(is.na(trap_feather_edi$counterAtEnd))/nrow(trap_feather_edi), 3)*100` % of values in the `counterAtEnd` column are NA.
 ```{r echo=FALSE}
-summary(trap_feather_edi$waterVel)
+summary(trap_feather_edi$counterAtEnd)
 ```
 
 #### fishProcessed
@@ -264,6 +263,7 @@ table(trap_feather_db$fish_processed_id)
 ```
 
 *EDI `fishProcessed`*
+
 * `r round(sum(is.na(trap_feather_edi$fishProcessed))/nrow(trap_feather_edi), 3)*100` % of values in the `fishProcessed` column are NA.
 ```{r echo=FALSE}
 table(trap_feather_edi$fishProcessed)
@@ -375,7 +375,6 @@ table(recapture_feather_edi$lifeStage)
 * `r round(sum(is.na(recapture_feather_db$lifestage_id))/nrow(recapture_feather_db), 3)*100` % of values in the `lifestage_id` column are NA.
 
 ```{r echo=FALSE}
-summary(recapture_feather_db$lifestage_id)
 table(recapture_feather_db$lifestage_id)
 ```
 
@@ -410,7 +409,6 @@ ggplot() +
 * `r round(sum(is.na(recapture_feather_edi$run))/nrow(recapture_feather_edi), 3)*100` % of values in the `run` column are NA.
 
 ```{r echo=FALSE}
-summary(recapture_feather_edi$run)
 table(recapture_feather_edi$run)
 ```
 
@@ -418,7 +416,6 @@ table(recapture_feather_edi$run)
 
 * `r round(sum(is.na(recapture_feather_db$run_id))/nrow(recapture_feather_db), 3)*100` % of values in the `run_id` column are NA.
 ```{r echo=FALSE}
-summary(recapture_feather_db$run_id)
 table(recapture_feather_db$run_id)
 ```
 
@@ -501,18 +498,21 @@ range(release_feather_edi$releaseTime)
 ```
 
 
-#### markedLifeStage
+#### origin_id
 
-*EDI `markedLifeStage`*
+*EDI `markedFishOrigin`*
 
-* `r round(sum(is.na(release_feather_edi$markedLifeStage))/nrow(release_feather_edi), 3)*100` % of values in the `markedLifeStage` column are NA.
-
-*DB `lifestage_id`*
-
-* `r round(sum(is.na(release_feather_db$lifestage_id))/nrow(release_feather_db), 3)*100` % of values in the `fork_length` column are NA.
+* `r round(sum(is.na(release_feather_edi$markedFishOrigin))/nrow(release_feather_edi), 3)*100` % of values in the `markedFishOrigin` column are NA.
 
 ```{r echo=FALSE}
-summary(release_feather_db$lifestage_id, na.rm = TRUE)
+table(release_feather_edi$markedFishOrigin)
+```
+*DB `origin_id`*
+
+* `r round(sum(is.na(release_feather_db$origin_id))/nrow(release_feather_db), 3)*100` % of values in the `origin_id` column are NA.
+
+```{r echo=FALSE}
+table(release_feather_db$origin_id)
 ```
 
 #### nReleased
@@ -629,8 +629,10 @@ release_fish_feather_db <- release_fish_with_stream |>
 
 ```{r echo=FALSE}
 release_fish_feather_edi <- read_csv("data-raw/edi-zips/feather_releasefish.csv") |>
-  # filter(commonName == "Chinook salmon") |>
-  mutate(stream="feather river")
+  mutate(releaseID = as.character(releaseID)) |>
+  inner_join(
+    release |> filter(trap_location_id >= 18, trap_location_id <= 43), by=c("releaseID" = "release_id")
+  )
 ```
 
 #### column names

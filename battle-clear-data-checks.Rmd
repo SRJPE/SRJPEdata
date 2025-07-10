@@ -132,7 +132,6 @@ ggplot(data = combined_catch_battle_clear, aes(x = date, y = fork_length, color 
 * `r round(sum(is.na(catch_battle_clear_db$lifestage_id))/nrow(catch_battle_clear_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
 
 #### Count
-TODO: EDI data contains lifestage value "mixed" but not in lifestage lookuptable (resolved)
 
 *EDI `count`*
 
@@ -237,7 +236,7 @@ trap_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_trap.csv") |>
   arrange(trap_start_date) |>          
   group_by(sample_id, station_code) |>
   slice_tail(n = 1)  |>                   
-  ungroup() |> glimpse()
+  ungroup()
 ```
 
 #### Date Range Check
@@ -261,6 +260,7 @@ summary(trap_battle_clear_db$water_velocity)
 ```
 
 *EDI `velocity`*
+
 * `r round(sum(is.na(trap_battle_clear_edi$velocity))/nrow(trap_battle_clear_edi), 3)*100` % of values in the `velocity` column are NA.
 ```{r echo=FALSE}
 summary(trap_battle_clear_edi$velocity)
@@ -290,6 +290,69 @@ ggplot() +
 
 ```
 
+#### debris tubs/volume
+
+*DB `debris_volume`*
+
+* `r round(sum(is.na(trap_battle_clear_db$debris_volume))/nrow(trap_battle_clear_db), 3)*100` % of values in the `debris_volume` column are NA.
+```{r echo=FALSE}
+summary(trap_battle_clear_db$debris_volume)
+```
+
+*EDI `debris_tubs`*
+
+* `r round(sum(is.na(trap_battle_clear_edi$debris_tubs))/nrow(trap_battle_clear_edi), 3)*100` % of values in the `debris_tubs` column are NA.
+```{r echo=FALSE}
+summary(trap_battle_clear_edi$debris_tubs)
+```
+
+Random pick of data entry to compare between db and EDI
+
+- test 1
+
+```{r echo=FALSE}
+# random pick to compare data
+trap_battle_clear_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id == "277_99") |>
+  glimpse()
+
+trap_battle_clear_edi |>
+  mutate(source = "EDI") |>
+  filter(sample_id == "277_99") |>
+  glimpse()
+```
+
+- test 2
+
+```{r echo=FALSE}
+# random pick to compare data
+trap_battle_clear_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "167_99") |>
+  glimpse()
+
+trap_battle_clear_edi |>
+  mutate(source = "EDI") |>
+  filter(sample_id == "167_99") |>
+  glimpse()
+
+```
+
+- test 3
+
+```{r echo=FALSE}
+# random pick to compare data
+trap_battle_clear_db |>
+  mutate(source = "DB") |>
+  filter(trap_visit_id  == "010_99") |>
+  glimpse()
+
+trap_battle_clear_edi |>
+  mutate(source = "EDI") |>
+  filter(sample_id == "010_99") |>
+  glimpse()
+```
 ### release
 
 **- Findings release:**
@@ -324,16 +387,21 @@ range(release_battle_clear_edi$date)
 ```
 
 
-#### markedLifeStage
+#### origin_released
 
-*EDI `* - no similar field
+*EDI `* - origin_released
 
-*DB `lifestage_id`*
-
-* `r round(sum(is.na(release_battle_clear_db$lifestage_id))/nrow(release_battle_clear_db), 3)*100` % of values in the `lifestage_id` column are NA.
+* `r round(sum(is.na(release_battle_clear_edi$origin_id))/nrow(release_battle_clear_db), 3)*100` % of values in the `origin_id` column are NA.
 
 ```{r echo=FALSE}
-summary(release_battle_clear_db$lifestage_id, na.rm = TRUE)
+table(release_battle_clear_edi$origin_released)
+```
+*DB `origin_id`*
+
+* `r round(sum(is.na(release_battle_clear_db$origin_id))/nrow(release_battle_clear_db), 3)*100` % of values in the `origin_id` column are NA.
+
+```{r echo=FALSE}
+table(release_battle_clear_db$origin_id)
 ```
 
 #### nReleased
@@ -396,14 +464,50 @@ ggplot() +
        )
 ```
 
-### releasefish
+Random pick of data entry to compare between db and EDI
 
-**- Findings releasefish:**
+- test 1
 
-  - no release fish table on EDI or DB
-  
-### releasefish
+```{r echo=FALSE}
+# random pick to compare data
+release_battle_clear_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "BAT356") |>
+  glimpse()
 
-**- Findings recapture:**
+release_battle_clear_edi |>
+  mutate(source = "EDI") |>
+  filter(release_id == "BAT356") |>
+  glimpse()
+```
 
-  - no release recapture table in DB  
+- test 2
+
+```{r echo=FALSE}
+# random pick to compare data
+release_battle_clear_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "CLR497") |>
+  glimpse()
+
+release_battle_clear_edi |>
+  mutate(source = "EDI") |>
+  filter(release_id == "CLR497") |>
+  glimpse()
+
+```
+
+- test 3
+
+```{r echo=FALSE}
+# random pick to compare data
+release_battle_clear_db |>
+  mutate(source = "DB") |>
+  filter(release_id == "BAT372") |>
+  glimpse()
+
+release_battle_clear_edi |>
+  mutate(source = "EDI") |>
+  filter(release_id == "BAT372") |>
+  glimpse()
+```

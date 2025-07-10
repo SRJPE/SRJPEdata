@@ -279,6 +279,7 @@ summary(trap_tisdale_db$water_velocity)
 ```
 
 *EDI `waterVel`*
+
 * `r round(sum(is.na(trap_tisdale_edi$waterVel))/nrow(trap_tisdale_edi), 3)*100` % of values in the `water_velocity` column are NA.
 ```{r echo=FALSE}
 summary(trap_tisdale_edi$waterVel)
@@ -316,6 +317,7 @@ table(trap_tisdale_db$fish_processed_id)
 ```
 
 *EDI `fishProcessed`*
+
 * `r round(sum(is.na(trap_tisdale_edi$fishProcessed))/nrow(trap_tisdale_edi), 3)*100` % of values in the `fishProcessed` column are NA.
 ```{r echo=FALSE}
 table(trap_tisdale_edi$fishProcessed)
@@ -443,7 +445,6 @@ table(release_tisdale_edi$markedLifeStage)
 * `r round(sum(is.na(release_tisdale_db$lifestage_id))/nrow(release_tisdale_db), 3)*100` % of values in the `fork_length` column are NA.
 
 ```{r echo=FALSE}
-summary(release_tisdale_db$lifestage_id, na.rm = TRUE)
 table(release_tisdale_db$lifestage_id)
 ```
 
