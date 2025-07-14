@@ -1,0 +1,64 @@
+projectDescriptionID,releaseID,commonName,markedRun,markedLifeStage,markedFishOrigin,sourceOfFishSite,releaseSite,releaseSubSite,nReleased,releaseTime,testDays,appliedMarkType,appliedMarkColor,appliedMarkPosition,appliedMarkCode,includeAnalysis
+10,1,Chinook salmon,Fall,Not recorded,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,358,2016-02-10T08:00:44Z,7,Elastomer,Yellow,Nose,NA,Yes
+10,256,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,457,2016-02-17T10:00:44Z,7,Elastomer,Green,Nose,NA,Yes
+10,257,Chinook salmon,Fall,Not recorded,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,493,2016-02-24T09:50:44Z,7,Elastomer,White,Nose,NA,Yes
+10,258,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,486,2016-03-16T10:35:44Z,7,Elastomer,Red,Nose,NA,Yes
+10,259,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,511,2016-03-23T10:00:44Z,7,Elastomer,Blue,Nose,NA,Yes
+10,260,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,502,2016-03-30T09:45:44Z,7,Elastomer,Blue,Nose,NA,Yes
+10,261,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,511,2016-04-06T19:15:44Z,7,Elastomer,Green,Nose,NA,Yes
+10,262,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,1 RM up,469,2016-04-13T19:15:44Z,1,Elastomer,White,Nose,NA,Yes
+10,264,Chinook salmon,Fall,NA,Natural,NA,Tisdale Weir release site,1 RM up,589,2016-01-17T08:30:44Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,265,Chinook salmon,Fall,NA,Natural,NA,Tisdale Weir release site,1 RM up,94,2016-04-12T15:30:44Z,1,Pigment / dye,Brown,Whole body,NA,Yes
+10,266,Chinook salmon,Fall,NA,Natural,NA,Tisdale Weir release site,1 RM up,75,2016-04-14T12:45:44Z,1,Pigment / dye,Brown,Whole body,NA,Yes
+10,267,Chinook salmon,Fall,NA,Natural,NA,Tisdale Weir release site,1 RM up,181,2016-04-16T13:15:44Z,1,Pigment / dye,Brown,Whole body,NA,Yes
+10,268,Chinook salmon,Fall,NA,Natural,NA,Tisdale Weir release site,1 RM up,248,2016-04-17T13:15:44Z,1,Pigment / dye,Brown,Whole body,NA,Yes
+10,269,Chinook salmon,Fall,NA,Natural,Tisdale Weir RST,Tisdale Weir release site,1 RM up,203,2016-04-19T09:30:44Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,270,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,390,2016-04-27T19:00:44Z,7,Elastomer,Green,Nose,NA,Yes
+10,271,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,159,2016-09-29T10:00:44Z,7,Elastomer,Yellow,Nose,NA,Yes
+10,272,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,170,2016-10-12T14:30:44Z,7,Elastomer,Yellow,Nose,NA,Yes
+10,273,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,500,2016-10-19T15:00:44Z,7,Elastomer,White,Nose,NA,Yes
+10,274,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,1038,2016-11-16T16:00:44Z,7,Elastomer,Orange,Nose,NA,Yes
+10,275,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,935,2017-02-24T10:25:44Z,7,Elastomer,Orange,Nose,NA,Yes
+10,276,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,250,2017-03-31T10:00:44Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,277,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,297,2017-04-03T12:00:44Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,278,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,993,2017-04-05T10:30:44Z,7,Elastomer,White,Nose,NA,Yes
+10,279,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,1170,2017-09-13T15:15:44Z,7,Fin clip,Not applicable (n/a),Pelvic fin right,NA,Yes
+10,280,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,1024,2017-10-11T14:30:44Z,7,Fin clip,Not applicable (n/a),Pelvic fin left,NA,Yes
+10,281,Chinook salmon,Fall,NA,Hatchery,Coleman National Fish Hatchery,Tisdale Weir release site,1 RM up,1168,2017-10-25T14:30:44Z,7,Fin clip,Not applicable (n/a),Pelvic fin right,NA,Yes
+10,282,Chinook salmon,Fall,NA,Hatchery,Tisdale Weir RST,Tisdale Weir release site,1 RM up,1004,2017-11-15T14:30:44Z,7,Fin clip,Not applicable (n/a),Pelvic fin left,NA,Yes
+10,283,Chinook salmon,Fall,NA,Hatchery,Tisdale Weir RST,Tisdale Weir release site,NA,500,2023-01-24T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,286,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,103,2012-02-19T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,292,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,128,2012-02-05T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,293,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1941,2012-03-18T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,294,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,104,2012-03-25T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,295,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1438,2012-04-01T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,296,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,582,2012-04-15T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,297,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,494,2012-04-22T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,298,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1151,2012-05-06T12:00:32Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,299,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,557,2015-03-24T12:00:32Z,7,Elastomer,Green,Nose,NA,Yes
+10,300,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,421,2015-03-31T12:00:32Z,7,Elastomer,Pink,Nose,NA,Yes
+10,301,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,92,2016-01-16T12:00:08Z,1,Pigment / dye,Brown,Whole body,NA,Yes
+10,302,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1084,2018-10-31T12:00:08Z,7,Elastomer,Yellow,Nose,NA,Yes
+10,303,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1040,2019-03-06T12:00:08Z,7,Elastomer,Orange,Nose,NA,Yes
+10,304,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,857,2019-03-20T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,305,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1187,2019-04-03T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,306,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,997,2019-04-17T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,307,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,298,2021-02-07T12:00:08Z,1,Pigment / dye,Brown,Whole body,NA,Yes
+10,308,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,387,2021-02-08T12:00:08Z,1,Pigment / dye,Brown,Whole body,NA,Yes
+10,309,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,107,2021-02-09T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,310,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,517,2022-03-10T12:00:08Z,7,Elastomer,Orange,Nose,NA,Yes
+10,311,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,392,2021-03-25T12:00:08Z,7,Elastomer,Orange,Nose,NA,Yes
+10,312,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,502,2022-03-17T12:00:08Z,7,Elastomer,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,313,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,500,2022-03-24T12:00:08Z,7,Elastomer,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,314,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,500,2022-03-31T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,315,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,478,2022-04-07T12:00:08Z,7,Elastomer,Pink,Nose,NA,Yes
+10,316,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,494,2023-02-08T12:00:08Z,7,Pigment / dye,Not applicable (n/a),Not applicable (n/a),NA,Yes
+10,317,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1093,2023-04-12T12:00:08Z,7,Elastomer,Pink,Nose,NA,Yes
+10,318,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,993,2023-04-19T12:00:08Z,7,Elastomer,Orange,Nose,NA,Yes
+10,319,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1025,2023-04-25T12:00:08Z,7,Elastomer,Red,Nose,NA,Yes
+10,320,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,431,2024-01-17T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,321,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,322,2024-01-26T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,322,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1054,2024-03-12T12:00:08Z,7,Pigment / dye,Brown,Whole body,NA,Yes
+10,323,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,1273,2024-03-19T12:00:08Z,7,Elastomer,Pink,Nose,NA,Yes
+10,324,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,604,2024-03-26T12:00:08Z,7,Elastomer,Orange,Nose,NA,Yes
+10,325,Chinook salmon,Fall,NA,Hatchery,NA,Tisdale Weir release site,NA,468,2024-03-28T12:00:08Z,1,Elastomer,Red,Nose,NA,Yes

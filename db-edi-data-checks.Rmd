@@ -1,0 +1,3169 @@
+---
+title: "RST Data checks - DB vs EDI"
+author: "Badhia Yunes Katz"
+output: html_document
+---
+
+```{r include=FALSE}
+library(DBI)
+library(tidyverse)
+library(EDIutils)
+library(EML)
+library(readr)
+library(janitor)
+```
+
+The purpose of this markdown is to compare the data that we have in jpe database and EDI. Data is being queried directly from the database and from EDI, this script can be used to check most up to date uploads.
+
+Database tables are be viewed first, then data is compared by stream
+
+```{r include=FALSE}
+# con <- DBI::dbConnect(drv = RPostgres::Postgres(),
+#                       host = "jpe-db.postgres.database.azure.com",
+#                       dbname = "jpedb-prod",
+#                       user = Sys.getenv("jpe_db_user_id"),
+#                       password = Sys.getenv("jpe_db_password"),
+#                       port = 5432)
+
+con <- dbConnect(
+  RPostgres::Postgres(),
+  dbname = "jpedb-staging",
+  host = "jpe-db.postgres.database.azure.com",
+  port = 5432,                
+  user = Sys.getenv("jpe_db_user_id"),
+  password = Sys.getenv("jpe_db_password")
+)
+
+DBI::dbListTables(con)
+# tables to look at:
+# catch, trap, release and recapture_fish (check if it is release or release_fish) 
+```
+
+# catch table
+
+```{r echo=FALSE}
+catch <- DBI::dbReadTable(con, "catch")
+head(catch)
+colnames(catch)
+```
+
+streams in catch table
+
+```{r echo=FALSE}
+unique(catch$trap_location_id)
+```
+
+date range
+
+```{r echo=FALSE}
+range(catch$date, na.rm = TRUE)
+```
+
+# trap table
+
+```{r include=FALSE}
+trap <- DBI::dbReadTable(con, "trap_visit")
+```
+
+```{r echo=FALSE}
+head(trap)
+
+colnames(trap)
+```
+
+date range
+
+  - `trap_visit_start`
+  
+```{r echo=FALSE}
+range(trap$trap_visit_time_start, na.rm = TRUE)
+```
+
+  - `trap_visit_end`
+  
+```{r echo=FALSE}
+range(trap$trap_visit_time_end, na.rm = TRUE)
+```
+
+# release table
+
+```{r include=FALSE}
+release <- DBI::dbReadTable(con, "release")
+```
+
+```{r echo=FALSE}
+head(release)
+colnames(release)
+```
+
+date range
+```{r echo=FALSE}
+range(release$date_released, na.rm = TRUE)
+```
+
+# recaptured_fish table
+
+```{r include=FALSE}
+recaptured_fish <- DBI::dbReadTable(con, "recaptured_fish")
+```
+
+```{r echo=FALSE}
+head(recaptured_fish)
+
+colnames(recaptured_fish)
+```
+
+date range
+```{r echo=FALSE}
+range(recaptured_fish$date, na.rm = TRUE)
+```
+
+## Exploration per stream {.tabset}
+
+
+### Battle/Clear Creek
+
+#### catch
+
+**- Findings catch:**
+    - same date range, just off by a moth
+    - forklength max of EDI is higher
+    - lifestage is challenging to compare since there are more categories on edi
+  
+```{r include=FALSE}
+# pulling trap_location table to tie to a steam
+trap_location <- DBI::dbReadTable(con, "trap_location")
+trap_id <- trap_location |> 
+  rename(trap_location_id = id) |>
+  select(trap_location_id, stream) 
+
+catch_with_stream <- catch |>
+  left_join(trap_id)
+
+catch_battle_db <- catch_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) 
+```
+
+  - DB date range
+  
+```{r echo=FALSE}
+range(catch_battle_db$date)
+```
+
+  - EDI date range
+
+```{r echo=FALSE}
+battle_catch_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/58540ac4ed34ce05f3309510f4be91e5"
+# Read the catch table
+catch_battle_edi <- read_csv(battle_catch_url, show_col_types = FALSE)
+
+range(catch_battle_edi$sample_date)
+```
+
+Checking stations of EDI to be battle and clear
+
+```{r echo=FALSE}
+# streams EDI
+unique(catch_battle_edi$station_code)
+```
+
+*fork_length*
+
+EDI 
+
+* `r round(sum(is.na(catch_battle_edi$fork_length))/nrow(catch_battle_edi), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(catch_battle_edi$fork_length, na.rm = TRUE)
+```
+
+DB
+
+* `r round(sum(is.na(catch_battle_db$fork_length))/nrow(catch_battle_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(catch_battle_db$fork_length, na.rm = TRUE)
+```
+
+```{r include=FALSE}
+catch_battle_edi_edited <- catch_battle_edi |> 
+  rename(date = sample_date,
+         life_stage_id = life_stage) |> 
+  mutate(source = "EDI") |> 
+  filter(date > ymd("1998-10-24"))
+
+catch_battle_db_edited <- catch_battle_db |> 
+  mutate(source = "DB") 
+
+# Combine both datasets
+combined_catch_battle <- bind_rows(catch_battle_edi_edited, catch_battle_db_edited)
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+ggplot(combined_catch_battle, aes(x = date, y = fork_length, color = source)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal() +
+  labs(x = "date", y = "fork length", color = "Source")
+```
+
+* `r round(sum(is.na(catch_battle_db$lifestage_id))/nrow(catch_battle_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_battle_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_battle_edi$lifestage_id))/nrow(catch_battle_edi), 3)*100` % of values in the `lifestage_id` column from the EDI data are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_battle_edi |> 
+   ggplot(aes(x = as.factor(life_stage), y = fork_length, fill = as.factor(life_stage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+*count*
+
+* `r round(sum(is.na(catch_battle_edi$count))/nrow(catch_battle_edi), 3)*100` % of values in the `count` column in edi data are NA.
+
+* `r round(sum(is.na(catch_battle_db$count))/nrow(catch_battle_db), 3)*100` % of values in the `count` column in database data are NA.
+
+```{r echo=FALSE, warning=FALSE}
+ggplot(combined_catch_battle, aes(x = date, y = count, color = source)) +
+  geom_jitter(alpha = 0.6, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(x = "date", y = "count", color = "Source")
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_battle_db |> 
+  filter(catch_raw_id == "{511A1464-8C0E-4CBC-83619A1F91634CBC}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{511A1464-8C0E-4CBC-83619A1F91634CBC}") |> 
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_battle_db |> 
+  filter(catch_raw_id == "{29329E00-E17B-42A0-8049C108CC8CB18D}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{29329E00-E17B-42A0-8049C108CC8CB18D}") |> 
+  glimpse()
+```
+
+  - test 3
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_battle_db |> 
+  filter(catch_raw_id == "{2566D65B-9F77-43C7-9F77A072A899FD7D}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{2566D65B-9F77-43C7-9F77A072A899FD7D}") |> 
+  glimpse()
+```
+
+  - test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_battle_db |> 
+  filter(catch_raw_id == "{B21666EA-D802-4C28-A3B1372EDD715D97}") |> 
+  glimpse()
+
+catch_battle_edi |> 
+  filter(catch_row_id == "{B21666EA-D802-4C28-A3B1372EDD715D97}") |> 
+  glimpse()
+```
+
+#### trap
+
+**- Findings trap:**
+    - overall date rage is similar, just off by a month 
+    - for random test 4, there are 4 data entries on database that seem dupicate, but with different id. Is this something we should check?. they have the same `trap_visit_time_start`/`trap_start_date` 
+    
+
+  - Database date range
+
+```{r echo=FALSE}
+trap_with_stream <- trap |>
+  left_join(trap_id)
+trap_battle_db <- trap_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) 
+
+range(trap_battle_db$trap_visit_time_start, na.rm = TRUE)
+```
+
+ - EDI date range
+
+```{r echo=FALSE}
+battle_trap_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/eed3b61b7eb6030dafc9e4765f07a106"
+# Read the trap table
+trap_battle_edi <- read_csv(battle_trap_url, show_col_types = FALSE)
+
+range(trap_battle_edi$sample_date)
+```
+
+*water_velocity*
+
+Database:
+
+* `r round(sum(is.na(trap_battle_edi$water_velocity))/nrow(trap_battle_edi), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_battle_db$water_velocity)
+```
+
+EDI:
+* `r round(sum(is.na(trap_battle_edi$water_velocity))/nrow(trap_battle_edi), 3)*100` % of values in the `water_velocity` column are NA.
+```{r echo=FALSE}
+summary(trap_battle_edi$velocity)
+```
+
+```{r echo=FALSE}
+trap_battle_db |> 
+  ggplot(aes(trap_visit_time_start, water_velocity)) +
+  geom_line()
+
+trap_battle_edi |> 
+  ggplot(aes(sample_date, velocity)) +
+  geom_line()
+```
+
+```{r echo=FALSE}
+trap_battle_db_edited <- trap_battle_db |> 
+  mutate(source = "DB",
+         velocity = water_velocity,
+         trap_start_date = as.Date(trap_visit_time_start))
+
+trap_battle_edi_edited <- trap_battle_edi |> 
+  mutate(source = "EDI")
+
+combined_trap_battle <- bind_rows(trap_battle_db_edited, trap_battle_edi_edited)
+
+combined_trap_battle |> 
+  ggplot(aes(trap_start_date, velocity, color = source)) +
+  geom_jitter(alpha = 0.6, width = 0.3, height = 1) +
+  theme_minimal() 
+```
+
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1 (hard to compare because many NAs)
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_db |> 
+  filter(id == "2093106") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+trap_battle_edi |> 
+  filter(sample_date == "2024-08-09") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+  - test 2 
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_db |> 
+  filter(id == "2013985") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+trap_battle_edi |> 
+  filter(trap_start_date == "2013-11-09" & velocity == "3.67") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+  - test 3 
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_db |> 
+  filter(id == "2007291") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+trap_battle_edi |> 
+  filter(trap_start_date == "2003-10-24" & velocity == "0.15") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+  - test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+trap_battle_edi |> 
+  filter(trap_start_date == "2012-01-20" & velocity == "3.75") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+trap_battle_db |> 
+  mutate(date = as.Date(trap_visit_time_start)) |> 
+  filter(water_velocity == "3.75" & date == "2012-01-20") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+#### release
+
+**Findings:**
+
+  - date range is the same
+  - fork length values seem the same as well 
+  - random checks are consistent
+
+DB glimpse
+
+```{r echo=FALSE}
+release_with_stream <- release |> # join to get stream names
+  left_join(trap_id)
+
+release_battle_db <- release_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) |>  glimpse()
+```
+
+  - Database date range (`date_released`)
+
+```{r echo=FALSE}
+range(release_battle_db$date_released, na.rm = TRUE)
+```
+
+EDI glimpse
+
+```{r echo=FALSE}
+battle_release_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/414dd61cd26985641875fb194328f8a6"
+
+release_battle_edi <- read_csv(battle_release_url, show_col_types = FALSE)
+glimpse(release_battle_edi)
+```
+
+- EDI date range (`date_released`)
+
+```{r echo=FALSE}
+range(release_battle_edi$date_released)
+```
+
+*median_fork_length_released*
+
+EDI:
+
+* `r round(sum(is.na(release_battle_edi$median_fork_length_released))/nrow(release_battle_edi), 3)*100` % of values in the `median_fork_length_released` column are NA.
+```{r echo=FALSE}
+summary(release_battle_edi$median_fork_length_released)
+```
+
+DB:
+
+* `r round(sum(is.na(release_battle_db$median_fork_length_released))/nrow(release_battle_db), 3)*100` % of values in the `median_fork_length_released` column are NA.
+```{r echo=FALSE}
+summary(release_battle_db$median_fork_length_released)
+```
+
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_jitter(data = release_battle_db,
+              aes(x = as.Date(date_released), y = median_fork_length_released),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_battle_edi,
+              aes(x = as.Date(date_released), y = median_fork_length_released),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Released",
+       y = "Median Fork Length Released")
+           
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+release_battle_db |> 
+  filter(release_id == "CLR637") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+release_battle_edi |> 
+  filter(release_id == "CLR637") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+release_battle_db |> 
+  filter(release_id == "BAT187") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+release_battle_edi |> 
+  filter(release_id == "BAT187") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+  - test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+release_battle_db |> 
+  filter(release_id == "CLR497") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+release_battle_edi |> 
+  filter(release_id == "CLR497") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+#### recapture (recapture_fish)
+
+**Findings: **
+
+  - date ranges are the same
+  - overall forklength and recapture values look the same
+  - across the random tests there were 4 data entries on db with the same `release_id`, wondering if we should look into this
+
+Database glimpse:
+
+```{r echo=FALSE}
+recapture_with_stream <- recaptured_fish |> # join to get stream names
+  left_join(trap_id)
+
+recapture_battle_db <- recapture_with_stream |> 
+  filter(stream %in% c("clear creek", "battle creek")) |> 
+  glimpse()
+```
+
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+range(recapture_battle_db$date)
+```
+
+EDI glimpse:
+
+```{r echo=FALSE}
+battle_recapture_url <- "https://pasta.lternet.edu/package/data/eml/edi/1509/3/460853b8a4a0a2308c2bfb4d3dc2793c"
+
+recapture_battle_edi <- read_csv(battle_recapture_url, show_col_types = FALSE)
+
+glimpse(recapture_battle_edi)
+```
+
+
+- EDI date range (`date_recaptured`)
+
+```{r echo=FALSE}
+range(recapture_battle_edi$date_recaptured)
+```
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_battle_db$count))/nrow(recapture_battle_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_battle_edi$number_recaptured))/nrow(recapture_battle_edi), 3)*100` % of values in the `number_recaptured` column from EDI are NA.
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_jitter(data = recapture_battle_db,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = recapture_battle_edi,
+              aes(x = date_recaptured, y = number_recaptured),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/number_recaptured")
+```
+
+*date vs fork_length*
+
+* `r round(sum(is.na(recapture_battle_db$fork_length))/nrow(recapture_battle_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_battle_edi$median_fork_length_recaptured))/nrow(recapture_battle_edi), 3)*100` % of values in the `median_fork_length_recaptured` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_jitter(data = recapture_battle_db,
+              aes(x = date, y = fork_length),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = recapture_battle_edi,
+              aes(x = date_recaptured, y = median_fork_length_recaptured),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/fork_length")
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_db |> 
+  filter(release_id == "CLR210" & date == "2004-04-13") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+
+recapture_battle_edi |> 
+  filter(release_id == "CLR210" & date_recaptured == "2004-04-13") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_edi |> 
+  filter(release_id == "CLR386" & date_recaptured == "2008-03-02") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+
+recapture_battle_db |> 
+  filter(release_id == "CLR386" & date == "2008-03-02") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+```
+
+  - test 3
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_edi |> 
+  filter(release_id == "CLR677" & date_recaptured == "2017-01-31") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+
+recapture_battle_db |> 
+  filter(release_id == "CLR677" & date == "2017-01-31") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+```
+
+  - test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_battle_edi |> 
+  filter(release_id == "BAT371" & date_recaptured == "2024-04-03") |> 
+  mutate(source = "EDI") |> 
+  glimpse()
+
+recapture_battle_db |> 
+  filter(release_id == "BAT371" & date == "2024-04-03") |> 
+  mutate(source = "DB") |> 
+  glimpse()
+```
+
+### Butte
+
+#### catch
+
+**- Findings catch:**
+    - date range is different, will filter EDI to start 1999 for this data comparison purpose 
+    - It seems like the database only has a few data entires from 1999, 2017 and 2020. Then it jumps to 2022 onwards
+    - lifestage on EDI data are repetitive (e.g. Parr vs parr, Smolt va smolt)
+    - test 2: catch_raw_id == "15924" was not found in Data (called catchRawID on EDI)
+    - test 4: date of 2022-02-22 does not match any data entries on database (there seems to be a gap between 1999 and 2022, check if this is expected)
+
+  - DB date range
+  
+```{r echo=FALSE}
+catch_butte_db <- catch_with_stream |> 
+  filter(stream == "butte creek") 
+
+range(catch_butte_db$date)
+```
+  
+  - EDI date range (`visitTime`)
+
+```{r echo=FALSE}
+catch_butte_edi <- read_csv("data-raw/edi-zips/butte_catch.csv") |> glimpse()
+range(catch_butte_edi$visitTime)
+```
+
+*forkLength*
+
+EDI 
+
+* `r round(sum(is.na(catch_butte_edi$forkLength))/nrow(catch_butte_edi), 3)*100` % of values in the `forkLength` column are NA.
+
+```{r echo=FALSE}
+summary(catch_butte_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+* `r round(sum(is.na(catch_butte_db$fork_length))/nrow(catch_butte_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(catch_butte_db$fork_length, na.rm = TRUE)
+```
+
+```{r include=FALSE}
+catch_butte_edi_edited <- catch_butte_edi |>
+  clean_names() |>
+  mutate(date = as.Date(visit_time)) |> 
+  mutate(source = "EDI") |>
+  filter(date > ymd("1999-06-04")) 
+ 
+catch_butte_db_edited <- catch_butte_db |>
+  mutate(source = "DB")
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+combined_catch_butte <- catch_butte_db_edited |> 
+  select(date, fork_length, source) |> 
+  bind_rows(catch_butte_edi_edited |> select(date, fork_length, source)) 
+
+ggplot(data = combined_catch_butte, aes(x = date, y = fork_length, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+* `r round(sum(is.na(catch_butte_db$lifestage_id))/nrow(catch_butte_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_butte_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_butte_edi$lifeStage))/nrow(catch_butte_edi), 3)*100` % of values in the `lifeStage` column from the EDI data are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_butte_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+*count*
+
+* `r round(sum(is.na(catch_butte_edi$n))/nrow(catch_butte_edi), 3)*100` % of values in the `n` column in edi data are NA.
+
+```{r echo=FALSE}
+summary(catch_butte_edi$n)
+```
+
+* `r round(sum(is.na(catch_butte_db$count))/nrow(catch_butte_db), 3)*100` % of values in the `count` column in database data are NA.
+
+```{r echo=FALSE}
+summary(catch_butte_db$count)
+```
+
+```{r echo=FALSE, warning=FALSE}
+ggplot(catch_butte_db_edited, aes(x = date, y = count, color = source)) +
+  geom_jitter(alpha = 0.6, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(x = "date", y = "count", color = "Source")
+
+ggplot() +
+  geom_jitter(data = catch_butte_db_edited,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = catch_butte_edi_edited,
+              aes(x = date, y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "count/n")
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_butte_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45936875") |> 
+  glimpse()
+
+catch_butte_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "55171") |> 
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data
+catch_butte_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "15924") |> 
+  glimpse()
+
+catch_butte_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id  == "15924") |> 
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data
+catch_butte_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id  == "51525") |> 
+  glimpse()
+
+catch_butte_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "51525") |> 
+  glimpse()
+```
+ 
+ - test 3
+
+```{r echo=FALSE}
+# random pick to compare data
+catch_butte_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id  == "60956") |> 
+  glimpse()
+
+catch_butte_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "60956") |> 
+  glimpse()
+```
+
+ - test 4
+
+```{r echo=FALSE}
+# random pick to compare data
+catch_butte_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "33534") |> 
+  glimpse()
+
+catch_butte_db |> 
+  mutate(source = "DB") |> 
+  filter(date == "2022-02-22") |> 
+  glimpse()
+```
+
+#### trap
+
+**- Findings:**
+   - time ranges are different, database has 2020 data only (wondering if this is an error?)
+   - couldn't do random test checks since couldn't find field in common 
+
+  - Database glimpse
+```{r echo=FALSE}
+trap_with_stream <- trap |>
+  left_join(trap_id)
+  
+trap_butte_db <- trap_with_stream |>  #lots of NA's on trap_visit_time_start, so using trap_visit_time_end instead
+  filter(stream %in% c("butte creek")) |> 
+  glimpse()
+```
+
+  - Database date range (`trap_visit_time_end`)
+  
+```{r echo=FALSE}
+range(trap_butte_db$trap_visit_time_end, na.rm = TRUE)
+```
+
+  - Database glimpse
+```{r echo=FALSE}
+# Read the trap table
+trap_butte_edi <- read_csv("data-raw/edi-zips/butte_trap.csv") |> glimpse()
+```
+
+  - EDI date range (current_year_butte_trap.csv `visitTime`)
+```{r echo=FALSE}
+range(trap_butte_edi$visitTime)
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# # random pick to compare data 
+# trap_butte_bd |> 
+#   mutate(source = "DB") |> 
+#   filter(id == "2093136") |> 
+#   glimpse()
+# 
+# trap_butte_edi |> 
+#   mutate(source = "EDI") |> 
+#   filter(catchRawID == "55171") |> 
+#   glimpse()
+```
+
+#### release
+
+**- Findings:**
+   - time ranges are exactly the same
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_butte_db <- release_with_stream |> 
+  filter(stream %in% c("butte creek")) 
+  
+range(release_butte_db$date_released)
+```
+
+- EDI date range (`releaseTime`)
+
+```{r include=FALSE}
+release_butte_edi <- read_csv("data-raw/edi-zips/butte_release.csv") 
+
+range(release_butte_edi$releaseTime, na.rm = TRUE)
+```
+
+*number_released and nReleased*
+
+* `r round(sum(is.na(release_butte_db$number_released))/nrow(release_butte_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+
+* `r round(sum(is.na(release_butte_edi$nReleased))/nrow(release_butte_edi), 3)*100` % of values in the `nReleased` column in the database dataset are NA.
+
+
+```{r echo=FALSE}
+release_butte_edi_clean<- release_butte_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_butte_db_clean<- release_butte_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_jitter(data = release_butte_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_butte_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+#### recapture
+
+**- Findings:**
+   - database earliest year is 2023, edi is 2021
+   - all fork length values are NA on both datasets
+   
+
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+recapture_butte_db <- recapture_with_stream |> 
+  filter(stream %in% c("butte creek")) 
+
+range(recapture_butte_db$date)
+```
+
+- EDI date range (`visitTime`) 
+
+```{r include=FALSE}
+recapture_butte_edi <- read_csv("data-raw/edi-zips/butte_recapture.csv") |> glimpse()
+
+range(recapture_butte_edi$visitTime, na.rm = TRUE)
+```
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_butte_db$count))/nrow(recapture_butte_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_butte_edi$n))/nrow(recapture_butte_edi), 3)*100` % of values in the `n` column from EDI are NA.
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_jitter(data = recapture_butte_db,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = recapture_butte_edi,
+              aes(x = as.Date(visitTime), y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "count/number_recaptured")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_butte_db$fork_length))/nrow(recapture_butte_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_butte_edi$forkLength))/nrow(recapture_butte_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_butte_db$lifestage_id))/nrow(recapture_butte_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_butte_edi$lifeStage))/nrow(recapture_butte_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+# plot
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "48132") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "48132") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "48250") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "48250") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "46604") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "46604") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_butte_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "45421") |>
+  glimpse()
+
+recapture_butte_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "45421") |>
+  glimpse()
+```
+
+### Feather River
+
+#### catch
+
+**- Findings catch:**
+    - date range is different, will filter EDI to start 1999 for this data comparison purpose 
+    
+
+  - Database date range
+  
+```{r echo=FALSE}
+catch_feather_db <- catch_with_stream |> 
+  filter(stream == "feather river") 
+
+range(catch_feather_db$date)
+```
+  
+ - EDI date range
+
+```{r echo=FALSE}
+catch_feather_edi <- read_csv("data-raw/edi-zips/feather_catch.csv") 
+
+range(catch_feather_edi$visitTime)
+```
+
+*forkLength*
+
+EDI 
+
+* `r round(sum(is.na(catch_feather_edi$forkLength))/nrow(catch_feather_edi), 3)*100` % of values in the `forkLength` column are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+* `r round(sum(is.na(catch_feather_db$fork_length))/nrow(catch_feather_db), 3)*100` % of values in the `fork_length` column are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_db$fork_length, na.rm = TRUE)
+```
+
+```{r include=FALSE}
+catch_feather_edi_edited <- catch_feather_edi |>
+  clean_names() |>
+  mutate(date = as.Date(visit_time)) |> 
+  mutate(source = "EDI") |>
+  filter(date > ymd("1999-06-04")) 
+ 
+catch_feather_db_edited <- catch_feather_db |>
+  mutate(source = "DB")
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+combined_catch_fether <- catch_feather_db_edited |> 
+  select(date, fork_length, source) |> 
+  bind_rows(catch_feather_edi_edited |> select(date, fork_length, source)) 
+
+ggplot(data = combined_catch_fether, aes(x = date, y = fork_length, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+* `r round(sum(is.na(catch_feather_db$lifestage_id))/nrow(catch_feather_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_feather_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_feather_edi$lifeStage))/nrow(catch_feather_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_feather_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+*count*
+
+* `r round(sum(is.na(catch_feather_edi$n))/nrow(catch_feather_edi), 3)*100` % of values in the `n` column in edi data are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_edi$n)
+```
+
+* `r round(sum(is.na(catch_feather_db$count))/nrow(catch_feather_db), 3)*100` % of values in the `count` column in database data are NA.
+
+```{r echo=FALSE}
+summary(catch_feather_db$count)
+```
+
+```{r echo=FALSE, warning=FALSE}
+ggplot() +
+  geom_jitter(data = catch_feather_db_edited,
+              aes(x = date, y = count),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = catch_feather_edi_edited,
+              aes(x = date, y = n),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "count/n")
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45467039") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76944151") |> 
+  glimpse()
+```
+
+  - test 2
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45477524") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76920264") |> 
+  glimpse()
+```
+
+  - test 3
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45442835") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76939998") |> 
+  glimpse()
+```
+
+  - test 4
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(id == "45443080") |> 
+  glimpse()
+
+catch_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76868549") |> 
+  glimpse()
+```
+
+#### trap
+
+**- Findings trap:**
+    - date range is different
+    - db data has different time range on `trap_visit_time_start` and `trap_visit_time_end`, wondering which one we should be comparing to edi
+  
+Database
+```{r echo=FALSE}
+trap_feather_db <- trap_with_stream |>  
+  filter(stream %in% c("feather river")) |> glimpse()
+```
+
+  - Database date range (`trap_visit_time_end`)
+```{r echo=FALSE}
+range(trap_feather_db$trap_visit_time_end, na.rm = TRUE)
+```
+
+  - Database date range (`trap_visit_time_start`)
+```{r echo=FALSE}
+range(trap_feather_db$trap_visit_time_start, na.rm = TRUE)
+```
+
+EDI
+```{r echo=FALSE}
+# Read the catch table
+trap_feather_edi <- read_csv("data-raw/edi-zips/feather_trap.csv") |> glimpse()
+```
+
+  - EDI date range (`visitTime`)
+```{r echo=FALSE}
+# Read the catch table
+trap_feather_edi <- read_csv("data-raw/edi-zips/feather_trap.csv")
+
+range(trap_feather_edi$visitTime)
+```
+
+*water_temp*
+
+DB
+```{r echo=FALSE}
+summary(trap_feather_db$water_temp)
+```
+
+EDI
+```{r echo=FALSE}
+summary(trap_feather_edi$waterTemp)
+```
+*turbidity*
+
+DB
+```{r echo=FALSE}
+summary(trap_feather_db$turbidity)
+```
+
+EDI
+```{r echo=FALSE}
+summary(trap_feather_edi$turbidity)
+```
+
+
+#### release
+
+**- Findings release:**
+    - date range is different - edi has only two data entries earlier than 2011 (1999 and 1900). Wondering is these are worth keeping? (DB has one 1999 data entry)
+    - all `median_fork_length_released` values on DB are NA. No fork_length field on EDI
+    - all `lifestage_id` values on DB are NA. No lifestage field on EDI
+    - data fields seem different among the two datasets
+  
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_feather_db <- release_with_stream |> 
+  filter(stream %in% c("feather river"))
+
+range(release_feather_db$date_released)
+```
+
+- EDI date range (`releaseTime`)
+
+```{r include=FALSE}
+release_feather_edi <- read_csv("data-raw/edi-zips/feather_release.csv")
+range(release_feather_edi$releaseTime)
+```
+
+*number_released and nReleased*
+
+* `r round(sum(is.na(release_feather_db$number_released))/nrow(release_feather_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+
+* `r round(sum(is.na(release_feather_edi$nReleased))/nrow(release_feather_edi), 3)*100` % of values in the `nReleased` column in the EDI dataset are NA.
+
+```{r echo=FALSE}
+release_feather_edi_clean<- release_feather_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_feather_db_clean <- release_feather_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_jitter(data = release_feather_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, width = 10, height = 0.5, shape = 16, size = 2) +
+  geom_jitter(data = release_feather_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, width = 10, height = 0.5, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+Column names DB
+```{r echo=FALSE}
+colnames(release_feather_db)
+```
+
+Column names EDI
+```{r echo=FALSE}
+colnames(release_feather_edi)
+```
+
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "341") |> 
+  glimpse()
+
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "341") |> 
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "910") |> 
+  glimpse()
+
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "910") |> 
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "696") |> 
+  glimpse()
+
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "696") |> 
+  glimpse()
+
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+release_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(releaseID == "606") |> 
+  glimpse()
+
+release_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(release_id == "606") |> 
+  glimpse()
+
+```
+
+#### recapture
+
+**- Findings:**
+    - date range is different (database start year is 2022, and EDI is 1999). Some filtering was done to focus data comparison within the same time period
+    - `fork_length` and `lifestage` values match between the two datasets
+    
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+recapture_feather_db <- recapture_with_stream |> 
+  filter(stream %in% c("feather river"))
+
+range(recapture_feather_db$date)
+```
+
+- EDI date range (`current_year_feather_recapture.csv`)
+
+```{r echo=FALSE, warning=FALSE}
+recapture_feather_edi <- read_csv("data-raw/edi-zips/feather_recapture.csv")
+
+range(recapture_feather_edi$visitTime)
+```
+
+column names DB
+```{r echo=FALSE}
+colnames(recapture_feather_db)
+```
+column names EDI
+```{r echo=FALSE}
+colnames(recapture_feather_edi)
+```
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_feather_db$count))/nrow(recapture_feather_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_feather_edi$n))/nrow(recapture_feather_edi), 3)*100` % of values in the `n` column from EDI are NA.
+```{r echo=FALSE, warning=FALSE}
+recapture_feather_db <- recapture_feather_db |>
+  mutate(source = "DB")
+
+recapture_feather_edi <- recapture_feather_edi |>
+  mutate(source = "EDI",
+         date = as.Date(visitTime),
+         count = n) 
+
+recapture_feather_combined <- bind_rows(recapture_feather_db, recapture_feather_edi)
+
+ggplot(recapture_feather_combined, aes(x = date, y = count, color = source, shape = source)) +
+  geom_jitter(alpha = 0.4, width = 10, height = 0.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "Count / Number Recaptured",
+       color = "Source",
+       shape = "Source",
+       title = "Recaptures by Source (Feather River)")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_feather_db$fork_length))/nrow(recapture_feather_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_feather_edi$forkLength))/nrow(recapture_feather_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_feather_db$lifestage_id))/nrow(recapture_feather_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_feather_edi$lifeStage))/nrow(recapture_feather_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_feather_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+
+recapture_feather_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage", y = "fork length", title = "EDI data - lifestage vs forkLength")
+```
+
+Note that EDI has been filtered to start date of 2022 to match database temporal coverage
+```{r echo=FALSE}
+recapture_feather_db |> 
+  ggplot(aes(x = date, y = count)) +
+  geom_point()+
+  theme_minimal() +
+  labs(title = "DB date vs count")
+
+# recapture_feather_edi |> 
+#   ggplot(aes(x = as.Date(visitTime), y = n)) +
+#   geom_point() +
+#   theme_minimal() +
+#   labs(title = "EDI visitTime vs n")
+
+recapture_feather_edi |> 
+  mutate(date = as.Date(visitTime)) |> 
+  filter(date > "2021-12-30") |> 
+  ggplot(aes(x = as.Date(visitTime), y = n)) +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "EDI visitTime vs n")
+  
+```
+Random pick of data entry to compare between db and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76868063") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76868063") |> 
+  glimpse()
+```
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76901705") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76901705") |> 
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76918872") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76918872") |> 
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_feather_db |> 
+  mutate(source = "DB") |> 
+  filter(catch_raw_id == "76880944") |> 
+  glimpse()
+
+recapture_feather_edi |> 
+  mutate(source = "EDI") |> 
+  filter(catchRawID == "76880944") |> 
+  glimpse()
+```
+
+### Yuba
+
+#### catch
+
+**- Findings catch:**
+    - date range is different, will filter EDI to start 1999 for this data comparison purpose 
+ 
+  - Database date range
+  
+```{r echo=FALSE}
+catch_yuba_db <- catch_with_stream |> 
+  filter(stream == "yuba river") |> glimpse()
+
+catch_with_stream |> 
+  filter(stream == "yuba river") |> 
+  summarize(min_date = min(date, na.rm = TRUE), max_date = max(date, na.rm = TRUE))
+```
+  
+ - EDI date range
+
+```{r echo=FALSE}
+catch_yuba_edi <- read_csv("data-raw/edi-zips/yuba_catch.csv") |> glimpse()
+
+range(catch_yuba_edi$visitTime)
+```
+
+*fork_length*
+
+EDI 
+
+* `r round(sum(is.na(catch_yuba_edi$forkLength))/nrow(catch_yuba_edi), 3)*100` % of values in the `forkLength` column are NA.
+```{r echo=FALSE}
+
+summary(catch_yuba_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+* `r round(sum(is.na(catch_yuba_db$fork_length))/nrow(catch_yuba_db), 3)*100` % of values in the `fork_length` column are NA.
+```{r echo=FALSE}
+summary(catch_yuba_db$fork_length, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE}
+catch_yuba_edi |> 
+  ggplot(aes(visitTime, forkLength)) +
+  geom_point()
+
+catch_yuba_db |> 
+  ggplot(aes(date, fork_length)) +
+  geom_point()
+
+```
+
+
+*edi - count* and *database - n*
+
+```{r echo=FALSE}
+catch_yuba_edi |> 
+  ggplot(aes(visitTime, n)) +
+  geom_point() +
+  labs(title = "EDI Yuba catch")
+
+catch_yuba_db |> 
+  ggplot(aes(date, count)) +
+  geom_point()+
+  labs(title = "Database Yuba catch")
+```
+
+Random pick of data entry to compare between db and EDI
+
+```{r echo=FALSE}
+# random pick to compare data 
+catch_yuba_db |> 
+  filter(catch_raw_id == "16336.0") |> 
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "16336") |> 
+  glimpse()
+
+```
+
+test 2
+```{r echo=FALSE}
+catch_yuba_db |> 
+  filter(catch_raw_id == "21795.0") |> 
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "21795") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+catch_yuba_db |> 
+  filter(date == "2024-12-27" & catch_raw_id == "31918.0") |> 
+
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "31918") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+catch_yuba_db |> 
+  filter(date == "2023-04-24" & catch_raw_id == "8830.0") |> 
+
+  glimpse()
+
+catch_yuba_edi |> 
+  filter(catchRawID == "8830") |> 
+  glimpse()
+```
+
+#### trap
+
+**- Findings:**
+    - database has a temporal coverage of 2015 - 2025, and EDI has a data as early as 1999
+
+  - Database date range (`trap_visit_time_end`)
+
+```{r echo=FALSE}
+trap_yuba_db <- trap_with_stream |>  
+  filter(stream %in% c("yuba river")) |> glimpse()
+
+range(trap_yuba_db$trap_visit_time_start, na.rm = TRUE)
+```
+
+  - EDI date range (current_year_feather_catch.csv `visitTime`)
+
+```{r echo=FALSE}
+trap_yuba_edi <- read_csv("data-raw/edi-zips/yuba_trap.csv") |> glimpse()
+
+range(trap_yuba_edi$visitTime)
+```
+*water temp*
+
+* `r round(sum(is.na(trap_yuba_db$water_temp))/nrow(trap_yuba_db), 3)*100` % of values in the `water_temp` column in DB data are NA.
+
+* `r round(sum(is.na(trap_yuba_edi$waterTemp))/nrow(trap_yuba_edi), 3)*100` % of values in the `waterTemp` column in edi data are NA.
+
+```{r include=FALSE}
+trap_yuba_db |> 
+  ggplot(aes(trap_visit_time_start, water_temp)) +
+  geom_point()
+
+trap_yuba_edi |> 
+  ggplot(aes(visitTime, waterTemp)) +
+  geom_point()
+
+# edi filtering just 2015 - 2025
+trap_yuba_edi |> 
+  filter(visitTime > "2015-01-01") |> 
+  ggplot(aes(visitTime, waterTemp)) +
+  geom_point()
+```
+
+```{r echo=FALSE}
+trap_yuba_edi <- trap_yuba_edi |> 
+  filter(visitTime > "2015-01-01") |> 
+  mutate(source = "EDI") |> 
+  rename(time = visitTime, temp = waterTemp)
+
+trap_yuba_db <- trap_yuba_db |> 
+  mutate(source = "DB") |> 
+  rename(time = trap_visit_time_start, temp = water_temp)
+
+# Combine both datasets
+combined_trap_yuba <- bind_rows(trap_yuba_edi, trap_yuba_db)
+
+ggplot(combined_trap_yuba, aes(x = time, y = temp, color = source)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal() +
+  labs(x = "visit time", y = "water temp", color = "Source",
+       title = "water temp vs visitTime")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+```{r echo=FALSE}
+trap_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(id == "2044844") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "11") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+trap_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(id == "2045597") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "960") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+trap_yuba_db |> 
+  # filter(date == "2024-01-25") |> 
+  filter(id == "2045982") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "643") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+trap_yuba_db |> 
+  filter(id == "2044846") |> 
+  glimpse()
+
+trap_yuba_edi |> 
+  filter(trapVisitID == "16") |> 
+  glimpse()
+```
+
+#### release
+
+**- Findings:**
+
+  - Date ranges are the same
+  - no fork_length or lifestage in EDI data
+
+```{r echo=FALSE}
+release_yuba_db <- release_with_stream |> 
+  filter(stream %in% c("yuba river")) |> glimpse() 
+
+range(release_yuba_db$date_released)
+```
+
+- EDI date range (current_year_yuba_release.csv `releaseTime`)
+
+```{r include=FALSE, warning=FALSE}
+release_yuba_edi <- read_csv("data-raw/edi-zips/yuba_release.csv") |> glimpse()
+
+range(release_yuba_edi$releaseTime, na.rm = TRUE)
+```
+
+*number_released or nReleased*
+
+DB
+```{r echo=FALSE}
+summary(release_yuba_db$number_released)
+```
+EDI
+```{r echo=FALSE}
+summary(release_yuba_edi$nReleased)
+```
+
+```{r echo=FALSE}
+release_yuba_edi_clean<- release_yuba_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_yuba_db_clean<- release_yuba_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_point(data = release_yuba_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, shape = 16, size = 2) +
+  geom_point(data = release_yuba_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "290") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "290") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "303") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "303") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "274") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "274") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+release_yuba_db |>  
+  filter(release_id == "259") |> 
+  glimpse()
+
+release_yuba_edi |> 
+  filter(releaseID == "259") |> 
+  glimpse()
+```
+
+#### recapture
+
+**- Findings:**
+  - Date range is the same
+  - Same percentage of fork length and lifetage NA values
+  - lifestage categories are the same
+
+
+  - Database
+
+```{r echo=FALSE}
+recapture_yuba_db <- recapture_with_stream |> 
+  filter(stream %in% c("yuba river")) 
+
+range(recapture_yuba_db$date)
+```
+  - EDI
+ 
+```{r echo=FALSE}
+recapture_yuba_edi <- read_csv("data-raw/edi-zips/yuba_recapture.csv") |> glimpse()
+
+range(recapture_yuba_edi$visitTime)
+``` 
+
+column names DB
+```{r echo=FALSE}
+colnames(recapture_yuba_db)
+```
+column names EDI
+```{r echo=FALSE}
+colnames(recapture_yuba_edi)
+```
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_yuba_db$count))/nrow(recapture_yuba_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_yuba_edi$n))/nrow(recapture_yuba_edi), 3)*100` % of values in the `n` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_yuba_db <- recapture_yuba_db |>
+  mutate(source = "DB")
+
+recapture_yuba_edi <- recapture_yuba_edi |>
+  mutate(source = "EDI",
+         date = as.Date(visitTime),
+         count = n) 
+
+recapture_yuba_combined <- bind_rows(recapture_yuba_db, recapture_yuba_edi)
+
+ggplot(recapture_yuba_combined, aes(x = date, y = count, color = source, shape = source)) +
+  geom_point(alpha = 0.4, width = 10, height = 0.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "Count - Number Recaptured",
+       color = "Source",
+       shape = "Source",
+       title = "Recaptures by Source (Yuba River)")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_yuba_db$fork_length))/nrow(recapture_yuba_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_yuba_edi$forkLength))/nrow(recapture_yuba_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_yuba_db$lifestage_id))/nrow(recapture_yuba_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_yuba_edi$lifeStage))/nrow(recapture_yuba_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_yuba_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+
+recapture_yuba_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage", y = "fork length", title = "EDI data - lifestage vs forkLength")
+```
+
+Random pick of data entry to compare between DB and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_yuba_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "4119") |>
+  glimpse()
+
+recapture_yuba_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "4119") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_yuba_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "17556") |>
+  glimpse()
+
+recapture_yuba_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "17556") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_yuba_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "10663") |>
+  glimpse()
+
+recapture_yuba_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "10663") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_yuba_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "29902") |>
+  glimpse()
+
+recapture_yuba_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "29902") |>
+  glimpse()
+```
+
+
+### Sacramento/Knights landing 
+
+#### catch
+**- Findings:**
+  - Date range is not the same (edi earliest year is 2003 and database is 2021)
+  - There are a lot of NA fork length values on EDI
+  - lifestage has more categories in EDI data
+  
+  
+  - Database date range
+
+```{r}
+catch_knights_db <- catch_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) # trap id for Sacramento/Knights landing
+
+range(catch_knights_db$date)
+```
+ - EDI date range
+
+```{r echo=FALSE}
+catch_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_catch.csv")
+
+range(catch_knights_edi$visitTime)
+```
+
+*fork_length*
+
+EDI 
+
+
+* `r round(sum(is.na(catch_knights_edi$forkLength))/nrow(catch_knights_edi), 3)*100` % of values in the `forkLength` column are NA.
+```{r echo=FALSE}
+
+summary(catch_knights_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+
+* `r round(sum(is.na(catch_knights_db$fork_length))/nrow(catch_knights_db), 3)*100` % of values in the `fork_length` column are NA.
+```{r echo=FALSE}
+summary(catch_knights_db$fork_length, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE}
+catch_knights_edi |> 
+  ggplot(aes(visitTime, forkLength)) +
+  geom_point()
+
+catch_knights_db |> 
+  ggplot(aes(date, fork_length)) +
+  geom_point()
+```
+
+filtering only matching years (2021 onwards)
+```{r include=FALSE}
+catch_knights_edi_edited <- catch_knights_edi |>
+  clean_names() |>
+  mutate(date = as.Date(visit_time)) |> 
+  mutate(source = "EDI",
+         count = n) |>
+  filter(date > ymd("2020-12-30")) 
+ 
+catch_knights_db_edited <- catch_knights_db |>
+  mutate(source = "DB")
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+combined_catch_knights <- catch_knights_db_edited |> 
+  select(date, fork_length, source, count) |> 
+  bind_rows(catch_knights_edi_edited |> select(date, fork_length, source, count)) 
+
+ggplot(data = combined_catch_knights, aes(x = date, y = fork_length, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+*edi - count* and *database - n*
+
+```{r echo=FALSE}
+ggplot(data = combined_catch_knights, aes(date, count, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+* `r round(sum(is.na(catch_knights_db$lifestage_id))/nrow(catch_knights_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_knights_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_knights_edi$lifeStage))/nrow(catch_knights_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_knights_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+Random pick of data entry to compare between db and EDI
+
+Test 1
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "144738") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "144738") |> 
+  glimpse()
+```
+test 2
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "171057") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "171057") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "156696") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "156696") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+# random pick to compare data 
+catch_knights_db |> 
+  filter(catch_raw_id == "167894") |> 
+  glimpse()
+
+catch_knights_edi |> 
+  filter(catchRawID == "167894") |> 
+  glimpse()
+```
+
+
+#### trap
+
+**- Findings trap:**
+
+  - EDI has earlier date range, starting 2003. DB starts 2021
+
+```{r include=FALSE}
+trap_knights_db <- trap_with_stream |>  
+  filter(trap_location_id %in% c(51, 52, 53, 54))  #  trap id for Sacramento/Knights landing 
+```
+
+Column names database 
+```{r echo=FALSE}
+colnames(trap_knights_db)
+```
+
+  - Database date range (`trap_visit_time_end`)
+
+`trap_visit_time_start`
+```{r echo=FALSE}
+range(trap_knights_db$trap_visit_time_start)
+```
+
+`trap_visit_time_end`
+```{r echo=FALSE}
+range(trap_knights_db$trap_visit_time_end)
+```
+
+  - EDI date range (`visitTime`)
+
+```{r echo=FALSE}
+# Read the trap table
+trap_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_trap.csv")
+
+range(trap_knights_edi$visitTime)
+```
+
+Column names EDI 
+```{r echo=FALSE}
+colnames(trap_knights_edi)
+```
+
+*water_temp*
+
+DB
+
+* `r round(sum(is.na(trap_knights_db$waterTemp))/nrow(trap_knights_db), 3)*100` % of values in the `waterTemp` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_db$waterTemp)
+```
+
+EDI
+
+* `r round(sum(is.na(trap_knights_edi$waterTemp))/nrow(trap_knights_edi), 3)*100` % of values in the `waterTemp` column in the EDI dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_edi$waterTemp)
+```
+
+*turbidity*
+
+DB
+* `r round(sum(is.na(trap_knights_db$turbidity))/nrow(trap_knights_db), 3)*100` % of values in the `turbidity` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_db$turbidity)
+```
+
+EDI
+* `r round(sum(is.na(trap_knights_edi$turbidity))/nrow(trap_knights_edi), 3)*100` % of values in the `turbidity` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_knights_edi$turbidity)
+```
+
+test 1
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2067293") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "6903") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2067799") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "7932") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2068103") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "8557") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+trap_knights_db |> 
+  filter(id == "2069083") |> 
+  glimpse()
+
+trap_knights_edi |> 
+  filter(trapVisitID == "8627") |> 
+  glimpse()
+```
+
+#### release
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_knights_db <- release_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) 
+
+range(release_knights_db$date_released)
+```
+
+column names
+```{r echo=FALSE}
+colnames(release_knights_db)
+```
+
+
+- EDI date range (`releaseTime`)
+
+```{r echo=FALSE}
+release_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_release.csv")
+
+range(release_knights_edi$releaseTime, na.rm = TRUE)
+```
+
+column names
+```{r echo=FALSE}
+colnames(release_knights_edi)
+```
+
+*number_released or nReleased*
+
+DB
+* `r round(sum(is.na(release_knights_db$number_released))/nrow(release_knights_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(release_knights_db$number_released)
+```
+EDI
+* `r round(sum(is.na(release_knights_edi$nReleased))/nrow(release_knights_edi), 3)*100` % of values in the `nReleased` column in EDI dataset are NA.
+```{r echo=FALSE}
+summary(release_knights_edi$nReleased)
+```
+
+```{r echo=FALSE}
+release_knights_edi_clean<- release_knights_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_knights_db_clean<- release_knights_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_point(data = release_knights_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, shape = 16, size = 2) +
+  geom_point(data = release_knights_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "64024") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "293") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "63978") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "577") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "63991") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "602") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+release_knights_db |>  
+  filter(id == "64008") |> 
+  glimpse()
+
+release_knights_edi |> 
+  filter(releaseID == "273") |> 
+  glimpse()
+```
+
+#### recapture
+
+**- Findings:**
+   - EDI temporal coverage starts at earlier year than DB. Earliest year is 2007
+   - there are only 9 data entries on DB
+   - DB lifestages are mostly just "5" and some "6"
+   
+   
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+recapture_knights_db <- recapture_with_stream |> 
+  filter(trap_location_id %in% c(51, 52, 53, 54)) # trap id for Sacramento/Knights landing 
+
+range(recapture_knights_db$date)
+```
+
+- EDI date range (`visitTime`) 
+
+```{r include=FALSE}
+recapture_knights_edi <- read_csv("data-raw/edi-zips/knights_landing_recapture.csv") |> glimpse()
+
+range(recapture_knights_edi$visitTime, na.rm = TRUE)
+```
+
+column names DB
+```{r echo=FALSE}
+colnames(recapture_knights_db)
+```
+
+column names EDI
+```{r echo=FALSE}
+colnames(recapture_knights_edi)
+```
+
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_knights_db$count))/nrow(recapture_knights_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_knights_edi$n))/nrow(recapture_knights_edi), 3)*100` % of values in the `n` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_knights_db <- recapture_knights_db |>
+  mutate(source = "DB")
+
+recapture_knights_edi <- recapture_knights_edi |>
+  mutate(source = "EDI",
+         date = as.Date(visitTime),
+         count = n) 
+
+recapture_knights_combined <- bind_rows(recapture_knights_edi, recapture_knights_db)
+
+ggplot(recapture_knights_combined, aes(x = date, y = count, color = source, shape = source)) +
+  geom_point(alpha = 0.4, width = 10, height = 0.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "Count - Number Recaptured",
+       color = "Source",
+       shape = "Source",
+       title = "Recaptures by Source (Sacramento River - Knights Landing)")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_knights_db$fork_length))/nrow(recapture_knights_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_knights_edi$forkLength))/nrow(recapture_knights_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_knights_db$lifestage_id))/nrow(recapture_knights_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_knights_edi$lifeStage))/nrow(recapture_knights_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_knights_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+
+recapture_knights_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage", y = "fork length", title = "EDI data - lifestage vs forkLength")
+```
+
+Random pick of data entry to compare between DB and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "160190") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "160190") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "160506") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "160506") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "152127") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "152127") |>
+  glimpse()
+```
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_knights_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "152129") |>
+  glimpse()
+
+recapture_knights_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "152129") |>
+  glimpse()
+```
+
+  
+### Sacramento/Tisdale
+
+#### catch
+
+**- Findings:**
+  - Date range is different (edi's earliest year us 2010)
+  - there is an outline fork length value on EDI in 2020
+  - lifestage has more categories in EDI data
+
+
+  - Database date range
+
+```{r echo=FALSE}
+catch_tisdale_db <- catch_with_stream |> 
+  filter(trap_location_id %in% c(55,56,57))  # trap id for Sacramento/Tisdale landing
+  
+range(catch_tisdale_db$date)
+```
+ - EDI date range
+
+```{r echo=FALSE}
+catch_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_catch.csv")
+
+range(catch_tisdale_edi$visitTime)
+```
+
+*fork_length*
+
+EDI 
+
+* `r round(sum(is.na(catch_tisdale_edi$forkLength))/nrow(catch_tisdale_edi), 3)*100` % of values in the `forkLength` column are NA.
+```{r echo=FALSE}
+
+summary(catch_tisdale_edi$forkLength, na.rm = TRUE)
+```
+
+DB
+
+* `r round(sum(is.na(catch_tisdale_db$fork_length))/nrow(catch_tisdale_db), 3)*100` % of values in the `fork_length` column are NA.
+```{r echo=FALSE}
+summary(catch_tisdale_db$fork_length, na.rm = TRUE)
+```
+
+
+```{r echo=FALSE}
+catch_tisdale_edi |> 
+  ggplot(aes(visitTime, forkLength)) +
+  geom_point() +
+  labs(title = "EDI")
+  
+
+catch_tisdale_db |> 
+  ggplot(aes(date, fork_length)) +
+  geom_point() +
+  labs(title = "database")
+```
+filtering only matching years (2022 onwards)
+```{r include=FALSE}
+catch_tisdale_edi_edited <- catch_tisdale_edi |>
+  clean_names() |>
+  mutate(date = as.Date(visit_time)) |> 
+  mutate(source = "EDI",
+         count = n) |>
+  filter(date > ymd("2021-12-30")) 
+ 
+catch_tisdale_db_edited <- catch_tisdale_db |>
+  mutate(source = "DB")
+```
+
+exploration plots 
+
+```{r echo=FALSE, warning=FALSE}
+combined_catch_tisdale <- catch_tisdale_db_edited |> 
+  select(date, fork_length, source, count) |> 
+  bind_rows(catch_tisdale_edi_edited |> select(date, fork_length, source, count)) 
+
+ggplot(data = combined_catch_tisdale, aes(x = date, y = fork_length, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+*edi - count* and *database - n*
+
+```{r echo=FALSE}
+ggplot(data = combined_catch_tisdale, aes(date, count, color = source)) +
+  geom_point() +
+  facet_wrap(~source)
+```
+
+* `r round(sum(is.na(catch_tisdale_db$lifestage_id))/nrow(catch_tisdale_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_tisdale_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+```
+
+* `r round(sum(is.na(catch_tisdale_edi$lifeStage))/nrow(catch_tisdale_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+catch_tisdale_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "EDI data - lifestage vs forklength")
+```
+
+Random pick of data entry to compare between db and EDI
+
+test 1
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "73027") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "73027") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "79378") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "79378") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "81039") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "81039") |> 
+  glimpse()
+```
+	
+test 4
+```{r echo=FALSE}
+# random pick to compare data 
+catch_tisdale_db |> 
+  filter(catch_raw_id == "83735") |> 
+  glimpse()
+
+catch_tisdale_edi |> 
+  filter(catchRawID == "83735") |> 
+  glimpse()
+```
+
+
+#### trap
+
+**- Findings trap:**
+  - EDI has earlier date range, starting 2012. DB starts 2022
+
+
+
+```{r include=FALSE}
+trap_tisdale_db <- trap_with_stream |>  
+  filter(trap_location_id %in% c(55, 56, 57))  # trap id for Sacramento/Knights landing
+```
+
+Column names DB
+```{r echo=FALSE}
+colnames(trap_tisdale_db)
+```
+
+
+  - Database date range
+  
+`trap_visit_time_start`
+```{r echo=FALSE}
+range(trap_tisdale_db$trap_visit_time_start)
+```
+
+`trap_visit_time_end`
+```{r echo=FALSE}
+range(trap_tisdale_db$trap_visit_time_end)
+```
+
+
+  - EDI date range (`visitTime`)
+
+```{r echo=FALSE}
+# Read the trap table
+trap_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_trap.csv")
+
+range(trap_tisdale_edi$visitTime)
+```
+
+Column names EDI
+```{r echo=FALSE}
+colnames(trap_tisdale_edi)
+```
+
+*water_temp*
+
+DB
+
+* `r round(sum(is.na(trap_tisdale_db$water_temp))/nrow(trap_tisdale_db), 3)*100` % of values in the `water_temp` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_db$water_temp)
+```
+
+EDI
+
+* `r round(sum(is.na(trap_tisdale_edi$waterTemp))/nrow(trap_tisdale_edi), 3)*100` % of values in the `waterTemp` column in the EDI dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_edi$waterTemp)
+```
+
+*turbidity*
+
+DB
+* `r round(sum(is.na(trap_tisdale_db$turbidity))/nrow(trap_tisdale_db), 3)*100` % of values in the `turbidity` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_db$turbidity)
+```
+
+EDI
+* `r round(sum(is.na(trap_tisdale_edi$turbidity))/nrow(trap_tisdale_edi), 3)*100` % of values in the `turbidity` column in EDI dataset are NA.
+```{r echo=FALSE}
+summary(trap_tisdale_edi$turbidity)
+```
+
+test 1
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2069220") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "6675") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2069463") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "7175") |> 
+  glimpse()
+```
+
+test 3
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2069899") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "7409") |> 
+  glimpse()
+```
+
+test 4
+```{r echo=FALSE}
+trap_tisdale_db |> 
+  filter(id == "2070318") |> 
+  glimpse()
+
+trap_tisdale_edi |> 
+  filter(trapVisitID == "7735") |> 
+  glimpse()
+```
+  
+  
+#### release
+
+  - Database date range 
+
+```{r echo=FALSE}
+release_tisdale_db <- release_with_stream |> 
+  filter(trap_location_id %in% c(55, 56, 57)) 
+
+range(release_tisdale_db$date_released)
+```
+
+column names
+```{r echo=FALSE}
+colnames(release_tisdale_db)
+```
+
+
+- EDI date range (`releaseTime`)
+
+```{r echo=FALSE}
+release_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_release.csv")
+
+range(release_tisdale_edi$releaseTime, na.rm = TRUE)
+```
+
+column names
+```{r echo=FALSE}
+colnames(release_tisdale_edi)
+```
+
+*number_released or nReleased*
+
+DB
+* `r round(sum(is.na(release_tisdale_db$number_released))/nrow(release_tisdale_db), 3)*100` % of values in the `number_released` column in the database dataset are NA.
+```{r echo=FALSE}
+summary(release_tisdale_db$number_released)
+```
+EDI
+* `r round(sum(is.na(release_tisdale_edi$nReleased))/nrow(release_tisdale_edi), 3)*100` % of values in the `nReleased` column in EDI dataset are NA.
+```{r echo=FALSE}
+summary(release_tisdale_edi$nReleased)
+```
+
+```{r echo=FALSE}
+release_tisdale_edi_clean<- release_tisdale_edi |> 
+  mutate(date = as.Date(releaseTime)) 
+release_tisdale_db_clean<- release_tisdale_db |> 
+  mutate(date = as.Date(date_released)) 
+
+ggplot() +
+  geom_point(data = release_tisdale_db_clean,
+              aes(x = date, y = number_released),
+              color = "blue", alpha = 0.4, shape = 16, size = 2) +
+  geom_point(data = release_tisdale_edi_clean,
+              aes(x = date, y = nReleased),
+              color = "red", alpha = 0.4, shape = 17, size = 2) +
+  theme_minimal() +
+  labs(x = "Date",
+       y = "number_released or nReleased")
+```
+
+Random pick of data entry to compare between db and EDI
+ 
+test 1
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "303") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "303") |> 
+  glimpse()
+```
+
+test 2
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "294") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "294") |> 
+  glimpse()
+```
+  
+test 3
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "296") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "296") |> 
+  glimpse()
+```  
+
+test 4
+```{r echo=FALSE}
+release_tisdale_db |>  
+  filter(release_id == "318") |> 
+  glimpse()
+
+release_tisdale_edi |> 
+  filter(releaseID == "318") |> 
+  glimpse()
+```  
+  
+#### recapture
+
+**- Findings:**
+   - All fork length values are NA in database
+   - there are only 8 data entries in database
+   
+   
+  - Database date range (`recaptured_fish`)
+
+```{r echo=FALSE}
+recapture_tisdale_db <- recapture_with_stream |> 
+  filter(trap_location_id %in% c(55,56,57))  # trap id for Sacramento/Tisdale landing
+
+range(recapture_tisdale_db$date)
+```
+
+- EDI date range (`visitTime`) 
+
+```{r include=FALSE}
+recapture_tisdale_edi <- read_csv("data-raw/edi-zips/tisdale_recapture.csv") |> glimpse()
+
+range(recapture_tisdale_edi$visitTime, na.rm = TRUE)
+```
+
+column names DB
+```{r echo=FALSE}
+colnames(recapture_tisdale_db)
+```
+
+column names EDI
+```{r echo=FALSE}
+colnames(recapture_tisdale_edi)
+```
+
+  
+*date vs count/number_recapture*
+
+* `r round(sum(is.na(recapture_tisdale_db$count))/nrow(recapture_tisdale_db), 3)*100` % of values in the `count` column from the database are NA.
+
+* `r round(sum(is.na(recapture_tisdale_edi$n))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `n` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_tisdale_db <- recapture_tisdale_db |>
+  mutate(source = "DB")
+
+recapture_tisdale_edi <- recapture_tisdale_edi |>
+  mutate(source = "EDI",
+         date = as.Date(visitTime),
+         count = n) 
+
+recapture_tisdale_combined <- bind_rows(recapture_tisdale_edi, recapture_tisdale_db)
+
+ggplot(recapture_tisdale_combined, aes(x = date, y = count, color = source, shape = source)) +
+  geom_point(alpha = 0.4, width = 10, height = 0.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Date Recaptured",
+       y = "Count - Number Recaptured",
+       color = "Source",
+       shape = "Source",
+       title = "Recaptures by Source (Sacramento River - Tisdale)")
+```
+
+*fork_length*
+
+* `r round(sum(is.na(recapture_tisdale_db$fork_length))/nrow(recapture_tisdale_db), 3)*100` % of values in the `fork_length` column from the database are NA.
+
+* `r round(sum(is.na(recapture_tisdale_edi$forkLength))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `forkLength` column from EDI are NA.
+
+*lifestage*
+
+* `r round(sum(is.na(recapture_tisdale_db$lifestage_id))/nrow(recapture_tisdale_db), 3)*100` % of values in the `lifestage_id` column from the database are NA.
+
+* `r round(sum(is.na(recapture_tisdale_edi$lifeStage))/nrow(recapture_tisdale_edi), 3)*100` % of values in the `lifeStage` column from EDI are NA.
+
+```{r echo=FALSE, warning=FALSE}
+recapture_tisdale_db |> 
+   ggplot(aes(x = as.factor(lifestage_id), y = fork_length, fill = as.factor(lifestage_id))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage id", y = "fork length", title = "DB data - lifestage vs forklength")
+
+recapture_tisdale_edi |> 
+   ggplot(aes(x = as.factor(lifeStage), y = forkLength, fill = as.factor(lifeStage))) +
+  geom_boxplot(outlier.shape = 16, outlier.size = 1, alpha = 0.7) +
+  coord_flip() +
+  theme_minimal() +
+  labs(x = "lifestage", y = "fork length", title = "EDI data - lifestage vs forkLength")
+```
+
+
+Random pick of data entry to compare between DB and EDI
+
+  - test 1
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88918") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88918") |>
+  glimpse()
+```
+
+  - test 2
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88914") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88914") |>
+  glimpse()
+```
+
+  - test 3
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88906") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88906") |>
+  glimpse()
+```
+
+
+  - test 4
+```{r echo=FALSE}
+# random pick to compare data 
+recapture_tisdale_db |> 
+  mutate(source = "DB") |>
+  filter(catch_raw_id == "88904") |>
+  glimpse()
+
+recapture_tisdale_edi |> 
+  mutate(source = "EDI") |>
+  filter(catchRawID == "88904") |>
+  glimpse()
+```
