@@ -17,7 +17,7 @@ load("filter_params.RData")
 ```{r include=FALSE}
 con <- DBI::dbConnect(
   RPostgres::Postgres(),
-  dbname = "jpedb-staging",
+  dbname = "jpedb-prod",
   host = "jpe-db.postgres.database.azure.com",
   port = 5432,
   user = Sys.getenv("jpe_db_user_id"),
