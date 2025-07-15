@@ -19,7 +19,7 @@ load("filter_params.RData")
 ```{r include=FALSE}
 con <- DBI::dbConnect(
   RPostgres::Postgres(),
-  dbname = "jpedb-staging",
+  dbname = "jpedb-prod",
   host = "jpe-db.postgres.database.azure.com",
   port = 5432,
   user = Sys.getenv("jpe_db_user_id"),
@@ -468,7 +468,6 @@ recapture_feather_edi |>
 **- Findings release:**
 
   - No markedLifeStage in EDI, all lifestage_id are NA in DB
-  - There is no release_id == 140 or == 231 in EDI (look at test 1 and 2)
 
 ```{r include=FALSE}
 release_with_stream <- release |>
