@@ -19,7 +19,7 @@ load("filter_params.RData")
 ```{r include=FALSE}
 con <- DBI::dbConnect(
   RPostgres::Postgres(),
-  dbname = "jpedb-staging",
+  dbname = "jpedb-prod",
   host = "jpe-db.postgres.database.azure.com",
   port = 5432,
   user = Sys.getenv("jpe_db_user_id"),
@@ -57,7 +57,7 @@ recapture_with_stream <- recaptured_fish |>
 
 **- Findings catch:**
 
-  - a lot of "not provided" values on EDI lifestage
+  - a lot of "not provided" values on EDI lifestage. Since DB has not been wranggled it is hard to compare. Flagging this in case we cant to look into details
 
 ```{r echo=FALSE}
 catch_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_catch.csv") |>
@@ -218,6 +218,8 @@ catch_battle_clear_edi |>
 ### Trap
 
 **- Findings trap:**
+
+- Date ranges are different- it looks like a few dates in database jump from 2025-07-08 to 2025-12-20
 
 
 ```{r echo=FALSE}
@@ -389,9 +391,9 @@ range(release_battle_clear_edi$date)
 
 #### origin_released
 
-*EDI `* - origin_released
+*EDI `origin_released`* 
 
-* `r round(sum(is.na(release_battle_clear_edi$origin_id))/nrow(release_battle_clear_db), 3)*100` % of values in the `origin_id` column are NA.
+* `r round(sum(is.na(release_battle_clear_edi$origin_released))/nrow(release_battle_clear_db), 3)*100` % of values in the `origin_released` column are NA.
 
 ```{r echo=FALSE}
 table(release_battle_clear_edi$origin_released)
