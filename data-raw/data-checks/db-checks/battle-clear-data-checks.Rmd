@@ -48,7 +48,6 @@ catch_with_stream <- catch |>
 ## battle_clear {.tabset}
  
 ```{r eval=FALSE, include=FALSE}
-#TODO, there is no recapture in database
 recapture_with_stream <- recaptured_fish |>
   left_join(trap_id)
 ``` 
@@ -57,7 +56,7 @@ recapture_with_stream <- recaptured_fish |>
 
 **- Findings catch:**
 
-  - a lot of "not provided" values on EDI lifestage. Since DB has not been wranggled it is hard to compare. Flagging this in case we cant to look into details
+  - a lot of "not provided" values on EDI lifestage. Since DB has not been wrangled it is hard to compare. Flagging this in case we cant to look into details
 
 ```{r echo=FALSE}
 catch_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_catch.csv") |>
@@ -247,9 +246,9 @@ trap_battle_clear_edi <- read_csv("data-raw/edi-zips/battle_clear_trap.csv") |>
 ```{r echo=FALSE}
 range(trap_battle_clear_db$trap_visit_time_start, na.rm = TRUE)
 ```
-*EDI `sample_date`*
+*EDI `trap_start_date`*
 ```{r}
-range(trap_battle_clear_edi$sample_date)
+range(trap_battle_clear_edi$trap_start_date, na.rm = TRUE)
 ```
 
 #### water_velocity
