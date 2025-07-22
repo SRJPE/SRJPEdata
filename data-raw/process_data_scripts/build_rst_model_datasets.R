@@ -125,12 +125,11 @@ weekly_efficiency <-
   group_by(stream, 
            site, 
            site_group, 
-           #origin,
-           #median_fork_length_released, # we add origin and fork length for figures
            week_released = week(date_released), 
            year_released = year(date_released)) |> 
   summarize(number_released = sum(number_released, na.rm = TRUE),
-            number_recaptured = sum(count, na.rm = TRUE)) |> 
+            number_recaptured = sum(count, na.rm = TRUE),
+            median_fork_length_released = median(median_fork_length_released, na.rm = T)) |> 
   ungroup() |> 
   #rename(origin_released = origin) |> 
   glimpse()
