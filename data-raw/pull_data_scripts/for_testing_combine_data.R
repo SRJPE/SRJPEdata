@@ -128,7 +128,7 @@ release <- bind_rows(release_standard, release_query_pilot |>
                        mutate(release_id = as.character(release_id)), temp_release)  |> 
   mutate(site = ifelse(is.na(site) & stream == "butte creek", "okie dam", site)) |> 
   filter(!is.na(number_released), year(date_released) != 1900) |> # there should not be any NAs
-  glimpse()
+  left_join(standard_release |> select(site, release_id, median_fork_length_released) |> distinct()) 
 recaptures <- bind_rows(recapture_standard, recaptures_query_pilot |> mutate(release_id = as.character(release_id)), temp_recapture) |> glimpse()
 
 ## SAVE TO DATA PACKAGE ---
