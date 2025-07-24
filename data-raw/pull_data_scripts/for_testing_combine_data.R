@@ -131,7 +131,10 @@ release <- bind_rows(release_standard, release_query_pilot |>
   left_join(standard_release |> 
               filter(!is.na(median_fork_length_released)) |> 
               select(site, release_id, median_fork_length_released) |> 
-              distinct()) # fork length is not on EDI but Josh needs it in weekly_efficiency
+              distinct()) |>  # fork length is not on EDI but Josh needs it in weekly_efficiency
+  left_join(standard_release |> 
+              select(site, release_id, origin_released) |> 
+              distinct())  # fork length is not on EDI but Josh needs it in weekly_efficiency
 recaptures <- bind_rows(recapture_standard, recaptures_query_pilot |> mutate(release_id = as.character(release_id)), temp_recapture) |> glimpse()
 
 ## SAVE TO DATA PACKAGE ---
