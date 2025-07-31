@@ -3,6 +3,13 @@ library(tidyverse)
 source("data-raw/pull_data_scripts/pull_tables_from_database.R")
 source("data-raw/pull_data_scripts/pull_tables_from_data_tackle_database.R")
 source("data-raw/pull_data_scripts/pull_misfit_rst_data.R") # Battle and Clear recapture, KNL pre 2004, Butte pre 2015
+
+# We use standard release to get fork length and origin (data that is not in EDI)
+# and this dataset is cached in helper_data. This data is on GCP:
+# "standard-format-data/standard_recapture.csv"
+standard_release <- read_csv("data-raw/helper-tables/standard_release.csv")
+
+
 # Bind rows 
 rst_catch <- bind_rows(rst_catch, rst_catch_query_pilot, edi_catch) |> 
   mutate(fork_length = ifelse(fork_length == 0, NA, fork_length), # looks like there were some cases where fork length is 0. this should be handled more upstream but fixing it here for now
@@ -10,11 +17,17 @@ rst_catch <- bind_rows(rst_catch, rst_catch_query_pilot, edi_catch) |>
          julian_year = year(date)) |> # adding week for noble
   glimpse()
 rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot, edi_trap)  |> glimpse()
-release <- bind_rows(release, release_query_pilot |> 
+release <- bind_rows(release_db, release_query_pilot |> 
                        mutate(release_id = as.character(release_id)), edi_release)  |> 
   filter(!is.na(number_released)) |> # there should not be any NAs
-  glimpse()
-recaptures <- bind_rows(recaptures, recaptures_query_pilot |> mutate(release_id = as.character(release_id)), edi_recapture) |> glimpse()
+  left_join(standard_release |> 
+              filter(!is.na(median_fork_length_released)) |> 
+              select(site, release_id, median_fork_length_released) |> 
+              distinct()) |>  # fork length is not on EDI but Josh needs it in weekly_efficiency
+  left_join(standard_release |> 
+              select(site, release_id, origin_released) |> 
+              distinct())  # fork length is not on EDI but Josh needs it in weekly_efficiency
+recaptures <- bind_rows(recaptures_db, recaptures_query_pilot |> mutate(release_id = as.character(release_id)), edi_recapture) |> glimpse()
 
 ## SAVE TO DATA PACKAGE ---
 usethis::use_data(rst_catch, overwrite = TRUE)

@@ -20,35 +20,6 @@ pull_edi <- function(id, index, version) {
   edi <- read_csv(file = raw)
 }
 
-gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
-gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
-
-gcs_get_object(object_name = "standard-format-data/standard_recapture.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/helper-tables/standard_recapture.csv",
-               overwrite = TRUE)
-standard_recapture <- read_csv("data-raw/helper-tables/standard_recapture.csv")
-# standard release data table
-gcs_get_object(object_name = "standard-format-data/standard_release.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/helper-tables/standard_release.csv",
-               overwrite = TRUE)
-standard_release <- read_csv("data-raw/helper-tables/standard_release.csv")
-
-# RST Monitoring Data
-# standard rst catch data table
-gcs_get_object(object_name = "standard-format-data/standard_rst_catch_051525.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/helper-tables/standard_catch.csv",
-               overwrite = TRUE)
-standard_catch <- read_csv("data-raw/helper-tables/standard_catch.csv")
-
-# standard rst trap data table
-gcs_get_object(object_name = "standard-format-data/standard_rst_trap.csv",
-               bucket = gcs_get_global_bucket(),
-               saveToDisk = "data-raw/helper-tables/standard_trap.csv",
-               overwrite = TRUE)
-standard_trap <- read_csv("data-raw/helper-tables/standard_trap.csv")
 
 # Butte -------------------------------------------------------------------
 
@@ -195,14 +166,78 @@ knl_trap_standard <- read_csv("data-raw/helper-tables/google_bucket/knl_trap_sta
 knl_recapture_standard <- read_csv("data-raw/helper-tables/google_bucket/knl_recapture_standard.csv")
 knl_release_standard <- read_csv("data-raw/helper-tables/google_bucket/knl_release_standard.csv")
 
+
+# Yuba --------------------------------------------------------------------
+
+# Using version 13 because this is the most up to date version before transitioning
+# to zip file which is more difficult to load in. We are pulling pre 2015 data
+# so it is OK to use an outdated version.
+
+# Note there are no release/recapture data prior to 2015 so do not need to pullcatch_edi <- read_csv("data-raw/TEMP_data/yuba_catch.csv")
+catch_edi <- pull_edi("1529", 1, 13)
+trap_edi <- pull_edi("1529", 4, 13)
+
+yuba_catch_edi <- catch_edi |> 
+  mutate(commonName = tolower(commonName)) |> 
+  filter(commonName == "chinook salmon",
+         year(visitTime) < 2022) |> # we are only pulling pre 2022 data
+  mutate(stream = "yuba river",
+         adipose_clipped = case_when(fishOrigin == "Natural" ~ F,
+                                     fishOrigin == "Hatchery" ~ T,
+                                     T ~ NA),
+         dead = NA,
+         weight = NA,
+         species = "chinook",
+         site = "hallwood",
+         subsite = case_when(subSiteName == "Yuba River" ~ "yub",
+                             subSiteName == "Hallwood 1 RR" ~ "hal",
+                             subSiteName == "Hallwood 2 RL" ~ "hal2",
+                             subSiteName == "Hallwood 3" ~ "hal3"),
+         site_group = "yuba river") |> 
+  rename(date = visitTime,
+         count = n,
+         life_stage = lifeStage,
+         fork_length = forkLength,
+         actual_count = actualCount) |> 
+  select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
+         dead, fork_length, weight, actual_count, species)
+
+yuba_trap_edi <- trap_edi |> 
+  filter(year(visitTime) < 2022) |> # we are only pulling pre 2022 data
+  arrange(subSiteName, visitTime) |>
+  mutate(trap_start_date = ymd_hms(lag(visitTime)),
+         trap_stop_date = ymd_hms(visitTime),
+         stream = "yuba river",
+         site = "hallwood",
+         subsite = case_when(subSiteName == "yuba river" ~ "yub",
+                             subSiteName == "Hallwood 1 RR" ~ "hal",
+                             subSiteName == "Hallwood 2 RL" ~ "hal2",
+                             subSiteName == "Hallwood 3" ~ "hal3"),
+         site_group = "yuba river") |> 
+  rename(visit_type = visitType,
+         trap_functioning = trapFunctioning,
+         fish_processed = fishProcessed,
+         total_revolutions = counterAtEnd,
+         rpm_start = rpmRevolutionsAtStart,
+         rpm_end = rpmRevolutionsAtEnd,
+         include = includeCatch,
+         water_temp = waterTemp) |> 
+  select(trap_start_date, visit_type, trap_stop_date, stream, site, subsite,
+         site_group, trap_functioning, fish_processed, rpm_start, rpm_end,
+         total_revolutions, water_temp, turbidity, include)
+
 # Combine -----------------------------------------------------------------
 
 edi_catch <- bind_rows(butte_catch_edi,
-                       knl_catch_standard)
+                       knl_catch_standard,
+                       yuba_catch_edi) |> 
+  mutate(actual_count = as.logical(actual_count))
 edi_recapture <- bind_rows(battle_clear_recapture_edi,
                            knl_recapture_standard)
 edi_release <- bind_rows(knl_release_standard)
 edi_trap <- bind_rows(butte_trap_edi |> 
                         mutate(include = ifelse(include == "Yes", T, F)),
-                      knl_trap_standard) |> 
+                      knl_trap_standard,
+                      yuba_trap_edi |> 
+                        mutate(include = ifelse(include == "Yes", T, F))) |> 
   filter(!is.na(trap_start_date))

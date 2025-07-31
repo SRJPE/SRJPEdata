@@ -95,8 +95,8 @@ try(if(!exists("rst_trap_query"))
                                                 left join lifestage ls on rs.lifestage_id = ls.id
                                                 left join origin o on rs.origin_id = o.id"))
  try(if(!exists("release_query"))
-   release <- SRJPEdata::release
-   else(release <- release_query))
+   release_db <- SRJPEdata::release
+   else(release_db <- release_query))
 
 # Pull in release fish info, Fork length for release trials 
 # TODO Update if we get data in release fish 
@@ -115,5 +115,5 @@ try(recaptures_query <- dbGetQuery(con, "SELECT rf.date, rf.count, rf.release_id
                                          left join lifestage ls on rf.lifestage_id = ls.id"))
 
 try(if(!exists("recaptures_query"))
-  recaptures <- SRJPEdata::recaptures
-  else(recaptures <- recaptures_query))
+  recaptures_db <- SRJPEdata::recaptures
+  else(recaptures_db <- recaptures_query))
