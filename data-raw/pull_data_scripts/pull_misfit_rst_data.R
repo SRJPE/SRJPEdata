@@ -170,10 +170,10 @@ knl_release_standard <- read_csv("data-raw/helper-tables/google_bucket/knl_relea
 # Yuba --------------------------------------------------------------------
 
 # Using version 13 because this is the most up to date version before transitioning
-# to zip file which is more difficult to load in. We are pulling pre 2015 data
+# to zip file which is more difficult to load in. We are pulling pre 2022 data
 # so it is OK to use an outdated version.
 
-# Note there are no release/recapture data prior to 2015 so do not need to pullcatch_edi <- read_csv("data-raw/TEMP_data/yuba_catch.csv")
+# Note there are no release/recapture data prior to 2022 so do not need to pull
 catch_edi <- pull_edi("1529", 1, 13)
 trap_edi <- pull_edi("1529", 4, 13)
 
