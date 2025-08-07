@@ -32,20 +32,6 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
  lifestage <- dbGetQuery(con, "SELECT * FROM lifestage")
  survey_location <- dbGetQuery(con, "SELECT * FROM survey_location")
  
- # This can be removed after historic yuba data on EDI are fixed so that Yuba River = Hallwood
- # rst_catch <- rst_catch_raw |>
- #   left_join(rst_trap_locations, by = c("trap_location_id" = "id")) |>
- #   left_join(run, by = c("run_id" = "id")) |>
- #   left_join(lifestage, by = c("lifestage_id" = "id")) |>
- #   select(date, stream, site, subsite, site_group, count, run = definition.x, life_stage = definition.y,
- #          adipose_clipped, dead, fork_length, weight, actual_count) |>
- #   mutate(species = "chinook",
- #          subsite = case_when(site == "yuba river" ~ "hal",
- #                     T ~ subsite),
- #          site = case_when(stream == "yuba river" ~ "hallwood",
- #                  T ~ site))
- 
-
 # PULL IN RST DATA -------------------------------------------------------------
 # Pull in Catch table
 try(rst_catch_query <- dbGetQuery(con, "SELECT c.date, tl.stream, tl.site, tl.subsite, tl.site_group, 
