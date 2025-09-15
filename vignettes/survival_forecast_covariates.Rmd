@@ -1,0 +1,194 @@
+---
+title: "Survival Covariates"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Survival Covariates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE, 
+  message = FALSE,
+  echo = FALSE,
+  comment = "#>", 
+  fig.width=8, fig.height=5)
+library(tidyverse)
+library(SRJPEdata)
+library(lubridate)
+library(kableExtra)
+
+colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                  "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
+                  "#F1BB7B", "#FD6467", "#5B1A18", # Grand Budapest 1 (-4)
+                  "#D8B70A", "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
+)
+#source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
+```
+
+The integrated JPE model forecast needs to account for the influence of flow on survival. Because we cannot forecast flow, we used weekly average and coefficient of variation (CV) of flow for wet and dry years in the historical data (averaged across same years and for the Sacramento mainstem, Butte River, and Feather River). 
+
+This article documents the process of generating the dataset that can be used to model the effect of flows on forecasted survival.
+
+## Filtering to relevant gages
+
+FlowWest used the data object `SRJPEdata::environmental_data` and filtered to include only those stations in the streams where we modeled survival: Butte River, Feather River, and the Sacramento Mainstem. The gages can be seen in Table 1.  
+
+
+*Table 1. Data sources of flow data for the forecasted survival covariates.*
+
+```{r}
+gages <- SRJPEdata::environmental_data |> 
+  filter(stream %in% c("butte creek", "sacramento river",
+                       "feather river"),
+         parameter == "flow") |> 
+  distinct(site_group, gage_agency, gage_number) |> 
+  mutate(site_group = case_when(site_group == "upper feather hfc" ~ "Upper Feather HFC",
+                                site_group == "upper feather lfc" ~ "Lower Feather LFC",
+                                TRUE ~ str_to_title(site_group))) |> 
+  select(`Site` = site_group, 
+         `Agency` = gage_agency,
+         `Gage ID` = gage_number)
+
+gages |>
+  kable() |> 
+  kable_classic(full_width = T)
+```
+
+## Preparing Covariates 
+
+The flow covariate to be used is the log-transformed peak flow for each week.
+
+### Note: NAs 
+
+#### Maximum flow values - NAs
+
+Flow data for all sites except Lower Feather River did not monitor for maximum flows. Table 2 shows the percentage of `NA` values for `maximum weekly flow` for each site group.
+
+*Table 2. Percentage of NA values by year for weekly maximum flow for all site groups*
+
+```{r}
+all_NAs <- SRJPEdata::environmental_data |> 
+  filter(stream %in% c("butte creek", "sacramento river",
+                       "feather river"),
+         parameter == "flow",
+         statistic == "max") |> 
+  group_by(stream, site_group, gage_agency, gage_number) |> 
+  summarise(
+    total_rows = n(),
+    na_rows = sum(is.na(value)),
+    pct_na = round((na_rows / total_rows) * 100)
+  ) |> 
+  ungroup() |> 
+  mutate(`Percent NA` = paste(pct_na, "%"),
+         `Gage ID` = paste(gage_agency, gage_number),
+         site_group = str_to_title(site_group)) |> 
+  select(`Site Group` = site_group,
+         `Gage ID`,
+         `Percent NA`)
+
+all_NAs |> 
+  kable() |> 
+  kable_classic()
+
+```
+
+
+#### Mean flow values - NAs
+
+All site groups except Lower Feather River recorded mean flows (Table 3):
+
+*Table 3. Percentage of NA values by year for weekly mean flow for all site groups*
+
+```{r}
+all_NAs_mean <- SRJPEdata::environmental_data |> 
+  filter(stream %in% c("butte creek", "sacramento river",
+                       "feather river"),
+         parameter == "flow",
+         statistic == "mean") |> 
+  group_by(stream, site_group, gage_agency, gage_number) |> 
+  summarise(
+    total_rows = n(),
+    na_rows = sum(is.na(value)),
+    pct_na = round((na_rows / total_rows) * 100)
+  ) |> 
+  ungroup() |> 
+  mutate(`Percent NA` = paste(pct_na, "%"),
+         `Gage ID` = paste(gage_agency, gage_number),
+         site_group = str_to_title(site_group)) |> 
+  select(`Site Group` = site_group,
+         `Gage ID`,
+         `Percent NA`)
+
+all_NAs_mean |> 
+  kable() |> 
+  kable_classic()
+
+```
+
+
+### Processing Steps
+
+Based on the NA values, we are going to use mean weekly flows for the time being.
+
+We prepare the covariates using the following steps: 
+
+- Convert the *mean* weekly flow to log-scale
+- Take the mean and sd of the log-scale *mean* weekly flow for each gage
+- Scale the value (center on 0) for each gage
+
+```{r}
+survival_forecast_covariates <- SRJPEdata::environmental_data |> 
+  filter(stream %in% c("butte creek", "sacramento river",
+                       "feather river"),
+         parameter == "flow",
+         statistic == "mean") |> 
+  # take the log
+  mutate(log_value = log(value)) |> 
+  group_by(stream, gage_number, gage_agency, site_group, week) |> 
+  # summary statistics
+  summarise(mean_weekly_log = mean(log_value, na.rm = T),
+            sd_weekly_log = sd(log_value, na.rm = T)) |> 
+  ungroup() |> 
+  select(stream, site_group, gage_agency, gage_number,
+         week,
+         weekly_mean_log_flow = mean_weekly_log,
+         weekly_sd_log_flow = sd_weekly_log) |> 
+  mutate(weekly_mean_log_flow = ifelse(is.nan(weekly_mean_log_flow), NA, weekly_mean_log_flow),
+         weekly_sd_log_flow = ifelse(is.na(weekly_sd_log_flow), NA, weekly_sd_log_flow))
+
+# std_log_value = as.vector(scale(log_value))
+```
+
+
+```{r}
+survival_forecast_covariates |> 
+  ggplot(aes(x = week, y = weekly_mean_log_flow, color = site_group)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Week",
+       y = "Mean of the weekly mean flow across years (cfs)",
+       title = "Survival forecast variables") +
+  theme(legend.position = "bottom")
+```
+### Combine and Save Covariate Data 
+
+These covariates datasets are combined into one table and saved as an export from the SRJPEdata package. This data can be accessed using `SRJPEdata::survival_forecast_covariates`.
+
+The first 10 rows of `SRJPEdata::survival_forecast_covariates` are shown below. 
+
+```{r}
+survival_forecast_covariates |> 
+  head(10) |> 
+  kable() |> 
+  kable_classic()
+```
+
+```{r}
+usethis::use_data(survival_forecast_covariates, overwrite = TRUE)
+```
+
