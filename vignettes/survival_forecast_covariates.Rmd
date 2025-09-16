@@ -162,10 +162,12 @@ survival_forecast_covariates <- SRJPEdata::environmental_data |>
                        "feather river"),
          parameter == "flow",
          statistic == "mean") |> 
-  #mutate(water_year = ifelse(week %in% c()))
-  left_join(water_year_data, by = c("year" = "WY")) |> 
+  mutate(date = ymd(paste(year, "01", "01")) + weeks(week - 1),
+         month = month(date),
+         water_year = ifelse(month %in% 10:12, year, year + 1)) |> 
+  left_join(water_year_data, by = c("water_year" = "WY")) |>
   # 2024 not in the dataset yet, but is AN
-  mutate(water_year_type = ifelse(year == 2024, "wet", water_year_type)) |> 
+  mutate(water_year_type = ifelse(year == 2024, "wet", water_year_type)) |>
   filter(!is.na(water_year_type)) |> 
   # take the log
   mutate(log_value = log(value)) |> 
