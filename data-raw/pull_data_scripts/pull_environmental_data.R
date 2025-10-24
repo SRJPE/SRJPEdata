@@ -557,7 +557,7 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
 # Define the required object names
 required_objects <- c("battle_creek_data_query", "butte_creek_data_query", "butte_creek_temp_query",
                       "clear_creek_data_query", "deer_creek_data_query", "deer_creek_temp_query",
-                      "feather_flow_raw", "feather_lfc_river_data_query", "lower_feather_river_data_query",
+                      "feather_flow", "feather_lfc_river_data_query", "lower_feather_river_data_query",
                       "feather_lfc_temp_query", "feather_hfc_temp_query", 
                       "mill_creek_data_query", "mill_creek_temp_query", 
                       "sac_river_data_query", "sac_river_temp_query",
@@ -667,7 +667,7 @@ kl_temp <- longer_updated_environmental_data |>
 environmental_data <- longer_updated_environmental_data |> 
   # remove knights landing temperature
   mutate(rm = ifelse(site_group == "knights landing" & parameter == "temperature", "remove","keep")) |> 
-  filter(rm != "remove") |> 
+  filter(rm != "remove" | is.na(rm)) |> 
   select(-rm) |> 
   # add on knights landing temperature where gaps have been filled in
   bind_rows(kl_temp)
