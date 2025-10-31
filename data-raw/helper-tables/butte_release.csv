@@ -1,7 +1,4 @@
 projectDescriptionID,releaseID,commonName,markedRun,markedLifeStage,markedFishOrigin,sourceOfFishSite,releaseSite,releaseSubSite,nReleased,releaseTime,testDays,appliedMarkType,appliedMarkColor,appliedMarkPosition,appliedMarkCode,includeAnalysis
-11,256,Chinook salmon,Spring,Juvenile,Natural,Parrott-Phelan canal trap box,Not applicable,,100.0,2021-01-06T13:48:05Z,7.0,Pigment / dye,Brown,Whole body,,Yes
-11,257,Chinook salmon,Spring,,Natural,,Not applicable,,100.0,2021-01-06T12:30:03Z,7.0,Pigment / dye,Brown,Whole body,,Yes
-11,258,Chinook salmon,Spring,,Natural,,Not applicable,,100.0,2021-10-12T13:59:49Z,7.0,Pigment / dye,Brown,Whole body,,No
 11,259,Not applicable (n/a),,,,,Not applicable,,,,,,,,,
 11,260,Not applicable (n/a),,,,,Not applicable,,,,,,,,,
 11,261,Chinook salmon,Spring,Juvenile,Natural,Parrot-Phelan RST,Parrott-Phelan e-test release site,,100.0,2021-01-06T12:30:03Z,6.0,Pigment / dye,Brown,Whole body,,Yes

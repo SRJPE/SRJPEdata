@@ -225,7 +225,7 @@ The table below shows a section of this table:
 ```{r, echo = FALSE}
 years_to_include_rst_data <- SRJPEdata::rst_catch |> 
   mutate(run_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
-  filter(run_year < year(Sys.Date())) |> 
+  filter(run_year <= year(Sys.Date())) |> 
   distinct(stream, site, run_year) |> 
   full_join(years_to_exclude_rst_data |> 
               select(run_year, stream, site) |> 
