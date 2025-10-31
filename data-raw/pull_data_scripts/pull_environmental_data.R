@@ -667,7 +667,7 @@ kl_temp <- longer_updated_environmental_data |>
 environmental_data <- longer_updated_environmental_data |> 
   # remove knights landing temperature
   mutate(rm = ifelse(site_group == "knights landing" & parameter == "temperature", "remove","keep")) |> 
-  filter(rm != "remove") |> 
+  filter(rm != "remove" | is.na(rm)) |> 
   select(-rm) |> 
   # add on knights landing temperature where gaps have been filled in
   bind_rows(kl_temp)

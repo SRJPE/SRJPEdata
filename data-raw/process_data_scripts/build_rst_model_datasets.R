@@ -116,6 +116,32 @@ weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
 # this dataset will be saved separately to retain the fork length and origin variables
+
+# Josh needs origin released but need to summarize it by week
+weekly_origin <- 
+  left_join(release, 
+            recaptures |> # need to summarize first so you don't get duplicated release data when joining
+              group_by(stream, site, release_id) |> 
+              summarize(count = sum(count, na.rm = T)),
+            by = c("release_id", "stream", "site")) |> 
+  mutate(week_released = week(date_released), 
+        year_released = year(date_released),
+        hatchery = ifelse(origin_released == "hatchery", 1, 0),
+        natural = ifelse(origin_released == "natural", 1, 0),
+        mixed = ifelse(origin_released == "mixed", 1, 0)) |> 
+  select(stream, site, week_released, year_released, hatchery, natural, mixed) |> 
+  group_by(stream, site, week_released, year_released) |> 
+  summarize(hatchery = sum(hatchery),
+            natural = sum(natural),
+            mixed = sum(mixed)) |> 
+  mutate(origin_released = case_when(mixed > 0 ~ "mixed",
+                                     hatchery == 0 & natural == 0 & mixed == 0 ~ NA,
+                                     hatchery > 0 & natural == 0 & mixed == 0 ~ "hatchery",
+                                     natural > 0 & hatchery == 0 & mixed == 0 ~ "natural",
+                                     is.na(hatchery) & is.na(natural) & is.na(mixed) ~ NA,
+                                     T ~ "mixed")) |> 
+  select(stream, site, week_released, year_released, origin_released)
+
 weekly_efficiency <- 
   left_join(release, 
             recaptures |> # need to summarize first so you don't get duplicated release data when joining
@@ -131,7 +157,7 @@ weekly_efficiency <-
             number_recaptured = sum(count, na.rm = TRUE),
             median_fork_length_released = median(median_fork_length_released, na.rm = T)) |> 
   ungroup() |> 
-  #rename(origin_released = origin) |> 
+  left_join(weekly_origin) |> 
   glimpse()
 
 # reformat flow data and summarize weekly

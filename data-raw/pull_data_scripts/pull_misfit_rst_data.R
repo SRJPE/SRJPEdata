@@ -87,32 +87,6 @@ butte_trap_edi <- trap_edi |>
          total_revolutions, discharge, water_velocity, water_temp, turbidity,
          include)
 
-# Battle & Clear ----------------------------------------------------------
-
-# TODO insert code to grab most recent version
-recapture_edi <- pull_edi("1509", 3, 2)
-
-battle_clear_recapture_edi <- recapture_edi |> 
-  mutate(stream = case_when(grepl("clear creek", site) ~ "clear creek",
-                            grepl("battle creek", site) ~ "battle creek"),
-         site_group = stream,
-         dead = NA,
-         species = "chinook",
-         site = case_when(site == "lower battle creek" ~ "lbc",
-                          site == "upper battle creek" ~ "ubc",
-                          site == "lower clear creek" ~ "lcc",
-                          site == "upper clear creek" ~ "ucc"),
-         subsite = site,
-         life_stage = NA,
-         weight = NA) |> 
-  rename(date = date_recaptured,
-         run = fws_run,
-         adipose_clipped = hatchery_origin,
-         count = number_recaptured,
-         fork_length = median_fork_length_recaptured) |> 
-  select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
-         dead, fork_length, weight, species)
-
 # Knights Landing ---------------------------------------------------------
 
 # As of July 2025, pre 2004 data are not on EDI. The goal would be to add those data

@@ -178,13 +178,12 @@ We check this list against our original method annually after it is run to confi
 #### Years to Exclude Table 
 
 ```{r, echo = FALSE}
-years_to_exclude_rst_data <- SRJPEdata::years_to_exclude_rst_data |> 
-  bind_rows(years_exclude_rst_csv) |> 
+years_to_exclude_rst_data <- years_exclude_rst_csv |> 
   distinct()
 
 # Automatic exclusion criteria to be applied to most recent year
 if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 
-  max_old_year <- max(years_to_exclude_rst_data$year)
+  max_old_year <- max(years_to_exclude_rst_data$run_year)
   # Consider thinking about adding subsites together, right now it looks like subsites are fished equally
   new_years_to_exclude <- SRJPEdata::rst_trap |> 
     mutate(week = ifelse(is.na(trap_stop_date), week(trap_start_date), week(trap_stop_date)),
@@ -201,7 +200,7 @@ if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at 
            exclusion_type = "automatic", 
            reason_for_exclusion = "less than 75% of weeks sampled") |> 
     filter(exclude) |> 
-    select(stream, site, year = monitoring_year, exclusion_type, reason_for_exclusion) 
+    select(stream, site, run_year = monitoring_year, exclusion_type, reason_for_exclusion) 
   years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
 }  
 
@@ -226,7 +225,7 @@ The table below shows a section of this table:
 ```{r, echo = FALSE}
 years_to_include_rst_data <- SRJPEdata::rst_catch |> 
   mutate(run_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
-  filter(run_year < year(Sys.Date())) |> 
+  filter(run_year <= year(Sys.Date())) |> 
   distinct(stream, site, run_year) |> 
   full_join(years_to_exclude_rst_data |> 
               select(run_year, stream, site) |> 
