@@ -23,13 +23,13 @@ pull_edi <- function(id, index, version) {
 
 # Butte -------------------------------------------------------------------
 
-# Using version 14 because this is the most up to date version before transitioning
-# to zip file which is more difficult to load in. We are pulling pre 2015 data
-# so it is OK to use an outdated version.
+# Using version 28 because this is the most up to date version at the time.
+# We are only pulling pre 2015 data. We save the catch and trap in the helper
+# tables.
 
 # Note there are no release/recapture data prior to 2015 so do not need to pull
-catch_edi <- pull_edi("1497", 1, 14)
-trap_edi <- pull_edi("1497", 4, 14)
+catch_edi <- read_csv(here::here("data-raw","helper-tables","butte_catch.csv"))
+trap_edi <- read_csv(here::here("data-raw","helper-tables","butte_trap.csv"))
 
 butte_catch_edi <- catch_edi |> 
   mutate(commonName = tolower(commonName)) |> 
@@ -87,6 +87,75 @@ butte_trap_edi <- trap_edi |>
          total_revolutions, discharge, water_velocity, water_temp, turbidity,
          include)
 
+# Battle & Clear ----------------------------------------------------------
+# We are unable to load the recapture dataset into the db because it does not
+# have a unique identifier
+
+# TODO insert code to grab most recent version
+recapture_edi <- pull_edi("1509", 3, 2)
+
+battle_clear_recapture_edi <- recapture_edi |> 
+  mutate(stream = case_when(grepl("clear creek", site) ~ "clear creek",
+                            grepl("battle creek", site) ~ "battle creek"),
+         site_group = stream,
+         dead = NA,
+         species = "chinook",
+         site = case_when(site == "lower battle creek" ~ "lbc",
+                          site == "upper battle creek" ~ "ubc",
+                          site == "lower clear creek" ~ "lcc",
+                          site == "upper clear creek" ~ "ucc"),
+         subsite = site,
+         life_stage = NA,
+         weight = NA) |> 
+  rename(date = date_recaptured,
+         run = fws_run,
+         adipose_clipped = hatchery_origin,
+         count = number_recaptured,
+         fork_length = median_fork_length_recaptured) |> 
+  select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
+         dead, fork_length, weight, species)
+
+
+# Deer & Mill -------------------------------------------------------------
+catch_edi <- pull_edi("1504", 1, 3)
+recapture_edi <- pull_edi("1504", 2, 3)
+release_edi <- pull_edi("1504", 3, 3)
+trap_edi <- pull_edi("1504", 4, 3)
+
+deer_mill_catch_edi <- catch_edi |> 
+  rename(life_stage = lifestage) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream)
+
+deer_mill_trap_edi <- trap_edi |> 
+  rename(trap_stop_date = date,
+         rpm_start = rpm_before,
+         rpm_end = rpm_after,
+         water_temp = water_temperature) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream) |> 
+  select(trap_stop_date, stream, site, subsite, site_group, turbidity, water_temp, rpm_start, rpm_end)
+
+deer_mill_release_edi <- release_edi |> 
+  rename(date_released = release_date,
+         origin = release_origin) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream) |> 
+  select(date_released, release_id, stream, site, subsite, site_group, number_released, origin)
+
+deer_mill_recapture_edi <- recapture_edi |> 
+  rename(date = recapture_date,
+         count = total_recaptured) |> 
+  mutate(site = stream,
+         subsite = site,
+         site_group = stream,
+         fork_length = mean_fl_recaptured,
+         date = case_when(year(date) == 2032 ~ as_date(paste0("2023-",month(date), "-", day(date))),
+                          T ~ date)) |> 
+  select(date, release_id, stream, site, subsite, site_group, count, fork_length)
 # Knights Landing ---------------------------------------------------------
 
 # As of July 2025, pre 2004 data are not on EDI. The goal would be to add those data
@@ -203,14 +272,18 @@ yuba_trap_edi <- trap_edi |>
 # Combine -----------------------------------------------------------------
 
 edi_catch <- bind_rows(butte_catch_edi,
+                       deer_mill_catch_edi,
                        knl_catch_standard,
                        yuba_catch_edi) |> 
   mutate(actual_count = as.logical(actual_count))
 edi_recapture <- bind_rows(battle_clear_recapture_edi,
+                           deer_mill_recapture_edi,
                            knl_recapture_standard)
-edi_release <- bind_rows(knl_release_standard)
+edi_release <- bind_rows(knl_release_standard,
+                         deer_mill_release_edi)
 edi_trap <- bind_rows(butte_trap_edi |> 
                         mutate(include = ifelse(include == "Yes", T, F)),
+                      deer_mill_trap_edi,
                       knl_trap_standard,
                       yuba_trap_edi |> 
                         mutate(include = ifelse(include == "Yes", T, F))) |> 

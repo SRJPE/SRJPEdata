@@ -17,6 +17,7 @@ rst_catch_prep <- bind_rows(rst_catch, rst_catch_query_pilot, edi_catch) |>
          life_stage = ifelse(is.na(life_stage), "not recorded", life_stage),
          subsite = case_when(site == "okie dam" & is.na(subsite) ~ "okie dam 1", # fix missing subsites
                              is.na(subsite) ~ site,
+                             subsite == "yub" ~ "hal", # we made the decision to include these historical ones as halwood
                              T ~ subsite)) |> 
   glimpse()
 
