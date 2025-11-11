@@ -30,11 +30,11 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
   current_site_year <- sort(current_site_year_raw$site_year)
   chosen_site_year_raw <- years_to_include_rst_data |> 
     mutate(site_year = paste0(site, "-", run_year)) |> 
-    filter(!site_year %in% c("live oak-2002", "steep riffle-2015")) |> 
-    filter(!(run_year == 2025)) # make sure to remove this next year!
+    filter(!site_year %in% c("live oak-2002", "steep riffle-2015"))
   chosen_site_year <- sort(chosen_site_year_raw$site_year)
   expect_equal(current_site_year, chosen_site_year)
 })
+
 
 # no missing values when there is catch data (even if catch is 0)
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
@@ -103,7 +103,7 @@ test_that("there is no -Inf values (hours fished...ect) when there is catch data
 # test that there is data for each site week combo
 test_that("test that there is data for each site week combo", {
   # check that there is data for each site week combo
-  rst_all_weeks <- SRJPEdata::rst_catch |> 
+  rst_all_weeks <- rst_catch |> 
     group_by(stream, site, subsite) |> 
     summarise(min = min(date),
               max = max(date)) |> 
@@ -117,7 +117,7 @@ test_that("test that there is data for each site week combo", {
            year = year(date)) |> 
     distinct(stream, site, year, week) |> 
     mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
-    left_join(SRJPEdata::years_to_include_rst_data |> # need to make sure to filter out years that have been excluded
+    left_join(years_to_include_rst_data |> # need to make sure to filter out years that have been excluded
                 mutate(include = T)) |> 
     filter(include == T) |> 
     select(-include) |> 
@@ -126,10 +126,9 @@ test_that("test that there is data for each site week combo", {
            run_year == 2002 & week %in% 1:2 & site == "herringer riffle" ~ "remove",# few weeks where live oak used for herringer
            run_year == 2002 & week %in% 3:44 & site == "live oak" ~ "remove",
            T ~ "keep")) |> 
-    filter(feather_multisite_filter == "keep") |> 
-    filter(run_year != 2025) # TODO remove once we want to include 2025 data
+    filter(feather_multisite_filter == "keep") 
   
-  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+  catch <- weekly_juvenile_abundance_catch_data |> 
     dplyr::select(stream, site, year, week, run_year) |> distinct()
   
   all_weeks_n_rows <- nrow(rst_all_weeks)
