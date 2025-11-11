@@ -54,8 +54,7 @@ rst_all_weeks <- rst_catch |>
   mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
   left_join(years_to_include_rst_data) |> # need to make sure to filter out years that have been excluded
   filter(include == T) |> 
-  select(-include) |> 
-  filter(run_year != 2025) # TODO remove once we want to include 2025 data
+  select(-include)
 
 # Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
 ### ----------------------------------------------------------------------------

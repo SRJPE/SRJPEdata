@@ -13,7 +13,7 @@ test_that("years_to_include_rst_data includes all sites", {
   # TODO confirm that we do not want adams dam in there at all
   expected_coverage <- c("deer creek", "eye riffle", "gateway riffle", 
                          "hallwood", "herringer riffle", "knights landing", "lbc", 
-                         "lcc", "live oak", "mill creek", "okie dam", 
+                         "lcc", "live oak", "mill creek", "okie dam",
                         "steep riffle", "sunset pumps", 
                          "tisdale", "ubc", "ucc")
   expect_equal(current_coverage, expected_coverage)
