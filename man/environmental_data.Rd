@@ -16,12 +16,108 @@
 \item \code{parameter}: Parameter measured, includes "flow" and "temperature"
 \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 }
-@source USGS/CDEC/FWS. See \code{data-raw/pull_environmental_data.R} for more details.
+#' @details
+Gage Information
+\strong Deer creek
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1986 - 2025
+\item USGS - 11383500
+\item CDEC - DCV
+}
+\itemize{Temperature gages - Temporal coverage: 1998 - 2025
+\item CDEC - DCV
+}
+}
+\strong Sacramento River
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1994 - 2025
+\item USGS - 11383500
+\item USGS - 11377100
+}
+\itemize{Temperature gages - Temporal coverage: 1994 - 2023
+\item USGS - 11383500
+}
+}
+\strong Battle Creek
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1995 - 2025
+\item USGS - 11376550
+\item USFWS - UBC
+}
+\itemize{Temperature gages  - Temporal coverage: 2003 - 2021
+\item USFWS - UBC
+}
+}
+\strong Butte Creek
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1930 - 2025
+\item USGS - 11376550
+\item USGS - BCK
+}
+}
+\strong Clear Creek
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1995 - 2025
+\item USFWS - UCC
+\item USGS - 11372000
+\item USFWS - LCC
+}
+\itemize{Temperature gages - Temporal coverage: 2001 - 2021
+\item USFWS - UCC
+\item USFWS - LCC
+}
+}
+\strong Mill Creek
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1995 - 2025
+\item USGS - 11381500
+\item CDEC - MLM
+}
+\itemize{Temperature gages - Temporal coverage: 1998 - 2025
+\item CDEC - MLM
+}
+}
+\strong Feather River
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1969 - 2025
+\item USGS - 11407000
+\item CDEC - TFB
+\item CDEC - GRL
+\item CDEC - FSB
+\item CDEC - FRA
+\item interpolated
+}
+\itemize{Temperature gages - Temporal coverage: 1999 - 2025
+\item CDEC - GRL
+\item CDEC - FRA
+\item interpolated
+}
+}
+\strong Yuba River
+\itemize{
+\itemize{Flow gages - Temporal coverage: 1999 - 2025
+\item USGS - 11421000
+\item CDEC - YR7
+\item interpolated
+}
+\itemize{Temperature gages - Temporal coverage: 1998 - 2025
+\item CDEC - YR7
+\item interpolated
+}
+}
+}
+\source{
+USGS/CDEC/FWS. See \code{data-raw/pull_environmental_data.R} for more details.
 }
 \usage{
 environmental_data
 }
 \description{
 Environmental gage data for each tributary in the SR JPE.
+Data includes flow and temperature measurements from gages located on tributaries and the Sacramento River mainstem.
+Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type.
+Interpolation was performed to fill in data gaps where temperature data were missing or the time series was incomplete.
+For the Feather River and Yuba River, temperature values were interpolated using regression models based on nearby gages and historical data, allowing for consistent estimation across incomplete records.
+The temporal coverage of flow data ranges from 1930 to 2025, and temperature data ranges from 1994 to 2025.
 }
 \keyword{datasets}
