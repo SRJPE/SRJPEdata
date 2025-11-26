@@ -35,7 +35,7 @@
       <a href="articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
     <li>
-      <a href="articles/lifestage_ruleset.html">Lifestage Rulesets</a>
+      <a href="articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
       <a href="articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
@@ -81,10 +81,10 @@
     </div>
 
 
-<p>This vignette focuses on developing covariates that could be used in forecast or scenario SR JPE models. We build upon prior work that identified and tested covariates using historical data, and transition to how those covariates are adapted for use in forecast or scenario scenarios.</p>
+<p>This vignette focuses on developing covariates that could be used in forecast or scenario SR JPE models. We build upon prior work that identified and tested covariates using historical data, and transition to how those covariates could be adapted for use in forecast or scenario scenarios. These covariates have not been implemented and represent one proposal for forecast covariates.</p>
 <div class="section level2">
 <h2 id="process-for-developing-forecast-covariates">Process for developing forecast covariates<a class="anchor" aria-label="anchor" href="#process-for-developing-forecast-covariates"></a></h2>
-<p>The diagram outlines the process for developing covariates for forecast and scenario models.</p>
+<p>The diagram outlines the process for developing proposed covariates for forecast and scenario models.</p>
 <p>Some covariates were selected and evaluated based on literature review and expert input, followed by testing with historical data using leave-one-out (LOO) analysis.</p>
 <p>As we transition to forecast and scenario model application, we need to find out if the data for a given covariate will be available at the time of forecasting. If yes, the covariate will be included in the forecast model using the same structure as the historical covariate. If the answer is no, meaning the covariate data will not be available during the forecaste period, then two strategies are considered:</p>
 <ol style="list-style-type: decimal"><li><p>Use continuous forecast data, if available</p></li>
@@ -94,25 +94,25 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="covariates-included-in-forecast-models">Covariates included in forecast models<a class="anchor" aria-label="anchor" href="#covariates-included-in-forecast-models"></a></h2>
+<h2 id="proposed-covariates-included-in-forecast-models">Proposed covariates included in forecast models<a class="anchor" aria-label="anchor" href="#proposed-covariates-included-in-forecast-models"></a></h2>
 <table class="table"><caption>Covariate Descriptions</caption>
-<colgroup><col width="7%"><col width="92%"></colgroup><thead><tr class="header"><th align="left">name</th>
+<colgroup><col width="7%"><col width="92%"></colgroup><thead><tr><th align="left">name</th>
 <th align="left">description</th>
-</tr></thead><tbody><tr class="odd"><td align="left">spawning/incubation minimum flow</td>
+</tr></thead><tbody><tr><td align="left">spawning/incubation minimum flow</td>
 <td align="left">Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the minimum. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.</td>
-</tr><tr class="even"><td align="left">spawning/incubation maximum flow</td>
+</tr><tr><td align="left">spawning/incubation maximum flow</td>
 <td align="left">Use daily max flows for the spawning/incubation time period (Aug-Dec) and then calculate the maximum. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.</td>
-</tr><tr class="odd"><td align="left">spawning/incubation maximum temperature</td>
+</tr><tr><td align="left">spawning/incubation maximum temperature</td>
 <td align="left">Summarizes the weekly maximum temperature for each stream (meaning it finds the max across all sites/subsites) within the spawning period. Note that the Sacramento River temperature data does not currently include a daily maximum so the weekly max is the max of the mean. An annual value is calculated by taking the max of the weekly max. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.</td>
-</tr><tr class="even"><td align="left">above 13C threshold</td>
+</tr><tr><td align="left">above 13C threshold</td>
 <td align="left">This covariate is defined as the week of the year when the 7DADM is above 13C. Data are filtered to Mar-Dec because this is the time period where spring run are in the tributaries and may be experiencing temperature stress. Note, we currently do not have max daily temperatures for the Sacramento so mainstem is not included. This variable is available for all 4 time periods and would be the same because we are using data from the previous Aug-Dec.</td>
-</tr><tr class="odd"><td align="left">3-category water year type</td>
+</tr><tr><td align="left">3-category water year type</td>
 <td align="left">Use water year type from CDEC for the Sacramento Valley and aggregate into 3 categories: C, D/BN/AN, W. This is a scenario based covariate meaning we do not need any data for the forecast. All 3 categories would be run for the forecast.</td>
-</tr><tr class="even"><td align="left">3-category flow exceedance year type</td>
+</tr><tr><td align="left">3-category flow exceedance year type</td>
 <td align="left">Use the flow exceedance methodology provided by the CDFW Instream Flow team (find mean annual flow by water year for each stream and rank the water years where the top 33% are wet, middle are average, bottom are dry) to categorize years for each stream into 3 categories: wet, average, dry</td>
-</tr><tr class="odd"><td align="left">monthly reservoir storage</td>
+</tr><tr><td align="left">monthly reservoir storage</td>
 <td align="left">Using reservoir storage data, calculate the monthly max storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)</td>
-</tr><tr class="even"><td align="left">monthly peak flow</td>
+</tr><tr><td align="left">monthly peak flow</td>
 <td align="left">Calculate the peak flow for each watershed and month. This would be different based on JPE date</td>
 </tr></tbody></table><p><em>Note that this covariate list will be iteratively updated and improved</em></p>
 </div>
@@ -139,10 +139,18 @@
 <div class="section level4">
 <h4 id="reservoir-storage">Reservoir storage<a class="anchor" aria-label="anchor" href="#reservoir-storage"></a></h4>
 <ul><li>
-<strong>monthly reservoir storage</strong>: Using reservoir storage data, calculate the monthly average storage. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec). This data contains monthly reservoir storage volumes (acre-feet) for Keswick Reservoir (KES), retrieved from the California Data Exchange Center (CDEC) operated by the California Department of Water Resources (DWR). The earliest data available is in 1965. Stream is NA because it applies to all streams and should not be joined on stream.</li>
-</ul><p>Plot the last 10 years - note that data have been filtered to Dec-Mar for use in JPE forecasting</p>
+<strong>monthly reservoir storage</strong>: Using reservoir storage data, calculate the monthly average storage for Keswick Reservoir and Shasta Reservoir. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec). This data contains monthly reservoir storage volumes (acre-feet) for Keswick Reservoir (KES), retrieved from the California Data Exchange Center (CDEC) operated by the California Department of Water Resources (DWR) and Shasta Reservoir USGS (11370000).</li>
+</ul><p>For Keswick - the earliest data available is in 1965. Stream is NA because it applies to all streams and should not be joined on stream.</p>
+<p>For Shasta - the earliest data available is in <em>TODO</em> Stream is NA because it applies to all streams and should not be joined on stream.</p>
+<p><strong>Keswick Reservoir (KES)</strong></p>
+<p>Plot the last 10 years - note that data have been filtered to Dec-Mar for use in JPE forecasting</p>
 <div class="float">
 <img src="figure/unnamed-chunk-6-1.png" alt="plot of chunk unnamed-chunk-6"><div class="figcaption">plot of chunk unnamed-chunk-6</div>
+</div>
+<p><strong>Shasta Reservoir (11370000)</strong></p>
+<p>Plot the last 10 years - note that data have been filtered to Dec-Mar for use in JPE forecasting</p>
+<div class="float">
+<img src="figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8"><div class="figcaption">plot of chunk unnamed-chunk-8</div>
 </div>
 </div>
 <div class="section level4">
@@ -151,7 +159,7 @@
 <strong>monthly peak flow</strong>: Calculate the peak flow for each watershed and month. This would be different based on JPE date. Takes the mean daily flow and finds the max for each month, year, and stream.</li>
 </ul><p>Plot the last 10 years</p>
 <div class="float">
-<img src="figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8"><div class="figcaption">plot of chunk unnamed-chunk-8</div>
+<img src="figure/unnamed-chunk-10-1.png" alt="plot of chunk unnamed-chunk-10"><div class="figcaption">plot of chunk unnamed-chunk-10</div>
 </div>
 </div>
 </div>
@@ -161,7 +169,7 @@
 <h4 id="id_3-category-water-year-type">3-category water year type<a class="anchor" aria-label="anchor" href="#id_3-category-water-year-type"></a></h4>
 <ul><li>This dataset provides annual Chronological Reconstructed Sacramento and San Joaquin Valley Water Year Hydrologic Classification Indices Based on measured unimpaired runoff (in million acre-feet). It was retrieved from the California Open Data Portal</li>
 </ul><div class="float">
-<img src="figure/unnamed-chunk-10-1.png" alt="plot of chunk unnamed-chunk-10"><div class="figcaption">plot of chunk unnamed-chunk-10</div>
+<img src="figure/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"><div class="figcaption">plot of chunk unnamed-chunk-12</div>
 </div>
 </div>
 <div class="section level4">
@@ -173,97 +181,97 @@
 <li>Dry: Bottom 33%</li>
 </ul></li>
 </ul><div class="float">
-<img src="figure/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"><div class="figcaption">plot of chunk unnamed-chunk-12</div>
+<img src="figure/unnamed-chunk-14-1.png" alt="plot of chunk unnamed-chunk-14"><div class="figcaption">plot of chunk unnamed-chunk-14</div>
 </div>
 </div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="combine-and-save-data">Combine and save data<a class="anchor" aria-label="anchor" href="#combine-and-save-data"></a></h2>
-<pre><code><span><span class="co">#&gt; Rows: 5,596</span></span>
+<pre><code><span><span class="co">#&gt; Rows: 6,084</span></span>
 <span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ name       &lt;chr&gt; "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min…</span></span>
-<span><span class="co">#&gt; $ year       &lt;dbl&gt; 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995, 1995, 1995, 1995, 1995, 1996, 1996, 1996, 1996, 1996, 1997, 1997, 1997, 1997, 1997…</span></span>
-<span><span class="co">#&gt; $ water_year &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span>
-<span><span class="co">#&gt; $ stream     &lt;chr&gt; "deer creek", "deer creek", "deer creek", "deer creek", "deer creek", "deer creek", "deer creek", "deer creek", "deer creek", "battle creek", …</span></span>
-<span><span class="co">#&gt; $ value      &lt;dbl&gt; 108, 75, 67, 76, 60, 58, 57, 89, 61, 273, 79, 66, 115, 121, 246, 92, 52, 107, 98, 235, 113, 55, 92, 602, 110, 415, 166, 50, 129, 602, 139, 296…</span></span>
-<span><span class="co">#&gt; $ month      &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span>
-<span><span class="co">#&gt; $ text_value &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span></code></pre>
-<table class="table"><thead><tr class="header"><th align="left">name</th>
+<span><span class="co">#&gt; $ name       &lt;chr&gt; "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "…</span></span>
+<span><span class="co">#&gt; $ year       &lt;dbl&gt; 1930, 1931, 1932, 1933, 1934, 1935, 1936, 1937, 1938, 1939, 1940, 1941, 1942, 1943, 1944, 1945, 1946, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1…</span></span>
+<span><span class="co">#&gt; $ water_year &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
+<span><span class="co">#&gt; $ stream     &lt;chr&gt; "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "…</span></span>
+<span><span class="co">#&gt; $ value      &lt;dbl&gt; 81, 44, 70, 63, 64, 62, 80, 84, 102, 60, 101, 124, 113, 90, 87, 96, 76, 66, 100, 60, 98, 95, 94, 100, 97, 90, 127, 121, 116, 74, 86, 61, 94, 123, 99, 98, 65, 84, 78, 93, 90, 84, 78,…</span></span>
+<span><span class="co">#&gt; $ month      &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span>
+<span><span class="co">#&gt; $ text_value &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…</span></span></code></pre>
+<table class="table"><thead><tr><th align="left">name</th>
 <th align="right">year</th>
 <th align="right">water_year</th>
 <th align="left">stream</th>
 <th align="right">value</th>
 <th align="right">month</th>
 <th align="left">text_value</th>
-</tr></thead><tbody><tr class="odd"><td align="left">si_min_flow</td>
-<td align="right">1986</td>
+</tr></thead><tbody><tr><td align="left">si_min_flow</td>
+<td align="right">1930</td>
 <td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">108</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-</tr><tr class="even"><td align="left">si_min_flow</td>
-<td align="right">1987</td>
-<td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">75</td>
+<td align="left">butte creek</td>
+<td align="right">81</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
-</tr><tr class="odd"><td align="left">si_min_flow</td>
-<td align="right">1988</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1931</td>
 <td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">67</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-</tr><tr class="even"><td align="left">si_min_flow</td>
-<td align="right">1989</td>
-<td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">76</td>
+<td align="left">butte creek</td>
+<td align="right">44</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
-</tr><tr class="odd"><td align="left">si_min_flow</td>
-<td align="right">1990</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1932</td>
 <td align="right">NA</td>
-<td align="left">deer creek</td>
+<td align="left">butte creek</td>
+<td align="right">70</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1933</td>
+<td align="right">NA</td>
+<td align="left">butte creek</td>
+<td align="right">63</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1934</td>
+<td align="right">NA</td>
+<td align="left">butte creek</td>
+<td align="right">64</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1935</td>
+<td align="right">NA</td>
+<td align="left">butte creek</td>
+<td align="right">62</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1936</td>
+<td align="right">NA</td>
+<td align="left">butte creek</td>
+<td align="right">80</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1937</td>
+<td align="right">NA</td>
+<td align="left">butte creek</td>
+<td align="right">84</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1938</td>
+<td align="right">NA</td>
+<td align="left">butte creek</td>
+<td align="right">102</td>
+<td align="right">NA</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">si_min_flow</td>
+<td align="right">1939</td>
+<td align="right">NA</td>
+<td align="left">butte creek</td>
 <td align="right">60</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-</tr><tr class="even"><td align="left">si_min_flow</td>
-<td align="right">1991</td>
-<td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">58</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-</tr><tr class="odd"><td align="left">si_min_flow</td>
-<td align="right">1992</td>
-<td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">57</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-</tr><tr class="even"><td align="left">si_min_flow</td>
-<td align="right">1993</td>
-<td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">89</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-</tr><tr class="odd"><td align="left">si_min_flow</td>
-<td align="right">1994</td>
-<td align="right">NA</td>
-<td align="left">deer creek</td>
-<td align="right">61</td>
-<td align="right">NA</td>
-<td align="left">NA</td>
-</tr><tr class="even"><td align="left">si_min_flow</td>
-<td align="right">1995</td>
-<td align="right">NA</td>
-<td align="left">battle creek</td>
-<td align="right">273</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
 </tr></tbody></table></div>
@@ -284,7 +292,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

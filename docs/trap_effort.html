@@ -35,7 +35,7 @@
       <a href="articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
     <li>
-      <a href="articles/lifestage_ruleset.html">Lifestage Rulesets</a>
+      <a href="articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
       <a href="articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
@@ -91,10 +91,46 @@
 <li>Use start time only</li>
 </ol><p>Over time locations have required different methods based on what information is available. For example, historically it was more common that a location might only have one date. However, currently all locations collect both a start and stop datetime. We have therefore adapted method 1 to use in all cases noting that historically when a start or stop date is missing we would apply method 3 and use the last stop time for a missing start date or the next start time for a missing stop date.</p>
 <p>Below is the code for each of the methods described above:</p>
-<ol style="list-style-type: decimal"><li><p>If the start and stop date/time of the sampling period are available, simply subtract the difference in time. There are some cases where start or stop might be missing. In those cases, we use the last stop time for a missing start date or the next start time for a missing stop date.</p></li>
-<li><p>If the RPMs start, RPMs end, and total revolutions are available, take the average cone RPMs and divide <code>total_revolutions</code>/average RMP/60 to get total hours fished.</p></li>
-<li><p>If only one date is available, assume that the end date is the date sampled on the following day.</p></li>
-</ol><div class="section level3">
+<ol style="list-style-type: decimal"><li>If the start and stop date/time of the sampling period are available, simply subtract the difference in time. There are some cases where start or stop might be missing. In those cases, we use the last stop time for a missing start date or the next start time for a missing stop date.</li>
+</ol><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># calculating hours fished when have start and stop datetime</span></span>
+<span><span class="va">hours_fished</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">dat</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>trap_start_time <span class="op">=</span> <span class="fu">as_hms</span><span class="op">(</span><span class="va">trap_start_date</span><span class="op">)</span>, <span class="co"># pull out hms from date</span></span>
+<span>           trap_stop_time <span class="op">=</span> <span class="fu">as_hms</span><span class="op">(</span><span class="va">trap_stop_date</span><span class="op">)</span>, <span class="co"># pull out hms from date</span></span>
+<span>           start_datetime <span class="op">=</span> <span class="fu">ymd_hms</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">as_date</span><span class="op">(</span><span class="va">trap_start_date</span><span class="op">)</span>, <span class="va">trap_start_time</span><span class="op">)</span><span class="op">)</span>, <span class="co"># fills in 00:00:00 for those without time originally</span></span>
+<span>           stop_datetime <span class="op">=</span> <span class="fu">ymd_hms</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">as_date</span><span class="op">(</span><span class="va">trap_stop_date</span><span class="op">)</span>, <span class="va">trap_stop_time</span><span class="op">)</span><span class="op">)</span>,  <span class="co"># fills in 00:00:00 for those without time originally</span></span>
+<span>           start_datetime <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">start_datetime</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">stop_datetime</span><span class="op">)</span>, </span>
+<span>                                      <span class="cn">T</span> <span class="op">~</span> <span class="va">start_datetime</span><span class="op">)</span>, <span class="co"># assigns next stop for missing start</span></span>
+<span>           stop_datetime <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">stop_datetime</span><span class="op">)</span> <span class="op">~</span> <span class="fu">lead</span><span class="op">(</span><span class="va">start_datetime</span><span class="op">)</span>, </span>
+<span>                                     <span class="cn">T</span> <span class="op">~</span> <span class="va">stop_datetime</span><span class="op">)</span>, <span class="co"># assigns next start time for missing stop</span></span>
+<span>           hours_fished <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">difftime</a></span><span class="op">(</span><span class="va">stop_datetime</span>, <span class="va">start_datetime</span>, units <span class="op">=</span> <span class="st">"hours"</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<ol start="2" style="list-style-type: decimal"><li>If the RPMs start, RPMs end, and total revolutions are available, take the average cone RPMs and divide <code>total_revolutions</code>/average RMP/60 to get total hours fished.</li>
+</ol><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># calculating hours fished when have start and stop datetime</span></span>
+<span><span class="va">revolution_calculated_hours_fished</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="va">dat</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">rpm_start</span><span class="op">)</span> <span class="op">|</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">rpm_end</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">total_revolutions</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>prior_day_rpm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">rpm_end</span><span class="op">)</span>, <span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/stats/lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">rpm_end</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>           sum_rpms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">prior_day_rpm</span><span class="op">)</span>, <span class="va">rpm_start</span>, <span class="va">rpm_start</span> <span class="op">+</span> <span class="va">prior_day_rpm</span><span class="op">)</span>, </span>
+<span>           cone_rpms <span class="op">=</span> <span class="va">sum_rpms</span> <span class="op">/</span> <span class="fl">2</span>,</span>
+<span>           hours_fished <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">rpm_start</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">total_revolutions</span><span class="op">/</span><span class="va">rpm_end</span><span class="op">/</span><span class="fl">60</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>                                    <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">rpm_end</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">total_revolutions</span><span class="op">/</span><span class="va">rpm_start</span><span class="op">/</span><span class="fl">60</span>, <span class="fl">2</span><span class="op">)</span>, </span>
+<span>                                    <span class="cn">TRUE</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">total_revolutions</span><span class="op">/</span><span class="va">cone_rpms</span><span class="op">/</span><span class="fl">60</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<ol start="3" style="list-style-type: decimal"><li>If only one date is available, assume that the end date is the date sampled on the following day.</li>
+</ol><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># calculating hours fished when have only date and time</span></span>
+<span><span class="va">hours_fished_one_date</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">dat</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="va">site</span>, <span class="va">subsite</span>, <span class="va">start_datetime</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>end_datetime <span class="op">=</span> <span class="fu">lead</span><span class="op">(</span><span class="va">start_datetime</span><span class="op">)</span>,</span>
+<span>         end_datetime <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">difftime</a></span><span class="op">(</span><span class="va">end_datetime</span>, <span class="va">start_datetime</span>, units <span class="op">=</span> <span class="st">"hours"</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">120</span> <span class="op">~</span> <span class="va">start_datetime</span> <span class="op">+</span> <span class="fu">hours</span><span class="op">(</span><span class="fl">24</span><span class="op">)</span>, </span>
+<span>                                  <span class="cn">T</span> <span class="op">~</span> <span class="va">end_datetime</span><span class="op">)</span>,</span>
+<span>         hours_fished <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">difftime</a></span><span class="op">(</span><span class="va">end_datetime</span>, <span class="va">start_datetime</span>, units <span class="op">=</span> <span class="st">"hours"</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="section level3">
 <h3 id="other-assumptions">Other Assumptions<a class="anchor" aria-label="anchor" href="#other-assumptions"></a></h3>
 <p>Based on protocols and information from monitoring programs, sampling periods are typically 24 hours, unless flows are very high in which traps are checked more frequently. Calculating hours fished based on time and date provided in data provides more specificity, however, there are typos and errors resulting in nonsensical hours fished. In these cases, we assume 24 hour sampling periods.</p>
 <ul><li>If only a date is available and no time, assume 24 hour sampling periods for each date.</li>
@@ -104,48 +140,48 @@
 <div class="section level2 tabset">
 <h2 class="tabset" id="hours-fished">Hours Fished<a class="anchor" aria-label="anchor" href="#hours-fished"></a></h2>
 <p>We now process all locations together using a combination of method 1 and 3. All locations currently have both a start and stop date though this was not the case historically. There are cases when start date or stop date is NA. For these we fill in the start date assuming it is the sample date of the previous record. When the stop date is missing we assume it is the start date of the next record. Note that there are some records with 0 hours. These occur because trap visit data was entered when the trap was not in service and then a new trap visit entry was recorded once the trap started working again. There are some erroneous values. These will be addressed at the end of the script by setting limits.</p>
-<table class="table"><colgroup><col width="17%"><col width="17%"><col width="8%"><col width="8%"><col width="10%"><col width="26%"><col width="11%"></colgroup><thead><tr class="header"><th align="left">start_datetime</th>
+<table class="table"><colgroup><col width="17%"><col width="17%"><col width="8%"><col width="8%"><col width="10%"><col width="26%"><col width="11%"></colgroup><thead><tr><th align="left">start_datetime</th>
 <th align="left">stop_datetime</th>
 <th align="left">site</th>
 <th align="left">subsite</th>
 <th align="left">stream</th>
 <th align="left">hours_fished_methodology</th>
 <th align="left">hours_fished</th>
-</tr></thead><tbody><tr class="odd"><td align="left">NA</td>
-<td align="left">1997-01-18 00:00:00</td>
-<td align="left">adams dam</td>
-<td align="left">adams dam</td>
-<td align="left">butte creek</td>
-<td align="left">using start time and stop time</td>
-<td align="left">NA hours</td>
-</tr><tr class="even"><td align="left">1997-01-18 00:00:00</td>
-<td align="left">1997-01-18 09:00:00</td>
-<td align="left">adams dam</td>
-<td align="left">adams dam</td>
-<td align="left">butte creek</td>
-<td align="left">using start time and stop time</td>
-<td align="left">9 hours</td>
-</tr><tr class="odd"><td align="left">1997-01-18 09:00:00</td>
-<td align="left">1997-03-05 00:00:00</td>
-<td align="left">adams dam</td>
-<td align="left">adams dam</td>
-<td align="left">butte creek</td>
-<td align="left">using start time and stop time</td>
-<td align="left">1095 hours</td>
-</tr><tr class="even"><td align="left">1997-01-18 09:00:00</td>
+</tr></thead><tbody><tr><td align="left">1997-01-18 09:00:00</td>
 <td align="left">1997-03-05 09:00:00</td>
 <td align="left">adams dam</td>
 <td align="left">adams dam</td>
 <td align="left">butte creek</td>
 <td align="left">using start time and stop time</td>
-<td align="left">1104 hours</td>
-</tr><tr class="odd"><td align="left">1997-03-05 09:00:00</td>
-<td align="left">1997-03-11 00:00:00</td>
+<td align="left">1104.00 hours</td>
+</tr><tr><td align="left">1997-03-05 09:00:00</td>
+<td align="left">1997-03-11 07:00:00</td>
 <td align="left">adams dam</td>
 <td align="left">adams dam</td>
 <td align="left">butte creek</td>
 <td align="left">using start time and stop time</td>
-<td align="left">135 hours</td>
+<td align="left">142.00 hours</td>
+</tr><tr><td align="left">1997-03-11 07:00:00</td>
+<td align="left">1997-03-12 09:15:00</td>
+<td align="left">adams dam</td>
+<td align="left">adams dam</td>
+<td align="left">butte creek</td>
+<td align="left">using start time and stop time</td>
+<td align="left">26.25 hours</td>
+</tr><tr><td align="left">1997-03-12 09:15:00</td>
+<td align="left">1997-03-15 09:00:00</td>
+<td align="left">adams dam</td>
+<td align="left">adams dam</td>
+<td align="left">butte creek</td>
+<td align="left">using start time and stop time</td>
+<td align="left">71.75 hours</td>
+</tr><tr><td align="left">1997-03-15 09:00:00</td>
+<td align="left">1997-03-16 09:30:00</td>
+<td align="left">adams dam</td>
+<td align="left">adams dam</td>
+<td align="left">butte creek</td>
+<td align="left">using start time and stop time</td>
+<td align="left">24.50 hours</td>
 </tr></tbody></table><div class="section level3">
 <h3 id="qc">QC<a class="anchor" aria-label="anchor" href="#qc"></a></h3>
 <p>The dot plot below shows hours fished for each stream by date. Most dots appear to be hovering around the 24 hour mark but a few are greater than 1000 or less than -1000 and skew the plot.</p>
@@ -165,27 +201,37 @@
 <div id="combine-data" class="section level1">
 
 <p>We added rows with 0 effort for days that where there is no trapping data and applied rulesets to ensure erroneous data are not included.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">hours_fished_combined</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">stream</span> <span class="op">==</span> <span class="st">"butte creek"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">date</span>, y <span class="op">=</span> <span class="va">hours_fished</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">subsite</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span><span class="op">+</span> </span>
+<span>  <span class="fu">scale_color_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="va">colors_full</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Week"</span>, y <span class="op">=</span> <span class="st">"Hours Fished"</span>, </span>
+<span>       title <span class="op">=</span> <span class="st">"Hours Fished All Methods"</span><span class="op">)</span></span></code></pre></div>
 <div class="float">
 <img src="figure/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"><div class="figcaption">plot of chunk unnamed-chunk-7</div>
 </div>
 <div class="section level2">
 <h2 id="summarized-by-week">Summarized by week<a class="anchor" aria-label="anchor" href="#summarized-by-week"></a></h2>
 <p>We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week. Before 2005 trap data is not available for Knights Landing, we assume 168 hours when trap data is missing.</p>
-<pre><code><span><span class="co">#&gt; # A tibble: 26 × 5</span></span>
-<span><span class="co">#&gt; # Groups:   year, stream, site [17]</span></span>
-<span><span class="co">#&gt;     year stream           site            subsite                n</span></span>
-<span><span class="co">#&gt;    &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;           &lt;chr&gt;              &lt;int&gt;</span></span>
-<span><span class="co">#&gt;  1  2002 sacramento river knights landing knights landing       14</span></span>
-<span><span class="co">#&gt;  2  2003 sacramento river knights landing knights landing       45</span></span>
-<span><span class="co">#&gt;  3  2004 sacramento river knights landing knights landing       37</span></span>
-<span><span class="co">#&gt;  4  2005 sacramento river knights landing knights landing       39</span></span>
-<span><span class="co">#&gt;  5  2006 sacramento river knights landing knights landing       26</span></span>
-<span><span class="co">#&gt;  6  2015 butte creek      okie dam        okie dam 1            10</span></span>
-<span><span class="co">#&gt;  7  2016 butte creek      okie dam        okie dam 1            24</span></span>
-<span><span class="co">#&gt;  8  2017 butte creek      okie dam        okie dam 1             9</span></span>
-<span><span class="co">#&gt;  9  2017 butte creek      okie dam        okie dam fyke trap     9</span></span>
-<span><span class="co">#&gt; 10  2018 butte creek      okie dam        okie dam 1            25</span></span>
-<span><span class="co">#&gt; # ℹ 16 more rows</span></span></code></pre>
+<pre><code><span><span class="co">## # A tibble: 264 × 5</span></span>
+<span><span class="co">## # Groups:   year, stream, site [215]</span></span>
+<span><span class="co">##     year stream           site            subsite        n</span></span>
+<span><span class="co">##    &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;           &lt;chr&gt;      &lt;int&gt;</span></span>
+<span><span class="co">##  1  1992 deer creek       deer creek      deer creek     7</span></span>
+<span><span class="co">##  2  1994 deer creek       deer creek      deer creek    14</span></span>
+<span><span class="co">##  3  1995 deer creek       deer creek      deer creek    17</span></span>
+<span><span class="co">##  4  1995 mill creek       mill creek      mill creek     1</span></span>
+<span><span class="co">##  5  1995 sacramento river knights landing 8.3            3</span></span>
+<span><span class="co">##  6  1995 sacramento river knights landing 8.4            7</span></span>
+<span><span class="co">##  7  1996 deer creek       deer creek      deer creek    28</span></span>
+<span><span class="co">##  8  1996 mill creek       mill creek      mill creek    25</span></span>
+<span><span class="co">##  9  1996 sacramento river knights landing 8.3           40</span></span>
+<span><span class="co">## 10  1996 sacramento river knights landing 8.4           40</span></span>
+<span><span class="co">## # ℹ 254 more rows</span></span></code></pre>
 <div class="section level3">
 <h3 id="qc-1">QC<a class="anchor" aria-label="anchor" href="#qc-1"></a></h3>
 <p>The following plots provide visuals to show weekly hours fished for a few select stream and calendar year. Note that for the combined plots this is for all years of data so there are multiple datapoints for a given week due to multiple years being represented and multiple subsites.</p>
@@ -214,7 +260,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

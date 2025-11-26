@@ -78,8 +78,8 @@ navbar:
     menu: 
       - text: 'Summary of Data for Modeling '
         href: articles/summary_of_data_for_modeling.html
-      - text: 'Lifestage Rulesets'
-        href: articles/lifestage_ruleset.html
+      - text: 'Yearling Ruleset'
+        href: articles/yearling_ruleset.html
       - text: 'Site Selection for Stock Recruit Modeling'
         href: articles/site_overview.html
       - text: 'Hours Fished Analysis'

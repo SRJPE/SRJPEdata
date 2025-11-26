@@ -2,7 +2,7 @@
 title: "RST Sites Used in JPE"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Draft of RST Sites Used in JPE}
+  %\VignetteIndexEntry{RST Sites Used in JPE}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -68,38 +68,6 @@ This vignette describes the trapping sites that we use for each tributary.
 ### Map
 
 The map below shows the location of existing RST sites.
-
-```{r, echo = FALSE}
-library(leaflet)
-#library(rgdal)
-library(sf)
-library(leaflet.extras2)
-
-# salmonid_extents <- readOGR("data-raw/helper-tables/habitat_extents/salmonid_habitat_extents.shp", 
-#                             stringsAsFactors = FALSE, verbose = FALSE) %>%
-#   spTransform(CRS("+proj=longlat +datum=WGS84 +no_defs"))
-# 
-# srjpe_systems <- c("Battle Creek", "Butte Creek", "Clear Creek", "Mill Creek", "Deer Creek", "Feather River", "Yuba River", "Upper Sacramento River", "Upper-mid Sacramento River", "Lower-mid Sacramento River", "Lower Sacramento River")
-# 
-# sprjpe <- subset(salmonid_extents, Species == 'Spring Run Chinook' & River %in% srjpe_systems)
-```
-
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
-# make_label <- function(data) {
-#   labels <- data$River
-# }
-# 
-# hab_map <- leaflet() %>% 
-#       # addProviderTiles(providers$Esri.WorldTopoMap, group = "Map") %>% 
-#       # addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-#       addProviderTiles(providers$CartoDB.Positron) |> 
-#       addPolylines(data = sprjpe, group = 'Spring Run Extent', label = make_label(sprjpe),
-#                    color = '#517ba8', opacity = .8, weight = 3) %>% 
-#       setView(lat = 38.85, lng = -121.49, zoom = 7.5) 
-# 
-# hab_map
-
-```
 
 ![Map of Rotary Screw Trap Monitoring Locations](images/rst_map.png){width="108%"}
 

@@ -33,7 +33,7 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
 source(here::here("data-raw", "pull_data_scripts", "pull_environmental_data.R"))
 ```
 
-There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selction and processing for different models: (1) Stock Recruit Covariates (this document) and (2) Adult Model Covariates.
+There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. There are currently two documents describing covariate selection and processing for different models: (1) Stock Recruit Covariates (this document) and (2) Adult Model Covariates.
 
 The goal of this document is to process covariates for use in SR JPE stock recruitment modeling. 
 
@@ -42,18 +42,18 @@ The goal of this document is to process covariates for use in SR JPE stock recru
 FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found [here](https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0). FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to generate the following environmental covariates table to test within the SR model. 
 
 
-*Table 1. Summary of covariates to include in stock recruit modeling based on preliminary literature review.*
+*Table 1. Summary of covariates to test in stock recruit modeling based on preliminary literature review.*
 
 ```{r}
-covariate_references <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0")
-kable(covariate_references |> select(`Covariate Type`, `Structure`, `Rationale`)) |> 
+covariate_definitions <- read_csv(here::here("data-raw","helper-tables", "covariate_definitions.csv"))
+kable(covariate_definitions |> select(`Variable Name` = `variable name`, Description = definition) |> 
+        filter(!is.na(`Variable Name`))) |> 
   kable_classic(full_width = T)
 ```
 
 ## Preparing Covariates 
 
 This document focuses on preparing flow and temperature covariates for use in stock recruit modeling and exploratory analysis. 
-
 
 ### Temperature
 
