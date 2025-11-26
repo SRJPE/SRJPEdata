@@ -10,7 +10,7 @@ source("data-raw/pull_data_scripts/pull_environmental_data.R")
 # And genetics data from DB
 # Need config file 
 # NOTE: missing field sheet data & 2023 data, should revisit after this is added to confirm that everything looks good
-source("data-raw/pull_data_scripts/pull_genetic_run_assignment_data.R")
+# source("data-raw/pull_data_scripts/pull_genetic_run_assignment_data.R")
 
 # in package (rebuild?)
 devtools::load_all()
@@ -19,15 +19,15 @@ devtools::document()
 # Source all vignettes 
 knitr::knit("vignettes/prep_environmental_covariates.Rmd")
 knitr::knit("vignettes/trap_effort.Rmd")
-knitr::knit("vignettes/lifestage_ruleset.Rmd") # very slow but logic is a bit tricky, could be one to update to data.table
-knitr::knit("vignettes/years_to_include_analysis.Rmd") # does not automatically exclude adults yet, so add that
-knitr::knit("vignettes/sr_covariates.Rmd")
-knitr::knit("vignettes/forecast_covariates.Rmd")
+knitr::knit("vignettes/yearling_ruleset.Rmd") 
+knitr::knit("vignettes/years_to_include_analysis.Rmd") 
+knitr::knit("vignettes/sr_covariates.Rmd") # this takes a long time because sources pull_environmental_data because daily data is needed
+knitr::knit("vignettes/forecast_covariates.Rmd") # this takes a long time because sources pull_environmental_data because daily data is needed
 # rebuild site to save updated data objects in package
 devtools::load_all()
 
 # Source prep data scripts 
-source("data-raw/process_data_scripts/build_adult_model_datasets.R") #TODO, error here 
+# source("data-raw/process_data_scripts/build_adult_model_datasets.R") #TODO, error here, talk to liz about if this is needed
 # Error because database pull for upstream passage returns empty table
 
 source("data-raw/process_data_scripts/build_rst_model_datasets.R")

@@ -35,7 +35,7 @@
       <a href="articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
     <li>
-      <a href="articles/lifestage_ruleset.html">Lifestage Rulesets</a>
+      <a href="articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
       <a href="articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
@@ -107,102 +107,102 @@
 </ul><p>We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.</p>
 <div class="section level4">
 <h4 id="years-to-exclude-table">Years to Exclude Table<a class="anchor" aria-label="anchor" href="#years-to-exclude-table"></a></h4>
-<table class="table"><colgroup><col width="11%"><col width="8%"><col width="7%"><col width="44%"><col width="27%"></colgroup><thead><tr class="header"><th align="left">Stream</th>
+<table class="table"><colgroup><col width="6%"><col width="5%"><col width="4%"><col width="25%"><col width="57%"></colgroup><thead><tr><th align="left">Stream</th>
 <th align="left">Site</th>
 <th align="right">Run Year</th>
 <th align="left">Exclusion Type</th>
 <th align="left">Notes</th>
-</tr></thead><tbody><tr class="odd"><td align="left">battle creek</td>
+</tr></thead><tbody><tr><td align="left">battle creek</td>
 <td align="left">lbc</td>
 <td align="right">1998</td>
 <td align="left">automatic</td>
 <td align="left">less than 75% of weeks sampled</td>
-</tr><tr class="even"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="left">lbc</td>
 <td align="right">2006</td>
 <td align="left">automatic</td>
 <td align="left">less than 75% of weeks sampled</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="left">lbc</td>
 <td align="right">2016</td>
 <td align="left">automatic</td>
 <td align="left">less than 75% of weeks sampled</td>
-</tr><tr class="even"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2007</td>
 <td align="left">really low sampling</td>
 <td align="left">only 12 week of data</td>
-</tr><tr class="odd"><td align="left">butte creek</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2003</td>
+<td align="left">really low sampling</td>
+<td align="left">Stream Team noted this as year that is incomparable and also efficiency data exists where there is no catch data</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2015</td>
+<td align="left">missing four consecutive weeks in critical window</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">1998</td>
+<td align="left">low sampling</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2001</td>
+<td align="left">low sampling</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">2001</td>
+<td align="left">low sampling</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">butte creek</td>
 <td align="left">adams dam</td>
 <td align="right">1997</td>
 <td align="left">automatic</td>
 <td align="left">less than 75% of weeks sampled</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="left">adams dam</td>
-<td align="right">1998</td>
-<td align="left">automatic</td>
-<td align="left">less than 75% of weeks sampled</td>
-</tr><tr class="odd"><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">2019</td>
-<td align="left">really low sampling</td>
-<td align="left">only 10 weeks of data</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">2005</td>
-<td align="left">really low sampling</td>
-<td align="left">only 6 weeks of data</td>
-</tr><tr class="odd"><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">1997</td>
-<td align="left">missing four consecutive weeks in critical window</td>
-<td align="left">NA</td>
-</tr><tr class="even"><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">1998</td>
-<td align="left">missing four consecutive weeks in critical window</td>
-<td align="left">NA</td>
-</tr></tbody></table><p><em>… with 63 more rows</em></p>
+</tr></tbody></table><p><em>… with 55 more rows</em></p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="applying-to-modeling-datasets">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets"></a></h3>
 <p>In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, site, year that should be included in the SR JPE modeling.</p>
 <p>The table below shows a section of this table:</p>
-<table class="table"><thead><tr class="header"><th align="left">stream</th>
+<table class="table"><thead><tr><th align="left">stream</th>
 <th align="left">site</th>
 <th align="right">run_year</th>
-</tr></thead><tbody><tr class="odd"><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">1999</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="right">1999</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">1999</td>
-</tr><tr class="even"><td align="left">clear creek</td>
-<td align="left">lcc</td>
+</tr></thead><tbody><tr><td align="left">feather river</td>
+<td align="left">eye riffle</td>
+<td align="right">1998</td>
+</tr><tr><td align="left">yuba river</td>
+<td align="left">hallwood</td>
+<td align="right">2023</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
 <td align="right">2018</td>
-</tr><tr class="odd"><td align="left">clear creek</td>
-<td align="left">ucc</td>
-<td align="right">2018</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">2000</td>
-</tr><tr class="odd"><td align="left">clear creek</td>
-<td align="left">ucc</td>
-<td align="right">2006</td>
-</tr><tr class="even"><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">2006</td>
-</tr><tr class="odd"><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">2000</td>
-</tr><tr class="even"><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">2001</td>
-</tr></tbody></table><p><em>… with 201 more rows</em></p>
+</tr><tr><td align="left">yuba river</td>
+<td align="left">hallwood</td>
+<td align="right">2024</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2021</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2022</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2023</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2020</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2025</td>
+</tr><tr><td align="left">yuba river</td>
+<td align="left">hallwood</td>
+<td align="right">2025</td>
+</tr></tbody></table><p><em>… with 219 more rows</em></p>
 </div>
 </div>
 <div class="section level2">
@@ -212,132 +212,158 @@
 <p><strong>Survey data</strong></p>
 <ul><li>
 <p>Exclude year if survey does not cover core reaches in a year or if less than 50% of reaches are sampled.</p>
-<table class="table"><colgroup><col width="14%"><col width="85%"></colgroup><thead><tr class="header"><th>Stream</th>
+<table class="table"><colgroup><col width="14%"><col width="85%"></colgroup><thead><tr><th>Stream</th>
 <th>Core Reaches</th>
-</tr></thead><tbody><tr class="odd"><td>Battle Creek</td>
+</tr></thead><tbody><tr><td>Battle Creek</td>
 <td>R1, R2, R3, R4 (R5, R6)</td>
-</tr><tr class="even"><td>Butte Creek</td>
+</tr><tr><td>Butte Creek</td>
 <td>A1, B1, C1, D1, E3</td>
-</tr><tr class="odd"><td>Clear Creek</td>
+</tr><tr><td>Clear Creek</td>
 <td>R1, R2, R3, R4, R5 (R5A, R5B, R5C)</td>
-</tr><tr class="even"><td>Deer Creek</td>
+</tr><tr><td>Deer Creek</td>
 <td>Lower Falls to A line, A line to Wilson Cove, Polk Springs to Murphy Trail, Murphy Trail to Ponderosa Way, Ponderosa Way to Trail 2E17, Trail 2E17 to Dillon Cove, Uper Falls to Potato Patch Camp, Potato Patch Camp to Highway 32 (Red Bridge)</td>
-</tr><tr class="odd"><td>Feather River</td>
+</tr><tr><td>Feather River</td>
 <td>1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38</td>
-</tr><tr class="even"><td>Mill Creek</td>
+</tr><tr><td>Mill Creek</td>
 <td>Mccarthy Place To Savercool Place, Savercool Place To Black Rock, Black Rock To Below Ranch House, Below Ranch House To Above Avery, Above Avery To Pape Place, Pape Place to Buckhorn Gulch, Buckhorn Gulch To Upper Dam, Above Hwy 36,Hwy 36 To Little Hole In Ground, Hole In Ground To Ishi Trail Head, Ishi Trail Head To Big Bend, Big Bend to Canyon Camp, Canyon Camp To Sooner Place</td>
-</tr><tr class="odd"><td>Yuba River</td>
+</tr><tr><td>Yuba River</td>
 <td>Yuba does not have core reaches with historical survyes, only samples section of river, not appropriate for use in JPE</td>
 </tr></tbody></table></li>
 </ul><p><strong>Video data</strong></p>
 <ul><li>Exclude year if video is out for more than 4 weeks in the sampling season</li>
 <li>Exclude year if flows exceed a threshold value on each tributary (overpass weir etc..). Threshold determined by monitoring program.</li>
-</ul><p>Additionally we conducted outreach to stream teams to review our list and highlight any other years that should be excluded.</p>
-<div class="section level3">
-<h3 id="video-data">Video Data<a class="anchor" aria-label="anchor" href="#video-data"></a></h3>
-<div class="section level4">
-<h4 id="cumulative-catch-curves-1">Cumulative catch curves<a class="anchor" aria-label="anchor" href="#cumulative-catch-curves-1"></a></h4>
-<p>The cumulative catch curve below shows cumulative upstream passage over time for Battle Creek. We used similar plots for each tributary with video data to exclude years where there is very limited sampling. This plot shows that in 2006 and 2019, upstream passage monitoring started late in the season on Battle Creek.</p>
-<pre><code><span><span class="co">#&gt; Error in loadNamespace(name): there is no package called 'webshot'</span></span></code></pre>
-</div>
-<div class="section level4">
-<h4 id="heat-map-of-all-tributaries-1">Heat map of all tributaries<a class="anchor" aria-label="anchor" href="#heat-map-of-all-tributaries-1"></a></h4>
-<p>The heat map below shows when video monitoring occurs for all streams. Some video passage systems have continued footage throughout the season. Some years there are gaps within season for specific systems.</p>
-<pre><code><span><span class="co">#&gt; Error in loadNamespace(name): there is no package called 'webshot'</span></span></code></pre>
-</div>
-</div>
-<div class="section level3">
-<h3 id="survey-data">Survey Data<a class="anchor" aria-label="anchor" href="#survey-data"></a></h3>
-<p>The below heat map shows Battle Creek redd survey coverage. It shows decent coverage of redd surveys across reaches and years with some gaps in early years and more gaps post 2015. We excluded years where less than 50% of reaches were sampled.</p>
-<pre><code><span><span class="co">#&gt; Error in loadNamespace(name): there is no package called 'webshot'</span></span></code></pre>
-</div>
+</ul><p>We used these rules as preliminary way to identify potentially incomplete years and then conducted outreach to stream teams to review our list and highlight any other years that should be excluded or not.</p>
 <div class="section level3">
 <h3 id="years-to-exclude-1">Years to exclude<a class="anchor" aria-label="anchor" href="#years-to-exclude-1"></a></h3>
 <p>We utilized above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling for adult data. See a section of the “years to exclude” table below.</p>
-<table class="table"><thead><tr class="header"><th align="left">Stream</th>
+<table class="table"><thead><tr><th align="left">Stream</th>
 <th align="right">Year</th>
 <th align="left">Data Type</th>
 <th align="left">Exclusion Type</th>
-</tr></thead><tbody><tr class="odd"><td align="left">battle creek</td>
+</tr></thead><tbody><tr><td align="left">battle creek</td>
 <td align="right">2017</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="even"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">2008</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">2019</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="even"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">1996</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">1997</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="even"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">1998</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">1999</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="even"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">2000</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">2001</td>
 <td align="left">carcass</td>
 <td align="left">Missing 50% or more of reach coverage</td>
-</tr><tr class="even"><td align="left">battle creek</td>
+</tr><tr><td align="left">battle creek</td>
 <td align="right">2017</td>
 <td align="left">redd</td>
 <td align="left">Missing reaches 2, 3, 5, and 6</td>
-</tr></tbody></table><p><em>… with 49 more rows</em></p>
+</tr></tbody></table><p><em>… with 47 more rows</em></p>
 </div>
 <div class="section level3">
 <h3 id="applying-to-modeling-datasets-1">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets-1"></a></h3>
 <p>In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, year by data type that should be included in the SR JPE modeling.</p>
 <p>The table below shows a section of this table:</p>
-<table class="table"><thead><tr class="header"><th align="left">stream</th>
-<th align="right">year</th>
+<table class="table"><colgroup><col width="5%"><col width="13%"><col width="6%"><col width="10%"><col width="22%"><col width="22%"><col width="18%"></colgroup><thead><tr><th align="right">year</th>
+<th align="left">stream</th>
+<th align="right">count</th>
 <th align="left">data_type</th>
-</tr></thead><tbody><tr class="odd"><td align="left">battle creek</td>
-<td align="right">1995</td>
-<td align="left">upstream passage</td>
-</tr><tr class="even"><td align="left">clear creek</td>
-<td align="right">1995</td>
-<td align="left">upstream passage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">1996</td>
-<td align="left">upstream passage</td>
-</tr><tr class="even"><td align="left">battle creek</td>
-<td align="right">1997</td>
-<td align="left">upstream passage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">1998</td>
-<td align="left">upstream passage</td>
-</tr><tr class="even"><td align="left">clear creek</td>
-<td align="right">1998</td>
-<td align="left">upstream passage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">1999</td>
-<td align="left">upstream passage</td>
-</tr><tr class="even"><td align="left">clear creek</td>
-<td align="right">1999</td>
-<td align="left">upstream passage</td>
-</tr><tr class="odd"><td align="left">battle creek</td>
-<td align="right">2000</td>
-<td align="left">upstream passage</td>
-</tr><tr class="even"><td align="left">clear creek</td>
-<td align="right">2000</td>
-<td align="left">upstream passage</td>
-</tr></tbody></table><p><em>… with 275 more rows</em></p>
+<th align="right">lower_bound_estimate</th>
+<th align="right">upper_bound_estimate</th>
+<th align="right">confidence_level</th>
+</tr></thead><tbody><tr><td align="right">2001</td>
+<td align="left">battle creek</td>
+<td align="right">30</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2002</td>
+<td align="left">battle creek</td>
+<td align="right">71</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2003</td>
+<td align="left">battle creek</td>
+<td align="right">156</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2004</td>
+<td align="left">battle creek</td>
+<td align="right">35</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2005</td>
+<td align="left">battle creek</td>
+<td align="right">46</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2006</td>
+<td align="left">battle creek</td>
+<td align="right">121</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2007</td>
+<td align="left">battle creek</td>
+<td align="right">132</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2008</td>
+<td align="left">battle creek</td>
+<td align="right">38</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2009</td>
+<td align="left">battle creek</td>
+<td align="right">85</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr><tr><td align="right">2010</td>
+<td align="left">battle creek</td>
+<td align="right">89</td>
+<td align="left">redd</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+<td align="right">NA</td>
+</tr></tbody></table><p><em>… with 253 more rows</em></p>
 </div>
 </div>
 
@@ -357,7 +383,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

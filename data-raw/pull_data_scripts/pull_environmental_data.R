@@ -240,7 +240,7 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
 #          statistic = "mean")
 # write_csv(feather_flow, "data-raw/helper-tables/feather_flow_db.csv")
 
-feather_flow <- read_csv("data-raw/helper-tables/feather_flow_db.csv")
+feather_flow <- read_csv(here::here("data-raw", "helper-tables", "feather_flow_db.csv"))
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
 # From Casey: There is also side flow input from the hatchery that increases flow another ~100 cfs. 

@@ -2,7 +2,7 @@
 title: "RST Sites Used in JPE"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Draft of RST Sites Used in JPE}
+  %\VignetteIndexEntry{RST Sites Used in JPE}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -51,7 +51,7 @@ The Spring Run JPE model considers data from 7 tributaries and the mainstem Sacr
 -   Mill Creek
 -   Yuba River
 
-Each of these tributaries has a unique monitoring setup and number of rotary screw traps (RSTs) that we can use in the SR JPE model. Data for the SR JPE is organized by stream, site, and subsite. `stream` represents the creek or river where the trapping sites are located. `site` represents a unique trapping location whereas `subsite` represents the RST positioning within the `site`. `site group` is used as a helper to group sites that may be more similar than others. For instance, on the Feather River there are multiple sites that have been used over time. It is assumed that sites within the Low Flow Channel are more similar to each other than the sites in the High Flow Channel and vice versa. Some streams only have one site and some sites only have one RST. The important difference is that catch from different subsites within the same site can be added together, whereas catch from different sites cannot be added together as this would be double counting.
+Each of these tributaries has a unique monitoring setup and number of rotary screw traps (RSTs) that we can use in the SR JPE model. Data for the SR JPE is organized by stream, site, and subsite. `stream` represents the creek or river where the trapping sites are located. `site` represents a unique trapping location whereas `subsite` represents the RST positioning within the `site`. `site group` is used as a helper to group sites that may be more similar than others. For instance, on the Feather River there are multiple sites that have been used over time. It is assumed that sites within the Low Flow Channel are more similar to each other than the sites in the High Flow Channel and vice versa. Some streams only have one site and some sites only have one RST. The important difference is that catch from different subsites within the same site and same year can be added together, whereas catch from different sites cannot be added together as this would be double counting.
 
 This vignette describes the trapping sites that we use for each tributary.
 
@@ -68,38 +68,6 @@ This vignette describes the trapping sites that we use for each tributary.
 ### Map
 
 The map below shows the location of existing RST sites.
-
-```{r, echo = FALSE}
-library(leaflet)
-#library(rgdal)
-library(sf)
-library(leaflet.extras2)
-
-# salmonid_extents <- readOGR("data-raw/helper-tables/habitat_extents/salmonid_habitat_extents.shp", 
-#                             stringsAsFactors = FALSE, verbose = FALSE) %>%
-#   spTransform(CRS("+proj=longlat +datum=WGS84 +no_defs"))
-# 
-# srjpe_systems <- c("Battle Creek", "Butte Creek", "Clear Creek", "Mill Creek", "Deer Creek", "Feather River", "Yuba River", "Upper Sacramento River", "Upper-mid Sacramento River", "Lower-mid Sacramento River", "Lower Sacramento River")
-# 
-# sprjpe <- subset(salmonid_extents, Species == 'Spring Run Chinook' & River %in% srjpe_systems)
-```
-
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
-# make_label <- function(data) {
-#   labels <- data$River
-# }
-# 
-# hab_map <- leaflet() %>% 
-#       # addProviderTiles(providers$Esri.WorldTopoMap, group = "Map") %>% 
-#       # addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-#       addProviderTiles(providers$CartoDB.Positron) |> 
-#       addPolylines(data = sprjpe, group = 'Spring Run Extent', label = make_label(sprjpe),
-#                    color = '#517ba8', opacity = .8, weight = 3) %>% 
-#       setView(lat = 38.85, lng = -121.49, zoom = 7.5) 
-# 
-# hab_map
-
-```
 
 ![Map of Rotary Screw Trap Monitoring Locations](images/rst_map.png){width="108%"}
 
@@ -226,15 +194,11 @@ knitr::kable(deer_sr)
 
 ### Feather River
 
-On Feather River there are many rotary screw trapping sites. Consistently, a Low Flow Channel site (between Orville Dam and the Thermalito after bay) and a High Flow Channel site (after Thermalito after bay) are monitored each year. In 2022, a new RST program started on the Lower Feather River below the confluence with the Yuba River. This RST captures juveniles from both Yuba and Feather rivers.
+On Feather River there are many rotary screw trap sites. Consistently, a Low Flow Channel site (between the Fish Barrier Dam and the Thermalito Afterbay Outlet) and a High Flow Channel site (after Thermalito Afterbay Outlet) are monitored each year. In 2022, a new RST program started on the Lower Feather River below the confluence with the Yuba River. This RST captures juveniles from both Yuba and Feather rivers.
 
-***Primary site selected: Herringer Riffle (High Flow Channel)***
+***Primary site selected: Eye Riffle (Low Flow Channel)***
 
-The SR JPE modeling team selected Herringer Riffle as the primary site to use for the Stock Recruit because it has the most consistent monitoring in the High Flow Channel, it is still an ongoing monitoring site, and it captures the full extent of spring run spawners. Additional sites will be used to fill data gaps on the HFC if Herringer is not fishing in a given year.
-
-***Secondary site*****:**
-
-Eye Riffle efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. After initial analysis, we will reassess site decision to see how to best incorporate Eye Riffle data in modeling.
+The SR JPE modeling team selected Eye Riffle as the primary site to use for the Stock Recruit because it would enable direct integration with the Probabilistic Length At Date (PLAD) model as genetic data are being collected at this site. Additionally, the time series for this site is robust. In years where data are not available at Eye Riffle the dataset can be supplemented with Steep Riffle and Gateway Riffle which are both in the Low Flow Channel. 
 
 *Additional considerations for Feather River*
 
@@ -270,11 +234,11 @@ knitr::kable(mill_sr)
 
 ### Yuba River
 
-Historically, multiple rotary screw trapping sites have operated on the Yuba River. Currently, only 1 site is in operation, the Hallwood site.
+Historically, data were collected at the Hallwood site on the Yuba River. Data collection at this site resumed in 2022.
 
 ***Primary site selected: Hallwood***
 
-The SR JPE modeling team selected Hallwood as the primary site to use for the Stock Recruit because it is the site with the most historical data, it is the lowest in the system, and ongoing monitoring at this site restarted in 2022.
+The SR JPE modeling team selected Hallwood as the primary site to use for the Stock Recruit because it is the primary RST site on the Yuba River. 
 
 ***Secondary site:***
 

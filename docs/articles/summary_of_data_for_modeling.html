@@ -53,7 +53,7 @@
       <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
     <li>
-      <a href="../articles/lifestage_ruleset.html">Lifestage Rulesets</a>
+      <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
       <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
@@ -118,23 +118,36 @@
 <p>The spring run juvenile production estimate (SR JPE) contains a suite
 of submodels that rely on different datasets. This document is currently
 focused on Chinook monitoring data that will be used to fit the stock
-recruit model.</p>
+recruit model and within season models. The within season model relies
+on juvenile data and the stock recruit relies on both juvenile and adult
+datasets.</p>
 <p>Additional sections will be added to highlight survival, genetics,
 and covariate data.</p>
 </div>
 <div class="section level2">
-<h2 id="stock-recruit-modeling-data-selection">Stock Recruit Modeling Data Selection<a class="anchor" aria-label="anchor" href="#stock-recruit-modeling-data-selection"></a>
+<h2 id="modeling-data-selection">Modeling Data Selection<a class="anchor" aria-label="anchor" href="#modeling-data-selection"></a>
 </h2>
 <p>Gathering and identifying spring run Chinook monitoring data to use
 in the spring run juvenile production estimate (SR JPE) was an
-iterative, multistep process. We acquired, processed and described
-monitoring data, hosted workshops to define a ruleset for evaluating
-years to exclude based on missing data (<a href="https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html" class="external-link">see
-years to include vignette for an in depth overview of this process</a>),
-selected data where there was both adult and juvenile data, and finally
-selected a single adult dataset to use for each year and stream. The
-diagram below visualizes this process and shows the total number of
-datasets we retained along the way.</p>
+iterative, multistep process.</p>
+<p>Filtering applied to juvenile RST data - necessary for both within
+season and stock recruit model data.</p>
+<ol style="list-style-type: decimal">
+<li>We acquired, processed and described monitoring that we presented in
+workshops to define a ruleset for evaluating years to exclude based on
+missing data (<a href="https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html" class="external-link">see
+years to include vignette for an in depth overview of this process</a>).
+This filtered juvenile dataset is used for both the within season and
+stock recruit models.</li>
+</ol>
+<p>Additional filters required for the stock recruit:</p>
+<ol start="2" style="list-style-type: decimal">
+<li>We selected data where there was both adult and juvenile data.</li>
+<li>We selected a single adult dataset to use for each year and
+stream.</li>
+</ol>
+<p>The diagram below visualizes this process and shows the total number
+of datasets we retained along the way.</p>
 <p><img src="images/data_selection_diagram.png" style="width:108.0%"></p>
 <p><em>Distinct annual datasets are identified by looking at distinct
 year, stream, and monitoring types</em></p>
@@ -150,27 +163,12 @@ JPE).</p>
 <p>The plot below shows all monitoring coverage of rotary screw trap,
 adult upstream passage, adult holding, adult redd, and adult carcass
 survey data.</p>
-<p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
+<p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" width="768"></p>
 <p><em>Plot does not include Sacramento River mainstem monitoring. This
 data may also be utilized in the SR JPE but will not be included in the
 stock recruit models. For some monitoring types data is collected
 annually or monthly communicated through gaps in the colored
 lines.</em></p>
-<div class="section level4">
-<h4 id="filtering-data-to-years-that-contain-both-juvinile-and-adult-monitoring">Filtering data to years that contain both juvinile and adult
-monitoring<a class="anchor" aria-label="anchor" href="#filtering-data-to-years-that-contain-both-juvinile-and-adult-monitoring"></a>
-</h4>
-<p>In order to utilize data for the stock recruit models, we need both
-juvenile data inputs (RST data) and adult data inputs (adults) for each
-year. The plot below shows the time windows where there is overlapping
-juvenile and adult monitoring on each tributary. While this limits the
-amount of data, it still provides a few large windows for most
-monitoring programs.</p>
-<p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-3-1.png" width="768"></p>
-<p><em>Gray boxes indicate that monitoring occurred but data is not
-being utilized for the stock recruit since a year does not have both
-adult and juvenile data</em></p>
-</div>
 </div>
 <div class="section level3">
 <h3 id="excluding-incomplete-years">Excluding Incomplete Years<a class="anchor" aria-label="anchor" href="#excluding-incomplete-years"></a>
@@ -179,16 +177,100 @@ adult and juvenile data</em></p>
 some years where data is sparse and is excluded from analysis. This
 decision process is documented in the <a href="https://srjpe.github.io/SRJPEdata/articles/years_to_include_analysis.html" class="external-link">Years
 to Include Analysis</a>.</p>
-<p>After filtering the RST and adult data to remove incomplete or
-inconsistent years, we are left with the following windows for the SR
-JPE. Gray boxes indicate that monitoring occurred but data is not being
-utilized for modeling. See years to exclude tables for additional
-information on why a year might be excluded.</p>
-<p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
+<p><strong>Juvenile datasets filtered to exclude incomplete
+years.</strong></p>
+<p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" width="768"></p>
+<p><em>Gray boxes indicate that monitoring occurred but data is not
+being utilized. Data may be excluded because the data was considered
+incomplete for a given monitoring type and year.</em></p>
+<p><strong>Adult dataset filtered to exclude incomplete
+years</strong></p>
+<p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" width="768"><em>Gray boxes indicate that monitoring occurred but data is not being
+utilized. Data may be excluded because the data was considered
+incomplete for a given monitoring type and year.</em></p>
+</div>
+<div class="section level3">
+<h3 id="summary-table-of-years-to-use-for-within-season">Summary Table of Years to Use for Within Season<a class="anchor" aria-label="anchor" href="#summary-table-of-years-to-use-for-within-season"></a>
+</h3>
+<p>The summary table below describes which years remain after filtering
+out incomplete juvenile data. This table accounts for years excluded
+based on data quality and completeness considerations.</p>
+<table class="table">
+<colgroup>
+<col width="16%">
+<col width="62%">
+<col width="21%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Stream</th>
+<th align="left">Years to Include in Model</th>
+<th align="right">Total Number of Years</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">battle creek</td>
+<td align="left">1999 - 2000, 2002 - 2006, 2008 - 2014, 2016 - 2025</td>
+<td align="right">24</td>
+</tr>
+<tr class="even">
+<td align="left">butte creek</td>
+<td align="left">1995 - 1996, 1999 - 2004, 2007 - 2008, 2012 - 2018,
+2020 - 2025</td>
+<td align="right">23</td>
+</tr>
+<tr class="odd">
+<td align="left">clear creek</td>
+<td align="left">1998 - 2025</td>
+<td align="right">28</td>
+</tr>
+<tr class="even">
+<td align="left">deer creek</td>
+<td align="left">1995 - 1996, 2000 - 2003, 2005, 2007, 2009 - 2010, 2023
+- 2025</td>
+<td align="right">13</td>
+</tr>
+<tr class="odd">
+<td align="left">feather river</td>
+<td align="left">1997 - 2020, 2022 - 2025</td>
+<td align="right">28</td>
+</tr>
+<tr class="even">
+<td align="left">mill creek</td>
+<td align="left">1995 - 1996, 2000 - 2003, 2005 - 2008, 2010, 2022 -
+2025</td>
+<td align="right">15</td>
+</tr>
+<tr class="odd">
+<td align="left">sacramento river</td>
+<td align="left">1995 - 2001, 2003 - 2025</td>
+<td align="right">30</td>
+</tr>
+<tr class="even">
+<td align="left">yuba river</td>
+<td align="left">1999, 2001 - 2002, 2004 - 2009, 2022 - 2025</td>
+<td align="right">13</td>
+</tr>
+</tbody>
+</table>
+<p>This table shows us that there are a total of 174 stream years to use
+for developing the SR JPE stock recruit model.</p>
+<div class="section level4">
+<h4 id="filtering-data-to-years-that-contain-both-juvinile-and-adult-monitoring">Filtering data to years that contain both juvinile and adult
+monitoring<a class="anchor" aria-label="anchor" href="#filtering-data-to-years-that-contain-both-juvinile-and-adult-monitoring"></a>
+</h4>
+<p>After excluding incomplete years, the stock recruit data requires
+additional filtering. In order to utilize data for the stock recruit
+models, we need both juvenile data inputs (RST data) and adult data
+inputs (adults) for each year. The plot below shows the time windows
+where there is overlapping juvenile and adult monitoring on each
+tributary. While this limits the amount of data, it still provides a few
+large windows for most monitoring programs.</p>
+<p><img src="summary_of_data_for_modeling_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="768"></p>
 <p><em>Gray boxes indicate that monitoring occurred but data is not
 being utilized for the stock recruit. Data may be excluded because there
 is not adult and juvenile annual overlap or because the data was
 considered incomplete for a given monitoring type and year.</em></p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="summary-table-of-years-to-use-for-stock-recruit">Summary Table of Years to Use for Stock Recruit<a class="anchor" aria-label="anchor" href="#summary-table-of-years-to-use-for-stock-recruit"></a>
@@ -196,13 +278,10 @@ considered incomplete for a given monitoring type and year.</em></p>
 <p>The summary table below describes which years have overlapping RST
 and adult data. This table accounts for years excluded based on data
 quality and completeness considerations.</p>
-<p>Feather River is currently not included in stock recruit modeling due
-to no adult data that represent spring run. This data gap is currently
-in the process of being filled.</p>
 <table class="table">
 <colgroup>
 <col width="12%">
-<col width="67%">
+<col width="66%">
 <col width="20%">
 </colgroup>
 <thead><tr class="header">
@@ -234,18 +313,23 @@ in the process of being filled.</p>
 <td align="right">11</td>
 </tr>
 <tr class="odd">
-<td align="left">mill creek</td>
-<td align="left">2000 - 2003, 2005 - 2008, 2010</td>
+<td align="left">feather river</td>
+<td align="left">2010 - 2012, 2018 - 2020, 2022 - ongoing</td>
 <td align="right">7</td>
 </tr>
 <tr class="even">
+<td align="left">mill creek</td>
+<td align="left">2000 - 2003, 2005 - 2008, 2010</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
 <td align="left">yuba river</td>
 <td align="left">2004 - 2008</td>
 <td align="right">5</td>
 </tr>
 </tbody>
 </table>
-<p>This table shows us that there are a total of 61 stream years to use
+<p>This table shows us that there are a total of 70 stream years to use
 for developing the SR JPE stock recruit model.</p>
 </div>
 <div class="section level3">
@@ -342,7 +426,7 @@ with various data types in more detail.</p>
 </tr>
 </tbody>
 </table>
-<p><em>… with 49 more rows</em></p>
+<p><em>… with 51 more rows</em></p>
 </div>
 <div class="section level3">
 <h3 id="proposed-data-to-use-in-sr-jpe">Proposed Data to Use in SR JPE<a class="anchor" aria-label="anchor" href="#proposed-data-to-use-in-sr-jpe"></a>
@@ -371,56 +455,56 @@ year.</p>
 <td align="left">holding</td>
 </tr>
 <tr class="odd">
+<td align="right">1996</td>
+<td align="left">mill creek</td>
+<td align="left">rst</td>
+<td align="left">redd</td>
+</tr>
+<tr class="even">
 <td align="right">1998</td>
 <td align="left">clear creek</td>
 <td align="left">rst</td>
 <td align="left">upstream_estimate</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1999</td>
 <td align="left">battle creek</td>
 <td align="left">rst</td>
 <td align="left">upstream_estimate</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1999</td>
 <td align="left">clear creek</td>
 <td align="left">rst</td>
 <td align="left">TBD</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">2000</td>
 <td align="left">battle creek</td>
 <td align="left">rst</td>
 <td align="left">upstream_estimate</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">2000</td>
 <td align="left">clear creek</td>
 <td align="left">rst</td>
 <td align="left">upstream_estimate</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">2000</td>
 <td align="left">deer creek</td>
 <td align="left">rst</td>
 <td align="left">holding</td>
 </tr>
-<tr class="odd">
-<td align="right">2001</td>
-<td align="left">butte creek</td>
-<td align="left">rst</td>
-<td align="left">TBD</td>
-</tr>
 <tr class="even">
-<td align="right">2001</td>
-<td align="left">clear creek</td>
+<td align="right">2000</td>
+<td align="left">mill creek</td>
 <td align="left">rst</td>
-<td align="left">TBD</td>
+<td align="left">redd</td>
 </tr>
 </tbody>
 </table>
-<p><em>… with 84 more rows</em></p>
+<p><em>… with 101 more rows</em></p>
 </div>
 </div>
   </div>
@@ -440,7 +524,7 @@ year.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

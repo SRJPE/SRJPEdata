@@ -35,7 +35,7 @@
       <a href="articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
     <li>
-      <a href="articles/lifestage_ruleset.html">Lifestage Rulesets</a>
+      <a href="articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
       <a href="articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
@@ -104,176 +104,190 @@
 <li>Degree Day 20 (DD20), where cumulative degree days are calculated against a threshold of 20 degrees Celsius <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204274" class="external-link">(source)</a>
 </li>
 </ol><p>Following initial analyses and discussions, we focused on approach 3 because it showed the most consistent relationship with prespawn mortality across streams and accounts for cumulative stress. We calculated the metric for migration months (March - May) in the Sacramento River and holding months (May - August) in each tributary. The resulting dataset is as follows (note that DD less than 0 are set to 0):</p>
-<pre><code><span><span class="co">#&gt; Error in `filter()`:</span></span>
-<span><span class="co">#&gt; ℹ In argument: `month %in% migratory_months`.</span></span>
-<span><span class="co">#&gt; Caused by error in `match()`:</span></span>
-<span><span class="co">#&gt; ! 'match' requires vector arguments</span></span>
-<span><span class="co">#&gt; Error in `filter()`:</span></span>
-<span><span class="co">#&gt; ℹ In argument: `month %in% holding_months`.</span></span>
-<span><span class="co">#&gt; Caused by error in `match()`:</span></span>
-<span><span class="co">#&gt; ! 'match' requires vector arguments</span></span>
-<span><span class="co">#&gt; Error: object 'gdd_trib' not found</span></span>
-<span><span class="co">#&gt; Error: object 'gdd' not found</span></span></code></pre>
-<p>The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:</p>
-<pre><code><span><span class="co">#&gt; Error: object 'gdd' not found</span></span></code></pre>
+<table class="table"><thead><tr><th align="right">year</th>
+<th align="left">stream</th>
+<th align="right">gdd_trib</th>
+<th align="right">gdd_sac</th>
+<th align="right">gdd_total</th>
+</tr></thead><tbody><tr><td align="right">1999</td>
+<td align="left">butte creek</td>
+<td align="right">1.2857143</td>
+<td align="right">0.0000000</td>
+<td align="right">1.29</td>
+</tr><tr><td align="right">1999</td>
+<td align="left">deer creek</td>
+<td align="right">10.5952381</td>
+<td align="right">0.0000000</td>
+<td align="right">10.60</td>
+</tr><tr><td align="right">1999</td>
+<td align="left">feather river</td>
+<td align="right">0.9564937</td>
+<td align="right">0.0000000</td>
+<td align="right">0.96</td>
+</tr><tr><td align="right">1999</td>
+<td align="left">mill creek</td>
+<td align="right">2.6888228</td>
+<td align="right">0.0000000</td>
+<td align="right">2.69</td>
+</tr><tr><td align="right">1999</td>
+<td align="left">yuba river</td>
+<td align="right">29.1278680</td>
+<td align="right">0.0000000</td>
+<td align="right">29.13</td>
+</tr><tr><td align="right">2000</td>
+<td align="left">butte creek</td>
+<td align="right">8.2142857</td>
+<td align="right">0.2142857</td>
+<td align="right">8.43</td>
+</tr><tr><td align="right">2000</td>
+<td align="left">deer creek</td>
+<td align="right">26.1731380</td>
+<td align="right">0.2142857</td>
+<td align="right">26.39</td>
+</tr><tr><td align="right">2000</td>
+<td align="left">feather river</td>
+<td align="right">5.4367217</td>
+<td align="right">0.2142857</td>
+<td align="right">5.65</td>
+</tr><tr><td align="right">2000</td>
+<td align="left">mill creek</td>
+<td align="right">12.9672619</td>
+<td align="right">0.2142857</td>
+<td align="right">13.18</td>
+</tr><tr><td align="right">2000</td>
+<td align="left">yuba river</td>
+<td align="right">36.8799505</td>
+<td align="right">0.2142857</td>
+<td align="right">37.09</td>
+</tr></tbody></table><p>The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:</p>
+<div class="float">
+<img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><div class="figcaption">plot of chunk unnamed-chunk-3</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="flow">Flow<a class="anchor" aria-label="anchor" href="#flow"></a></h3>
 <p>Maximum flow more effectively captures the high flow events that support migration speed and passage to upstream holding areas. Additionally, upon inspection of the data source across multiple years average maximum flow over the migratory and holding months (March-May and May-August, respectively) was more representative of the fluctuations in flow over the entire year. The resulting dataset is as follows:</p>
-<pre><code><span><span class="co">#&gt; Error in `filter()`:</span></span>
-<span><span class="co">#&gt; ℹ In argument: `month %in% migratory_and_holding_months`.</span></span>
-<span><span class="co">#&gt; Caused by error in `match()`:</span></span>
-<span><span class="co">#&gt; ! 'match' requires vector arguments</span></span>
-<span><span class="co">#&gt; Error: object 'flow_metrics' not found</span></span></code></pre>
-<p>The following plot is of max flow (cfs) over time for all tributaries:</p>
-<pre><code><span><span class="co">#&gt; Error: object 'flow_metrics' not found</span></span></code></pre>
+<table class="table"><thead><tr><th align="left">stream</th>
+<th align="right">year</th>
+<th align="right">mean_flow</th>
+<th align="right">max_flow</th>
+</tr></thead><tbody><tr><td align="left">battle creek</td>
+<td align="right">1995</td>
+<td align="right">1013.6758</td>
+<td align="right">2395.5714</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">1996</td>
+<td align="right">624.3736</td>
+<td align="right">1205.8571</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">1997</td>
+<td align="right">389.7031</td>
+<td align="right">531.6667</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">1998</td>
+<td align="right">1089.8352</td>
+<td align="right">2020.0000</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">1999</td>
+<td align="right">610.8681</td>
+<td align="right">1310.4286</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">2000</td>
+<td align="right">517.2527</td>
+<td align="right">1183.8571</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">2001</td>
+<td align="right">318.2253</td>
+<td align="right">567.4286</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">2002</td>
+<td align="right">364.0824</td>
+<td align="right">515.2857</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">2003</td>
+<td align="right">611.2473</td>
+<td align="right">1134.2857</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="right">2004</td>
+<td align="right">474.1429</td>
+<td align="right">1093.8571</td>
+</tr></tbody></table><p>The following plot is of max flow (cfs) over time for all tributaries:</p>
+<div class="float">
+<img src="figure/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"><div class="figcaption">plot of chunk unnamed-chunk-5</div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="water-year-type">Water Year Type<a class="anchor" aria-label="anchor" href="#water-year-type"></a></h3>
 <p>To account for the influence of large scale interannual climate variability, we investigated water year type as a covariate as described by the <a href="https://cdec.water.ca.gov/reportapp/javareports?name=WSIHIST" class="external-link">California Department of Water Resources</a> and available in the <a href="https://cloud.r-project.org/web/packages/waterYearType/index.html" class="external-link">waterYearType package in R</a>.</p>
 <p>We used the <code>waterYearType</code> package to pull water year assignments as a categorical covariate. Some streams had very few data points (i.e. for Mill Creek, only seven years were considered dependable), so we simplified all potential categories of water year type into either dry (<code>Dry</code>, <code>Below Normal</code>, <code>Critical</code>) or wet (<code>Wet</code>, <code>Above Normal</code>). The table below summarizes the number of dry and wet years that were included:</p>
-<table class="table"><thead><tr class="header"><th align="left">Water Year Type</th>
+<table class="table"><thead><tr><th align="left">Water Year Type</th>
 <th align="right">Count</th>
-</tr></thead><tbody><tr class="odd"><td align="left">dry</td>
-<td align="right">64</td>
-</tr><tr class="even"><td align="left">wet</td>
-<td align="right">54</td>
+</tr></thead><tbody><tr><td align="left">dry</td>
+<td align="right">60</td>
+</tr><tr><td align="left">wet</td>
+<td align="right">52</td>
 </tr></tbody></table></div>
-<div class="section level3">
-<h3 id="passage-timing">Passage Timing<a class="anchor" aria-label="anchor" href="#passage-timing"></a></h3>
-<p>Passage timing was considered; however, limited data reduced the sample size of the datasets for some tributaries so much as to remove them from candidacy for the model due to lack of statistical power. Passage timing was summarized as the mean, median, and min day of passage. The resulting dataset is as follows:</p>
-<pre><code><span><span class="co">#&gt; Error in `filter()`:</span></span>
-<span><span class="co">#&gt; ℹ In argument: `direction %in% c(NA, "up")`.</span></span>
-<span><span class="co">#&gt; Caused by error:</span></span>
-<span><span class="co">#&gt; ! object 'direction' not found</span></span>
-<span><span class="co">#&gt; Error: object 'upstream_passage_timing' not found</span></span></code></pre>
-<p>The following plot is of median passage over time for all tributaries:</p>
-<pre><code><span><span class="co">#&gt; Error: object 'upstream_passage_timing' not found</span></span></code></pre>
-</div>
-<div class="section level3">
-<h3 id="total-passage-as-index">Total Passage as Index<a class="anchor" aria-label="anchor" href="#total-passage-as-index"></a></h3>
-<p>We hypothesized that total annual passage might be an indicator of density because more adults in holding/spawning habitat could result in less available habitat and thus influence prespawn mortality.</p>
-<table class="table"><thead><tr class="header"><th align="right">year</th>
-<th align="left">stream</th>
-<th align="right">passage_index</th>
-</tr></thead><tbody><tr class="odd"><td align="right">1995</td>
-<td align="left">battle creek</td>
-<td align="right">66</td>
-</tr><tr class="even"><td align="right">1995</td>
-<td align="left">clear creek</td>
-<td align="right">2</td>
-</tr><tr class="odd"><td align="right">1996</td>
-<td align="left">battle creek</td>
-<td align="right">35</td>
-</tr><tr class="even"><td align="right">1997</td>
-<td align="left">battle creek</td>
-<td align="right">107</td>
-</tr><tr class="odd"><td align="right">1998</td>
-<td align="left">battle creek</td>
-<td align="right">178</td>
-</tr><tr class="even"><td align="right">1998</td>
-<td align="left">clear creek</td>
-<td align="right">47</td>
-</tr><tr class="odd"><td align="right">1999</td>
-<td align="left">battle creek</td>
-<td align="right">73</td>
-</tr><tr class="even"><td align="right">1999</td>
-<td align="left">clear creek</td>
-<td align="right">35</td>
-</tr><tr class="odd"><td align="right">2000</td>
-<td align="left">battle creek</td>
-<td align="right">78</td>
-</tr><tr class="even"><td align="right">2000</td>
-<td align="left">clear creek</td>
-<td align="right">9</td>
-</tr></tbody></table><div class="float">
-<img src="figure/unnamed-chunk-16-1.png" alt="plot of chunk unnamed-chunk-16"><div class="figcaption">plot of chunk unnamed-chunk-16</div>
-</div>
-</div>
 <div class="section level3">
 <h3 id="combine-and-save-covariate-data">Combine and Save Covariate Data<a class="anchor" aria-label="anchor" href="#combine-and-save-covariate-data"></a></h3>
 <p>Both continuous environmental variables (flow and temperature) were standardized and centered within streams before performing any analyses so that the scale of the data did not affect results. Water year type was coded as a binary variable as <code>1</code> for wet (wet, above normal) and <code>0</code> for dry (below normal, dry, critical). The resulting dataset is as follows (note that flow data has the longest time series available):</p>
-<pre><code><span><span class="co">#&gt; Error: object 'flow_metrics' not found</span></span></code></pre>
-<table style="width:100%;" class="table"><colgroup><col width="5%"><col width="14%"><col width="8%"><col width="14%"><col width="12%"><col width="15%"><col width="28%"></colgroup><thead><tr class="header"><th align="right">year</th>
+<table class="table"><thead><tr><th align="right">year</th>
 <th align="left">stream</th>
 <th align="right">wy_type</th>
 <th align="right">max_flow_std</th>
 <th align="right">gdd_std</th>
-<th align="right">passage_index</th>
-<th align="right">median_passage_timing_std</th>
-</tr></thead><tbody><tr class="odd"><td align="right">1995</td>
+</tr></thead><tbody><tr><td align="right">1995</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">4.0345222</td>
+<td align="right">2.4649663</td>
 <td align="right">NA</td>
-<td align="right">-0.6837483</td>
-<td align="right">NA</td>
-</tr><tr class="even"><td align="right">1996</td>
+</tr><tr><td align="right">1996</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.1424010</td>
+<td align="right">0.2898692</td>
 <td align="right">NA</td>
-<td align="right">-0.8597315</td>
-<td align="right">NA</td>
-</tr><tr class="odd"><td align="right">1997</td>
+</tr><tr><td align="right">1997</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.7730646</td>
+<td align="right">-0.9427207</td>
 <td align="right">NA</td>
-<td align="right">-0.4509963</td>
-<td align="right">NA</td>
-</tr><tr class="even"><td align="right">1998</td>
+</tr><tr><td align="right">1998</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">1.2187238</td>
+<td align="right">1.7783272</td>
 <td align="right">NA</td>
-<td align="right">-0.0479381</td>
-<td align="right">0.1381146</td>
-</tr><tr class="odd"><td align="right">1999</td>
+</tr><tr><td align="right">1999</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.4874200</td>
+<td align="right">0.4810521</td>
 <td align="right">NA</td>
-<td align="right">-0.6440101</td>
-<td align="right">0.2900407</td>
-</tr><tr class="even"><td align="right">2000</td>
+</tr><tr><td align="right">2000</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.0187405</td>
+<td align="right">0.2496476</td>
 <td align="right">NA</td>
-<td align="right">-0.6156258</td>
-<td align="right">1.2015972</td>
-</tr><tr class="odd"><td align="right">2001</td>
+</tr><tr><td align="right">2001</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.6155609</td>
+<td align="right">-0.8773390</td>
 <td align="right">NA</td>
-<td align="right">-0.4282888</td>
-<td align="right">-0.7734419</td>
-</tr><tr class="even"><td align="right">2002</td>
+</tr><tr><td align="right">2002</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.8162630</td>
+<td align="right">-0.9726692</td>
 <td align="right">NA</td>
-<td align="right">0.2018445</td>
-<td align="right">0.8977450</td>
-</tr><tr class="odd"><td align="right">2003</td>
+</tr><tr><td align="right">2003</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.0164556</td>
-<td align="right">-0.6931611</td>
-<td align="right">0.1961676</td>
-<td align="right">3.0247102</td>
-</tr><tr class="even"><td align="right">2004</td>
+<td align="right">0.1590186</td>
+<td align="right">-0.6228421</td>
+</tr><tr><td align="right">2004</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">0.0477623</td>
-<td align="right">-0.7325204</td>
-<td align="right">-0.5475032</td>
-<td align="right">-0.0138115</td>
+<td align="right">0.0851050</td>
+<td align="right">-0.6228421</td>
 </tr></tbody></table><p>The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:</p>
 <div class="float">
-<img src="figure/unnamed-chunk-18-1.png" alt="plot of chunk unnamed-chunk-18"><div class="figcaption">plot of chunk unnamed-chunk-18</div>
+<img src="figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8"><div class="figcaption">plot of chunk unnamed-chunk-8</div>
 </div>
 <div class="section level4">
 <h4 id="save-data-object">Save data object<a class="anchor" aria-label="anchor" href="#save-data-object"></a></h4>
@@ -298,7 +312,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

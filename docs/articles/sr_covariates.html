@@ -53,7 +53,7 @@
       <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
     <li>
-      <a href="../articles/lifestage_ruleset.html">Lifestage Rulesets</a>
+      <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
       <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
@@ -115,9 +115,9 @@
     
 <p>There are multiple covariates used in SR JPE modeling that were
 developed through separate but related processes. There are currently
-two documents describing covariate selction and processing for different
-models: (1) Stock Recruit Covariates (this document) and (2) Adult Model
-Covariates.</p>
+two documents describing covariate selection and processing for
+different models: (1) Stock Recruit Covariates (this document) and (2)
+Adult Model Covariates.</p>
 <p>The goal of this document is to process covariates for use in SR JPE
 stock recruitment modeling.</p>
 <div class="section level2">
@@ -129,180 +129,166 @@ This work can be found <a href="https://docs.google.com/spreadsheets/d/1Q4VUBE72
 FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to
 generate the following environmental covariates table to test within the
 SR model.</p>
-<p><em>Table 1. Summary of covariates to include in stock recruit
-modeling based on preliminary literature review.</em></p>
+<p><em>Table 1. Summary of covariates to test in stock recruit modeling
+based on preliminary literature review.</em></p>
 <table class="table  lightable-classic" style='font-family: "Arial Narrow", "Source Sans Pro", sans-serif; margin-left: auto; margin-right: auto;'>
 <thead><tr>
 <th style="text-align:left;">
-Covariate Type
+Variable Name
 </th>
 <th style="text-align:left;">
-Structure
-</th>
-<th style="text-align:left;">
-Rationale
+Description
 </th>
 </tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
-Temperature
+si_gdd_spawn
 </td>
 <td style="text-align:left;">
-Mean or median degree days
-</td>
-<td style="text-align:left;">
-Influence growth rates of juvenile and affect survival
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Temperature
-</td>
-<td style="text-align:left;">
-Day of year when 7DADM drops below or above 13 C
-</td>
-<td style="text-align:left;">
-Production will be low if there are high water temperatures during the
-adult holding and spawning periods
+Additive measure of temperatures during the adult upstream migration and
+spawning window. This window is defined as August-December. The steps
+involved in calculating this value include: obtain daily mean
+temperature values for each stream (if data are available at a finer
+resolution e.g. 15-min intervals then the daily mean is calculated),
+filter the dataset to Aug-Dec, add the daily mean values by stream and
+year. Missing values are filled in with either the rolling 3-day mean or
+if that is not available the monthly mean.
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Temperature
+si_above_13_temp_day
 </td>
 <td style="text-align:left;">
-Mean or median maximum weekly stream temperature
-</td>
-<td style="text-align:left;">
-Temperatures above optimal or above a threshold negatively affect
-fertilization rates and embryo survival
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Temperature
-</td>
-<td style="text-align:left;">
-Emergence date
-</td>
-<td style="text-align:left;">
-Emergence date is correlated with temperature and will influence growth
-rates and survival
+Day of the year when water temperature exceeds 13C representing thermal
+stress during spawning and incubation in tributaries. 13C is recognized
+as the upper limit of water temperature for spawning and incubation. The
+data are not filtered to the spawning time period as this threshold is
+typically met before August; though Jan and Feb are filtered out as
+adults are not yet in the tributaries. The steps involved in calculating
+this value include: obtain daily max temperature values for each stream,
+calculate the 7-day rolling mean of max values (any missing values are
+filled in the weekly mean of the 7DADM), find the min date when the
+7DADM is greater than 13
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Temperature
+si_above_13_temp_week
 </td>
 <td style="text-align:left;">
-Degree days (20 threshold) upstream passage to spawning
-</td>
-<td style="text-align:left;">
-Temperature negatively affects adults as they migrate upstream to spawn
+This is the same as si_above_13_temp_day except instead of a day of the
+year it is the week of the year.
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Hatchery
+si_weekly_max_temp_max
 </td>
 <td style="text-align:left;">
-Proportion of hatchery on spawning grounds
-</td>
-<td style="text-align:left;">
-Hatchery progeny are less fit
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Disaster
-</td>
-<td style="text-align:left;">
-Affected by fire? (0/1)
-</td>
-<td style="text-align:left;">
-Wildfire may have impacts on water quality; after a certain period of
-time or flow these effects may dissipate. Wildfire may also have
-negative impacts on habitat in terms of temperature.
+Weekly max water temperature for tributaries and the mainstem Sacramento
+during the spawning and incubation time period. This window is defined
+as August-December. Note that daily max temperatures are not available
+for Sacramento so daily mean values are used. The steps involved in
+calculating this value include: obtain daily max temperature values for
+each stream, filter the dataset to Aug-Dec, calculate the weekly max
+value for each year and stream, calculate the max value across all
+weeks.
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Water year type
+si_weekly_max_temp_mean
 </td>
 <td style="text-align:left;">
-Categorical water year type
-</td>
-<td style="text-align:left;">
-System level impact on number of juveniles
+This is the same as si_weekly_max_temp_max except when summarizing
+across all weeks the mean value is calculated
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Streamflow
+si_weekly_max_temp_median
 </td>
 <td style="text-align:left;">
-Mean precipitation
-</td>
-<td style="text-align:left;">
-Rainfall affects juvenile growth by influencing foraging efficiency or
-habitat connectivity
+This is the same as si_weekly_max_temp_max except when summarizing
+across all weeks the median value is calculated
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Streamflow
+si_mean_flow
 </td>
 <td style="text-align:left;">
-Maximum monthly precipitation
-</td>
-<td style="text-align:left;">
-High rainfall negatively affects egg survival through streambed scour or
-sedimentation
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Fecundity
-</td>
-<td style="text-align:left;">
-Adult length
-</td>
-<td style="text-align:left;">
-Important for fecundity
+Mean flow during the spawning and incubation time window. This window is
+defined as August-December. The steps involved in calculating this value
+include: obtain daily max flow values for each stream, filter the
+dataset to Aug-Dec, find the mean flow by stream and year.
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Thiamine deficiency
+si_max_flow
 </td>
 <td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
+This is the same as si_mean_flow except the max flow by stream and year
+is calculated.
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Habitat
+si_min_flow
 </td>
 <td style="text-align:left;">
-Off channel habitat
-</td>
-<td style="text-align:left;">
-NA
+This is the same as si_mean_flow except the min flow by stream and year
+is calculated.
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Habitat
+si_median_flow
 </td>
 <td style="text-align:left;">
-Restoration (0/1)
+This is the same as si_mean_flow except the median flow by stream and
+year is calculated.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rr_mean_flow
 </td>
 <td style="text-align:left;">
-NA
+Mean flow during the rearing time period. This window is defined as
+November-July. The steps involved in calculating this value include:
+obtain daily max flow values, filter the dataset to Nov-July, find the
+mean flow by stream and year.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rr_max_flow
+</td>
+<td style="text-align:left;">
+This is the same as rr_mean_flow except the max flow by stream and year
+is calculated.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rr_min_flow
+</td>
+<td style="text-align:left;">
+This is the same as rr_mean_flow except the max flow by stream and year
+is calculated.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+rr_median_flow
+</td>
+<td style="text-align:left;">
+This is the same as rr_mean_flow except the max flow by stream and year
+is calculated.
 </td>
 </tr>
 </tbody>
@@ -337,7 +323,7 @@ stream.</p>
 was selected. Clear Creek 2020 value is low which may be due to a few
 missing data points in December. This approach is vulnerable to missing
 data.</em></p>
-<p><img src="sr_covariates_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
+<p><img src="sr_covariates_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" width="768"></p>
 <p><em>Figure 1. Annual sum of daily mean temperatures during spawning
 and incubation time period (Aug - Dec)</em></p>
 <div class="section level5">
@@ -348,7 +334,7 @@ degrees to indicate thermal stress which could contribute to mortality
 ocurring in the tributaries between adult observation and juveniles at
 the rotary screw trap. Note that adult data from tributaries is used as
 the stock in the mainstem stock recruit model.</p>
-<p><img src="sr_covariates_files/figure-html/unnamed-chunk-7-1.png" width="768"></p>
+<p><img src="sr_covariates_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="768"></p>
 </div>
 </div>
 <div class="section level4">
@@ -370,7 +356,7 @@ on the plot below that are worth further investigation.</li>
 </ul>
 <p><strong>Plot of week where threshold is met (above 13 C) for all
 years and streams</strong></p>
-<p><img src="sr_covariates_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
+<p><img src="sr_covariates_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="768"></p>
 <p><em>Figure 2. Plot of week where threshold is met (above or below 13)
 for all years and streams</em></p>
 </div>
@@ -388,7 +374,7 @@ the daily mean.</li>
 <li>Summarize the weekly max for each stream and year by finding the
 mean, median, and max.</li>
 </ul>
-<p><img src="sr_covariates_files/figure-html/unnamed-chunk-12-1.png" width="768"></p>
+<p><img src="sr_covariates_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" width="768"></p>
 <p><em>Figure 3. Plot of mean, median, max of the maximum weekly
 temperature</em></p>
 </div>
@@ -422,11 +408,11 @@ formats including:</p>
 </h4>
 <p>These covariates summarize daily max flows as annual
 mean/median/max/min within the spawning and rearing time period.</p>
-<p><img src="sr_covariates_files/figure-html/unnamed-chunk-15-1.png" width="768"></p>
+<p><img src="sr_covariates_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" width="768"></p>
 <p><em>Figure 4. Plot of annual summarized (mean, median, max, min) max
 flows during the spawning and incubation time period (Aug -
 Dec)</em></p>
-<p><img src="sr_covariates_files/figure-html/unnamed-chunk-17-1.png" width="768"></p>
+<p><img src="sr_covariates_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" width="768"></p>
 <p><em>Figure 5. Plot of annual summarized (mean, median, max, min) max
 flows during the rearing time period (Tributary: Nov - July, Sacramento:
 Jan - July)</em></p>
@@ -514,7 +500,7 @@ are shown below.</p>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">gdd_spawn</td>
-<td align="right">603.743972</td>
+<td align="right">610.685252</td>
 </tr>
 <tr class="even">
 <td align="right">1998</td>
@@ -522,7 +508,7 @@ are shown below.</p>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">weekly_max_temp_max</td>
-<td align="right">10.241077</td>
+<td align="right">10.198657</td>
 </tr>
 <tr class="odd">
 <td align="right">1998</td>
@@ -530,7 +516,7 @@ are shown below.</p>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">weekly_max_temp_mean</td>
-<td align="right">7.511579</td>
+<td align="right">7.564606</td>
 </tr>
 <tr class="even">
 <td align="right">1998</td>
@@ -538,7 +524,7 @@ are shown below.</p>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">weekly_max_temp_median</td>
-<td align="right">7.274067</td>
+<td align="right">7.434778</td>
 </tr>
 </tbody>
 </table>
@@ -561,7 +547,7 @@ are shown below.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

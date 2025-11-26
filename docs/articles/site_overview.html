@@ -53,7 +53,7 @@
       <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
     </li>
     <li>
-      <a href="../articles/lifestage_ruleset.html">Lifestage Rulesets</a>
+      <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
       <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
@@ -148,8 +148,9 @@ used over time. It is assumed that sites within the Low Flow Channel are
 more similar to each other than the sites in the High Flow Channel and
 vice versa. Some streams only have one site and some sites only have one
 RST. The important difference is that catch from different subsites
-within the same site can be added together, whereas catch from different
-sites cannot be added together as this would be double counting.</p>
+within the same site and same year can be added together, whereas catch
+from different sites cannot be added together as this would be double
+counting.</p>
 <p>This vignette describes the trapping sites that we use for each
 tributary.</p>
 </div>
@@ -351,20 +352,12 @@ Recruit</strong></p>
 <tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
-<td align="right">2006</td>
-<td align="left">TRUE</td>
-<td align="right">2005</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="odd">
-<td align="left">battle creek</td>
-<td align="left">ubc</td>
 <td align="right">2008</td>
 <td align="left">TRUE</td>
 <td align="right">2007</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2009</td>
@@ -372,7 +365,7 @@ Recruit</strong></p>
 <td align="right">2008</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2010</td>
@@ -380,7 +373,7 @@ Recruit</strong></p>
 <td align="right">2009</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2011</td>
@@ -388,7 +381,7 @@ Recruit</strong></p>
 <td align="right">2010</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2012</td>
@@ -396,7 +389,7 @@ Recruit</strong></p>
 <td align="right">2011</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2013</td>
@@ -404,7 +397,7 @@ Recruit</strong></p>
 <td align="right">2012</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2014</td>
@@ -412,7 +405,7 @@ Recruit</strong></p>
 <td align="right">2013</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2016</td>
@@ -420,7 +413,7 @@ Recruit</strong></p>
 <td align="right">2015</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2017</td>
@@ -428,7 +421,7 @@ Recruit</strong></p>
 <td align="right">2016</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2018</td>
@@ -436,7 +429,7 @@ Recruit</strong></p>
 <td align="right">2017</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2019</td>
@@ -444,7 +437,7 @@ Recruit</strong></p>
 <td align="right">2018</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2020</td>
@@ -452,7 +445,7 @@ Recruit</strong></p>
 <td align="right">2019</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2021</td>
@@ -460,7 +453,7 @@ Recruit</strong></p>
 <td align="right">2020</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2022</td>
@@ -468,7 +461,7 @@ Recruit</strong></p>
 <td align="right">2021</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2023</td>
@@ -476,12 +469,28 @@ Recruit</strong></p>
 <td align="right">2022</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">battle creek</td>
 <td align="left">ubc</td>
 <td align="right">2024</td>
 <td align="left">TRUE</td>
 <td align="right">2023</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2025</td>
+<td align="left">TRUE</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2006</td>
+<td align="left">TRUE</td>
+<td align="right">2005</td>
 <td align="left">TRUE</td>
 </tr>
 </tbody>
@@ -579,20 +588,12 @@ Recruit</strong></p>
 <tr class="even">
 <td align="left">butte creek</td>
 <td align="left">okie dam</td>
-<td align="right">2015</td>
-<td align="left">TRUE</td>
-<td align="right">2014</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="odd">
-<td align="left">butte creek</td>
-<td align="left">okie dam</td>
 <td align="right">2016</td>
 <td align="left">TRUE</td>
 <td align="right">2015</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">butte creek</td>
 <td align="left">okie dam</td>
 <td align="right">2018</td>
@@ -600,7 +601,7 @@ Recruit</strong></p>
 <td align="right">2017</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">butte creek</td>
 <td align="left">okie dam</td>
 <td align="right">2020</td>
@@ -608,7 +609,7 @@ Recruit</strong></p>
 <td align="right">2019</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">butte creek</td>
 <td align="left">okie dam</td>
 <td align="right">2021</td>
@@ -616,7 +617,7 @@ Recruit</strong></p>
 <td align="right">2020</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">butte creek</td>
 <td align="left">okie dam</td>
 <td align="right">2022</td>
@@ -624,12 +625,36 @@ Recruit</strong></p>
 <td align="right">2021</td>
 <td align="left">TRUE</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">butte creek</td>
 <td align="left">okie dam</td>
 <td align="right">2023</td>
 <td align="left">TRUE</td>
 <td align="right">2022</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+<td align="right">2023</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2025</td>
+<td align="left">TRUE</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2015</td>
+<td align="left">TRUE</td>
+<td align="right">2014</td>
 <td align="left">TRUE</td>
 </tr>
 </tbody>
@@ -886,6 +911,14 @@ Recruit</strong></p>
 <td align="right">2023</td>
 <td align="left">TRUE</td>
 </tr>
+<tr class="odd">
+<td align="left">clear creek</td>
+<td align="left">lcc</td>
+<td align="right">2025</td>
+<td align="left">TRUE</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1005,6 +1038,14 @@ Recruit</strong></p>
 <td align="right">1994</td>
 <td align="left">TRUE</td>
 </tr>
+<tr class="odd">
+<td align="left">deer creek</td>
+<td align="left">deer creek</td>
+<td align="right">2025</td>
+<td align="left">TRUE</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1014,25 +1055,22 @@ Recruit</strong></p>
 <div class="section level3">
 <h3 id="feather-river">Feather River<a class="anchor" aria-label="anchor" href="#feather-river"></a>
 </h3>
-<p>On Feather River there are many rotary screw trapping sites.
-Consistently, a Low Flow Channel site (between Orville Dam and the
-Thermalito after bay) and a High Flow Channel site (after Thermalito
-after bay) are monitored each year. In 2022, a new RST program started
-on the Lower Feather River below the confluence with the Yuba River.
-This RST captures juveniles from both Yuba and Feather rivers.</p>
-<p><strong><em>Primary site selected: Herringer Riffle (High Flow
+<p>On Feather River there are many rotary screw trap sites.
+Consistently, a Low Flow Channel site (between the Fish Barrier Dam and
+the Thermalito Afterbay Outlet) and a High Flow Channel site (after
+Thermalito Afterbay Outlet) are monitored each year. In 2022, a new RST
+program started on the Lower Feather River below the confluence with the
+Yuba River. This RST captures juveniles from both Yuba and Feather
+rivers.</p>
+<p><strong><em>Primary site selected: Eye Riffle (Low Flow
 Channel)</em></strong></p>
-<p>The SR JPE modeling team selected Herringer Riffle as the primary
-site to use for the Stock Recruit because it has the most consistent
-monitoring in the High Flow Channel, it is still an ongoing monitoring
-site, and it captures the full extent of spring run spawners. Additional
-sites will be used to fill data gaps on the HFC if Herringer is not
-fishing in a given year.</p>
-<p><strong><em>Secondary site</em>:</strong></p>
-<p>Eye Riffle efficiency or catch data may be used in fitting the
-juvenile abundance estimate model (BTSPAS-X) and for supplementary
-analysis. After initial analysis, we will reassess site decision to see
-how to best incorporate Eye Riffle data in modeling.</p>
+<p>The SR JPE modeling team selected Eye Riffle as the primary site to
+use for the Stock Recruit because it would enable direct integration
+with the Probabilistic Length At Date (PLAD) model as genetic data are
+being collected at this site. Additionally, the time series for this
+site is robust. In years where data are not available at Eye Riffle the
+dataset can be supplemented with Steep Riffle and Gateway Riffle which
+are both in the Low Flow Channel.</p>
 <p><em>Additional considerations for Feather River</em></p>
 <p>The Lower Feather River site will be used in the SR JPE modeling but
 will not be used directly to fit a Stock Recruit in a tributary specific
@@ -1053,33 +1091,17 @@ Recruit</strong></p>
 <tr class="odd">
 <td align="left">feather river</td>
 <td align="left">herringer riffle</td>
-<td align="right">2012</td>
-<td align="left">TRUE</td>
-<td align="right">2011</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="even">
-<td align="left">feather river</td>
-<td align="left">herringer riffle</td>
-<td align="right">2013</td>
-<td align="left">TRUE</td>
-<td align="right">2012</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="odd">
-<td align="left">feather river</td>
-<td align="left">herringer riffle</td>
-<td align="right">2014</td>
-<td align="left">TRUE</td>
-<td align="right">2013</td>
-<td align="left">TRUE</td>
-</tr>
-<tr class="even">
-<td align="left">feather river</td>
-<td align="left">herringer riffle</td>
 <td align="right">2015</td>
 <td align="left">TRUE</td>
 <td align="right">2014</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">feather river</td>
+<td align="left">herringer riffle</td>
+<td align="right">2016</td>
+<td align="left">TRUE</td>
+<td align="right">2015</td>
 <td align="left">TRUE</td>
 </tr>
 <tr class="odd">
@@ -1124,10 +1146,26 @@ Recruit</strong></p>
 </tr>
 <tr class="even">
 <td align="left">feather river</td>
-<td align="left">sunset pumps</td>
-<td align="right">2011</td>
+<td align="left">herringer riffle</td>
+<td align="right">2024</td>
 <td align="left">TRUE</td>
-<td align="right">2010</td>
+<td align="right">2023</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">feather river</td>
+<td align="left">herringer riffle</td>
+<td align="right">2025</td>
+<td align="left">TRUE</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">feather river</td>
+<td align="left">sunset pumps</td>
+<td align="right">2025</td>
+<td align="left">TRUE</td>
+<td align="right">2024</td>
 <td align="left">TRUE</td>
 </tr>
 </tbody>
@@ -1249,6 +1287,14 @@ Recruit</strong></p>
 <td align="right">2002</td>
 <td align="left">TRUE</td>
 </tr>
+<tr class="odd">
+<td align="left">mill creek</td>
+<td align="left">mill creek</td>
+<td align="right">2025</td>
+<td align="left">TRUE</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1258,14 +1304,12 @@ Recruit</strong></p>
 <div class="section level3">
 <h3 id="yuba-river">Yuba River<a class="anchor" aria-label="anchor" href="#yuba-river"></a>
 </h3>
-<p>Historically, multiple rotary screw trapping sites have operated on
-the Yuba River. Currently, only 1 site is in operation, the Hallwood
-site.</p>
+<p>Historically, data were collected at the Hallwood site on the Yuba
+River. Data collection at this site resumed in 2022.</p>
 <p><strong><em>Primary site selected: Hallwood</em></strong></p>
 <p>The SR JPE modeling team selected Hallwood as the primary site to use
-for the Stock Recruit because it is the site with the most historical
-data, it is the lowest in the system, and ongoing monitoring at this
-site restarted in 2022.</p>
+for the Stock Recruit because it is the primary RST site on the Yuba
+River.</p>
 <p><strong><em>Secondary site:</em></strong></p>
 <p>Additional Yuba River efficiency or catch data may be used in fitting
 the juvenile abundance estimate model (BTSPAS-X) and for supplementary
@@ -1317,6 +1361,22 @@ Recruit</strong></p>
 <tr class="odd">
 <td align="left">yuba river</td>
 <td align="left">hallwood</td>
+<td align="right">2023</td>
+<td align="left">TRUE</td>
+<td align="right">2022</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">yuba river</td>
+<td align="left">hallwood</td>
+<td align="right">2024</td>
+<td align="left">TRUE</td>
+<td align="right">2023</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">yuba river</td>
+<td align="left">hallwood</td>
 <td align="right">2006</td>
 <td align="left">TRUE</td>
 <td align="right">2005</td>
@@ -1346,7 +1406,7 @@ Recruit</strong></p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

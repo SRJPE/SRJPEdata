@@ -1,5 +1,5 @@
 ---
-title: "Covariate Development for Forecast and Scenario Models"
+title: "Proposed Covariate Development for Forecast and Scenario Models"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Covariate Development for Forecast and Scenario Models}
@@ -38,11 +38,11 @@ standard_flow <- flow_daily
 ```
 
 
-This vignette focuses on developing covariates that could be used in forecast or scenario SR JPE models. We build upon prior work that identified and tested covariates using historical data,  and transition to how those covariates are adapted for use in forecast or scenario scenarios.
+This vignette focuses on developing covariates that could be used in forecast or scenario SR JPE models. We build upon prior work that identified and tested covariates using historical data, and transition to how those covariates could be adapted for use in forecast or scenario scenarios. These covariates have not been implemented and represent one proposal for forecast covariates.
 
 ## Process for developing forecast covariates
 
-The diagram outlines the process for developing covariates for forecast and scenario models. 
+The diagram outlines the process for developing proposed covariates for forecast and scenario models. 
 
 Some covariates were selected and evaluated based on literature review and expert input, followed by testing with historical data using leave-one-out (LOO) analysis. 
 
@@ -55,7 +55,7 @@ As we transition to forecast and scenario model application, we need to find out
 ![*Spring Run JPE Forecast Covariate Process Diagram*](images/sr_jpe_covariate_process_diagram.png){width="108%"}
 
 
-## Covariates included in forecast models
+## Proposed covariates included in forecast models
 
 ```{r include=FALSE}
 covariate_table <- tibble::tibble(
