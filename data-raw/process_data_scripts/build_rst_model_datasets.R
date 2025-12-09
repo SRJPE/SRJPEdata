@@ -196,7 +196,7 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
          number_released, number_recaptured,
          hours_fished, 
          flow_cfs) |> 
-  group_by(stream) |> 
+  group_by(site) |> 
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
   ungroup() |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year),
@@ -210,7 +210,7 @@ standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
   filter(!is.na(flow_cfs), 
          !is.na(number_released),
          !is.na(number_recaptured)) |> 
-  group_by(stream) |> 
+  group_by(site) |> 
   summarise(mean_eff_flow = mean(flow_cfs, na.rm = T),
             sd_eff_flow = sd(flow_cfs, na.rm = T))
 
@@ -220,8 +220,8 @@ mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows 
          !is.na(flow_cfs), 
          !is.na(number_released),
          !is.na(number_recaptured)) |>
-  left_join(standardizing_lookup, by = "stream") |> 
-  group_by(stream) |>
+  left_join(standardizing_lookup, by = "site") |> 
+  group_by(site) |>
   mutate(standardized_efficiency_flow = (flow_cfs - mean_eff_flow) / 
            sd_eff_flow) |> 
   select(year, week, stream, site, standardized_efficiency_flow)
@@ -231,8 +231,8 @@ tributary_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows
          !is.na(flow_cfs),
          !is.na(number_released),
          !is.na(number_recaptured)) |>
-  left_join(standardizing_lookup, by = "stream") |> 
-  group_by(stream) |>
+  left_join(standardizing_lookup, by = "site") |> 
+  group_by(site) |>
   mutate(standardized_efficiency_flow = (flow_cfs - mean_eff_flow) / 
            sd_eff_flow) |> 
   select(year, week, stream, site, standardized_efficiency_flow)
@@ -242,7 +242,7 @@ efficiency_standard_flows <- bind_rows(mainstem_standardized_efficiency_flows,
   glimpse()
 
 weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |> 
-  left_join(standardizing_lookup, by = "stream") |> 
+  left_join(standardizing_lookup, by = "site") |> 
   # standardize catch flow using mean and sd of mark recap flow
   mutate(standardized_flow = (flow_cfs - mean_eff_flow) / 
            sd_eff_flow) |> 
