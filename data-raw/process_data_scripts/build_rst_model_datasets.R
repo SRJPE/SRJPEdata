@@ -212,7 +212,8 @@ standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
          !is.na(number_recaptured)) |> 
   group_by(site) |> 
   summarise(mean_eff_flow = mean(flow_cfs, na.rm = T),
-            sd_eff_flow = sd(flow_cfs, na.rm = T))
+            sd_eff_flow = sd(flow_cfs, na.rm = T)) |> 
+  ungroup()
 
 # Add in standardized efficiency flows 
 mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
