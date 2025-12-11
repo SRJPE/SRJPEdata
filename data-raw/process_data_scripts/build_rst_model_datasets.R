@@ -196,9 +196,8 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
          number_released, number_recaptured,
          hours_fished, 
          flow_cfs) |> 
-  group_by(stream) |> 
-  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE),
-         standardized_flow = as.vector(scale(flow_cfs))) |> # standardizes and centers see ?scale
+  group_by(site) |> 
+  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> 
   ungroup() |> 
   mutate(run_year = ifelse(week >= 45, year + 1, year),
          catch_standardized_by_hours_fished = ifelse((hours_fished == 0 | is.na(hours_fished)), count, round(count * average_stream_hours_fished / hours_fished, 0)),
@@ -207,15 +206,25 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
          ) |> # add logic for situations where trap data is missing
   glimpse()
 
+standardizing_lookup <- weekly_model_data_wo_efficiency_flows |> 
+  filter(!is.na(flow_cfs), 
+         !is.na(number_released),
+         !is.na(number_recaptured)) |> 
+  group_by(site) |> 
+  summarise(mean_eff_flow = mean(flow_cfs, na.rm = T),
+            sd_eff_flow = sd(flow_cfs, na.rm = T)) |> 
+  ungroup()
+
 # Add in standardized efficiency flows 
 mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
   filter(site %in% c("knights landing", "tisdale", "red bluff diversion dam"),
          !is.na(flow_cfs), 
          !is.na(number_released),
          !is.na(number_recaptured)) |>
-  group_by(stream) |>
-  mutate(standardized_efficiency_flow = (flow_cfs - mean(flow_cfs, na.rm = T)) / 
-           sd(flow_cfs, na.rm = T)) |> 
+  left_join(standardizing_lookup, by = "site") |> 
+  group_by(site) |>
+  mutate(standardized_efficiency_flow = (flow_cfs - mean_eff_flow) / 
+           sd_eff_flow) |> 
   select(year, week, stream, site, standardized_efficiency_flow)
 
 tributary_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
@@ -223,17 +232,24 @@ tributary_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows
          !is.na(flow_cfs),
          !is.na(number_released),
          !is.na(number_recaptured)) |>
-  group_by(stream) |>
-  mutate(standardized_efficiency_flow = (flow_cfs - mean(flow_cfs, na.rm = T)) / 
-           sd(flow_cfs, na.rm = T)) |> 
+  left_join(standardizing_lookup, by = "site") |> 
+  group_by(site) |>
+  mutate(standardized_efficiency_flow = (flow_cfs - mean_eff_flow) / 
+           sd_eff_flow) |> 
   select(year, week, stream, site, standardized_efficiency_flow)
 
 efficiency_standard_flows <- bind_rows(mainstem_standardized_efficiency_flows, 
                                        tributary_standardized_efficiency_flows) |> 
-  distinct()
+  glimpse()
 
 weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |> 
-  left_join(efficiency_standard_flows, by = c("year", "week", "stream", "site"))
+  left_join(standardizing_lookup, by = "site") |> 
+  # standardize catch flow using mean and sd of mark recap flow
+  mutate(standardized_flow = (flow_cfs - mean_eff_flow) / 
+           sd_eff_flow) |> 
+  left_join(efficiency_standard_flows, by = c("year", "week", "stream", "site"))  |> 
+  select(-c(mean_eff_flow, sd_eff_flow))
+  
 
 # ADD special priors data in 
 btspasx_special_priors_data <- read.csv(here::here("data-raw", "helper-tables", "Special_Priors.csv")) |>
