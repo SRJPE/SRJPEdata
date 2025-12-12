@@ -308,16 +308,7 @@ tryCatch({
 # Catch 
 weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |> 
   select(-c(number_released, number_recaptured, standardized_efficiency_flow)) |> 
-  mutate(feather_multisite_filter = case_when(run_year == 2015 & week %in% c(1:9, 18:47, 52:53) & site %in% c("steep riffle") ~ "remove", # few weeks where steep used for gateway
-                                              run_year == 2015 & week %in% c(10:17, 48:51) & site %in% c("gateway riffle") ~ "remove",# few weeks where steep used for gateway
-                                              run_year == 2002 & week %in% 1:2 & site == "herringer riffle" ~ "remove",# few weeks where live oak used for herringer
-                                              run_year == 2002 & week %in% 3:44 & site == "live oak" ~ "remove",# few weeks where live oak used for herringer
-                                              T ~ "keep")) |> 
-  filter(feather_multisite_filter == "keep") |> 
-  mutate(site = case_when(run_year == 2015 & stream == "feather river" & site != "herringer riffle" ~ "gateway riffle", # few weeks where steep used for gateway
-                          run_year == 2002 & stream == "feather river" & site != "eye riffle" ~ "herringer riffle", # few weeks where live oak used for herringer
-                          T ~ site)) |> 
-  # ensure weeks are organized by water year
+  # ensure weeks are organized by water year for indexing in BTSPASX
   group_by(site) |> 
   arrange(year, week) |> 
   ungroup()
@@ -327,7 +318,7 @@ weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_dat
   select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow, flow_cfs) |> 
   filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE) |> 
-  # ensure weeks are organized by water year
+  # ensure weeks are organized by water year for indexing in BTSPASX
   group_by(site) |> 
   arrange(year, week) |> 
   ungroup()
