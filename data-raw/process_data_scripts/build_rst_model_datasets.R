@@ -328,7 +328,7 @@ eff_trial_data_check <- weekly_juvenile_abundance_efficiency_data_raw |>
   filter(number_recaptured > number_released)
 
 if(nrow(eff_trial_data_check) > 0) {
-  warning(paste(nrow(eff_trial_data_check), "rows in the efficiency data have more recaptures than releases. Filtering here but should be addressed."))
+  warning(paste(nrow(eff_trial_data_check), "row(s) in the efficiency data have more recaptures than releases. Filtering here but should be addressed."))
 }
 
 # remove erroneous rows
