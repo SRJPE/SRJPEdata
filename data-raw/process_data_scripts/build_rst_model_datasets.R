@@ -316,13 +316,21 @@ weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |>
   filter(feather_multisite_filter == "keep") |> 
   mutate(site = case_when(run_year == 2015 & stream == "feather river" & site != "herringer riffle" ~ "gateway riffle", # few weeks where steep used for gateway
                           run_year == 2002 & stream == "feather river" & site != "eye riffle" ~ "herringer riffle", # few weeks where live oak used for herringer
-                          T ~ site))
+                          T ~ site)) |> 
+  # ensure weeks are organized by water year
+  group_by(site) |> 
+  arrange(year, week) |> 
+  ungroup()
 
 # Efficiency
 weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_data |> 
   select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow, flow_cfs) |> 
   filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
-  distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE)
+  distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE) |> 
+  # ensure weeks are organized by water year
+  group_by(site) |> 
+  arrange(year, week) |> 
+  ungroup()
 
 ck <- weekly_juvenile_abundance_catch_data |>
   select(year, week, stream, site, count) |>
