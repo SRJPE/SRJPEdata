@@ -314,7 +314,7 @@ weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |>
   ungroup()
 
 # Efficiency
-weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_data |> 
+weekly_juvenile_abundance_efficiency_data_raw <- weekly_juvenile_abundance_model_data |> 
   select(year, run_year, week, stream, site, number_released, number_recaptured, standardized_efficiency_flow, flow_cfs) |> 
   filter(!is.na(number_released) & !is.na(number_recaptured)) |> 
   distinct(site, run_year, week, number_released, number_recaptured, .keep_all = TRUE) |> 
@@ -322,6 +322,18 @@ weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_model_dat
   group_by(site) |> 
   arrange(year, week) |> 
   ungroup()
+
+# check for rows where number released > number recaptured
+eff_trial_data_check <- weekly_juvenile_abundance_efficiency_data_raw |> 
+  filter(number_recaptured > number_released)
+
+if(nrow(eff_trial_data_check) > 0) {
+  warning(paste(nrow(eff_trial_data_check), "row(s) in the efficiency data have more recaptures than releases. Filtering here but should be addressed."))
+}
+
+# remove erroneous rows
+weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_efficiency_data_raw |> 
+  filter(number_released >= number_recaptured)
 
 ck <- weekly_juvenile_abundance_catch_data |>
   select(year, week, stream, site, count) |>
