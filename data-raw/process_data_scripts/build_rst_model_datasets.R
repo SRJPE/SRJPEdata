@@ -206,6 +206,18 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
          ) |> # add logic for situations where trap data is missing
   glimpse()
 
+# calculate mean and sd used to standardize flows. should be mean and 
+# sd of efficiency flows except for lbc
+
+# for lbc, use mean and sd of catch flow because we have no efficiency flows
+standardizing_lbc <- weekly_model_data_wo_efficiency_flows |> 
+  filter(site == "lbc") |> 
+  summarise(mean_eff_flow = mean(flow_cfs, na.rm = T),
+            sd_eff_flow = sd(flow_cfs, na.rm = T)) |> 
+  ungroup() |> 
+  mutate(site = "lbc")
+
+# all others
 standardizing_lookup <- weekly_model_data_wo_efficiency_flows |> 
   filter(!is.na(flow_cfs), 
          !is.na(number_released),
@@ -213,7 +225,8 @@ standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
   group_by(site) |> 
   summarise(mean_eff_flow = mean(flow_cfs, na.rm = T),
             sd_eff_flow = sd(flow_cfs, na.rm = T)) |> 
-  ungroup()
+  ungroup() |> 
+  bind_rows(standardizing_lbc)
 
 # Add in standardized efficiency flows 
 mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
