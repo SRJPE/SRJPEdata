@@ -39,7 +39,7 @@ test_that("weekly_juvenile_abundance_catch_data has the appropriate run years ar
 # no missing values when there is catch data (even if catch is 0)
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
 test_that("there is no missing values (hours fished...ect) when there is catch data (even if catch is 0)", {
-  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+  catch <- weekly_juvenile_abundance_catch_data |> 
     filter(!is.na(count)) 
   stream_na = anyNA(catch$stream)
   site_na = anyNA(catch$site) # note 2/14 fixing this in db update
@@ -62,7 +62,7 @@ test_that("there is no missing values (hours fished...ect) when there is catch d
 # still have flow and hours fished even if no catch
 # Currently fails, there are nas in flow, standard flow, fork length, hours fished, catch standardized by hours fished
 test_that("still have flow and hours fished even if no catch", {
-  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |> 
+  catch <- weekly_juvenile_abundance_catch_data |> 
     filter(is.na(count)) 
   stream_na = anyNA(catch$stream)
   site_na = anyNA(catch$site)
@@ -86,7 +86,7 @@ test_that("still have flow and hours fished even if no catch", {
 # no missing values when there is catch data (even if catch is 0)
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
 test_that("there is no -Inf values (hours fished...ect) when there is catch data (even if catch is 0)", {
-  catch <- SRJPEdata::weekly_juvenile_abundance_catch_data 
+  catch <- weekly_juvenile_abundance_catch_data 
   flow_na = any(catch$flow_cfs  == -Inf)
   std_flow_na = any(catch$standardized_flow == -Inf)
   hf_na = any(catch$hours_fished == -Inf)
@@ -120,13 +120,7 @@ test_that("test that there is data for each site week combo", {
     left_join(years_to_include_rst_data |> # need to make sure to filter out years that have been excluded
                 mutate(include = T)) |> 
     filter(include == T) |> 
-    select(-include) |> 
-    mutate(feather_multisite_filter = case_when(run_year == 2015 & week %in% c(1:9, 18:47, 52:53) & site %in% c("steep riffle") ~ "remove", # few weeks where steep used for gateway
-           run_year == 2015 & week %in% c(10:17, 48:51) & site %in% c("gateway riffle") ~ "remove",# few weeks where steep used for gateway
-           run_year == 2002 & week %in% 1:2 & site == "herringer riffle" ~ "remove",# few weeks where live oak used for herringer
-           run_year == 2002 & week %in% 3:44 & site == "live oak" ~ "remove",
-           T ~ "keep")) |> 
-    filter(feather_multisite_filter == "keep") 
+    select(-include)
   
   catch <- weekly_juvenile_abundance_catch_data |> 
     dplyr::select(stream, site, year, week, run_year) |> distinct()

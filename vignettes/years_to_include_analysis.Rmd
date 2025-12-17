@@ -182,7 +182,6 @@ years_to_exclude_rst_data <- years_exclude_rst_csv |>
   distinct()
 
 # Automatic exclusion criteria to be applied to most recent year
-if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at the end of the season 
   max_old_year <- max(years_to_exclude_rst_data$run_year)
   # Consider thinking about adding subsites together, right now it looks like subsites are fished equally
   new_years_to_exclude <- SRJPEdata::rst_trap |> 
@@ -202,7 +201,7 @@ if (month(Sys.Date()) %in% c(8, 9, 10)) { # automatic exclusion only happens at 
     filter(exclude) |> 
     select(stream, site, run_year = monitoring_year, exclusion_type, reason_for_exclusion) 
   years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
-}  
+
 
 usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
 years_exclude_nice_names <- years_to_exclude_rst_data |> select("Stream" = stream, 
