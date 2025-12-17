@@ -99,7 +99,14 @@ try(rst_trap_query_pilot <-  dbGetQuery(con, "SELECT
                                    left join trap_locations tl on (t.trap_location_id = tl.id) 
                                    left join equipment e on (t.sample_gear_id = e.id)
                                    left join why_trap_not_functioning wtnf on (t.why_trap_not_functioning = wtnf.id)
-                                   where (t.program_id = 1 or t.program_id = 2)") )
+                                   where (t.program_id = 1 or t.program_id = 2)") |> 
+      mutate(stream = tolower(stream), 
+             site = ifelse(tolower(site) == "mill creek rst", "mill creek", "deer creek"), # TODO update once queries are more complicated
+             subsite = ifelse(tolower(trap_name) == "mill creek rst", "mill creek", "deer creek"),
+             site_group = stream,
+             rpm_start = rpm_at_start, 
+             rpm_end = rpm_at_end, 
+             debris_volume = debris_volume_gal))
 
 
 # ENV variables we are missing 

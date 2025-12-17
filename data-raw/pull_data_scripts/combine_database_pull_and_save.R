@@ -55,7 +55,9 @@ rst_trap_query_pilot_processed <- rst_trap_query_pilot |>
     debris_volume_gal
   )
 
-rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot_processed, edi_trap)
+rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot_processed, edi_trap) |> 
+  mutate(subsite = ifelse(is.na(subsite), site, subsite),
+         site_group = ifelse(is.na(site_group), site, site_group))
 
 # rst_catch ---------------------------------------------------------------
 
@@ -83,7 +85,7 @@ catch_dates <- rst_trap |>
   )) |>
   distinct(date, stream, site, subsite)
 
-rst_catch <- full_join(catch_dates, rst_catch_raw) |>
+rst_catch <- full_join(catch_dates, rst_catch_prep) |>
   mutate(
     fork_length = ifelse(fork_length == 0, NA, fork_length),
     # looks like there were some cases where fork length is 0. this should be handled more upstream but fixing it here for now
