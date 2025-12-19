@@ -1,0 +1,177 @@
+---
+title: "Yearling Ruleset"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Yearling Ruleset}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.width=8, fig.height=5)
+```
+
+```{r setup, echo = FALSE, warning=FALSE, message=FALSE}
+library(SRJPEdata)
+library(tidyverse)
+library(lubridate)
+# Read in datasets 
+rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
+  mutate(date_for_plot = as_date(date_for_plot))
+daily_ruleset_all <- read.csv(here::here("data-raw", "helper-tables", "daily_yearling_ruleset.csv"))
+```
+
+## Generate Yearling Rulesets 
+
+Raw catch from the trap does not consistently differentiate between yearling and young of year (YOY) Chinook. FlowWest presented a proposed methodology at a life history diversity (LHD) ruleset workshop (see [lhd shiny](https://flowwest.shinyapps.io/lhd-workshop-shiny/) for workshop materials) and worked with watershed experts to define a methodology to systematically determine life history for each tributary (described below).
+
+**Approach**
+
+1) Set weekly cutoff values: Use visual determination on fork length over time scatter plots to set weekly cutoff values of yearlings vs YOY. 
+2) Generate daily cutoff values: Use linear interpolation to extrapolate weekly cutoffs into daily values. 
+3) Review & update: Share proposed cutoff values with watershed experts to review. Update as needed. 
+4) Apply cutoff to catch data: Use daily cutoff values to generate a yearling column in the catch data. 
+
+### Set Weekly Cutoff Values & Generate daily cutoff values
+
+FlowWest proposed weekly cutoff values and used these weekly cutoff values to generate daily values using a linear approximation function, `approxfun`. 
+
+`generate_cutoff <- approxfun(date, fork_length_cutoff, rule = 2)`
+
+The plot below shows the updated cutoff values with linear interpolation of weekly cutoffs for Deer Creek. 
+
+**Note: You can view all code used to generate plots and tables in this markdown [here.](https://github.com/SRJPE/SRJPEdata/blob/main/vignettes/lifestage_ruleset.Rmd)**
+
+```{r}
+# PLOT EXAMPLE FOR DEER 
+stream_name <- "deer creek"
+
+rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
+  mutate(date_for_plot = as_date(date_for_plot))
+
+rulesets_filtered <- rulesets |> 
+    filter(stream == stream_name) 
+  
+data <- rst_catch |> 
+  filter(fork_length < 300) |> # for graph scaling, takes out a lot of butte creek
+  filter(stream != "sacramento river") |> 
+  mutate(week = week(date),
+         week = if_else(week == 53, 52, week), # all December 30th or 31st
+         month = month(date),
+         day = ifelse(day(date) < 10, paste0("0", day(date)), day(date)),
+         fake_year = ifelse(month %in% 10:12, 1971, 1972),
+         # create fake date for plotting all years on same x axis
+         fake_date = ymd(paste0(fake_year, "-",month, "-", day))) |> 
+  select(true_fl = fork_length, week, stream, fake_date) |> 
+  filter(stream == stream_name) 
+
+# interpolate daily cutoff line from weekly cutoff values
+generate_cutoff <- approxfun(rulesets_filtered$date_for_plot,
+                             rulesets_filtered$fl_cutoff, rule = 2)
+ruleset_lines <- tibble(
+    rulesets_dates = seq(as.Date("1971-10-01"), as.Date("1972-09-30"), by = "day"),
+    cutoff_line = generate_cutoff(rulesets_dates))
+
+# format daily rulesets
+daily_ruleset <- ruleset_lines |> 
+    mutate(month = month(rulesets_dates),
+           day = day(rulesets_dates),
+           cutoff = round(cutoff_line, 2),
+           stream = stream_name) |> 
+    select(stream, month, day, cutoff)
+  
+  # join interpolated line by date and then assign
+  # yearling cutoffs based on the interpolated line
+data <- data |> 
+    left_join(ruleset_lines, by = c("fake_date" = "rulesets_dates")) |> 
+    mutate(is_yearling = case_when(true_fl <= cutoff_line ~ "Subyearling",
+                                   true_fl > cutoff_line ~ "Yearling"))
+  
+  # plot
+ ggplot() + 
+    geom_point(data, mapping = aes(x = fake_date, y = true_fl, 
+                                   color = is_yearling), alpha = 0.6) +
+    scale_x_date(date_breaks = "1 month", date_labels = "%b",
+                 limits = c(ymd("1971-10-01"), ymd("1972-09-30"))) +
+    labs(y = "fork length (mm)",
+         x = "") +
+    theme_minimal() +
+    geom_line(ruleset_lines, mapping = aes(x = rulesets_dates, y = cutoff_line)) +
+    ggtitle(paste0(str_to_title(stream_name))) + 
+    theme(plot.title = element_text(hjust = 0.5),
+          legend.position = "bottom") + 
+    labs(color = "Yearling designation") + 
+    geom_point(rulesets_filtered, mapping = aes(x = date_for_plot, y = fl_cutoff), shape = 15) + 
+    scale_color_manual(values = c("#440154FF", "#FDE725FF", "#21908CFF"),
+                       breaks = c("Subyearling", "Yearling", "Missing weekly cutoff value"))
+
+```
+
+```{r, echo = FALSE}
+# Create for all tribs 
+generate_daily_cutoff <- function(stream_name) {
+  rulesets <- read.csv(here::here("data-raw", "helper-tables", "weekly_yearling_cutoff.csv")) |> 
+    mutate(date_for_plot = as_date(date_for_plot))
+  
+  rulesets_filtered <- rulesets |> 
+    filter(stream == stream_name) 
+    
+  catch_data <- rst_catch |> 
+    filter(fork_length < 300) |> # for graph scaling, takes out a lot of butte creek
+    filter(stream == stream_name) |> 
+    mutate(week = week(date),
+           week = if_else(week == 53, 52, week), # all December 30th or 31st
+           month = month(date),
+           day = ifelse(day(date) < 10, paste0("0", day(date)), day(date)),
+           fake_year = ifelse(month %in% 10:12, 1971, 1972),
+           # create fake date for plotting all years on same x axis
+           fake_date = ymd(paste0(fake_year, "-",month, "-", day))) |> 
+    select(true_fl = fork_length, week, stream, fake_date) 
+  
+  # interpolate daily cutoff line from weekly cutoff values
+  generate_cutoff <- approxfun(rulesets_filtered$date_for_plot,
+                               rulesets_filtered$fl_cutoff, rule = 2)
+  ruleset_lines <- tibble(
+      rulesets_dates = seq(as.Date("1971-10-01"), as.Date("1972-09-30"), by = "day"),
+      cutoff_line = generate_cutoff(rulesets_dates))
+  
+  # format daily rulesets
+  daily_yearling_ruleset <- ruleset_lines |> 
+      mutate(month = month(rulesets_dates),
+             day = day(rulesets_dates),
+             cutoff = round(cutoff_line, 2),
+             stream = stream_name) |> 
+      select(stream, month, day, cutoff)
+  return(daily_yearling_ruleset)
+}
+streams <- c("battle creek", "butte creek", "clear creek", "deer creek", 
+             "feather river", "mill creek", "yuba river")
+
+daily_yearling_ruleset <- purrr::map(streams, generate_daily_cutoff) |> reduce(bind_rows)
+
+usethis::use_data(daily_yearling_ruleset, overwrite = TRUE)
+```
+
+
+### Review & Update
+
+FlowWest shared above plot for each watershed and asked stream experts to review. We incorporated feedback and modified rulesets to better separate yearlings and YOY. 
+
+### Apply Cutoff to Catch Data
+
+FlowWest took the daily cutoff line (shown in plot above) and used it as a threshold to classify yearling vs YOY in historical catch data. We added an `is_yearling` column to the catch data and set `is_yearling = TRUE` for any fish with a fork length that exceeded the yearling cutoff on a given date. 
+
+The following code is applied in the `weekly_data_summary` script. 
+
+```{r, include = TRUE, echo = TRUE}
+# Note this is not the final dataset as lifestage is added below
+standard_catch_unmarked_w_yearling <- rst_catch |> 
+  filter(species %in% c("chinook", "chinook salmon")) |>  # filter for only chinook
+  mutate(month = month(date), 
+         day = day(date)) |> 
+  left_join(daily_yearling_ruleset) |> 
+  mutate(is_yearling = case_when((fork_length <= cutoff & !run %in% c("fall","late fall", "winter")) ~ F,
+                                 (fork_length > cutoff & !run %in% c("fall","late fall", "winter")) ~ T,
+                                 (run %in% c("fall","late fall", "winter")) ~ NA,
+                                 T ~ NA)) 
+```
