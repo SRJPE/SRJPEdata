@@ -233,17 +233,17 @@ data_from_ryan <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.cs
 # Prior to year 1 of the weir, we were unsure how much of the run were making it to the Hatchery and being tagged. What we saw year 1, was a large percentage of the fish passing the weir did go into the hatchery (see table below).
 # Th table shows the number of spring-run tagged for broodstock, number returning to the Hatchery in the fall, the number of over summer mortalities during the same period, and includes the corrected count at the weir for 2024.
 
-feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_052925.csv"))
+# Casey provided updated data in Dec 2025 that includes data dating back to 2004 to expand the adult dataset
+feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_data_for_stock_recruit_dec_2025.csv"))
 
 feather_spring_spawner <- feather_adult_raw |> 
-  rename(broodstock_tagged = `broodstock tagged `,
-         broodstock_returns = `broodstock returning to the Hatchery`,
-         over_summer_mortality = `Over summer Mortality`,
-         fms_corrected_count = `FMS corrected count`) |> 
-  mutate(count = broodstock_tagged - broodstock_returns - over_summer_mortality,
-         stream = "feather river",
-         data_type = "broodstock_tag") |> 
-  select(year, stream, count, data_type)
+  filter(!is.na(`Hallprint Tagged1`)) |> 
+  rename(count = `Estimated in-river spring-run`,
+         year = Year) |> 
+  select(year, count) |> 
+  mutate(stream = "feather river",
+         data_type = "broodstock_tag")
+
 
 # Yuba
 # Upstream passage data
