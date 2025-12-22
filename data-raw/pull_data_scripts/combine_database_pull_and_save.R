@@ -1,4 +1,5 @@
 library(tidyverse)
+library(hms)
 # Bind together tables from SRJPE data and data tackle
 source("data-raw/pull_data_scripts/pull_tables_from_database.R")
 source("data-raw/pull_data_scripts/pull_tables_from_data_tackle_database.R")
@@ -30,17 +31,27 @@ rst_trap_query_pilot_processed <- rst_trap_query_pilot |>
       as_date(trap_visit_time_end) - as_date(trap_visit_time_start) < 0 ~ as_date(trap_visit_time_end) - 1,
       # this is the first day for mill
       T ~ trap_visit_time_start
-    )
+    ),
+    trap_start_date = as_date(trap_visit_time_start),
+    trap_start_time = as_hms(trap_visit_time_start),
+    trap_stop_date = as_date(trap_visit_time_end),
+    trap_stop_time = as_hms(trap_visit_time_end),
+    subsite = site
   ) |>
   select(
     trap_visit_id,
     stream,
     site,
+    subsite,
     trap_name,
     is_paper_entry,
-    trap_visit_time_start,
-    trap_visit_time_end,
-    trap_visit_time_restart,
+    trap_start_date,
+    trap_stop_date,
+    trap_start_time,
+    trap_stop_time,
+    #trap_visit_time_start,
+    #trap_visit_time_end,
+    #trap_visit_time_restart,
     fish_processed,
     why_fish_not_processed,
     sample_gear,
@@ -102,10 +113,16 @@ rst_catch <- full_join(catch_dates, rst_catch_prep) |>
       # we made the decision to include these historical ones as halwood
       T ~ subsite
     ),
-    species = ifelse(
-      species %in% c("chinook", "chinook salmon"),
-      "chinook salmon",
-      species
+    site_group = case_when(!stream %in% c("feather river", "sacramento river") ~ stream,
+                           site == "knights landing" ~ "knights landing",
+                           site == "tisdale" ~ "tisdale",
+                           site %in% c("eye riffle", "steep riffle", "gateway riffle") ~ "upper feather lfc",
+                           site %in% c("live oak", "herringer riffle", "sunset pumps", "shawn's beach") ~ "upper feather hfc",
+                           T ~ stream),
+    species = case_when(
+      species %in% c("chinook", "chinook salmon") ~ "chinook salmon",
+      is.na(species) ~ "chinook salmon",
+      T ~ species
     ),
     butte_fyke_filter = case_when(
       site == "okie dam" & as_date(date) %in% okie_rst ~ "rst & fyke",
@@ -121,8 +138,9 @@ rst_catch <- full_join(catch_dates, rst_catch_prep) |>
     # filter for only chinook
     life_stage != "adult",
     # remove the adult fish (mostly on Butte)
-    butte_fyke_filter != "fyke only",!is.na(stream)
-  ) |>  # 7 NAs I think come from knights landings
+    butte_fyke_filter != "fyke only",!is.na(stream),
+    !is.na(date) # there are currently (12/19) 3 NA dates from battle/clear with count 0, believe this is an issue with trap data rather than catch
+  ) |>  
   select(-c(butte_fyke_filter))
 
 # release -----------------------------------------------------------------
