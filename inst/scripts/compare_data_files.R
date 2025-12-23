@@ -13,9 +13,26 @@ library(yaml)
 # ============================================
 
 # Path to YAML configuration file
-CONFIG_FILE <- "inst/config/data_comparison_config.yml"
+# Try multiple possible locations
+find_config_file <- function() {
+  possible_paths <- c(
+    "inst/config/data_comparison_config.yml",
+    "../inst/config/data_comparison_config.yml",
+    "../../inst/config/data_comparison_config.yml",
+    file.path(getwd(), "inst/config/data_comparison_config.yml")
+  )
+  
+  for (path in possible_paths) {
+    if (file.exists(path)) {
+      cat("Found config file at:", normalizePath(path), "\n")
+      return(normalizePath(path))
+    }
+  }
+  
+  return(NULL)
+}
 
-get_file_config <- function(file_path, config_file = CONFIG_FILE) {
+get_file_config <- function(file_path, config_file = NULL) {
   file_name <- basename(file_path)
   
   # Default configuration
@@ -28,9 +45,20 @@ get_file_config <- function(file_path, config_file = CONFIG_FILE) {
     allowed_attribute_changes = c("class", "row.names")
   )
   
+  # Find config file if not specified
+  if (is.null(config_file)) {
+    config_file <- find_config_file()
+  }
+  
   # Check if config file exists
-  if (!file.exists(config_file)) {
-    warning(paste("Configuration file not found:", config_file, "- using defaults"))
+  if (is.null(config_file) || !file.exists(config_file)) {
+    warning(paste("Configuration file not found - using defaults for", file_name))
+    warning(paste("Searched locations:", paste(c(
+      "inst/config/data_comparison_config.yml",
+      "../inst/config/data_comparison_config.yml",
+      "../../inst/config/data_comparison_config.yml"
+    ), collapse = ", ")))
+    warning(paste("Current working directory:", getwd()))
     return(default_config)
   }
   
@@ -41,10 +69,10 @@ get_file_config <- function(file_path, config_file = CONFIG_FILE) {
     # Get file-specific config or use default from YAML
     if (file_name %in% names(all_configs)) {
       config_data <- all_configs[[file_name]]
-      cat("Using configuration for:", file_name, "\n")
+      cat("✓ Using configuration for:", file_name, "\n")
     } else if ("default" %in% names(all_configs)) {
       config_data <- all_configs[["default"]]
-      warning(paste("No configuration found for", file_name, "- using default from YAML"))
+      warning(paste("No specific configuration for", file_name, "- using default from YAML"))
     } else {
       warning(paste("No configuration found for", file_name, "- using built-in defaults"))
       return(default_config)
@@ -63,6 +91,12 @@ get_file_config <- function(file_path, config_file = CONFIG_FILE) {
         unlist(config_data$allowed_attribute_changes)
       }
     )
+    
+    # Print configuration being used
+    cat("Configuration loaded:\n")
+    cat("  ID columns:", if (is.null(config$id_columns)) "NULL (using row numbers)" else paste(config$id_columns, collapse = ", "), "\n")
+    cat("  Allowed to change:", paste(config$allowed_to_change, collapse = ", "), "\n")
+    cat("  Date columns:", if (length(config$date_columns) == 0) "none" else paste(config$date_columns, collapse = ", "), "\n")
     
     return(config)
     

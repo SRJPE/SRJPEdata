@@ -71,15 +71,32 @@ jobs:
       
       - name: Check for config file
         run: |
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo ""
+          echo "Checking for config file..."
           if [ -f "inst/config/data_comparison_config.yml" ]; then
-            echo "✓ Configuration file found"
+            echo "✓ Configuration file found at inst/config/data_comparison_config.yml"
+            echo ""
+            echo "Config file contents:"
             cat inst/config/data_comparison_config.yml
           else
-            echo "⚠ Warning: Configuration file not found at inst/config/data_comparison_config.yml"
-            echo "The script will use default configuration for all files."
+            echo "❌ Configuration file NOT found at inst/config/data_comparison_config.yml"
             echo ""
-            echo "To add configuration, create inst/config/data_comparison_config.yml"
-            echo "See documentation for examples."
+            echo "Checking inst directory:"
+            if [ -d "inst" ]; then
+              echo "inst/ exists, contents:"
+              ls -la inst/
+              if [ -d "inst/config" ]; then
+                echo "inst/config/ exists, contents:"
+                ls -la inst/config/
+              else
+                echo "inst/config/ does NOT exist"
+              fi
+            else
+              echo "inst/ directory does NOT exist"
+            fi
           fi
       
       - name: Compare data files
