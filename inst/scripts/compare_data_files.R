@@ -119,14 +119,14 @@ load_rda_file <- function(file_path) {
   })
 }
 
-compare_values <- function(old_val, new_val, col_name) {
+compare_values <- function(old_val, new_val, col_name, tolerance = 1e-6) {
   # Handle NA comparisons
   if (is.na(old_val) && is.na(new_val)) return(TRUE)
   if (is.na(old_val) || is.na(new_val)) return(FALSE)
   
   # Numeric comparison with tolerance
   if (is.numeric(old_val) && is.numeric(new_val)) {
-    return(abs(old_val - new_val) < NUMERIC_TOLERANCE)
+    return(abs(old_val - new_val) < tolerance)
   }
   
   # Direct comparison for other types
@@ -387,7 +387,7 @@ compare_data_files <- function(old_file, new_file) {
       old_val <- old_row[[col]]
       new_val <- new_row[[col]]
       
-      if (!compare_values(old_val, new_val, col)) {
+      if (!compare_values(old_val, new_val, col, NUMERIC_TOLERANCE)) {
         modifications[[length(modifications) + 1]] <- list(
           row_id = row_id,
           column = col,
