@@ -47,6 +47,7 @@ environmental_data.rda:
     - gage_agency
     - site_group
     - parameter
+    - statistic
   allowed_to_change:
   date_columns:
   numeric_tolerance: 1

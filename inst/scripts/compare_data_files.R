@@ -15,20 +15,31 @@ library(yaml)
 # Path to YAML configuration file
 # Try multiple possible locations
 find_config_file <- function() {
+  # Get the repository root (where .git is)
+  repo_root <- system("git rev-parse --show-toplevel", intern = TRUE)
+  
   possible_paths <- c(
     "inst/config/data_comparison_config.yml",
+    file.path(repo_root, "inst/config/data_comparison_config.yml"),
     "../inst/config/data_comparison_config.yml",
     "../../inst/config/data_comparison_config.yml",
     file.path(getwd(), "inst/config/data_comparison_config.yml")
   )
   
+  cat("Searching for config file...\n")
+  cat("Repository root:", repo_root, "\n")
+  cat("Current directory:", getwd(), "\n")
+  
   for (path in possible_paths) {
+    cat("  Checking:", path, "... ")
     if (file.exists(path)) {
-      cat("Found config file at:", normalizePath(path), "\n")
+      cat("FOUND\n")
       return(normalizePath(path))
     }
+    cat("not found\n")
   }
   
+  cat("Config file not found in any location\n")
   return(NULL)
 }
 
@@ -154,7 +165,15 @@ load_rda_file <- function(file_path) {
 }
 
 compare_values <- function(old_val, new_val, col_name, tolerance = 1e-6) {
+  # Handle vectors (should not happen, but safety check)
+  if (length(old_val) > 1 || length(new_val) > 1) {
+    warning(paste("compare_values received vector for column", col_name, "- using first element"))
+    old_val <- old_val[1]
+    new_val <- new_val[1]
+  }
+  
   # Handle NA comparisons
+  if (length(old_val) == 0 || length(new_val) == 0) return(FALSE)
   if (is.na(old_val) && is.na(new_val)) return(TRUE)
   if (is.na(old_val) || is.na(new_val)) return(FALSE)
   
@@ -418,8 +437,9 @@ compare_data_files <- function(old_file, new_file) {
     new_row <- new_data[new_data$row_id == row_id, ]
     
     for (col in cols_to_check) {
-      old_val <- old_row[[col]]
-      new_val <- new_row[[col]]
+      # Extract single values (not vectors)
+      old_val <- old_row[[col]][1]
+      new_val <- new_row[[col]][1]
       
       if (!compare_values(old_val, new_val, col, NUMERIC_TOLERANCE)) {
         modifications[[length(modifications) + 1]] <- list(
