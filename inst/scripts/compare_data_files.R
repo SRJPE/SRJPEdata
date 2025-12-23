@@ -554,22 +554,42 @@ cat("Changed files:", paste(changed_files, collapse = ", "), "\n")
 results_list <- list()
 
 for (new_file in changed_files) {
-  cat("\nComparing:", new_file, "\n")
+  cat("\n========================================\n")
+  cat("Comparing:", new_file, "\n")
+  cat("========================================\n")
   
   # Get the old version from main branch
   old_file <- paste0("main_", basename(new_file))
   
   # Checkout the file from main branch
   git_command <- paste0("git show main:", new_file, " > ", old_file)
-  git_result <- system(git_command, ignore.stderr = FALSE, intern = FALSE)
+  cat("Running git command:", git_command, "\n")
   
-  # Check if git command succeeded
-  if (git_result != 0 || !file.exists(old_file) || file.info(old_file)$size == 0) {
-    cat("Note: Could not retrieve old version from main branch (may be new file)\n")
-    # Create empty marker file so compare_data_files knows it's new
-    if (file.exists(old_file)) {
+  git_result <- system(git_command, ignore.stderr = FALSE, intern = FALSE)
+  cat("Git command exit code:", git_result, "\n")
+  
+  # Check if git command succeeded and file exists
+  if (file.exists(old_file)) {
+    file_size <- file.info(old_file)$size
+    cat("Old file retrieved. Size:", file_size, "bytes\n")
+    
+    if (file_size == 0) {
+      cat("WARNING: Old file is empty (0 bytes)\n")
       file.remove(old_file)
     }
+  } else {
+    cat("WARNING: Old file not created by git command\n")
+  }
+  
+  # Verify files before comparison
+  cat("\nFile check:\n")
+  cat("  New file exists:", file.exists(new_file), "\n")
+  if (file.exists(new_file)) {
+    cat("  New file size:", file.info(new_file)$size, "bytes\n")
+  }
+  cat("  Old file exists:", file.exists(old_file), "\n")
+  if (file.exists(old_file)) {
+    cat("  Old file size:", file.info(old_file)$size, "bytes\n")
   }
   
   # Compare
@@ -579,7 +599,10 @@ for (new_file in changed_files) {
   # Clean up
   if (file.exists(old_file)) {
     file.remove(old_file)
+    cat("Cleaned up temporary old file\n")
   }
+  
+  cat("\n")
 }
 
 # Generate report
