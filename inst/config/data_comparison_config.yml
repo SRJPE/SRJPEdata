@@ -239,3 +239,4 @@ default:
   date_columns: []
   numeric_tolerance: 1
   check_attributes: true
+
