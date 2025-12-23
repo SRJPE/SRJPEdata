@@ -544,11 +544,25 @@ jobs:
         run: |
           echo "=== Final Status Check ==="
           
-          CREDENTIAL_ISSUES=${{ steps.credential-check.outputs.credential_issues }}
-          STRUCTURE_ISSUES=${{ steps.structure-check.outputs.structure_issues }}
+          CREDENTIAL_ISSUES="${{ steps.credential-check.outputs.credential_issues }}"
+          STRUCTURE_ISSUES="${{ steps.structure-check.outputs.structure_issues }}"
           TEST_STATUS="${{ steps.testthat.outputs.test_status }}"
-          COMPARISON_EXIT=${{ steps.comparison.outputs.comparison_exit_code }}
-          DATA_APPROVED=${{ steps.check-approval.outputs.approved }}
+          COMPARISON_EXIT="${{ steps.comparison.outputs.comparison_exit_code }}"
+          DATA_APPROVED="${{ steps.check-approval.outputs.approved }}"
+          
+          # Default empty values to 0 or appropriate defaults
+          CREDENTIAL_ISSUES=${CREDENTIAL_ISSUES:-0}
+          STRUCTURE_ISSUES=${STRUCTURE_ISSUES:-0}
+          TEST_STATUS=${TEST_STATUS:-unknown}
+          COMPARISON_EXIT=${COMPARISON_EXIT:-0}
+          DATA_APPROVED=${DATA_APPROVED:-false}
+          
+          echo "Credential issues: $CREDENTIAL_ISSUES"
+          echo "Structure issues: $STRUCTURE_ISSUES"
+          echo "Test status: $TEST_STATUS"
+          echo "Comparison exit code: $COMPARISON_EXIT"
+          echo "Data approved: $DATA_APPROVED"
+          echo ""
           
           FAILURES=0
           
@@ -620,4 +634,3 @@ jobs:
           
           exit $TEST_EXIT_CODE
       
-    
