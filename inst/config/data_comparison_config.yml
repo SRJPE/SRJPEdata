@@ -1,0 +1,240 @@
+# inst/config/data_comparison_config.yml
+# ============================================
+# DATA FILE COMPARISON CONFIGURATION
+# ============================================
+# Define ID columns and allowed changes for each data file
+
+# Annual adult data
+annual_adult.rda:
+  id_columns:
+    - year
+    - stream
+    - data_type
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Priors for BTSPASX
+btspasx_special_priors_data.rda:
+  id_columns:
+    - site
+    - run_year
+    - week
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 0.001  # 0.69-2.48 so shouldn't vary too much
+  check_attributes: true
+
+# Daily yearling ruleset
+daily_yearling_ruleset.rda:
+  id_columns:
+    - stream
+    - month
+    - day
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Species reference list
+environmental_data.rda:
+  id_columns:
+    - stream
+    - week
+    - year
+    - gage_number
+    - gage_agency
+    - site_group
+    - parameter
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Forecast covariates
+forecast_covariates.rda:
+  id_columns:
+    - name
+    - year
+    - water_year
+    - stream
+    - month
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# P2S covariates
+p2s_model_covariates.rda:
+  id_columns:
+    - year
+    - stream
+    - wy_type
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Recaptures
+recaptures.rda:
+  id_columns:
+    - date
+    - release_id
+    - stream
+    - site
+    - subsite
+    - site_group
+    - fork_length
+    - dead
+    - weight
+    - run
+    - life_stage
+    - adipose_clipped
+    - species
+  allowed_to_change:
+  date_columns:
+    - date
+  numeric_tolerance: 1
+  check_attributes: true
+  
+# Release
+release.rda:
+  id_columns:
+    - date_released
+    - release_id
+    - stream
+    - site
+    - subsite
+    - site_group
+    - run
+    - life_stage
+    - origin_released
+  allowed_to_change:
+  date_columns:
+    - date_released
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Catch
+rst_catch.rda:
+  id_columns:
+    - date
+    - stream
+    - site
+    - subsite
+    - site_group
+    - fork_length
+    - dead
+    - weight
+    - run
+    - life_stage
+    - adipose_clipped
+    - actual_count
+    - species
+  allowed_to_change:
+  date_columns:
+    - date
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Trap
+rst_trap.rda:
+  id_columns:
+    - trap_start_date
+    - trap_start_time
+    - trap_stop_date
+    - trap_stop_time
+    - stream
+    - site
+    - subsite
+    - site_group
+  allowed_to_change:
+  date_columns:
+    - trap_start_date
+    - trap_stop_date
+  numeric_tolerance: 1
+  check_attributes: true
+  
+# Stock recruit covariates
+stock_recruit_covariates.rda:
+  id_columns:
+    - year
+    - stream
+    - lifestage
+    - covariate_type
+    - covariate_structure
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  
+# Survival model inputs
+survival_model_inputs.rda:
+  id_columns:
+    - fish_id
+  allowed_to_change:
+  date_columns:
+    - fish_release_date
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Weekly efficiency
+weekly_efficiency.rda:
+  id_columns:
+    - stream
+    - site
+    - site_group
+    - week_released
+    - year_released
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Weekly hours fished
+weekly_hours_fished.rda:
+  id_columns:
+    - stream
+    - site
+    - subsite
+    - site_group
+    - week
+    - year
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true  
+
+# Weekly juvenile abundance catch
+weekly_juvenile_abundance_catch_data.rda:
+  id_columns:
+    - year
+    - week
+    - stream
+    - site
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Weekly juvenile abundance efficiency
+weekly_juvenile_abundance_efficiency.rda:
+  id_columns:
+    - year
+    - run_year
+    - week
+    - stream
+    - site
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  
+# Default
+default:
+  id_columns: null  # Will use row numbers
+  allowed_to_change:
+  date_columns: []
+  numeric_tolerance: 1
+  check_attributes: true
