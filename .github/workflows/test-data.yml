@@ -69,6 +69,19 @@ jobs:
             fi
           done
       
+      - name: Check for config file
+        run: |
+          if [ -f "inst/config/data_comparison_config.yml" ]; then
+            echo "✓ Configuration file found"
+            cat inst/config/data_comparison_config.yml
+          else
+            echo "⚠ Warning: Configuration file not found at inst/config/data_comparison_config.yml"
+            echo "The script will use default configuration for all files."
+            echo ""
+            echo "To add configuration, create inst/config/data_comparison_config.yml"
+            echo "See documentation for examples."
+          fi
+      
       - name: Compare data files
         if: steps.changed-files.outputs.any_changed == 'true'
         run: |

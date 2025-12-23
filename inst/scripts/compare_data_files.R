@@ -147,15 +147,15 @@ create_row_id <- function(data, id_cols) {
   do.call(paste, c(data[id_cols], sep = "_"))
 }
 
-compare_attributes <- function(old_data, new_data) {
+compare_attributes <- function(old_data, new_data, allowed_changes = c("class", "row.names")) {
   issues <- list()
   
   old_attrs <- attributes(old_data)
   new_attrs <- attributes(new_data)
   
   # Remove allowed attribute changes
-  old_attrs <- old_attrs[!names(old_attrs) %in% ALLOWED_ATTRIBUTE_CHANGES]
-  new_attrs <- new_attrs[!names(new_attrs) %in% ALLOWED_ATTRIBUTE_CHANGES]
+  old_attrs <- old_attrs[!names(old_attrs) %in% allowed_changes]
+  new_attrs <- new_attrs[!names(new_attrs) %in% allowed_changes]
   
   # Check for missing attributes
   missing_attrs <- setdiff(names(old_attrs), names(new_attrs))
@@ -302,7 +302,7 @@ compare_data_files <- function(old_file, new_file) {
   
   # Compare attributes if enabled
   if (CHECK_ATTRIBUTES) {
-    attr_issues <- compare_attributes(old_data, new_data)
+    attr_issues <- compare_attributes(old_data, new_data, ALLOWED_ATTRIBUTE_CHANGES)
     if (length(attr_issues) > 0) {
       results$issues <- c(results$issues, attr_issues)
     }
