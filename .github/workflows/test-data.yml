@@ -19,19 +19,13 @@ jobs:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Get full history to compare with main
-          ref: ${{ github.head_ref }}  # Checkout the PR branch
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
       
       - name: Fetch main branch
         run: |
           git fetch origin main:main
           echo "Current branch: $(git branch --show-current)"
-          echo ""
-          echo "Checking if config file exists on current branch:"
-          git ls-files inst/config/data_comparison_config.yml || echo "Config file NOT tracked on current branch"
-          echo ""
-          echo "Checking if config file exists on main branch:"
-          git ls-tree main:inst/config/ 2>/dev/null || echo "Config directory doesn't exist on main or is empty"
       
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
@@ -58,7 +52,6 @@ jobs:
           echo "=== Checking for credentials and sensitive files ==="
           FOUND_ISSUES=0
           
-          # Files that should NEVER be committed
           FORBIDDEN_FILES=(
             ".Renviron"
             ".env"
@@ -68,7 +61,6 @@ jobs:
             "config.yml"
           )
           
-          # Patterns to search for in code
           FORBIDDEN_PATTERNS=(
             "password\\s*=\\s*['\"][^'\"]{3,}['\"]"
             "api[_-]?key\\s*=\\s*['\"][^'\"]{10,}['\"]"
@@ -116,30 +108,14 @@ jobs:
           echo "=== Checking R package structure ==="
           STRUCTURE_ISSUES=0
           
-          # Required files for R package
           REQUIRED_FILES=(
             "DESCRIPTION"
             "NAMESPACE"
           )
           
-          # Required directories
           REQUIRED_DIRS=(
             "R"
             "man"
-          )
-          
-          # Recommended directories
-          RECOMMENDED_DIRS=(
-            "data"
-            "tests"
-            "inst"
-          )
-          
-          # Files that shouldn't be in root
-          MISPLACED_FILES=(
-            "*.rda"
-            "*.RData"
-            "*.rds"
           )
           
           echo "Checking required files..."
@@ -164,26 +140,6 @@ jobs:
           done
           
           echo ""
-          echo "Checking recommended directories..."
-          for dir in "${RECOMMENDED_DIRS[@]}"; do
-            if [ ! -d "$dir" ]; then
-              echo "⚠️  Warning: Missing recommended directory: $dir/"
-            else
-              echo "✓ Found: $dir/"
-            fi
-          done
-          
-          echo ""
-          echo "Checking for misplaced data files..."
-          for pattern in "${MISPLACED_FILES[@]}"; do
-            files=$(find . -maxdepth 1 -name "$pattern" -type f 2>/dev/null || true)
-            if [ ! -z "$files" ]; then
-              echo "⚠️  Warning: Data files in root directory (should be in data/):"
-              echo "$files"
-            fi
-          done
-          
-          echo ""
           echo "Checking DESCRIPTION file format..."
           if [ -f "DESCRIPTION" ]; then
             if ! grep -q "^Package:" DESCRIPTION; then
@@ -194,17 +150,6 @@ jobs:
               echo "❌ ERROR: DESCRIPTION missing 'Version:' field"
               STRUCTURE_ISSUES=$((STRUCTURE_ISSUES + 1))
             fi
-            if ! grep -q "^Title:" DESCRIPTION; then
-              echo "⚠️  Warning: DESCRIPTION missing 'Title:' field"
-            fi
-          fi
-          
-          echo ""
-          echo "Checking for proper .Rbuildignore..."
-          if [ ! -f ".Rbuildignore" ]; then
-            echo "⚠️  Warning: No .Rbuildignore file found"
-          else
-            echo "✓ Found: .Rbuildignore"
           fi
           
           echo ""
@@ -228,12 +173,10 @@ jobs:
           
           if [ ! -d "tests/testthat" ]; then
             echo "⚠️  No tests/testthat directory found"
-            echo "To add tests, create tests/testthat/ and add test files"
             echo "test_status=skipped" >> $GITHUB_OUTPUT
             exit 0
           fi
           
-          # Count test files
           TEST_FILES=$(find tests/testthat -name "test*.R" | wc -l)
           echo "Found $TEST_FILES test file(s)"
           
@@ -243,83 +186,58 @@ jobs:
             exit 0
           fi
           
-          # Run tests
           Rscript -e "
           library(testthat)
           
-          # Try to load package with devtools if available
           tryCatch({
             if (requireNamespace('devtools', quietly = TRUE)) {
               devtools::load_all('.', quiet = TRUE)
               cat('✓ Package loaded with devtools\n')
             } else {
-              # Try loading without devtools
-              cat('⚠️  devtools not available, loading package namespace directly\n')
-              # Source all R files
-              r_files <- list.files('R', pattern = '\\\\.R
+              cat('⚠️  devtools not available, loading R files directly\n')
+              r_files <- list.files('R', pattern = '\\\\.R$', full.names = TRUE)
+              lapply(r_files, source)
+              cat('✓ Sourced', length(r_files), 'R file(s)\n')
+            }
+          }, error = function(e) {
+            cat('⚠️  Warning: Could not load package:', e\$message, '\n')
+          })
+          
+          cat('\nRunning tests...\n')
+          results <- test_dir('tests/testthat', reporter = 'summary')
+          
+          if (any(results\$failed > 0)) {
+            cat('\n❌ Some tests failed\n')
+            quit(status = 1)
+          } else if (any(results\$warning > 0)) {
+            cat('\n⚠️  Tests passed with warnings\n')
+            quit(status = 0)
+          } else {
+            cat('\n✅ All tests passed\n')
+            quit(status = 0)
+          }
+          "
+          
+          TEST_EXIT_CODE=$?
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            echo "test_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "test_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          exit $TEST_EXIT_CODE
       
       # ==========================================
       # DATA COMPARISON
       # ==========================================
       
-      - name: Debug git and file info
-        if: steps.changed-files.outputs.any_changed == 'true'
-        run: |
-          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-          echo "Current branch: $(git branch --show-current)"
-          echo "Git log (last 2 commits on current branch):"
-          git log --oneline -2
-          echo ""
-          echo "Git log (last 2 commits on main):"
-          git log --oneline -2 main
-          echo ""
-          echo "Testing git show command:"
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "Checking: $file"
-            echo "  On current branch: $(git log -1 --format="%h" -- $file)"
-            echo "  On main: $(git log -1 --format="%h" main -- $file)"
-            echo "  Attempting git show main:$file"
-            git show main:$file > /tmp/test_output 2>&1 && echo "  ✓ Success" || echo "  ✗ Failed"
-            if [ -f /tmp/test_output ]; then
-              echo "  File size: $(wc -c < /tmp/test_output) bytes"
-              rm /tmp/test_output
-            fi
-          done
-      
-      - name: Check for config file
-        run: |
-          echo "=== Checking for config file ==="
-          echo "Current directory: $(pwd)"
-          echo ""
-          echo "Full directory tree:"
-          find . -name "data_comparison_config.yml" -o -name "*.yml" -path "*/config/*" 2>/dev/null || echo "No yml files found in config directories"
-          echo ""
-          echo "Checking standard location:"
-          if [ -f "inst/config/data_comparison_config.yml" ]; then
-            echo "✓ Configuration file found at inst/config/data_comparison_config.yml"
-            echo "File size: $(wc -c < inst/config/data_comparison_config.yml) bytes"
-            echo ""
-            echo "Config file contents:"
-            cat inst/config/data_comparison_config.yml
-          else
-            echo "❌ Configuration file NOT found at inst/config/data_comparison_config.yml"
-            echo ""
-            echo "Checking if file is tracked by git:"
-            git ls-files | grep -i config || echo "No config files tracked by git"
-            echo ""
-            echo "Repository structure:"
-            ls -la
-            if [ -d "inst" ]; then
-              echo ""
-              echo "inst/ directory contents:"
-              ls -la inst/
-              if [ -d "inst/config" ]; then
-                echo ""
-                echo "inst/config/ directory contents:"
-                ls -la inst/config/
-              fi
-            fi
-          fi
+      - name: Get changed RDA files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            data/*.rda
+            data/*.RData
       
       - name: Compare data files
         if: steps.changed-files.outputs.any_changed == 'true'
@@ -343,7 +261,6 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // Check if PR has "data-changes-approved" label
             const labels = context.payload.pull_request.labels.map(l => l.name);
             const approved = labels.includes('data-changes-approved');
             
@@ -352,6 +269,11 @@ jobs:
             
             core.setOutput('approved', approved);
             return approved;
+      
+      # ==========================================
+      # REPORTING
+      # ==========================================
+      
       - name: Comment PR with results
         if: always()
         uses: actions/github-script@v7
@@ -359,37 +281,31 @@ jobs:
           script: |
             const fs = require('fs');
             
-            // Get all check statuses
             const credentialIssues = parseInt('${{ steps.credential-check.outputs.credential_issues }}') || 0;
             const structureIssues = parseInt('${{ steps.structure-check.outputs.structure_issues }}') || 0;
             const testStatus = '${{ steps.testthat.outputs.test_status }}' || 'unknown';
             const comparisonExitCode = '${{ steps.comparison.outputs.comparison_exit_code }}';
             const dataApproved = '${{ steps.check-approval.outputs.approved }}' === 'true';
             
-            // Read comparison report
             let comparisonReport = 'No comparison report generated.';
             if (fs.existsSync('comparison_report.txt')) {
               comparisonReport = fs.readFileSync('comparison_report.txt', 'utf8');
             }
             
-            // Build status summary
             let statusSummary = '## 🔍 Quality Check Summary\n\n';
             
-            // Credential check
             if (credentialIssues > 0) {
               statusSummary += '❌ **Credential Scan:** Found ' + credentialIssues + ' potential issue(s)\n';
             } else {
               statusSummary += '✅ **Credential Scan:** No credentials detected\n';
             }
             
-            // Structure check
             if (structureIssues > 0) {
               statusSummary += '❌ **Package Structure:** Found ' + structureIssues + ' issue(s)\n';
             } else {
               statusSummary += '✅ **Package Structure:** Valid R package structure\n';
             }
             
-            // Test results
             if (testStatus === 'passed') {
               statusSummary += '✅ **Tests:** All tests passed\n';
             } else if (testStatus === 'failed') {
@@ -400,7 +316,6 @@ jobs:
               statusSummary += '❓ **Tests:** Status unknown\n';
             }
             
-            // Data comparison
             if (comparisonExitCode === '0') {
               statusSummary += '✅ **Data Comparison:** No unauthorized modifications\n';
             } else if (dataApproved) {
@@ -411,10 +326,8 @@ jobs:
             
             statusSummary += '\n---\n\n';
             
-            // Detailed sections
             let detailedReport = '';
             
-            // Data comparison details
             if (comparisonExitCode !== '0') {
               let dataMessage = '';
               if (dataApproved) {
@@ -426,92 +339,68 @@ jobs:
             1. Review the comparison report below carefully
             2. Verify the modifications are intentional and correct
             3. Add the \`data-changes-approved\` label to this PR
-            4. The check will automatically pass once the label is added
-            
-            **Note:** Only repository maintainers should approve data modifications.`;
+            4. The check will automatically pass once the label is added`;
               }
               
               detailedReport += `### 📊 Data File Comparison\n\n${dataMessage}\n\n${comparisonReport}\n\n---\n\n`;
             }
             
-            // Credential issues details
             if (credentialIssues > 0) {
               detailedReport += `### 🔐 Credential Scan Issues
             
-            **Action Required:** Review the "Check for credentials" step in the workflow logs to see what was detected.
-            
-            **Common issues:**
-            - \`.Renviron\` file committed (should be in .gitignore)
-            - Hardcoded API keys or passwords in code
-            - OAuth tokens or secrets
+            Review the "Check for credentials" step to see what was detected.
             
             **How to fix:**
-            1. Remove sensitive files from the commit
-            2. Use environment variables instead: \`Sys.getenv("API_KEY")\`
-            3. Add sensitive files to \`.gitignore\`
-            4. If credentials were already pushed, rotate them immediately
+            - Remove sensitive files from the commit
+            - Use environment variables: \`Sys.getenv("API_KEY")\`
+            - Add sensitive files to \`.gitignore\`
             
             ---
             
             `;
             }
             
-            // Structure issues details
             if (structureIssues > 0) {
               detailedReport += `### 📦 Package Structure Issues
             
-            **Action Required:** Review the "Check R package structure" step in the workflow logs.
-            
-            **Common issues:**
-            - Missing DESCRIPTION or NAMESPACE file
-            - Missing required directories (R/, man/)
-            - Data files in wrong location
+            Review the "Check R package structure" step in the workflow logs.
             
             **How to fix:**
-            1. Ensure standard R package structure
-            2. Run \`devtools::check()\` locally
-            3. See: https://r-pkgs.org/structure.html
+            - Ensure standard R package structure
+            - Run \`devtools::check()\` locally
             
             ---
             
             `;
             }
             
-            // Test failure details  
             if (testStatus === 'failed') {
               detailedReport += `### 🧪 Test Failures
             
-            **Action Required:** Review the "Run testthat tests" step in the workflow logs.
+            Review the "Run testthat tests" step in the workflow logs.
             
             **How to fix:**
-            1. Run tests locally: \`devtools::test()\`
-            2. Fix failing tests
-            3. Push updated code
+            - Run tests locally: \`devtools::test()\`
+            - Fix failing tests
             
             ---
             
             `;
             }
             
-            // Info footer
             const infoFooter = `
             <details>
             <summary>ℹ️ About these checks</summary>
             
-            **Credential Scan:** Prevents accidental commit of API keys, passwords, and other sensitive information.
+            - **Credential Scan:** Prevents accidental commit of secrets
+            - **Package Structure:** Ensures R package standards
+            - **Tests:** Verifies code functionality
+            - **Data Comparison:** Protects data integrity
             
-            **Package Structure:** Ensures the repository follows R package standards.
-            
-            **Tests:** Runs automated tests to verify code functionality.
-            
-            **Data Comparison:** Ensures existing data values are not modified unless explicitly allowed.
-            
-            For more information, see the repository documentation.
             </details>`;
             
             const fullComment = statusSummary + detailedReport + infoFooter;
             
-            // Find and update or create comment
             const comments = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
