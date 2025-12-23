@@ -78,21 +78,45 @@ get_file_config <- function(file_path, config_file = CONFIG_FILE) {
 
 load_rda_file <- function(file_path) {
   # Load .rda file and return the object(s) it contains
+  
+  if (!file.exists(file_path)) {
+    stop(paste("File does not exist:", file_path))
+  }
+  
+  # Check file is not empty
+  if (file.info(file_path)$size == 0) {
+    stop(paste("File is empty (0 bytes):", file_path))
+  }
+  
   env <- new.env()
-  obj_names <- load(file_path, envir = env)
   
-  if (length(obj_names) == 0) {
-    stop(paste("No objects found in", file_path))
-  }
-  
-  if (length(obj_names) > 1) {
-    warning(paste("Multiple objects in", file_path, "- using first:", obj_names[1]))
-  }
-  
-  list(
-    data = env[[obj_names[1]]],
-    object_name = obj_names[1]
-  )
+  # Load returns the names of objects loaded
+  tryCatch({
+    obj_names <- load(file_path, envir = env)
+    
+    if (length(obj_names) == 0) {
+      stop(paste("No objects found in", file_path))
+    }
+    
+    if (length(obj_names) > 1) {
+      warning(paste("Multiple objects in", file_path, "- using first:", obj_names[1]))
+    }
+    
+    # Get the actual object
+    obj <- env[[obj_names[1]]]
+    
+    if (is.null(obj)) {
+      stop(paste("Object", obj_names[1], "is NULL in", file_path))
+    }
+    
+    return(list(
+      data = obj,
+      object_name = obj_names[1]
+    ))
+    
+  }, error = function(e) {
+    stop(paste("Error loading", file_path, ":", e$message))
+  })
 }
 
 compare_values <- function(old_val, new_val, col_name) {
@@ -196,27 +220,42 @@ compare_data_files <- function(old_file, new_file) {
   old_data <- NULL
   new_data <- NULL
   
+  cat("\nLoading data files...\n")
+  
   # Load new file
+  cat("  Loading new file:", new_file, "\n")
   tryCatch({
     new_loaded <- load_rda_file(new_file)
     new_data <- new_loaded$data
     results$summary$new_object_name <- new_loaded$object_name
+    cat("  ✓ New file loaded successfully. Object:", new_loaded$object_name, "\n")
+    cat("    Type:", class(new_data)[1], "\n")
+    if (is.data.frame(new_data)) {
+      cat("    Dimensions:", nrow(new_data), "rows ×", ncol(new_data), "columns\n")
+    }
   }, error = function(e) {
     results$status <- "ERROR"
     results$issues[[length(results$issues) + 1]] <- list(
       type = "LOAD_ERROR",
       message = paste("Error loading new file:", e$message)
     )
+    cat("  ✗ Error loading new file:", e$message, "\n")
     return(results)
   })
   
   if (results$status == "ERROR") return(results)
   
   # Load old file
+  cat("  Loading old file:", old_file, "\n")
   tryCatch({
     old_loaded <- load_rda_file(old_file)
     old_data <- old_loaded$data
     results$summary$old_object_name <- old_loaded$object_name
+    cat("  ✓ Old file loaded successfully. Object:", old_loaded$object_name, "\n")
+    cat("    Type:", class(old_data)[1], "\n")
+    if (is.data.frame(old_data)) {
+      cat("    Dimensions:", nrow(old_data), "rows ×", ncol(old_data), "columns\n")
+    }
     
     # Check if object names match
     if (old_loaded$object_name != new_loaded$object_name) {
@@ -225,10 +264,12 @@ compare_data_files <- function(old_file, new_file) {
         type = "OBJECT_NAME_CHANGED",
         message = paste("Object name changed from", old_loaded$object_name, "to", new_loaded$object_name)
       )
+      cat("  ⚠ Warning: Object name changed from", old_loaded$object_name, "to", new_loaded$object_name, "\n")
     }
   }, error = function(e) {
     # Old file doesn't exist or can't be loaded - this is a new file
-    cat("Note: Could not load old file (may be new file):", e$message, "\n")
+    cat("  ✗ Could not load old file:", e$message, "\n")
+    cat("  → Treating as new file\n")
     old_data <- NULL
   })
   
@@ -236,8 +277,11 @@ compare_data_files <- function(old_file, new_file) {
   if (is.null(old_data)) {
     results$status <- "NEW_FILE"
     results$summary$message <- "This is a new file (no previous version to compare)"
+    cat("\nResult: NEW_FILE (no previous version found)\n")
     return(results)
   }
+  
+  cat("\nBoth files loaded successfully. Proceeding with comparison...\n")
   
   # Check data types
   if (class(old_data)[1] != class(new_data)[1]) {
