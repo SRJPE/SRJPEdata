@@ -539,7 +539,7 @@ jobs:
               });
             }
       
-      - name: Final status check
+     - name: Final status check
         if: always()
         run: |
           echo "=== Final Status Check ==="
@@ -550,12 +550,11 @@ jobs:
           COMPARISON_EXIT="${{ steps.comparison.outputs.comparison_exit_code }}"
           DATA_APPROVED="${{ steps.check-approval.outputs.approved }}"
           
-          # Default empty values to 0 or appropriate defaults
-          CREDENTIAL_ISSUES=${CREDENTIAL_ISSUES:-0}
-          STRUCTURE_ISSUES=${STRUCTURE_ISSUES:-0}
-          TEST_STATUS=${TEST_STATUS:-unknown}
-          COMPARISON_EXIT=${COMPARISON_EXIT:-0}
-          DATA_APPROVED=${DATA_APPROVED:-false}
+          if [ -z "$CREDENTIAL_ISSUES" ]; then CREDENTIAL_ISSUES=0; fi
+          if [ -z "$STRUCTURE_ISSUES" ]; then STRUCTURE_ISSUES=0; fi
+          if [ -z "$TEST_STATUS" ]; then TEST_STATUS=unknown; fi
+          if [ -z "$COMPARISON_EXIT" ]; then COMPARISON_EXIT=0; fi
+          if [ -z "$DATA_APPROVED" ]; then DATA_APPROVED=false; fi
           
           echo "Credential issues: $CREDENTIAL_ISSUES"
           echo "Structure issues: $STRUCTURE_ISSUES"
@@ -566,71 +565,32 @@ jobs:
           
           FAILURES=0
           
-          # Check credentials
           if [ "$CREDENTIAL_ISSUES" != "0" ]; then
             echo "❌ Credential scan found issues"
             FAILURES=$((FAILURES + 1))
           fi
           
-          # Check structure
           if [ "$STRUCTURE_ISSUES" != "0" ]; then
             echo "❌ Package structure has issues"
             FAILURES=$((FAILURES + 1))
           fi
           
-          # Check tests
           if [ "$TEST_STATUS" = "failed" ]; then
             echo "❌ Tests failed"
             FAILURES=$((FAILURES + 1))
           fi
           
-          # Check data comparison
           if [ "$COMPARISON_EXIT" != "0" ] && [ "$DATA_APPROVED" != "true" ]; then
             echo "❌ Data comparison failed and not approved"
             FAILURES=$((FAILURES + 1))
           fi
           
           echo ""
-          if [ $FAILURES -eq 0 ]; then
+          if [ "$FAILURES" -eq 0 ]; then
             echo "✅ All checks passed!"
             exit 0
           else
             echo "❌ $FAILURES check(s) failed"
-            echo ""
-            echo "Review the PR comment for details on what needs to be fixed."
+            echo "Review the PR comment for details."
             exit 1
-          fi, full.names = TRUE)
-              lapply(r_files, source)
-              cat('✓ Sourced', length(r_files), 'R file(s)\n')
-            }
-          }, error = function(e) {
-            cat('⚠️  Warning: Could not load package:', e\$message, '\n')
-            cat('Tests will run but package functions may not be available\n')
-          })
-          
-          # Run tests
-          cat('\nRunning tests...\n')
-          results <- test_dir('tests/testthat', reporter = 'summary')
-          
-          # Check results
-          if (any(results\$failed > 0)) {
-            cat('\n❌ Some tests failed\n')
-            quit(status = 1)
-          } else if (any(results\$warning > 0)) {
-            cat('\n⚠️  Tests passed with warnings\n')
-            quit(status = 0)
-          } else {
-            cat('\n✅ All tests passed\n')
-            quit(status = 0)
-          }
-          "
-          
-          TEST_EXIT_CODE=$?
-          if [ $TEST_EXIT_CODE -eq 0 ]; then
-            echo "test_status=passed" >> $GITHUB_OUTPUT
-          else
-            echo "test_status=failed" >> $GITHUB_OUTPUT
           fi
-          
-          exit $TEST_EXIT_CODE
-      
