@@ -193,15 +193,30 @@ compare_data_files <- function(old_file, new_file) {
   }
   
   # Load .rda files
+  old_data <- NULL
+  new_data <- NULL
+  
+  # Load new file
+  tryCatch({
+    new_loaded <- load_rda_file(new_file)
+    new_data <- new_loaded$data
+    results$summary$new_object_name <- new_loaded$object_name
+  }, error = function(e) {
+    results$status <- "ERROR"
+    results$issues[[length(results$issues) + 1]] <- list(
+      type = "LOAD_ERROR",
+      message = paste("Error loading new file:", e$message)
+    )
+    return(results)
+  })
+  
+  if (results$status == "ERROR") return(results)
+  
+  # Load old file
   tryCatch({
     old_loaded <- load_rda_file(old_file)
-    new_loaded <- load_rda_file(new_file)
-    
     old_data <- old_loaded$data
-    new_data <- new_loaded$data
-    
     results$summary$old_object_name <- old_loaded$object_name
-    results$summary$new_object_name <- new_loaded$object_name
     
     # Check if object names match
     if (old_loaded$object_name != new_loaded$object_name) {
@@ -211,17 +226,18 @@ compare_data_files <- function(old_file, new_file) {
         message = paste("Object name changed from", old_loaded$object_name, "to", new_loaded$object_name)
       )
     }
-    
   }, error = function(e) {
-    results$status <- "ERROR"
-    results$issues[[length(results$issues) + 1]] <- list(
-      type = "LOAD_ERROR",
-      message = paste("Error loading file:", e$message)
-    )
-    return(results)
+    # Old file doesn't exist or can't be loaded - this is a new file
+    cat("Note: Could not load old file (may be new file):", e$message, "\n")
+    old_data <- NULL
   })
   
-  if (results$status == "ERROR") return(results)
+  # If old_data is NULL, this is a new file
+  if (is.null(old_data)) {
+    results$status <- "NEW_FILE"
+    results$summary$message <- "This is a new file (no previous version to compare)"
+    return(results)
+  }
   
   # Check data types
   if (class(old_data)[1] != class(new_data)[1]) {
@@ -544,7 +560,17 @@ for (new_file in changed_files) {
   old_file <- paste0("main_", basename(new_file))
   
   # Checkout the file from main branch
-  system(paste0("git show main:", new_file, " > ", old_file), ignore.stderr = TRUE)
+  git_command <- paste0("git show main:", new_file, " > ", old_file)
+  git_result <- system(git_command, ignore.stderr = FALSE, intern = FALSE)
+  
+  # Check if git command succeeded
+  if (git_result != 0 || !file.exists(old_file) || file.info(old_file)$size == 0) {
+    cat("Note: Could not retrieve old version from main branch (may be new file)\n")
+    # Create empty marker file so compare_data_files knows it's new
+    if (file.exists(old_file)) {
+      file.remove(old_file)
+    }
+  }
   
   # Compare
   result <- compare_data_files(old_file, new_file)
