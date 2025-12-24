@@ -39,7 +39,7 @@ jobs:
       
       - name: Install R packages
         run: |
-          install.packages(c('tidyverse', 'testthat', 'yaml', 'devtools', 'dplyr', 'remotes', 'roxygen2'))
+          install.packages(c('padr','tidyverse', 'testthat', 'yaml', 'devtools', 'dplyr', 'remotes', 'roxygen2'))
         shell: Rscript {0}
       
       # ==========================================
