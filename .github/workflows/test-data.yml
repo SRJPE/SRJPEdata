@@ -1,0 +1,485 @@
+name: Data Quality and Package Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'data/*.rda'
+      - 'data/*.RData'
+      - 'R/**'
+      - 'tests/**'
+      - 'inst/**'
+
+jobs:
+  quality-checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+      
+      - name: Fetch main branch
+        run: |
+          git fetch origin main:main
+          echo "Current branch: $(git branch --show-current)"
+      
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.0'
+          
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
+      
+      - name: Install R packages
+        run: |
+          install.packages(c('padr','tidyverse', 'testthat', 'yaml', 'devtools', 'dplyr', 'remotes', 'roxygen2'))
+        shell: Rscript {0}
+      
+      # ==========================================
+      # CREDENTIAL SCANNING
+      # ==========================================
+      
+      - name: Check for credentials and sensitive files
+        id: credential-check
+        run: |
+          echo "=== Checking for credentials and sensitive files ==="
+          FOUND_ISSUES=0
+          
+          FORBIDDEN_FILES=(
+            ".Renviron"
+            ".env"
+            ".httr-oauth"
+            ".secrets"
+            "credentials.R"
+            "config.yml"
+          )
+          
+          FORBIDDEN_PATTERNS=(
+            "password\\s*=\\s*['\"][^'\"]{3,}['\"]"
+            "api[_-]?key\\s*=\\s*['\"][^'\"]{10,}['\"]"
+            "secret\\s*=\\s*['\"][^'\"]{10,}['\"]"
+            "token\\s*=\\s*['\"][^'\"]{10,}['\"]"
+            "aws_access_key_id"
+            "aws_secret_access_key"
+          )
+          
+          echo "Checking for forbidden files..."
+          for file in "${FORBIDDEN_FILES[@]}"; do
+            if git ls-files | grep -q "^${file}$"; then
+              echo "❌ ERROR: Found forbidden file: $file"
+              FOUND_ISSUES=$((FOUND_ISSUES + 1))
+            fi
+          done
+          
+          echo ""
+          echo "Checking for credential patterns in code..."
+          for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
+            matches=$(git grep -i -E "$pattern" -- '*.R' '*.r' '*.Rmd' '*.rmd' 2>/dev/null || true)
+            if [ ! -z "$matches" ]; then
+              echo "⚠️  WARNING: Found potential credential pattern:"
+              echo "$matches"
+              FOUND_ISSUES=$((FOUND_ISSUES + 1))
+            fi
+          done
+          
+          echo ""
+          if [ $FOUND_ISSUES -eq 0 ]; then
+            echo "✅ No credentials or sensitive files found"
+          else
+            echo "❌ Found $FOUND_ISSUES potential issues"
+          fi
+          
+          echo "credential_issues=$FOUND_ISSUES" >> $GITHUB_OUTPUT
+      
+      # ==========================================
+      # R PACKAGE STRUCTURE CHECK
+      # ==========================================
+      
+      - name: Check R package structure
+        id: structure-check
+        run: |
+          echo "=== Checking R package structure ==="
+          STRUCTURE_ISSUES=0
+          
+          REQUIRED_FILES=(
+            "DESCRIPTION"
+            "NAMESPACE"
+          )
+          
+          REQUIRED_DIRS=(
+            "R"
+            "man"
+          )
+          
+          echo "Checking required files..."
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "❌ ERROR: Missing required file: $file"
+              STRUCTURE_ISSUES=$((STRUCTURE_ISSUES + 1))
+            else
+              echo "✓ Found: $file"
+            fi
+          done
+          
+          echo ""
+          echo "Checking required directories..."
+          for dir in "${REQUIRED_DIRS[@]}"; do
+            if [ ! -d "$dir" ]; then
+              echo "❌ ERROR: Missing required directory: $dir/"
+              STRUCTURE_ISSUES=$((STRUCTURE_ISSUES + 1))
+            else
+              echo "✓ Found: $dir/"
+            fi
+          done
+          
+          echo ""
+          echo "Checking DESCRIPTION file format..."
+          if [ -f "DESCRIPTION" ]; then
+            if ! grep -q "^Package:" DESCRIPTION; then
+              echo "❌ ERROR: DESCRIPTION missing 'Package:' field"
+              STRUCTURE_ISSUES=$((STRUCTURE_ISSUES + 1))
+            fi
+            if ! grep -q "^Version:" DESCRIPTION; then
+              echo "❌ ERROR: DESCRIPTION missing 'Version:' field"
+              STRUCTURE_ISSUES=$((STRUCTURE_ISSUES + 1))
+            fi
+          fi
+          
+          echo ""
+          if [ $STRUCTURE_ISSUES -eq 0 ]; then
+            echo "✅ Package structure looks good"
+          else
+            echo "❌ Found $STRUCTURE_ISSUES structure issues"
+          fi
+          
+          echo "structure_issues=$STRUCTURE_ISSUES" >> $GITHUB_OUTPUT
+      
+      # ==========================================
+      # TESTTHAT TESTS
+      # ==========================================
+      
+      - name: Run testthat tests
+        id: testthat
+        continue-on-error: true
+        run: |
+          echo "=== Running testthat tests ==="
+          
+          if [ ! -d "tests/testthat" ]; then
+            echo "⚠️  No tests/testthat directory found"
+            echo "test_status=skipped" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          TEST_FILES=$(find tests/testthat -name "test*.R" | wc -l)
+          echo "Found $TEST_FILES test file(s)"
+          
+          if [ $TEST_FILES -eq 0 ]; then
+            echo "⚠️  No test files found in tests/testthat/"
+            echo "test_status=skipped" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          Rscript -e "
+          library(testthat)
+          
+          tryCatch({
+            if (requireNamespace('devtools', quietly = TRUE)) {
+              devtools::load_all('.', quiet = TRUE)
+              cat('✓ Package loaded with devtools\n')
+            } else {
+              cat('⚠️  devtools not available, loading R files directly\n')
+              r_files <- list.files('R', pattern = '\\\\.R$', full.names = TRUE)
+              lapply(r_files, source)
+              cat('✓ Sourced', length(r_files), 'R file(s)\n')
+            }
+          }, error = function(e) {
+            cat('⚠️  Warning: Could not load package:', e\$message, '\n')
+          })
+          
+          cat('\nRunning tests...\n')
+          results <- test_dir('tests/testthat', reporter = 'summary')
+          
+          if (any(results\$failed > 0)) {
+            cat('\n❌ Some tests failed\n')
+            quit(status = 1)
+          } else if (any(results\$warning > 0)) {
+            cat('\n⚠️  Tests passed with warnings\n')
+            quit(status = 0)
+          } else {
+            cat('\n✅ All tests passed\n')
+            quit(status = 0)
+          }
+          "
+          
+          TEST_EXIT_CODE=$?
+          if [ $TEST_EXIT_CODE -eq 0 ]; then
+            echo "test_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "test_status=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          exit $TEST_EXIT_CODE
+      
+      # ==========================================
+      # DATA COMPARISON
+      # ==========================================
+      
+      - name: Get changed RDA files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: |
+            data/*.rda
+            data/*.RData
+      
+      - name: Compare data files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        id: comparison
+        continue-on-error: true
+        run: |
+          Rscript inst/scripts/compare_data_files.R "${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "comparison_exit_code=$?" >> $GITHUB_OUTPUT
+        
+      - name: Upload comparison report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-comparison-report
+          path: comparison_report.txt
+          retention-days: 30
+      
+      - name: Check for approval override
+        if: steps.comparison.outputs.comparison_exit_code != '0'
+        id: check-approval
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.pull_request.labels.map(l => l.name);
+            const approved = labels.includes('data-changes-approved');
+            
+            console.log('PR labels:', labels);
+            console.log('Has approval:', approved);
+            
+            core.setOutput('approved', approved);
+            return approved;
+      
+      # ==========================================
+      # REPORTING
+      # ==========================================
+      
+      - name: Comment PR with results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            const credentialIssues = parseInt('${{ steps.credential-check.outputs.credential_issues }}') || 0;
+            const structureIssues = parseInt('${{ steps.structure-check.outputs.structure_issues }}') || 0;
+            const testStatus = '${{ steps.testthat.outputs.test_status }}' || 'unknown';
+            const comparisonExitCode = '${{ steps.comparison.outputs.comparison_exit_code }}';
+            const dataApproved = '${{ steps.check-approval.outputs.approved }}' === 'true';
+            
+            let comparisonReport = 'No comparison report generated.';
+            if (fs.existsSync('comparison_report.txt')) {
+              comparisonReport = fs.readFileSync('comparison_report.txt', 'utf8');
+            }
+            
+            let statusSummary = '## 🔍 Quality Check Summary\n\n';
+            
+            if (credentialIssues > 0) {
+              statusSummary += '❌ **Credential Scan:** Found ' + credentialIssues + ' potential issue(s)\n';
+            } else {
+              statusSummary += '✅ **Credential Scan:** No credentials detected\n';
+            }
+            
+            if (structureIssues > 0) {
+              statusSummary += '❌ **Package Structure:** Found ' + structureIssues + ' issue(s)\n';
+            } else {
+              statusSummary += '✅ **Package Structure:** Valid R package structure\n';
+            }
+            
+            if (testStatus === 'passed') {
+              statusSummary += '✅ **Tests:** All tests passed\n';
+            } else if (testStatus === 'failed') {
+              statusSummary += '❌ **Tests:** Some tests failed\n';
+            } else if (testStatus === 'skipped') {
+              statusSummary += '⚠️ **Tests:** No tests found (skipped)\n';
+            } else {
+              statusSummary += '❓ **Tests:** Status unknown\n';
+            }
+            
+            if (comparisonExitCode === '0') {
+              statusSummary += '✅ **Data Comparison:** No unauthorized modifications\n';
+            } else if (dataApproved) {
+              statusSummary += '⚠️ **Data Comparison:** Changes manually approved\n';
+            } else {
+              statusSummary += '❌ **Data Comparison:** Unauthorized modifications (requires approval)\n';
+            }
+            
+            statusSummary += '\n---\n\n';
+            
+            let detailedReport = '';
+            
+            if (comparisonExitCode !== '0') {
+              let dataMessage = '';
+              if (dataApproved) {
+                dataMessage = '⚠️ **Data modifications detected but manually approved.** The PR has the `data-changes-approved` label.';
+              } else {
+                dataMessage = `❌ **Data modifications detected and not approved.**
+            
+            **To approve these changes:**
+            1. Review the comparison report below carefully
+            2. Verify the modifications are intentional and correct
+            3. Add the \`data-changes-approved\` label to this PR
+            4. The check will automatically pass once the label is added`;
+              }
+              
+              detailedReport += `### 📊 Data File Comparison\n\n${dataMessage}\n\n${comparisonReport}\n\n---\n\n`;
+            }
+            
+            if (credentialIssues > 0) {
+              detailedReport += `### 🔐 Credential Scan Issues
+            
+            Review the "Check for credentials" step to see what was detected.
+            
+            **How to fix:**
+            - Remove sensitive files from the commit
+            - Use environment variables: \`Sys.getenv("API_KEY")\`
+            - Add sensitive files to \`.gitignore\`
+            
+            ---
+            
+            `;
+            }
+            
+            if (structureIssues > 0) {
+              detailedReport += `### 📦 Package Structure Issues
+            
+            Review the "Check R package structure" step in the workflow logs.
+            
+            **How to fix:**
+            - Ensure standard R package structure
+            - Run \`devtools::check()\` locally
+            
+            ---
+            
+            `;
+            }
+            
+            if (testStatus === 'failed') {
+              detailedReport += `### 🧪 Test Failures
+            
+            Review the "Run testthat tests" step in the workflow logs.
+            
+            **How to fix:**
+            - Run tests locally: \`devtools::test()\`
+            - Fix failing tests
+            
+            ---
+            
+            `;
+            }
+            
+            const infoFooter = `
+            <details>
+            <summary>ℹ️ About these checks</summary>
+            
+            - **Credential Scan:** Prevents accidental commit of secrets
+            - **Package Structure:** Ensures R package standards
+            - **Tests:** Verifies code functionality
+            - **Data Comparison:** Protects data integrity
+            
+            </details>`;
+            
+            const fullComment = statusSummary + detailedReport + infoFooter;
+            
+            const comments = await github.rest.issues.listComments({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            const botComment = comments.data.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Quality Check Summary')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: fullComment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: fullComment
+              });
+            }
+      
+      - name: Final status check
+        if: always()
+        run: |
+          echo "=== Final Status Check ==="
+          
+          CREDENTIAL_ISSUES="${{ steps.credential-check.outputs.credential_issues }}"
+          STRUCTURE_ISSUES="${{ steps.structure-check.outputs.structure_issues }}"
+          TEST_STATUS="${{ steps.testthat.outputs.test_status }}"
+          COMPARISON_EXIT="${{ steps.comparison.outputs.comparison_exit_code }}"
+          DATA_APPROVED="${{ steps.check-approval.outputs.approved }}"
+          
+          if [ -z "$CREDENTIAL_ISSUES" ]; then CREDENTIAL_ISSUES=0; fi
+          if [ -z "$STRUCTURE_ISSUES" ]; then STRUCTURE_ISSUES=0; fi
+          if [ -z "$TEST_STATUS" ]; then TEST_STATUS=unknown; fi
+          if [ -z "$COMPARISON_EXIT" ]; then COMPARISON_EXIT=0; fi
+          if [ -z "$DATA_APPROVED" ]; then DATA_APPROVED=false; fi
+          
+          echo "Credential issues: $CREDENTIAL_ISSUES"
+          echo "Structure issues: $STRUCTURE_ISSUES"
+          echo "Test status: $TEST_STATUS"
+          echo "Comparison exit code: $COMPARISON_EXIT"
+          echo "Data approved: $DATA_APPROVED"
+          echo ""
+          
+          FAILURES=0
+          
+          if [ "$CREDENTIAL_ISSUES" != "0" ]; then
+            echo "❌ Credential scan found issues"
+            FAILURES=$((FAILURES + 1))
+          fi
+          
+          if [ "$STRUCTURE_ISSUES" != "0" ]; then
+            echo "❌ Package structure has issues"
+            FAILURES=$((FAILURES + 1))
+          fi
+          
+          if [ "$TEST_STATUS" = "failed" ]; then
+            echo "❌ Tests failed"
+            FAILURES=$((FAILURES + 1))
+          fi
+          
+          if [ "$COMPARISON_EXIT" != "0" ] && [ "$DATA_APPROVED" != "true" ]; then
+            echo "❌ Data comparison failed and not approved"
+            FAILURES=$((FAILURES + 1))
+          fi
+          
+          echo ""
+          if [ "$FAILURES" -eq 0 ]; then
+            echo "✅ All checks passed!"
+            exit 0
+          else
+            echo "❌ $FAILURES check(s) failed"
+            echo "Review the PR comment for details."
+            exit 1
+          fi

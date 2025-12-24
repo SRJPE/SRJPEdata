@@ -15,9 +15,9 @@
 *.DS_Store
 .Rproj.user
 inst/doc
-*config.yml
+config.yml
 *.Rproj.user
 .Rproj.user/**
-*.yml
+.yml
 *.md
 !db-edi-data-checks.html
