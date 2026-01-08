@@ -43,6 +43,12 @@ find_config_file <- function() {
   return(NULL)
 }
 
+# Performance optimization settings
+# For very large datasets, you can enable sampling
+ENABLE_SAMPLING <- TRUE  # Set to TRUE to enable sampling for huge datasets
+SAMPLE_SIZE <- 10000      # Number of rows to sample if enabled
+LARGE_DATASET_THRESHOLD <- 1000  # Use vectorized comparison above this size
+
 get_file_config <- function(file_path, config_file = NULL) {
   file_name <- basename(file_path)
   
@@ -434,34 +440,96 @@ compare_data_files <- function(old_file, new_file) {
   
   results$summary$matching_rows <- length(matching_ids)
   
+  # Optional: Sample for very large datasets
+  if (ENABLE_SAMPLING && length(matching_ids) > SAMPLE_SIZE) {
+    cat("Dataset is very large (", length(matching_ids), "rows). Sampling", SAMPLE_SIZE, "rows for comparison.\n")
+    set.seed(42)  # For reproducibility
+    matching_ids <- sample(matching_ids, SAMPLE_SIZE)
+    results$summary$sampled <- TRUE
+    results$summary$sample_size <- SAMPLE_SIZE
+  }
+  
   # Get columns to check (exclude ID columns and allowed-to-change columns)
   cols_to_check <- setdiff(
     intersect(names(old_data), names(new_data)),
     c(ID_COLUMNS, ALLOWED_TO_CHANGE, "row_id")
   )
   
-  # Compare matching rows
+  # Compare matching rows - OPTIMIZED VERSION
   modifications <- list()
   
-  for (row_id in matching_ids) {
-    old_row <- old_data[old_data$row_id == row_id, ]
-    new_row <- new_data[new_data$row_id == row_id, ]
+  cat("Comparing", length(matching_ids), "matching rows...\n")
+  
+  # For large datasets, use vectorized comparison instead of loops
+  if (length(matching_ids) > 1000) {
+    cat("Using optimized vectorized comparison for large dataset\n")
     
+    # Filter to matching rows only
+    old_matched <- old_data[old_data$row_id %in% matching_ids, ]
+    new_matched <- new_data[new_data$row_id %in% matching_ids, ]
+    
+    # Sort both by row_id to align
+    old_matched <- old_matched[order(old_matched$row_id), ]
+    new_matched <- new_matched[order(new_matched$row_id), ]
+    
+    # Compare each column vectorized
     for (col in cols_to_check) {
-      # Extract single values (not vectors)
-      old_val <- old_row[[col]][1]
-      new_val <- new_row[[col]][1]
+      old_vals <- old_matched[[col]]
+      new_vals <- new_matched[[col]]
       
-      if (!compare_values(old_val, new_val, col, NUMERIC_TOLERANCE)) {
-        modifications[[length(modifications) + 1]] <- list(
-          row_id = row_id,
-          column = col,
-          old_value = old_val,
-          new_value = new_val
-        )
+      # Vectorized comparison
+      if (is.numeric(old_vals) && is.numeric(new_vals)) {
+        # Numeric comparison with tolerance
+        diffs <- abs(old_vals - new_vals)
+        diffs[is.na(old_vals) & is.na(new_vals)] <- 0  # Both NA = same
+        changed <- which(diffs >= NUMERIC_TOLERANCE | (is.na(old_vals) != is.na(new_vals)))
+      } else {
+        # Non-numeric comparison
+        same_na <- is.na(old_vals) & is.na(new_vals)
+        same_val <- old_vals == new_vals
+        same_val[is.na(same_val)] <- FALSE
+        changed <- which(!same_na & !same_val)
+      }
+      
+      # Record modifications
+      if (length(changed) > 0) {
+        for (idx in changed) {
+          modifications[[length(modifications) + 1]] <- list(
+            row_id = old_matched$row_id[idx],
+            column = col,
+            old_value = old_vals[idx],
+            new_value = new_vals[idx]
+          )
+        }
+      }
+    }
+    
+  } else {
+    # Original row-by-row comparison for smaller datasets
+    cat("Using row-by-row comparison for small dataset\n")
+    
+    for (row_id in matching_ids) {
+      old_row <- old_data[old_data$row_id == row_id, ]
+      new_row <- new_data[new_data$row_id == row_id, ]
+      
+      for (col in cols_to_check) {
+        # Extract single values (not vectors)
+        old_val <- old_row[[col]][1]
+        new_val <- new_row[[col]][1]
+        
+        if (!compare_values(old_val, new_val, col, NUMERIC_TOLERANCE)) {
+          modifications[[length(modifications) + 1]] <- list(
+            row_id = row_id,
+            column = col,
+            old_value = old_val,
+            new_value = new_val
+          )
+        }
       }
     }
   }
+  
+  cat("Found", length(modifications), "modifications\n")
   
   # Report modifications
   if (length(modifications) > 0) {
