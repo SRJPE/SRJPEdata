@@ -172,18 +172,29 @@ compare_values <- function(old_val, new_val, col_name, tolerance = 1e-6) {
     new_val <- new_val[1]
   }
   
-  # Handle NA comparisons
+  # Handle empty or NULL values
   if (length(old_val) == 0 || length(new_val) == 0) return(FALSE)
+  if (is.null(old_val) || is.null(new_val)) return(FALSE)
+  
+  # Handle NA comparisons - both NA = same
   if (is.na(old_val) && is.na(new_val)) return(TRUE)
   if (is.na(old_val) || is.na(new_val)) return(FALSE)
   
   # Numeric comparison with tolerance
   if (is.numeric(old_val) && is.numeric(new_val)) {
-    return(abs(old_val - new_val) < tolerance)
+    diff <- abs(old_val - new_val)
+    # Handle cases where diff might be NA (e.g., Inf - Inf)
+    if (is.na(diff)) return(FALSE)
+    return(diff < tolerance)
   }
   
   # Direct comparison for other types
-  return(old_val == new_val)
+  result <- old_val == new_val
+  
+  # Handle NA result from comparison (e.g., comparing incompatible types)
+  if (is.na(result)) return(FALSE)
+  
+  return(result)
 }
 
 create_row_id <- function(data, id_cols) {
