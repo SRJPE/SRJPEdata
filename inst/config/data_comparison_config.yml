@@ -170,6 +170,18 @@ stock_recruit_covariates.rda:
   numeric_tolerance: 1
   check_attributes: true
   
+# Stock recruit year lookup
+stock_recruit_year_lookup.rda:
+  id_columns:
+    - run_year
+    - stream
+    - site
+    - brood_year
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  
 # Survival model inputs
 survival_model_inputs.rda:
   id_columns:
@@ -211,6 +223,7 @@ weekly_hours_fished.rda:
 weekly_juvenile_abundance_catch_data.rda:
   id_columns:
     - year
+    - run_year
     - week
     - stream
     - site
@@ -225,6 +238,51 @@ weekly_juvenile_abundance_efficiency.rda:
     - year
     - run_year
     - week
+    - stream
+    - site
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  
+# Years to exclude adult
+years_to_exclude_adult.rda:
+  id_columns:
+    - year
+    - stream
+    - data_type
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  
+# Years to exclude rst
+years_to_exclude_rst_data.rda:
+  id_columns:
+    - year
+    - run_year
+    - stream
+    - site
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Years to include adult
+years_to_exclude_adult.rda:
+  id_columns:
+    - year
+    - stream
+    - data_type
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+
+# Years to exclude adult
+years_to_include_rst_data.rda:
+  id_columns:
+    - run_year
     - stream
     - site
   allowed_to_change:
