@@ -43,6 +43,12 @@ find_config_file <- function() {
   return(NULL)
 }
 
+# Performance optimization settings
+# For very large datasets, you can enable sampling
+ENABLE_SAMPLING <- TRUE  # Set to TRUE to enable sampling for huge datasets
+SAMPLE_SIZE <- 10000      # Number of rows to sample if enabled
+LARGE_DATASET_THRESHOLD <- 1000  # Use vectorized comparison above this size
+
 get_file_config <- function(file_path, config_file = NULL) {
   file_name <- basename(file_path)
   
@@ -70,8 +76,11 @@ get_file_config <- function(file_path, config_file = NULL) {
       "../../inst/config/data_comparison_config.yml"
     ), collapse = ", ")))
     warning(paste("Current working directory:", getwd()))
+    cat("⚠️  Using default configuration (no ID columns)\n")
     return(default_config)
   }
+  
+  cat("Reading config from:", config_file, "\n")
   
   # Load YAML configuration
   tryCatch({
@@ -172,18 +181,29 @@ compare_values <- function(old_val, new_val, col_name, tolerance = 1e-6) {
     new_val <- new_val[1]
   }
   
-  # Handle NA comparisons
+  # Handle empty or NULL values
   if (length(old_val) == 0 || length(new_val) == 0) return(FALSE)
+  if (is.null(old_val) || is.null(new_val)) return(FALSE)
+  
+  # Handle NA comparisons - both NA = same
   if (is.na(old_val) && is.na(new_val)) return(TRUE)
   if (is.na(old_val) || is.na(new_val)) return(FALSE)
   
   # Numeric comparison with tolerance
   if (is.numeric(old_val) && is.numeric(new_val)) {
-    return(abs(old_val - new_val) < tolerance)
+    diff <- abs(old_val - new_val)
+    # Handle cases where diff might be NA (e.g., Inf - Inf)
+    if (is.na(diff)) return(FALSE)
+    return(diff < tolerance)
   }
   
   # Direct comparison for other types
-  return(old_val == new_val)
+  result <- old_val == new_val
+  
+  # Handle NA result from comparison (e.g., comparing incompatible types)
+  if (is.na(result)) return(FALSE)
+  
+  return(result)
 }
 
 create_row_id <- function(data, id_cols) {
@@ -254,12 +274,23 @@ compare_data_files <- function(old_file, new_file) {
   CHECK_ATTRIBUTES <- config$check_attributes
   ALLOWED_ATTRIBUTE_CHANGES <- config$allowed_attribute_changes
   
+  cat("\n=== Configuration Being Used ===\n")
+  cat("File:", basename(new_file), "\n")
+  cat("ID Columns:", if(is.null(ID_COLUMNS)) "NULL (using row numbers)" else paste(ID_COLUMNS, collapse=", "), "\n")
+  cat("Allowed to Change:", if(length(ALLOWED_TO_CHANGE)==0) "none" else paste(ALLOWED_TO_CHANGE, collapse=", "), "\n")
+  cat("Date Columns:", if(length(DATE_COLUMNS)==0) "none" else paste(DATE_COLUMNS, collapse=", "), "\n")
+  cat("================================\n\n")
+  
   results <- list(
     file_name = basename(new_file),
     comparison_date = Sys.time(),
     status = "PASS",
     issues = list(),
-    summary = list()
+    summary = list(),
+    config_used = list(
+      id_columns = ID_COLUMNS,
+      allowed_to_change = ALLOWED_TO_CHANGE
+    )
   )
   
   # Check if old file exists
@@ -405,13 +436,38 @@ compare_data_files <- function(old_file, new_file) {
         type = "MISSING_ID_COLUMNS",
         message = paste("ID columns missing in new data:", paste(missing_id_cols, collapse = ", "))
       )
+      cat("❌ ERROR: ID columns not found in data:", paste(missing_id_cols, collapse=", "), "\n")
+      cat("Available columns:", paste(names(new_data), collapse=", "), "\n")
       return(results)
+    } else {
+      cat("✓ All ID columns found in data\n")
     }
+  } else {
+    cat("⚠️  No ID columns specified - will compare by row number\n")
   }
   
   # Create row identifiers
   old_data$row_id <- create_row_id(old_data, ID_COLUMNS)
   new_data$row_id <- create_row_id(new_data, ID_COLUMNS)
+  
+  # Check for duplicate row_ids (ID columns don't uniquely identify rows)
+  old_dups <- sum(duplicated(old_data$row_id))
+  new_dups <- sum(duplicated(new_data$row_id))
+  
+  if (old_dups > 0 || new_dups > 0) {
+    cat("⚠️  WARNING: ID columns don't create unique rows\n")
+    cat("   Old data duplicates:", old_dups, "\n")
+    cat("   New data duplicates:", new_dups, "\n")
+    cat("   This may cause comparison issues. Consider adding more ID columns.\n")
+    
+    results$issues[[length(results$issues) + 1]] <- list(
+      type = "DUPLICATE_IDS",
+      message = paste("ID columns don't uniquely identify rows. Found", 
+                      max(old_dups, new_dups), "duplicate row_ids")
+    )
+  } else {
+    cat("✓ ID columns create unique row identifiers\n")
+  }
   
   # Find matching rows
   matching_ids <- intersect(old_data$row_id, new_data$row_id)
@@ -423,34 +479,119 @@ compare_data_files <- function(old_file, new_file) {
   
   results$summary$matching_rows <- length(matching_ids)
   
+  # Optional: Sample for very large datasets
+  if (ENABLE_SAMPLING && length(matching_ids) > SAMPLE_SIZE) {
+    cat("Dataset is very large (", length(matching_ids), "rows). Sampling", SAMPLE_SIZE, "rows for comparison.\n")
+    set.seed(42)  # For reproducibility
+    matching_ids <- sample(matching_ids, SAMPLE_SIZE)
+    results$summary$sampled <- TRUE
+    results$summary$sample_size <- SAMPLE_SIZE
+  }
+  
   # Get columns to check (exclude ID columns and allowed-to-change columns)
   cols_to_check <- setdiff(
     intersect(names(old_data), names(new_data)),
     c(ID_COLUMNS, ALLOWED_TO_CHANGE, "row_id")
   )
   
-  # Compare matching rows
+  # Compare matching rows - OPTIMIZED VERSION
   modifications <- list()
   
-  for (row_id in matching_ids) {
-    old_row <- old_data[old_data$row_id == row_id, ]
-    new_row <- new_data[new_data$row_id == row_id, ]
+  cat("Comparing", length(matching_ids), "matching rows...\n")
+  
+  # For large datasets, use vectorized comparison instead of loops
+  if (length(matching_ids) > LARGE_DATASET_THRESHOLD) {
+    cat("Using optimized vectorized comparison for large dataset\n")
     
+    # Filter to matching rows only and ensure unique row_ids
+    old_matched <- old_data[old_data$row_id %in% matching_ids, ]
+    new_matched <- new_data[new_data$row_id %in% matching_ids, ]
+    
+    # Remove duplicate row_ids (keep first occurrence)
+    old_matched <- old_matched[!duplicated(old_matched$row_id), ]
+    new_matched <- new_matched[!duplicated(new_matched$row_id), ]
+    
+    # Merge to align rows properly by row_id
+    merged <- merge(old_matched, new_matched, by = "row_id", suffixes = c(".old", ".new"))
+    
+    if (nrow(merged) == 0) {
+      cat("⚠️  Warning: No rows could be aligned for comparison\n")
+      return(results)
+    }
+    
+    cat("Successfully aligned", nrow(merged), "rows for comparison\n")
+    
+    # Compare each column vectorized
     for (col in cols_to_check) {
-      # Extract single values (not vectors)
-      old_val <- old_row[[col]][1]
-      new_val <- new_row[[col]][1]
+      old_col <- paste0(col, ".old")
+      new_col <- paste0(col, ".new")
       
-      if (!compare_values(old_val, new_val, col, NUMERIC_TOLERANCE)) {
-        modifications[[length(modifications) + 1]] <- list(
-          row_id = row_id,
-          column = col,
-          old_value = old_val,
-          new_value = new_val
-        )
+      # Check if columns exist in merged data
+      if (!old_col %in% names(merged) || !new_col %in% names(merged)) {
+        cat("⚠️  Skipping column", col, "- not found in merged data\n")
+        next
+      }
+      
+      old_vals <- merged[[old_col]]
+      new_vals <- merged[[new_col]]
+      
+      # Vectorized comparison
+      if (is.numeric(old_vals) && is.numeric(new_vals)) {
+        # Numeric comparison with tolerance
+        diffs <- abs(old_vals - new_vals)
+        diffs[is.na(old_vals) & is.na(new_vals)] <- 0  # Both NA = same
+        changed <- which(diffs >= NUMERIC_TOLERANCE | (is.na(old_vals) != is.na(new_vals)))
+      } else {
+        # Non-numeric comparison
+        same_na <- is.na(old_vals) & is.na(new_vals)
+        same_val <- old_vals == new_vals
+        same_val[is.na(same_val)] <- FALSE
+        changed <- which(!same_na & !same_val)
+      }
+      
+      # Record modifications
+      if (length(changed) > 0) {
+        for (idx in changed) {
+          modifications[[length(modifications) + 1]] <- list(
+            row_id = merged$row_id[idx],
+            column = col,
+            old_value = old_vals[idx],
+            new_value = new_vals[idx]
+          )
+        }
+      }
+    }
+    
+  } else {
+    # Original row-by-row comparison for smaller datasets
+    cat("Using row-by-row comparison for small dataset\n")
+    
+    # For small datasets, also use merge for proper alignment
+    old_matched <- old_data[old_data$row_id %in% matching_ids, ]
+    new_matched <- new_data[new_data$row_id %in% matching_ids, ]
+    
+    for (row_id in matching_ids) {
+      old_row <- old_matched[old_matched$row_id == row_id, ][1, ]  # Take first if duplicates
+      new_row <- new_matched[new_matched$row_id == row_id, ][1, ]  # Take first if duplicates
+      
+      for (col in cols_to_check) {
+        # Extract single values
+        old_val <- old_row[[col]]
+        new_val <- new_row[[col]]
+        
+        if (!compare_values(old_val, new_val, col, NUMERIC_TOLERANCE)) {
+          modifications[[length(modifications) + 1]] <- list(
+            row_id = row_id,
+            column = col,
+            old_value = old_val,
+            new_value = new_val
+          )
+        }
       }
     }
   }
+  
+  cat("Found", length(modifications), "modifications\n")
   
   # Report modifications
   if (length(modifications) > 0) {
