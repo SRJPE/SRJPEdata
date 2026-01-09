@@ -55,7 +55,7 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 The cumulative catch curve below shows cumulative catch over time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used similar plots for each tributary to exclude years where there is very limited sampling. 
 
 ```{r, echo = FALSE}
-standard_catch <- SRJPEdata::rst_catch 
+standard_catch <- rst_catch 
 spring_run_catch <- filter(standard_catch, run == "spring" | stream %in% c("mill creek", "deer creek")) %>%
   mutate(day = day(date),
          month = month(date),
@@ -181,26 +181,40 @@ We check this list against our original method annually after it is run to confi
 years_to_exclude_rst_data <- years_exclude_rst_csv |> 
   distinct()
 
+
 # Automatic exclusion criteria to be applied to most recent year
-  max_old_year <- max(years_to_exclude_rst_data$run_year)
-  # Consider thinking about adding subsites together, right now it looks like subsites are fished equally
-  new_years_to_exclude <- SRJPEdata::rst_trap |> 
-    mutate(week = ifelse(is.na(trap_stop_date), week(trap_start_date), week(trap_stop_date)),
-           year = ifelse(is.na(trap_stop_date), year(trap_start_date), year(trap_stop_date)),
-           monitoring_year = ifelse(week >= 45, year + 1, year)) |> 
-    filter(monitoring_year > max_old_year) |> 
-    group_by(stream, site, subsite, site_group, week, monitoring_year) |> 
-    tally() |> 
-    ungroup() |> 
-    group_by(stream, site, subsite, site_group, monitoring_year) |> 
-    summarise(number_weeks = n()) |> # TODO potentially add in logic for consecutive weeks
-    ungroup() |> 
-    mutate(exclude = ifelse(number_weeks < 20, TRUE, FALSE),
-           exclusion_type = "automatic", 
-           reason_for_exclusion = "less than 75% of weeks sampled") |> 
-    filter(exclude) |> 
-    select(stream, site, run_year = monitoring_year, exclusion_type, reason_for_exclusion) 
-  years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
+max_old_year <- max(years_to_exclude_rst_data$run_year)
+# Consider thinking about adding subsites together, right now it looks like subsites are fished equally
+new_years_to_exclude <- rst_trap |>
+  mutate(
+    week = ifelse(
+      is.na(trap_stop_date),
+      week(trap_start_date),
+      week(trap_stop_date)
+    ),
+    year = ifelse(
+      is.na(trap_stop_date),
+      year(trap_start_date),
+      year(trap_stop_date)
+    ),
+    monitoring_year = ifelse(week >= 45, year + 1, year)
+  ) |>
+  filter(monitoring_year > max_old_year) |>
+  group_by(stream, site, subsite, site_group, week, monitoring_year) |>
+  tally() |>
+  ungroup() |>
+  group_by(stream, site, subsite, site_group, monitoring_year) |>
+  summarise(number_weeks = n()) |> # TODO potentially add in logic for consecutive weeks
+  ungroup() |>
+  mutate(
+    exclude = ifelse(number_weeks < 20, TRUE, FALSE),
+    exclusion_type = "automatic",
+    reason_for_exclusion = "less than 75% of weeks sampled"
+  ) |>
+  filter(exclude) |>
+  select(stream, site, run_year = monitoring_year, exclusion_type, reason_for_exclusion) 
+  
+years_to_exclude_rst_data <- bind_rows(years_to_exclude_rst_data, new_years_to_exclude) 
 
 
 usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
@@ -222,15 +236,23 @@ In order to apply the years to exclude information to the modeling datasets we d
 The table below shows a section of this table:
 
 ```{r, echo = FALSE}
-years_to_include_rst_data <- SRJPEdata::rst_catch |> 
+current_date <- Sys.Date()
+current_run_year <- if (month(current_date) %in% 10:12) {
+  year(current_date) + 1
+} else {
+  year(current_date)
+}
+
+years_to_include_rst_data <- rst_catch |> 
   mutate(run_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
   filter(run_year <= year(Sys.Date())) |> 
   distinct(stream, site, run_year) |> 
   full_join(years_to_exclude_rst_data |> 
               select(run_year, stream, site) |> 
               mutate(exclude = T)) |> 
-  filter(is.na(exclude)) |> 
-  select(-exclude)
+  mutate(current_year = ifelse(month(current_date) %in% c(10:12, 1:5) & run_year == current_run_year, T, F)) |> 
+  filter(is.na(exclude) & current_year == F) |> 
+  select(-c(exclude, current_year))
 
 knitr::kable(head(years_to_include_rst_data, 10))
 

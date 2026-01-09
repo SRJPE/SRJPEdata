@@ -68,7 +68,11 @@ rst_trap_query_pilot_processed <- rst_trap_query_pilot |>
 
 rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot_processed, edi_trap) |> 
   mutate(subsite = ifelse(is.na(subsite), site, subsite),
-         site_group = ifelse(is.na(site_group), site, site_group))
+         site_group = ifelse(is.na(site_group), site, site_group)) |> 
+  mutate(flag = case_when(trap_start_date < as_date("2022-10-17") & trap_start_date > as_date("2009-8-19") & site == "hallwood" ~ "remove",
+                            T ~ "keep")) |> 
+  filter(flag == "keep") |> 
+  select(-flag)
 
 # rst_catch ---------------------------------------------------------------
 
