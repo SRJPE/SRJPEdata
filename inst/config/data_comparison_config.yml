@@ -133,6 +133,8 @@ rst_catch.rda:
     - adipose_clipped
     - actual_count
     - species
+    - julian_week
+    - julian_year
   allowed_to_change:
   date_columns:
     - date
