@@ -36,12 +36,14 @@ stock_recruit_year_lookup <- full_join(rst_data, adult_data) |>
   # BUTTE CREEK
   filter(site != "adams dam") |> # okie should be used in SR, see site_overview vignette for why
   # CLEAR CREEK
-  filter(site != "ucc") |> # lcc should be used in SR, see site_overview vignette for why
+  filter(site != "lcc") |> # lcc should be used in SR, see site_overview vignette for why
   # FEATHER RIVER
   filter(site != "steep riffle", 
          site != "lower feather river", 
          site != "gateway riffle", 
-         site != "eye riffle") |> # herringer riffle should be used all years in SR except in 2011 we use sunset pumps, filter all else out, see site_overview vignette for why
+         site != "live oak",
+         site != "sunset pumps",
+         site != "herringer riffle") |> 
   # YUBA RIVER
   filter(site != "yuba river") |> 
   mutate(recommended_adult_data = case_when(stream %in% c("battle creek", "clear creek", "mill creek") ~ "redd", 
