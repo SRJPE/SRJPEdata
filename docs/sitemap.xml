@@ -1,6 +1,5 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://SRJPE.github.io/SRJPEdata/404.html</loc></url>
-<url><loc>https://SRJPE.github.io/SRJPEdata/LICENSE-text.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/articles/flow_data_pull.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/articles/forecast_covariates.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/articles/index.html</loc></url>
@@ -31,6 +30,7 @@
 <url><loc>https://SRJPE.github.io/SRJPEdata/reference/efficiency_summary.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/reference/environmental_data.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/reference/fahrenheit_to_celsius.html</loc></url>
+<url><loc>https://SRJPE.github.io/SRJPEdata/reference/feather_hatchery_release.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/reference/get_receiver_sites_metadata.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/reference/holding.html</loc></url>
 <url><loc>https://SRJPE.github.io/SRJPEdata/reference/index.html</loc></url>
