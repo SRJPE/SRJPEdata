@@ -458,3 +458,29 @@
 #'   \item \code{subsite}: Specific trap site   
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 'site_lookup'
+
+#' @title Feather Hatchery Release
+#' @name feather_hatchery_release
+#' @description This table summarizes coded wire tag (CWT) data from Feather River Hatchery releases by release group. Data source: Regional Mark Processing Center: https://www.rmpc.org/ filtered to Feather River Hatchery releases
+#' @format
+#' \itemize{
+#'   \item \code{release_location_name}: Name of the location where fish were released ("FEATHER AT GRIDLEY", "FEATHER AT LIVE OAK", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER BOYDS PUMP RAMP", "FEATHER R HATCHERY")
+#'   \item \code{avg_weight}: Average weight of fish released
+#'   \item \code{avg_length}: Average length of fish released  
+#'   \item \code{first_release_data}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
+#'   \item \code{last_release_data}: Last date of release
+#'   \item \code{date_span}: Number of days between the first and last release date
+#'   \item \code{mid_release_data}: Midpoint date between first and last release date
+#'   \item \code{delta_distance}: Distance to Delta Entry (1st St Bridge)
+#'   \item \code{release_latitude}: Latitude of the release location
+#'   \item \code{release_longitude}: Longitude of releate location
+#'   \item \code{group_tagcode}: Tag codes or IDs grouped together
+#'   \item \code{group_total_marked_N}: Total number of marked fish included in the release
+#'   \item \code{group_total_unmarked_N}: Total number of unmarked fish included in the release
+#'   \item \code{group_total_release_N}: Total number of fish released
+#'   \item \code{group_mark_rate}: Mark rate of fish released
+#'   \item \code{month}: Month of first release date used to join environmental covariates
+#'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
+#'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+#'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+'feather_hatchery_release'
