@@ -6,7 +6,7 @@
 \usage{
 aggregate_detections_butte(
   detections,
-  receiever_metadata,
+  receiver_metadata,
   replace_dict = list(replace_with = list(c("Releasepoint"), c("Sacramento"),
     c("Endpoint")), replace_list = list(c("UpperButte_RST_Rel", "UpperButte_RST",
     "UpperButte_SKWY", "Butte_Blw_Sanborn_Rel", "North_Weir_Rel", "Sanborn_Slough_Rel",
@@ -18,7 +18,7 @@ aggregate_detections_butte(
 \arguments{
 \item{detections}{A dataframe containing detections information.}
 
-\item{receiever_metadata}{A dataframe containing receiver metadata.}
+\item{receiver_metadata}{A dataframe containing receiver metadata.}
 
 \item{replace_dict}{A list specifying receiver locations to aggregate and their aggregated name.}
 }

@@ -70,7 +70,7 @@ region_mapped_reach_metadata_sacramento <- reach_metadata_sacramento %>%
 
 # Aggregate receiver locations and detections ----------------------------------
 aggregate_sacramento <- aggregate_detections_sacramento(detections = sacramento_all_detections, 
-                                                        receiever_metadata = region_mapped_reach_metadata_sacramento) 
+                                                        receiver_metadata = region_mapped_reach_metadata_sacramento) 
 
 # Sacramento Analysis 
 sacramento_all_aggregated <- aggregate_sacramento$detections

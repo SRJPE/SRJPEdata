@@ -6,7 +6,7 @@
 \usage{
 aggregate_detections_sacramento(
   detections,
-  receiever_metadata,
+  receiver_metadata,
   replace_dict = list(replace_with = list(c("Releasepoint"), c("WoodsonBridge"),
     c("ButteBridge"), c("Sacramento"), c("Endpoint")), replace_list =
     list(c("BattleCk_CNFH_Rel", "RBDD_Rel", "RBDD_Rel_Rec", "Altube Island",
@@ -19,7 +19,7 @@ aggregate_detections_sacramento(
 \arguments{
 \item{detections}{A dataframe containing detections information.}
 
-\item{receiever_metadata}{A table containing metadata for general release sites. Created using \code{get_reciever_sites_metadata()}.}
+\item{receiver_metadata}{A table containing metadata for general release sites. Created using \code{get_reciever_sites_metadata()}.}
 
 \item{replace_dict}{A list specifying receiver locations to aggregate and their corresponding aggregated names.}
 }
