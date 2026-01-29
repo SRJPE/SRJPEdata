@@ -185,7 +185,8 @@ aggregate_detections_sacramento <- function(detections, receiever_metadata,
                                                                     "ToeDrainBase","Hwy84Ferry"),
                                                                   c("BeniciaE","BeniciaW",
                                                                     "ChippsE","ChippsW"
-                                                                  )))) {
+                                                                  ))),
+                                            create_detection_history = FALSE) {
   # Replace receiver_general_locationin detections df according to replace_list, basically aggregate
   # sites into one. By default this is done for ChippsE/W, BeniciaE/W, and
   # SacTrawl1/2
@@ -201,7 +202,7 @@ aggregate_detections_sacramento <- function(detections, receiever_metadata,
   #  of receiver sites with new aggregated GEN's, along with RKM, Lat, Lon
   
   # Make a copy of reach_meta (receiver metadata)
-  reach_meta_aggregate <<- receiever_metadata
+  reach_meta_aggregate <- receiever_metadata
   
   # Walk through each key/pair value
   for (i in 1:length(replace_dict$replace_with)) {
@@ -238,13 +239,21 @@ aggregate_detections_sacramento <- function(detections, receiever_metadata,
         receiver_general_longitude = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_general_longitude, receiver_general_longitude),
         receiver_region = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_region, receiver_region)) %>%
       distinct()
-    
+    if (create_detection_history == TRUE) {
     detections <- detections %>%
       filter(receiver_general_location%in% reach_meta_aggregate$receiver_general_location) %>%
       group_by(fish_id) %>%
       arrange(fish_id, desc(receiver_general_river_km)) %>%
       ungroup()
   }
+  }
+  if (create_detection_history == TRUE) {
+    detections <- detections %>% 
+      filter(receiver_general_location %in% reach_meta_aggregate$receiver_general_location) %>% 
+      group_by(fish_id, receiver_general_location, receiver_general_river_km) %>% 
+      summarise(min_time = min(time, na.rm = TRUE)) %>%
+      arrange(fish_id, min_time) 
+  } 
   return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate))
 }
 
