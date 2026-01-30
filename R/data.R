@@ -484,3 +484,16 @@
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 'feather_hatchery_release'
+
+#' @title Escapement estimates all runns
+#' @name escapement_estimates_all_runs
+#' @description This table makes escapement data from GrandTab (https://wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Anadromous-Assessment) available for use. Currently only fall run are included.
+#' @format
+#' \itemize{
+#'   \item \code{run_year}: Year that salmon returned to the tributary. 
+#'   \item \code{stream}: Stream that salmon returned to. This has been filtered to SR JPE tributaries. See GrandTab for a full list of locations.
+#'   \item \code{estimates}: Escapement estimate. Note that these values are generated through a variety of methods.
+#'   \item \code{run}: Run of Chinook salmon. Currently only fall are included. See `annual_adult` for the best spring run estimates
+#'   \item \code{species}: Chinook salmon
+#'   \item \code{data_type}: Escapement estimates from GrandTab.
+'escapement_estimates_all_runs'
