@@ -178,7 +178,8 @@ aggregate_detections_sacramento <- function(detections, receiver_metadata,
                                                                                     c("Sacramento"),
                                                                                     c("Endpoint")),
                                                                 replace_list = list(c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec",
-                                                                                      "Altube Island","Abv_Altube1",
+                                                                                      # TODO confirm IrvineFinch_Rel goes here
+                                                                                      "Altube Island","Abv_Altube1", "IrvineFinch_Rel",
                                                                                       "MillCk_RST_Rel","MillCk2_Rel","DeerCk_RST_Rel"), 
                                                                                     c("Abv_WoodsonBr","Blw_Woodson"),
                                                                                     c("ButteBr","BlwButteBr","AbvButteBr"),
@@ -247,7 +248,14 @@ aggregate_detections_sacramento <- function(detections, receiver_metadata,
       ungroup()
   } 
   
-  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate))
+  reach_meta_aggregate_mean <- reach_meta_aggregate |> 
+    group_by(receiver_general_location, receiver_region) |> 
+    summarise(receiver_general_river_km = mean(receiver_general_river_km),
+              receiver_general_latitude = mean(receiver_general_latitude),
+              receiver_general_longitude = mean(receiver_general_longitude)) |> 
+    ungroup()
+  
+  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate_mean))
 }
 
 #' Aggregate Detections for Butte Region
@@ -351,7 +359,14 @@ aggregate_detections_butte <- function(detections, receiver_metadata,
       ungroup()
   } 
   
-  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate))
+  reach_meta_aggregate_mean <- reach_meta_aggregate |> 
+    group_by(receiver_general_location, receiver_region) |> 
+    summarise(receiver_general_river_km = mean(receiver_general_river_km),
+              receiver_general_latitude = mean(receiver_general_latitude),
+              receiver_general_longitude = mean(receiver_general_longitude)) |> 
+    ungroup()
+  
+  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate_mean))
 }
 
 #' Aggregate Detections for Feather River Region
@@ -452,7 +467,14 @@ aggregate_detections_feather <- function(detections, receiver_metadata,
       ungroup()
   } 
   
-  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate))
+  reach_meta_aggregate_mean <- reach_meta_aggregate |> 
+    group_by(receiver_general_location, receiver_region) |> 
+    summarise(receiver_general_river_km = mean(receiver_general_river_km),
+              receiver_general_latitude = mean(receiver_general_latitude),
+              receiver_general_longitude = mean(receiver_general_longitude)) |> 
+    ungroup()
+  
+  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate_mean))
 }
 
 #' Make Fish Encounter History

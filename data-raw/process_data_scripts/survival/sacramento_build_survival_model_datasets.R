@@ -50,6 +50,8 @@ region_mapped_reach_metadata_sacramento <- reach_metadata_sacramento %>%
   filter(receiver_general_location %in% c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec","Altube Island","MillCk_RST_Rel", 
                                           "MillCk2_Rel","DeerCk_RST_Rel",
                                           "Abv_WoodsonBr","Blw_Woodson", #"Mill_Ck_Conf",
+                                          # TODO confirm this goes here
+                                          "IrvineFinch_Rel",
                                           "ButteBr","BlwButteBr","AbvButteBr",
                                           "I80-50_Br","TowerBridge", 
                                           "ToeDrainBase","Hwy84Ferry",
@@ -60,6 +62,8 @@ region_mapped_reach_metadata_sacramento <- reach_metadata_sacramento %>%
                                      receiver_general_location == 'RBDD_Rel'& receiver_region == 'Upper Sac R' ~ 'Release',
                                      receiver_general_location == 'RBDD_Rel_Rec' & receiver_region == 'Upper Sac R' ~ 'Release',
                                      receiver_general_location == "Altube Island" & receiver_region == 'Upper Sac R' ~ 'Release', 
+                                     # TODO confirm this goes here
+                                     receiver_general_location == "IrvineFinch_Rel" & receiver_region == "Upper Sac R" ~ "Release",
                                      receiver_region == 'Yolo Bypass' ~ 'Lower Sac R',
                                      receiver_region == 'North Delta' ~ 'Lower Sac R',
                                      receiver_region == 'West Delta' ~ 'End',
