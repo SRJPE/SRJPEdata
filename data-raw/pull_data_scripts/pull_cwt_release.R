@@ -4,13 +4,11 @@ library(tidyverse)
 cwt_distances <- read_csv("data-raw/cwt_data/cwt_distances_summary.csv") |>
   add_row(Id = 8,
           to_name = "FEATHER BEL THRM HI FLOW", # this is a duplicate from feather at gridley 
-          distance_rkm = cwt_distances |>
-            filter(to_name == "FEATHER AT GRIDLEY") |>
-            pull(distance_rkm),
+          distance_rkm = 115.90392, # this is the distance at feather at gridley
           from_name = "Delta Entry 1st Bridge") |>
   mutate(delta_distance = round(distance_rkm, 2),
          release_location_name = to_name) |> 
-  select(release_location_name, delta_distance) |> glimpse()
+  select(release_location_name, delta_distance)
 
 # This table was provided by Brett and was created to determine a lat and long for each location
 site_info <- read_csv("data-raw/cwt_data/CWT_release_sites_latlong.csv") |> 
@@ -20,26 +18,46 @@ site_info <- read_csv("data-raw/cwt_data/CWT_release_sites_latlong.csv") |>
          release_longitude = longitude) |> glimpse()
 
 # This dataset is fro are from the Regional Mark Processing Center: https://www.rmpc.org/
-cwt_data_raw <- read_csv("data-raw/cwt_data/CWT.Sac.Valley.Releases.csv") 
-  
-# feather_cwt_release <- cwt_data_raw |> 
-#   filter(hatchery_location_name == "FEATHER R HATCHERY",
-#          release_location_name %in% c("FEATHER THERMALITO BYPASS", "YUBA AT HALLWOOD BLVD", "YUBA RIVER", "FEATHER BOYDS PUMP RAMP", "FEATHER AT LIVE OAK", 
-#                                       "FEATHER AT GRIDLEY", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER R HATCHERY"),
-#          run == 1) |>  #filter for spring run 
-#   mutate(first_release_date = as.Date(first_release_date, format = "%m/%d/%Y"), 
-#          release_group = release_agency,
-#          # year = year(first_release_date),
-#          year = brood_year,
-#          week = NA,
-#          mean_fl = avg_length) |>
-#   left_join(site_info |> select(-hatchery_location_name), by = "release_location_name") |> 
-#   select(release_group, year, week, mean_fl, delta_distance, release_location_name, hatchery_location_name) |> 
-#   glimpse()
+cwt_data_raw_historical <- read_csv("data-raw/cwt_data/CWT_releases.csv") |> 
+  mutate(first_release_date = as.Date(first_release_date, format = "%m/%d/%Y"),
+         first_release_date = as.Date(format(first_release_date, "%Y-%m-%d")),
+         last_release_date = as.Date(last_release_date, format = "%m/%d/%Y"),
+         last_release_date = as.Date(format(last_release_date, "%Y-%m-%d"))) |> 
+  select(
+    release_location_name,
+    avg_weight,
+    avg_length,
+    first_release_date,
+    last_release_date,
+    tag_code_or_release_id,
+    cwt_1st_mark_count,
+    cwt_2nd_mark_count,
+    non_cwt_1st_mark_count,
+    non_cwt_2nd_mark_count,
+    tag_loss_rate,
+    species,
+    run,
+    hatchery_location_name)
+cwt_data_raw_2023 <- read_csv("data-raw/cwt_data/CWT_releases_2023_2025.csv") |> 
+  mutate(first_release_date = ymd(first_release_date),
+         last_release_date = ymd(last_release_date)) |> 
+  select(
+    release_location_name,
+    avg_weight,
+    avg_length,
+    first_release_date,
+    last_release_date,
+    tag_code_or_release_id,
+    cwt_1st_mark_count,
+    cwt_2nd_mark_count,
+    non_cwt_1st_mark_count,
+    non_cwt_2nd_mark_count,
+    tag_loss_rate,
+    species,
+    run,
+    hatchery_location_name)
 
-# write.csv(feather_cwt_release, "data-raw/cwt_data/feather_cwt_release.csv")
-
-# usethis::use_data(feather_cwt_release, overwrite = TRUE)
+cwt_data_raw <- bind_rows(cwt_data_raw_historical, cwt_data_raw_2023)
 
 cwt_data_summary <- cwt_data_raw |> 
   filter(
@@ -48,29 +66,13 @@ cwt_data_summary <- cwt_data_raw |>
     release_location_name %in% c("FEATHER THERMALITO BYPASS", "YUBA AT HALLWOOD BLVD", "YUBA RIVER", "FEATHER BOYDS PUMP RAMP", "FEATHER AT LIVE OAK", 
                                  "FEATHER AT GRIDLEY", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER R HATCHERY"),
     hatchery_location_name == "FEATHER R HATCHERY") |> 
-  select(
-      release_location_name,
-      avg_weight,
-      avg_length,
-      first_release_date,
-      last_release_date,
-      tag_code_or_release_id,
-      cwt_1st_mark_count,
-      cwt_2nd_mark_count,
-      non_cwt_1st_mark_count,
-      non_cwt_2nd_mark_count,
-      tag_loss_rate) |>  
   replace_na(list(tag_loss_rate = 0,
                   non_cwt_1st_mark_count = 0,
                   non_cwt_2nd_mark_count = 0,
                   cwt_1st_mark_count = 0,
                   cwt_2nd_mark_count = 0)) |>
   mutate(
-    first_release_date = as.Date(first_release_date, format = "%m/%d/%Y"),
-    last_release_date = as.Date(last_release_date, format = "%m/%d/%Y"),
-    #wy_first_release = as.Date(first_release_date, format = "%m/%d/%Y"), # can use to filter for problem groups later on, from ashley - I don't understand these so removing
-   #wy_last_release = as.Date(last_release_date, format = "%m/%d/%Y"),   # can use to filter for problem groups later on, from ashley - I don't understand these so removing
-    date_span = 1 + as.numeric(difftime(wy_last_release, wy_first_release, units = "days")), # can be used to summarize conditions over release period
+    date_span = 1 + as.numeric(difftime(last_release_date, first_release_date, units = "days")), # can be used to summarize conditions over release period
     total_marked_N =  round((cwt_1st_mark_count + cwt_2nd_mark_count) * (1 - tag_loss_rate)),
     total_unmarked_N = non_cwt_1st_mark_count + non_cwt_2nd_mark_count + round((cwt_1st_mark_count + cwt_2nd_mark_count) * (tag_loss_rate)),
     total_release_N = cwt_1st_mark_count + cwt_2nd_mark_count + non_cwt_1st_mark_count + non_cwt_2nd_mark_count,
@@ -117,14 +119,11 @@ feather_hatchery_release <- cwt_data_summary |>
     last_release_date,
     date_span,
     mid_release_date,
-    #wy_first_release,
-    #wy_last_release,
     delta_distance,
     release_latitude,
     release_longitude) |> 
   summarise(
     group_tagcode = paste(tag_code_or_release_id, collapse = "_"),
-    # group_total_marked_N = round(sum(total_marked_N)),
     group_total_marked_N = sum(total_marked_N),
     group_total_unmarked_N = sum(total_unmarked_N),
     group_total_release_N = sum(total_release_N))|> 
