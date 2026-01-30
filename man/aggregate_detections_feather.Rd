@@ -10,7 +10,8 @@ aggregate_detections_feather(
   replace_dict = list(replace_with = list(c("Releasepoint"), c("Sacramento"),
     c("Endpoint")), replace_list = list(c("FR_Gridley_Rel", "FR_Boyds_Rel",
     "FR_Boyds_Rel_Rec"), c("TowerBridge", "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"),
-    c("BeniciaE", "BeniciaW", "ChippsE", "ChippsW")))
+    c("BeniciaE", "BeniciaW", "ChippsE", "ChippsW"))),
+  create_detection_history = FALSE
 )
 }
 \arguments{

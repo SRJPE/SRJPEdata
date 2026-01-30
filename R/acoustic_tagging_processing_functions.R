@@ -361,7 +361,6 @@ aggregate_detections_butte <- function(detections, receiver_metadata,
       distinct()
     
   }
-  # TODO need something to catch where we have multiple detections
   if (create_detection_history == FALSE) {
     detections <- detections %>%
       filter(receiver_general_location %in% reach_meta_aggregate$receiver_general_location) %>%
@@ -371,7 +370,6 @@ aggregate_detections_butte <- function(detections, receiver_metadata,
   } else if (create_detection_history == TRUE) {
     detections <- detections %>% 
       filter(receiver_general_location %in% reach_meta_aggregate$receiver_general_location) %>% 
-      # TODO we were grouping by receiver_general_River_km - this was causing duplicates. We need to address this
       group_by(fish_id, receiver_general_location) %>% 
       summarise(min_time = min(time, na.rm = TRUE)) %>%
       arrange(fish_id, min_time) |> 
@@ -477,7 +475,6 @@ aggregate_detections_feather <- function(detections, receiver_metadata,
       distinct()
     
   }
-  # TODO need something to catch where we have multiple detections
   if (create_detection_history == FALSE) {
     detections <- detections %>%
       filter(receiver_general_location %in% reach_meta_aggregate$receiver_general_location) %>%
@@ -487,7 +484,6 @@ aggregate_detections_feather <- function(detections, receiver_metadata,
   } else if (create_detection_history == TRUE) {
     detections <- detections %>% 
       filter(receiver_general_location %in% reach_meta_aggregate$receiver_general_location) %>% 
-      # TODO we were grouping by receiver_general_River_km - this was causing duplicates. We need to address this
       group_by(fish_id, receiver_general_location) %>% 
       summarise(min_time = min(time, na.rm = TRUE)) %>%
       arrange(fish_id, min_time) |> 

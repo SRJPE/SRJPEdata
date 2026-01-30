@@ -13,7 +13,8 @@ aggregate_detections_sacramento(
     "Abv_Altube1", "MillCk_RST_Rel", "MillCk2_Rel", "DeerCk_RST_Rel"), c("Abv_WoodsonBr",
     "Blw_Woodson"), c("ButteBr", "BlwButteBr", "AbvButteBr"), c("TowerBridge",
     "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"), c("BeniciaE", "BeniciaW", "ChippsE",
-    "ChippsW")))
+    "ChippsW"))),
+  create_detection_history = FALSE
 )
 }
 \arguments{

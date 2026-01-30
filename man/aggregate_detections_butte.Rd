@@ -12,7 +12,8 @@ aggregate_detections_butte(
     "UpperButte_SKWY", "Butte_Blw_Sanborn_Rel", "North_Weir_Rel", "Sanborn_Slough_Rel",
     "Laux Rd", "SutterBypass_Weir2_RST_Rel", "SutterBypass Weir2 RST"), c("TowerBridge",
     "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"), c("BeniciaE", "BeniciaW", "ChippsE",
-    "ChippsW")))
+    "ChippsW"))),
+  create_detection_history = FALSE
 )
 }
 \arguments{
