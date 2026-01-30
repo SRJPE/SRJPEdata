@@ -171,6 +171,7 @@ get_receiver_sites_metadata <- function(all_detections) {
 #'
 #' @export
 aggregate_detections_sacramento <- function(detections, receiver_metadata, 
+                                            # TODO do we need to update any of these with new years of data?
                                             replace_dict = list(replace_with = list(c("Releasepoint"),
                                                                                     c("WoodsonBridge"),
                                                                                     c("ButteBridge"),
@@ -198,27 +199,14 @@ aggregate_detections_sacramento <- function(detections, receiver_metadata,
     replace_with <- unlist(replace_dict[[1]][i])
     
     # Get the averaged replacement values
-    replace <- receiver_metadata %>%
+    replace_values <- receiver_metadata %>%
       select(receiver_general_location, receiver_general_river_km, receiver_general_latitude, receiver_general_longitude, receiver_region) %>%
       filter(receiver_general_location %in% c(replace_list, replace_with)) %>%
       distinct() %>%
       select(-receiver_general_location) %>%
       group_by(receiver_region) %>%
-      summarise_all(mean)
-    
-    # Handle single or multiple regions
-    if (nrow(replace) == 1) {
-      replace_values <- replace
-    } else {
-      replace_values <- replace %>%
-        ungroup() %>%
-        summarise(
-          receiver_general_river_km = mean(receiver_general_river_km),
-          receiver_general_latitude = mean(receiver_general_latitude),
-          receiver_general_longitude = mean(receiver_general_longitude),
-          receiver_region = first(receiver_region)
-        )
-    }
+      summarise_all(mean) |> 
+      ungroup()
     
     # Replace in detections - single mutate, check membership in replace_list
     detections <- detections %>%
@@ -317,27 +305,14 @@ aggregate_detections_butte <- function(detections, receiver_metadata,
     replace_with <- unlist(replace_dict[[1]][i])
     
     # Get the averaged replacement values
-    replace <- receiver_metadata %>%
+    replace_values <- receiver_metadata %>%
       select(receiver_general_location, receiver_general_river_km, receiver_general_latitude, receiver_general_longitude, receiver_region) %>%
       filter(receiver_general_location %in% c(replace_list, replace_with)) %>%
       distinct() %>%
       select(-receiver_general_location) %>%
       group_by(receiver_region) %>%
-      summarise_all(mean)
-    
-    # Handle single or multiple regions
-    if (nrow(replace) == 1) {
-      replace_values <- replace
-    } else {
-      replace_values <- replace %>%
-        ungroup() %>%
-        summarise(
-          receiver_general_river_km = mean(receiver_general_river_km),
-          receiver_general_latitude = mean(receiver_general_latitude),
-          receiver_general_longitude = mean(receiver_general_longitude),
-          receiver_region = first(receiver_region)
-        )
-    }
+      summarise_all(mean) |> 
+      ungroup()
     
     # Replace in detections - single mutate, check membership in replace_list
     detections <- detections %>%
@@ -431,27 +406,14 @@ aggregate_detections_feather <- function(detections, receiver_metadata,
     replace_with <- unlist(replace_dict[[1]][i])
     
     # Get the averaged replacement values
-    replace <- receiver_metadata %>%
+    replace_values <- receiver_metadata %>%
       select(receiver_general_location, receiver_general_river_km, receiver_general_latitude, receiver_general_longitude, receiver_region) %>%
       filter(receiver_general_location %in% c(replace_list, replace_with)) %>%
       distinct() %>%
       select(-receiver_general_location) %>%
       group_by(receiver_region) %>%
-      summarise_all(mean)
-    
-    # Handle single or multiple regions
-    if (nrow(replace) == 1) {
-      replace_values <- replace
-    } else {
-      replace_values <- replace %>%
-        ungroup() %>%
-        summarise(
-          receiver_general_river_km = mean(receiver_general_river_km),
-          receiver_general_latitude = mean(receiver_general_latitude),
-          receiver_general_longitude = mean(receiver_general_longitude),
-          receiver_region = first(receiver_region)
-        )
-    }
+      summarise_all(mean) |> 
+      ungroup()
     
     # Replace in detections - single mutate, check membership in replace_list
     detections <- detections %>%
@@ -526,11 +488,13 @@ make_fish_encounter_history <- function(detections,
   # Get earliest detection for each fish at each GEN
   min_detects <- detections %>% 
     filter(receiver_general_location %in% aggregated_reciever_metadata$receiver_general_location) %>% 
-    group_by(fish_id, receiver_general_location, receiver_general_river_km) %>% 
+    #group_by(fish_id, receiver_general_location, receiver_general_river_km) %>% 
+    group_by(fish_id, receiver_general_location) %>% 
     summarise(min_time = min(time, na.rm = TRUE)) %>%
     arrange(fish_id, min_time) |> 
-    mutate(detect = 1) # Add col detect to min_detects, these fish get a 1
-
+    mutate(detect = 1) |>  # Add col detect to min_detects, these fish get a 1 |> 
+    ungroup()
+  
   # Get list of all tagged fish for the studyID
   fish <- released_fish_table %>%
     # filter(study_id == detections$study_id[1]) %>%
@@ -540,7 +504,7 @@ make_fish_encounter_history <- function(detections,
   # Create matrix of all combinations of fish and GEN
   encounter_history <- expand.grid(
     fish,
-    aggregated_reciever_metadata$receiver_general_location, stringsAsFactors = FALSE)
+    unique(aggregated_reciever_metadata$receiver_general_location), stringsAsFactors = FALSE)
   
   names(encounter_history) <- c('fish_id', 'receiver_general_location')
   
