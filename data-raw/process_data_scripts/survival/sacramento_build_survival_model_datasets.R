@@ -117,8 +117,10 @@ add_covariates <- surv_model_inputs_with_fish_information %>%
   mutate(rl = case_when(release_location == "BattleCk_CNFH_Rel" ~ '1S',
                         release_location == "RBDD_Rel" ~ '2S',
                         release_location == "Altube Island" ~ '3S',
-                        release_location == "MillCk_RST_Rel" ~ '4S',
-                        release_location == "DeerCk_RST_Rel" ~ '5S'), 
+                        # TODO RB river park? in Flora's 2026 code but not in our data
+                        release_location == "IrvineFinch_Rel" ~ "5S",
+                        release_location == "MillCk_RST_Rel" ~ '6S',
+                        release_location == "DeerCk_RST_Rel" ~ '7S'), 
          wy_two_categories = case_when(year %in% c(2013,2015,2016,2018,2020, 2021,2022) ~ 0,
                          year %in% c(2017, 2019, 2023) ~ 1), #0 or 1 for 2 water year type categories: dry (C,D,BN) and wet (AN,W) water year 
          wy_three_categories = case_when(year %in% c(2015, 2021, 2022) ~ 0,
@@ -140,8 +142,10 @@ add_covariates <- surv_model_inputs_with_fish_information %>%
          dist_rlwoodson = case_when(rl == "1S" ~ 91.8, # dist from Battle Creek to Woodson Bridge
                                     rl == "2S" ~ 36.9, # dist from RBDD to Woodson Bridge
                                     rl == "3S" ~ 36.9, # same as RBDD
-                                    rl == "4S" ~ 25.7, # dist from Mill Creek to Woodson Bridge
-                                    rl == "5S" ~ 16.6), # dist from Deer Creek to Woodson Bridge
+                                    # TODO placeholder for rl "4S", # dist from RB River Park to Woodson Bridge, same as RBDD
+                                    rl == "5S" ~ 36.9, # dist from Irvine Finch to Woodson Bridge, same as RBDD
+                                    rl == "6S" ~ 25.7, # dist from Mill Creek to Woodson Bridge
+                                    rl == "7S" ~ 16.6), # dist from Deer Creek to Woodson Bridge
          dist_woodsonbutte = 88, # distance in km from Woodson Bridge to Butte Bridge
          dist_buttesac = 170, # distance in km from Butte Bridge to Sac
          dist_sacdelta = 110,
