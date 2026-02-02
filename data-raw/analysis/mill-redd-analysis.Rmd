@@ -1,0 +1,203 @@
+---
+title: "Mill Creek - redd data analysis and interpolation"
+author: "Maddee Wiggins (FlowWest)"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 12, 
+  fig.height = 12
+)
+
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(size = 16, face = "bold"),
+      axis.title.x = element_text(size = 14),
+      axis.title.y = element_text(size = 14), 
+      legend.position = "bottom"
+    )
+)
+```
+
+**Objective**
+
+Compile and standardize a long-term redd survey dataset across Mill Creek sections and years, and to address gaps in survey coverage using an interpolation approach that preserves both annual variation in spawning abundance and spatial patterns in redd distribution.
+
+**Read in raw data**
+
+Data: `adult-holding-redd-and-carcass-surveys_mill-creek_data-raw_Mill Creek SRCS Redd Counts by Section 1997-2020 Reformatted.xlsx`
+
+```{r read_data}
+adult_redd_long <- readxl::read_excel(here::here("data-raw", "analysis", "adult-holding-redd-and-carcass-surveys_mill-creek_data-raw_Mill Creek SRCS Redd Counts by Section 1997-2020 Reformatted.xlsx")) |> 
+  janitor::clean_names() |> 
+  mutate(across(matches("^x\\d{4}_redd_count$"), as.character)) |>
+  pivot_longer(
+    cols = matches("^x\\d{4}_redd_count$"),
+    names_to = "year",
+    values_to = "n_redds"
+  ) |>
+  mutate(
+    year = as.integer(str_extract(year, "\\d{4}")),
+    n_redds = na_if(n_redds, "n/s"),
+    n_redds = na_if(n_redds, "*"),
+    n_redds = parse_number(n_redds) 
+  ) |>
+  select(site = section, year, n_redds) |>
+  filter(!str_detect(site, "^total")) |> 
+  filter(site != "Total Redds Counted:") 
+
+# Fill in Savercool Place  to Black Rock with McCarthy Place to Savercool Place
+# from 1997 to 2006 since those rows were merged in the spreadsheet
+adult_redd_long <- adult_redd_long |> 
+  left_join(
+    adult_redd_long |>
+      filter(site == "McCarthy Place to Savercool Place", year %in% 1997:2006) |>
+      select(year, n_redds_xxx = n_redds),
+    by = "year"
+  ) |>
+  mutate(
+    n_redds = if_else(
+      site == "Savercool Place  to Black Rock" & year %in% 1997:2006 & is.na(n_redds),
+      n_redds_xxx,
+      n_redds
+    )
+  ) |>
+  select(-n_redds_xxx) |> 
+  glimpse()
+```
+
+**Visualize data gaps**
+
+Years that were not surveyed are shown in grey. 
+
+```{r plot1}
+ggplot(adult_redd_long) + 
+  geom_tile(aes(x = year, y = site, fill = n_redds)) +
+  scale_fill_viridis_c() + 
+  labs(
+    title = "Redd Counts by Site (raw data)",
+    fill = "n_redds"
+  )
+
+```
+
+**Interpolation Method**
+
+Redd counts were not available for all river sections in every year because some sections were not surveyed (`n/s`). To estimate redd abundance in these missing site–year combinations, we used a scaled interpolation approach that maintains the strong year-to-year variation in overall redd production.
+
+First, for each year, we calculated the total number of redds observed across all sections that were surveyed that year. This annual total reflects basin-wide changes in spawning abundance (for example, strong vs. weak run years).
+
+Next, for each river section, we estimated its typical contribution to the total redd count based on years when data were available. In other words, we calculated the average proportion of redds that usually occur in each section relative to the basin-wide annual total.
+
+For years when a section was not surveyed, we filled missing redd counts by multiplying that section’s typical proportion by the total redd count observed in that year. This produces estimates that are consistent with both (1) the overall abundance in a given year and (2) the long-term spatial distribution of redds across river sections.
+
+Fill confidence was assigned based on whether redd counts were directly observed or interpolated, and on the amount of available survey history for each river section. Observed values were given a high confidence rating. For interpolated values, confidence was determined by the number of years with observed data for that section: sections with at least 15 years of survey coverage were assigned medium confidence, sections with at least 5 years of coverage were assigned low confidence, and sections with fewer than 5 years of observed data were assigned very low confidence.
+
+
+```{r fill_in}
+annual_totals <- adult_redd_long |>
+  group_by(year) |>
+  summarise(
+    total_redds_obs = sum(n_redds, na.rm = TRUE),
+    n_sites_obs     = sum(!is.na(n_redds)),
+    .groups = "drop"
+  )
+
+site_shares <- adult_redd_long |>
+  left_join(annual_totals, by = "year") |>
+  mutate(
+    share = n_redds / total_redds_obs
+  ) |>
+  group_by(site) |>
+  summarise(
+    mean_share = mean(share, na.rm = TRUE),
+    n_years_present = sum(!is.na(n_redds)),
+    .groups = "drop"
+  )
+
+adult_redd_scaled <- adult_redd_long |>
+  left_join(annual_totals, by = "year") |>
+  left_join(site_shares, by = "site") |>
+  mutate(
+    n_scaled = round(mean_share * total_redds_obs,0),
+    
+    n_filled = if_else(
+      is.na(n_redds),
+      n_scaled,
+      n_redds
+    ),
+    
+    fill_method = if_else(
+      is.na(n_redds),
+      "scaled_interpolation",
+      "observed"
+    )
+  )
+
+adult_redd_scaled <- adult_redd_scaled |>
+  mutate(
+    fill_confidence = case_when(
+      fill_method == "observed" ~ "high",
+      n_years_present >= 15     ~ "medium",
+      n_years_present >= 5      ~ "low",
+      TRUE                      ~ "very_low"
+    )
+  )
+
+
+```
+
+```{r}
+ggplot(adult_redd_scaled |> 
+         mutate(
+           fill_confidence = factor(
+             fill_confidence,
+             levels = c("high", "medium", "low")
+           )
+         ),
+       aes(x = year, y = site, fill = n_filled)) +
+  geom_tile(
+    aes(color = fill_confidence),
+    linewidth = 1.2,
+    width = 0.92,   
+    height = 0.92
+  ) +
+  scale_fill_viridis_c(name = "Redd count") +
+  # outline colors for confidence
+  scale_color_manual(
+    name = "Fill confidence",
+    values = c(
+      "high"   = "darkgreen",
+      "medium" = "orange",
+      "low"    = "darkred"
+    )
+  ) +
+  labs(
+    title = "Redd Counts by Site (Scaled Interpolation Filled)",
+    x = "Year",
+    y = "Site"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank()
+  )
+
+analysis_summary <- adult_redd_scaled |> 
+  group_by(site, n_years_present) |> 
+  summarise(total_redds = sum(n_redds, na.rm = TRUE),
+            total_redds_with_interpolation = sum(n_filled, na.rm = TRUE)) 
+
+knitr::kable(analysis_summary)
+```
+
+
