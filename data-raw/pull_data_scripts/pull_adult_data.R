@@ -56,7 +56,8 @@ scope = "edi"
 battle_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |> 
   filter(stream == "battle creek")
 
-clear_redd <- read_csv("data-raw/helper-tables/clear_redd_historical.csv") # Sam provided updated data for Clear redd on 5/21/2025 so use these instead
+clear_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |>  # Sam provided updated data for Clear redd on 5/21/2025 so use these instead
+  filter(stream == "clear creek")
 
 # gcs_get_object(object_name = "standard-format-data/standard_adult_passage_estimate.csv",
 #                bucket = gcs_get_global_bucket(),
@@ -253,7 +254,8 @@ feather_spring_spawner <- feather_adult_raw |>
          year = Year) |> 
   select(year, count) |> 
   mutate(stream = "feather river",
-         data_type = "broodstock_tag")
+         data_type = "broodstock_tag",
+         year = as.numeric(year))
 
 
 # Yuba
