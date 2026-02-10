@@ -95,6 +95,10 @@ battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_es
   add_row(year = 2025,
           stream = "battle creek",
           count = 160,
+          data_type = "upstream_estimate") |> 
+  add_row(year = 2025,
+          stream = "clear creek",
+          count = 69,
           data_type = "upstream_estimate")
 # Butte
 # Carcass estimates
