@@ -142,6 +142,9 @@ butte_carcass <- butte_historical |>
           lower_bound_estimate = 20,
           upper_bound_estimate = 40,
           confidence_level = 90) |> 
+  add_row(stream = "butte creek",
+          year = 2025,
+          carcass_estimate = 6861) |> 
   rename(count = carcass_estimate) |> 
   mutate(data_type = "carcass_estimate")
 
