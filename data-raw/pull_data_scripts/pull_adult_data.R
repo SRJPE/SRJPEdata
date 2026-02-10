@@ -91,7 +91,11 @@ clear_redd <- read_csv("data-raw/helper-tables/clear_redd_historical.csv") # Sam
 #   mutate(data_type = "upstream_estimate")
 # write_csv(upstream_passage_estimates_battle_clear, "data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
 
-battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
+battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv") |>
+  add_row(year = 2025,
+          stream = "battle creek",
+          count = 160,
+          data_type = "upstream_estimate")
 # Butte
 # Carcass estimates
 # Only agreed to publishing carcass estimates which are available on GrandTab
