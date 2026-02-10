@@ -56,7 +56,8 @@ scope = "edi"
 battle_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |> 
   filter(stream == "battle creek")
 
-clear_redd <- read_csv("data-raw/helper-tables/clear_redd_historical.csv") # Sam provided updated data for Clear redd on 5/21/2025 so use these instead
+clear_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |>  # Sam provided updated data for Clear redd on 5/21/2025 so use these instead
+  filter(stream == "clear creek")
 
 # gcs_get_object(object_name = "standard-format-data/standard_adult_passage_estimate.csv",
 #                bucket = gcs_get_global_bucket(),
@@ -91,7 +92,15 @@ clear_redd <- read_csv("data-raw/helper-tables/clear_redd_historical.csv") # Sam
 #   mutate(data_type = "upstream_estimate")
 # write_csv(upstream_passage_estimates_battle_clear, "data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
 
-battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
+battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv") |>
+  add_row(year = 2025,
+          stream = "battle creek",
+          count = 160,
+          data_type = "upstream_estimate") |> 
+  add_row(year = 2025,
+          stream = "clear creek",
+          count = 69,
+          data_type = "upstream_estimate")
 # Butte
 # Carcass estimates
 # Only agreed to publishing carcass estimates which are available on GrandTab
@@ -142,6 +151,9 @@ butte_carcass <- butte_historical |>
           lower_bound_estimate = 20,
           upper_bound_estimate = 40,
           confidence_level = 90) |> 
+  add_row(stream = "butte creek",
+          year = 2025,
+          carcass_estimate = 6861) |> 
   rename(count = carcass_estimate) |> 
   mutate(data_type = "carcass_estimate")
 
@@ -233,17 +245,18 @@ data_from_ryan <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.cs
 # Prior to year 1 of the weir, we were unsure how much of the run were making it to the Hatchery and being tagged. What we saw year 1, was a large percentage of the fish passing the weir did go into the hatchery (see table below).
 # Th table shows the number of spring-run tagged for broodstock, number returning to the Hatchery in the fall, the number of over summer mortalities during the same period, and includes the corrected count at the weir for 2024.
 
-feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_052925.csv"))
+# Casey provided updated data in Dec 2025 that includes data dating back to 2004 to expand the adult dataset
+feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_data_for_stock_recruit_dec_2025.csv"))
 
 feather_spring_spawner <- feather_adult_raw |> 
-  rename(broodstock_tagged = `broodstock tagged `,
-         broodstock_returns = `broodstock returning to the Hatchery`,
-         over_summer_mortality = `Over summer Mortality`,
-         fms_corrected_count = `FMS corrected count`) |> 
-  mutate(count = broodstock_tagged - broodstock_returns - over_summer_mortality,
-         stream = "feather river",
-         data_type = "broodstock_tag") |> 
-  select(year, stream, count, data_type)
+  filter(!is.na(`Hallprint Tagged1`)) |> 
+  rename(count = `Estimated in-river spring-run`,
+         year = Year) |> 
+  select(year, count) |> 
+  mutate(stream = "feather river",
+         data_type = "broodstock_tag",
+         year = as.numeric(year))
+
 
 # Yuba
 # Upstream passage data
