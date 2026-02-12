@@ -59,13 +59,7 @@ cwt_data_raw_2023 <- read_csv("data-raw/cwt_data/CWT_releases_2023_2025.csv") |>
 
 cwt_data_raw <- bind_rows(cwt_data_raw_historical, cwt_data_raw_2023)
 
-cwt_data_summary <- cwt_data_raw |> 
-  filter(
-    species == 1,
-    run == 1,
-    release_location_name %in% c("FEATHER THERMALITO BYPASS", "YUBA AT HALLWOOD BLVD", "YUBA RIVER", "FEATHER BOYDS PUMP RAMP", "FEATHER AT LIVE OAK", 
-                                 "FEATHER AT GRIDLEY", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER R HATCHERY"),
-    hatchery_location_name == "FEATHER R HATCHERY") |> 
+cwt_data_summary_all <- cwt_data_raw |> 
   replace_na(list(tag_loss_rate = 0,
                   non_cwt_1st_mark_count = 0,
                   non_cwt_2nd_mark_count = 0,
@@ -110,7 +104,9 @@ max_flows <- SRJPEdata::forecast_covariates |>
   select(year, month, value) |> 
   rename(monthly_max_flow = value)
 
-feather_hatchery_release <- cwt_data_summary |> 
+# MW - TODO: there are some NA year/month - is this okay or should they be removed? 
+# It causes NAs in the flows
+hatchery_release <- cwt_data_summary_all |> 
   group_by(
     release_location_name,
     avg_weight,
@@ -135,5 +131,80 @@ feather_hatchery_release <- cwt_data_summary |>
   left_join(exceedence_flows) |> 
   left_join(max_flows)
 
+# MW: Verified this is identical to the original
+feather_hatchery_release <- cwt_data_summary_all |> 
+  filter(
+    species == 1,
+    run == 1,
+    release_location_name %in% c("FEATHER THERMALITO BYPASS", "YUBA AT HALLWOOD BLVD", "YUBA RIVER", "FEATHER BOYDS PUMP RAMP", "FEATHER AT LIVE OAK", 
+                                 "FEATHER AT GRIDLEY", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER R HATCHERY"),
+    hatchery_location_name == "FEATHER R HATCHERY") |> 
+  group_by(
+    release_location_name,
+    avg_weight,
+    avg_length,
+    first_release_date,
+    last_release_date,
+    date_span,
+    mid_release_date,
+    delta_distance,
+    release_latitude,
+    release_longitude) |> 
+  summarise(
+    group_tagcode = paste(tag_code_or_release_id, collapse = "_"),
+    group_total_marked_N = sum(total_marked_N),
+    group_total_unmarked_N = sum(total_unmarked_N),
+    group_total_release_N = sum(total_release_N))|> 
+  mutate(
+    group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
+    month = month(first_release_date),
+    year = ifelse(month %in% 10:12, year(first_release_date) + 1, year(first_release_date))) |> # this is water year to align with the covariates
+  ungroup() |> 
+  left_join(exceedence_flows) |> 
+  left_join(max_flows)
+
+
+# RST recaptures ----------------------------------------------------------
+
+# MW: is there a better place to store this spreadsheet? 
+recaptures_raw <- readxl::read_excel(here::here("data-raw", "cwt_data", "KL.CWT.Data.1999-2024.UPDATED.1.xlsx")) |> 
+  janitor::clean_names()
+
+rst_recaptures <- recaptures_raw |> 
+  mutate(date_chr = str_trim(date),
+         date_mdy = suppressWarnings(mdy(date_chr, quiet = TRUE)),
+         date_excel = suppressWarnings(as_date(as.numeric(date_chr), origin = "1899-12-30")),
+         date_parsed = case_when(
+           str_detect(date_chr, "^[0-9]+(\\.[0-9]+)?$") & is.na(date_mdy) ~ date_excel,
+           TRUE ~ date_mdy)) |> 
+  select(date = date_parsed, forklength = fl, weight = wt, tag_code = cwt) |> 
+  mutate(stream = "sacramento river",
+         site = "knights landing") |> 
+  filter(!is.na(tag_code)) |> 
+  filter(tag_code != "N/A") |> 
+  glimpse()
+
+# QC check: 
+cwt_tag_codes <- unique(hatchery_release$group_tagcode)
+rst_tag_codes <- unique(rst_recaptures$tag_code)
+
+### returns tag codes that appear in RST recaptures but NOT in hatchery releases
+setdiff(rst_tag_codes, cwt_tag_codes)
+
+## summary
+rst_recaptures  |> 
+  mutate(tag_code = str_trim(tag_code))  |> 
+  anti_join(
+    hatchery_release  |> 
+      mutate(group_tagcode = str_trim(group_tagcode)),
+    by = c("tag_code" = "group_tagcode")
+  ) |>  
+  count(tag_code, sort = TRUE) 
+
+# save data  --------------------------------------------------------------
+
 # write_csv(feathery_hatchery_release, "data-raw/cwt_data/cwt_data_grouped.csv")
 usethis::use_data(feather_hatchery_release, overwrite = TRUE)
+
+# MW: TODO - do we want this? Currently not run 
+# usethis::use_data(hatchery_release, overwrite = TRUE)
