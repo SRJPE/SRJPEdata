@@ -7,13 +7,6 @@
 aggregate_detections_sacramento(
   detections,
   receiver_metadata,
-  replace_dict = list(replace_with = list(c("Releasepoint"), c("WoodsonBridge"),
-    c("ButteBridge"), c("Sacramento"), c("Endpoint")), replace_list =
-    list(c("BattleCk_CNFH_Rel", "RBDD_Rel", "RBDD_Rel_Rec", "Altube Island",
-    "Abv_Altube1", "MillCk_RST_Rel", "MillCk2_Rel", "DeerCk_RST_Rel"), c("Abv_WoodsonBr",
-    "Blw_Woodson"), c("ButteBr", "BlwButteBr", "AbvButteBr"), c("TowerBridge",
-    "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"), c("BeniciaE", "BeniciaW", "ChippsE",
-    "ChippsW"))),
   create_detection_history = FALSE
 )
 }
@@ -21,8 +14,6 @@ aggregate_detections_sacramento(
 \item{detections}{A dataframe containing detections information.}
 
 \item{receiver_metadata}{A table containing metadata for general release sites. Created using \code{get_reciever_sites_metadata()}.}
-
-\item{replace_dict}{A list specifying receiver locations to aggregate and their corresponding aggregated names.}
 }
 \value{
 A dataframe of detections with aggregated receiver sites and updated metadata.
@@ -32,25 +23,4 @@ Replaces specific receiver locations in the detections dataframe with aggregated
 }
 \details{
 This function replaces specified receiver locations in the detections dataframe with aggregated sites according to the provided replace dictionary. It updates the River Kilometer (RKM), Latitude (Lat), Longitude (Lon), and Region for the aggregated sites. The function creates a new dataframe containing the aggregated receiver sites' metadata, reflecting the aggregation done.
-}
-\examples{
-# Define replace dictionary
-replace_dict <- list(replace_with = list(c("Releasepoint"),
-                                         c("WoodsonBridge"),
-                                         c("ButteBridge"),
-                                         c("Sacramento"),
-                                         c("Endpoint")),
-                    replace_list = list(c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec",
-                                          "Altube Island","Abv_Altube1",
-                                          "MillCk_RST_Rel","MillCk2_Rel","DeerCk_RST_Rel"),
-                                        c("Mill_Ck_Conf","Abv_WoodsonBr","Blw_Woodson"),
-                                        c("ButteBr","BlwButteBr"),
-                                        c("TowerBridge","I80-50_Br",
-                                          "ToeDrainBase","Hwy84Ferry"),
-                                        c("BeniciaE","BeniciaW",
-                                          "ChippsE","ChippsW")))
-
-# Aggregate detections data for Sacramento River sites
-aggregated_detections <- aggregate_detections_sacramento(detections_data, replace_dict)
-
 }
