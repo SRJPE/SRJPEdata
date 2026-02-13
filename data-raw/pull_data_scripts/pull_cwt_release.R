@@ -104,9 +104,13 @@ max_flows <- SRJPEdata::forecast_covariates |>
   select(year, month, value) |> 
   rename(monthly_max_flow = value)
 
-# MW - TODO: there are some NA year/month - is this okay or should they be removed? 
-# It causes NAs in the flows
+# MW: Note that exceedance_flow_year_type will be NA until 1996
 hatchery_release <- cwt_data_summary_all |> 
+  mutate(
+    # prefer first_release_date; fall back to last_release_date
+    release_date_use = coalesce(first_release_date, last_release_date)
+  ) |> 
+  filter(!is.na(release_date_use))  |> 
   group_by(
     release_location_name,
     avg_weight,
@@ -122,16 +126,18 @@ hatchery_release <- cwt_data_summary_all |>
     group_tagcode = paste(tag_code_or_release_id, collapse = "_"),
     group_total_marked_N = sum(total_marked_N),
     group_total_unmarked_N = sum(total_unmarked_N),
-    group_total_release_N = sum(total_release_N))|> 
+    group_total_release_N = sum(total_release_N),
+    release_date_use = min(release_date_use, na.rm = TRUE))|> 
   mutate(
     group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
-    month = month(first_release_date),
-    year = ifelse(month %in% 10:12, year(first_release_date) + 1, year(first_release_date))) |> # this is water year to align with the covariates
+    month = month(release_date_use),
+    year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |> # this is water year to align with the covariates
   ungroup() |> 
   left_join(exceedence_flows) |> 
-  left_join(max_flows)
+  left_join(max_flows) |> 
+  select(-release_date_use) |> 
+  glimpse()
 
-# MW: Verified this is identical to the original
 feather_hatchery_release <- cwt_data_summary_all |> 
   filter(
     species == 1,
@@ -165,12 +171,10 @@ feather_hatchery_release <- cwt_data_summary_all |>
 
 
 # RST recaptures ----------------------------------------------------------
-
-# MW: is there a better place to store this spreadsheet? 
-recaptures_raw <- readxl::read_excel(here::here("data-raw", "cwt_data", "KL.CWT.Data.1999-2024.UPDATED.1.xlsx")) |> 
+recaptures_raw <- readxl::read_excel(here::here("data-raw", "helper-tables", "cwt_data", "KL.CWT.Data.1999-2024.UPDATED.1.xlsx")) |> 
   janitor::clean_names()
 
-rst_recaptures <- recaptures_raw |> 
+rst_cwt_recaptures <- recaptures_raw |> 
   mutate(date_chr = str_trim(date),
          date_mdy = suppressWarnings(mdy(date_chr, quiet = TRUE)),
          date_excel = suppressWarnings(as_date(as.numeric(date_chr), origin = "1899-12-30")),
@@ -186,13 +190,13 @@ rst_recaptures <- recaptures_raw |>
 
 # QC check: 
 cwt_tag_codes <- unique(hatchery_release$group_tagcode)
-rst_tag_codes <- unique(rst_recaptures$tag_code)
+rst_tag_codes <- unique(rst_cwt_recaptures$tag_code)
 
 ### returns tag codes that appear in RST recaptures but NOT in hatchery releases
 setdiff(rst_tag_codes, cwt_tag_codes)
 
-## summary
-rst_recaptures  |> 
+### Summary - Some releases were not reported
+rst_cwt_recaptures  |> 
   mutate(tag_code = str_trim(tag_code))  |> 
   anti_join(
     hatchery_release  |> 
@@ -201,10 +205,19 @@ rst_recaptures  |>
   ) |>  
   count(tag_code, sort = TRUE) 
 
+rst_cwt_recaptures  |> 
+  mutate(tag_code = str_trim(tag_code))  |> 
+  left_join(
+    hatchery_release  |> 
+      mutate(group_tagcode = str_trim(group_tagcode)),
+    by = c("tag_code" = "group_tagcode")
+  ) |>  
+  filter(!is.na(first_release_date)) |> 
+  count(tag_code, sort = TRUE) 
+
 # save data  --------------------------------------------------------------
 
 # write_csv(feathery_hatchery_release, "data-raw/cwt_data/cwt_data_grouped.csv")
 usethis::use_data(feather_hatchery_release, overwrite = TRUE)
-
-# MW: TODO - do we want this? Currently not run 
-# usethis::use_data(hatchery_release, overwrite = TRUE)
+usethis::use_data(hatchery_release, overwrite = TRUE)
+usethis::use_data(rst_cwt_recaptures, overwrite = TRUE)
