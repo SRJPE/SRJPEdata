@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # This table was generated in GIS and it is located in this folder: X:\GIS\Projects\028-03_SpringRunJPE_DataMgmt\APRX\cwt_data\cwt_distances
-cwt_distances <- read_csv("data-raw/cwt_data/cwt_distances_summary.csv") |>
+cwt_distances <- read_csv("data-raw/helper-tables/cwt_data/cwt_distances_summary.csv") |>
   add_row(Id = 8,
           to_name = "FEATHER BEL THRM HI FLOW", # this is a duplicate from feather at gridley 
           distance_rkm = 115.90392, # this is the distance at feather at gridley
@@ -11,14 +11,29 @@ cwt_distances <- read_csv("data-raw/cwt_data/cwt_distances_summary.csv") |>
   select(release_location_name, delta_distance)
 
 # This table was provided by Brett and was created to determine a lat and long for each location
-site_info <- read_csv("data-raw/cwt_data/CWT_release_sites_latlong.csv") |> 
+site_info_feather <- read_csv("data-raw/helper-tables/cwt_data/CWT_release_sites_latlong.csv") |> 
   filter(hatchery_location_name == "FEATHER R HATCHERY") |> 
   left_join(cwt_distances, by = "release_location_name") |> 
   rename(release_latitude = latitude,
          release_longitude = longitude) |> glimpse()
 
+# read in lat/longs from https://www.rmpc.org/data-selection/rmis-queries/
+rest_of_site_info <- read_csv(here::here("data-raw", "helper-tables", "cwt_data", "CSV55526.TXT")) |> 
+  filter(!(name %in% unique(site_info_feather$release_location_name))) |> 
+  select(release_latitude = latitude, release_longitude = longitude, 
+         release_location_name = name) |> 
+  glimpse()
+
+site_info <- bind_rows(site_info_feather, rest_of_site_info) |> 
+  filter(!is.na(release_latitude)) |> 
+  distinct()
+
+
+# do not have location information for: SACRA.-SAN JOAQ. SYS
+# setdiff(unique(cwt_data_summary_all$release_location_name), locations$name)
+
 # This dataset is fro are from the Regional Mark Processing Center: https://www.rmpc.org/
-cwt_data_raw_historical <- read_csv("data-raw/cwt_data/CWT_releases.csv") |> 
+cwt_data_raw_historical <- read_csv("data-raw/helper-tables/cwt_data/CWT_releases.csv") |> 
   mutate(first_release_date = as.Date(first_release_date, format = "%m/%d/%Y"),
          first_release_date = as.Date(format(first_release_date, "%Y-%m-%d")),
          last_release_date = as.Date(last_release_date, format = "%m/%d/%Y"),
@@ -38,7 +53,7 @@ cwt_data_raw_historical <- read_csv("data-raw/cwt_data/CWT_releases.csv") |>
     species,
     run,
     hatchery_location_name)
-cwt_data_raw_2023 <- read_csv("data-raw/cwt_data/CWT_releases_2023_2025.csv") |> 
+cwt_data_raw_2023 <- read_csv("data-raw/helper-tables/cwt_data/CWT_releases_2023_2025.csv") |> 
   mutate(first_release_date = ymd(first_release_date),
          last_release_date = ymd(last_release_date)) |> 
   select(
