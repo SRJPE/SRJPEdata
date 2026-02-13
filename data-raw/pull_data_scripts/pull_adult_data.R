@@ -266,13 +266,12 @@ data <- read_csv(file = raw)
 # process into format as previously defined by database
 yuba_passage_estimates <- data |> 
   mutate(run = ifelse(run %in% c("early spring", "late spring"), "spring", run)) |> 
-  group_by(year = year(date), run, adipose_clipped) |> 
+  group_by(year = year(date), run) |> 
   dplyr::summarize(passage_estimate = sum(count, na.rm = T)) |> 
   mutate(stream = "yuba river")
 
 yuba_spring_passage_estimates <- yuba_passage_estimates |> 
   filter(run == "spring",
-         adipose_clipped == F,
          !year %in% c(2016, 2017, 2019)) |> 
   rename(count = passage_estimate) |> 
   ungroup() |> 
