@@ -99,7 +99,11 @@ map_reaches <- aggregate_sacramento$reach_meta_aggregate %>%
 # Create Encounter History list and inp file for Sac River model------------------------------------------------------------------
 sacramento_all_encounter_history <- make_fish_encounter_history(detections = sacramento_all_aggregated, 
                                                      aggregated_reciever_metadata = aggregate_sacramento$reach_meta_aggregate,
-                                                     released_fish_table = fish_data |> filter(study_id %in% sacramento_studyIDs))
+                                                     released_fish_table = fish_data |> filter(study_id %in% sacramento_studyIDs)) |> 
+  # TODO these are not in Floras data nor in the detections
+  # I can't tell where they are getting filtered out, but they have incomplete capture histories
+  # so filtering out here to help detections and ch datasets match
+  filter(!fish_id %in% c("RBDD_WS2021-001", "RBDD_WS2021-008"))
 
 
 # Add in fish information to inp file
