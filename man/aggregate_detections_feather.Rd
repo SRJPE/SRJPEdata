@@ -7,10 +7,6 @@
 aggregate_detections_feather(
   detections,
   receiver_metadata,
-  replace_dict = list(replace_with = list(c("Releasepoint"), c("Sacramento"),
-    c("Endpoint")), replace_list = list(c("FR_Gridley_Rel", "FR_Boyds_Rel",
-    "FR_Boyds_Rel_Rec"), c("TowerBridge", "I80-50_Br", "ToeDrainBase", "Hwy84Ferry"),
-    c("BeniciaE", "BeniciaW", "ChippsE", "ChippsW"))),
   create_detection_history = FALSE
 )
 }
@@ -18,8 +14,6 @@ aggregate_detections_feather(
 \item{detections}{A dataframe containing detections information.}
 
 \item{receiver_metadata}{A dataframe containing receiver metadata.}
-
-\item{replace_dict}{A list specifying receiver locations to aggregate and their aggregated name.}
 }
 \value{
 A list containing:
@@ -35,17 +29,6 @@ Replace receiver locations in the detections dataframe with aggregated locations
 This function replaces receiver locations in the detections dataframe with aggregated locations for the Feather River region according to the specified replacement dictionary. It aggregates receiver locations into one and calculates the mean River Kilometer (RKM), Latitude, Longitude, and Region for each aggregated location. The function also updates the receiver metadata accordingly.
 }
 \examples{
-# Define replacement dictionary
-replacement_dict <- list(replace_with = list(c("Releasepoint"),
-                                             c("Sacramento"),
-                                             c("Endpoint")),
-                         replace_list = list(c("FR_Gridley_Rel","FR_Boyds_Rel","FR_Boyds_Rel_Rec"),
-                                            c("TowerBridge","I80-50_Br", 
-                                              "ToeDrainBase","Hwy84Ferry"),
-                                            c("BeniciaE","BeniciaW", 
-                                              "ChippsE","ChippsW" 
-                                            )))
-
 # Aggregate detections for Feather River region
 aggregated_data <- aggregate_detections_feather(detections_data, receiver_metadata, replace_dict = replacement_dict)
 
