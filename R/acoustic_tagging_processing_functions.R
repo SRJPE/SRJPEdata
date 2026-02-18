@@ -202,7 +202,11 @@ aggregate_detections_sacramento <- function(detections, receiver_metadata, creat
            receiver_general_river_km = mean_river_km,
            receiver_general_latitude = mean_lat,
            receiver_general_longitude = mean_long,
-           receiver_region = region)
+           receiver_region = region) |> 
+    # need to sort so that they are ordered correctly in the capture history
+    mutate(receiver_general_location = factor(receiver_general_location, 
+                                              levels = c("Releasepoint", "WoodsonBridge", "ButteBridge", "Sacramento", "Endpoint"))) |>
+    arrange(receiver_general_location)
   
   if (create_detection_history == FALSE) {
     detections_final <- detections_with_mean_vals |>
@@ -296,7 +300,11 @@ aggregate_detections_butte <- function(detections, receiver_metadata, create_det
            receiver_general_river_km = mean_river_km,
            receiver_general_latitude = mean_lat,
            receiver_general_longitude = mean_long,
-           receiver_region = region)
+           receiver_region = region) |> 
+    # need to sort so that they are ordered correctly in the capture history
+    mutate(receiver_general_location = factor(receiver_general_location, 
+                                              levels = c("Releasepoint", "Sacramento", "Endpoint"))) |>
+    arrange(receiver_general_location)
   
   if (create_detection_history == FALSE) {
     detections_final <- detections_with_mean_vals |>
@@ -391,7 +399,11 @@ aggregate_detections_feather <- function(detections, receiver_metadata, create_d
            receiver_general_river_km = mean_river_km,
            receiver_general_latitude = mean_lat,
            receiver_general_longitude = mean_long,
-           receiver_region = region)
+           receiver_region = region) |> 
+    # need to sort so that they are ordered correctly in the capture history
+    mutate(receiver_general_location = factor(receiver_general_location, 
+                                              levels = c("Releasepoint", "Sacramento", "Endpoint"))) |>
+    arrange(receiver_general_location)
   
   if (create_detection_history == FALSE) {
     detections_final <- detections_with_mean_vals |>
@@ -459,7 +471,7 @@ make_fish_encounter_history <- function(detections,
   # Create matrix of all combinations of fish and GEN
   encounter_history <- expand.grid(
     fish,
-    unique(aggregated_reciever_metadata$receiver_general_location), stringsAsFactors = FALSE)
+    aggregated_reciever_metadata$receiver_general_location, stringsAsFactors = FALSE)
   
   names(encounter_history) <- c('fish_id', 'receiver_general_location')
   
