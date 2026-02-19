@@ -196,8 +196,7 @@ mill_redd <- data_from_ryan_raw |>
   glimpse()
 
 data_from_ryan <- data_from_ryan_raw |> 
-  filter(data_type != "redd",
-         stream != "mill creek") |> 
+  filter(!(data_type == "redd" & stream == "mill creek")) |> 
   bind_rows(mill_redd)
 
 # identifier = "1672"
