@@ -130,13 +130,11 @@ adult_redd_scaled <- adult_redd_long |>
   left_join(site_shares, by = "site") |>
   mutate(
     n_scaled = round(mean_share * total_redds_obs,0),
-    
     n_filled = if_else(
       is.na(n_redds),
       n_scaled,
       n_redds
     ),
-    
     fill_method = if_else(
       is.na(n_redds),
       "scaled_interpolation",
@@ -198,6 +196,66 @@ analysis_summary <- adult_redd_scaled |>
             total_redds_with_interpolation = sum(n_filled, na.rm = TRUE)) 
 
 knitr::kable(analysis_summary)
+```
+
+## Scale Redd Totals by Year
+
+Redd counts were incomplete in some years because not all river sections were surveyed. To estimate missing site–year values, we applied a year-scaled single-value interpolation approach. For each year, we calculated the total number of observed redds across surveyed sections and used this to derive a year-specific scaling factor relative to the long-term mean observed annual total. A global baseline redd count was computed as the mean redd count across all observed site–year records. We then calculated a single interpolated redd value for each year by multiplying the baseline by the year-specific scaling factor. Missing site–year redd counts were filled using this annual value, ensuring that estimates reflect interannual variability without imposing site-specific spatial structure. 
+
+```{r}
+annual_totals <- adult_redd_long |>
+  group_by(year) |>
+  summarise(
+    total_redds_obs = sum(n_redds, na.rm = TRUE),
+    n_sites_obs     = sum(!is.na(n_redds)),
+    .groups = "drop"
+  )
+
+baseline_siteyear_mean <- adult_redd_long |>
+  summarise(baseline = mean(n_redds, na.rm = TRUE)) |>
+  pull(baseline)
+
+mean_annual_total <- mean(annual_totals$total_redds_obs, na.rm = TRUE)
+
+annual_fill_value <- annual_totals |>
+  mutate(
+    year_factor = total_redds_obs / mean_annual_total,
+    fill_value_year = round(baseline_siteyear_mean * year_factor, 0)
+  )
+
+adult_redd_scaled <- adult_redd_long |>
+  left_join(annual_fill_value, by = "year") |>
+  mutate(
+    n_filled = if_else(is.na(n_redds), fill_value_year, n_redds),
+    fill_method = if_else(is.na(n_redds), "year_scaled_single_value", "observed"),
+    fill_confidence = case_when(
+      fill_method == "observed" ~ "high",
+      n_sites_obs >= 10         ~ "medium",
+      n_sites_obs >= 5          ~ "low",
+      TRUE                      ~ "very_low"
+    )
+  )
+
+annual_summary_filled <- adult_redd_scaled |>
+  group_by(year) |>
+  summarise(
+    total_redds_obs    = first(total_redds_obs),
+    fill_value_year    = first(fill_value_year),
+    n_sites_missing    = sum(fill_method != "observed"),
+    total_redds_filled = sum(n_filled),
+    .groups = "drop"
+  ) |>
+  mutate(
+    obs_fraction = total_redds_obs / total_redds_filled,             
+    redd_multiplier = if_else(total_redds_obs > 0,
+                              total_redds_filled / total_redds_obs, 
+                              NA_real_)
+  )
+
+knitr::kable(annual_summary_filled)
+
+write_csv(annual_summary_filled, here::here("data-raw", "analysis", "mill_redd_fill_table.csv"))
+
 ```
 
 
