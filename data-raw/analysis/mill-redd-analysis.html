@@ -11,7 +11,7 @@
 
 <meta name="author" content="Maddee Wiggins (FlowWest)" />
 
-<meta name="date" content="2026-02-02" />
+<meta name="date" content="2026-02-19" />
 
 <title>Mill Creek - redd data analysis and interpolation</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Mill Creek - redd data analysis and
 interpolation</h1>
 <h4 class="author">Maddee Wiggins (FlowWest)</h4>
-<h4 class="date">2026-02-02</h4>
+<h4 class="date">2026-02-19</h4>
 
 </div>
 
@@ -511,6 +511,261 @@ low confidence.</p>
 </tr>
 </tbody>
 </table>
+<div id="scale-redd-totals-by-year" class="section level2">
+<h2>Scale Redd Totals by Year</h2>
+<p>Redd counts were incomplete in some years because not all river
+sections were surveyed. To estimate missing site–year values, we applied
+a year-scaled single-value interpolation approach. For each year, we
+calculated the total number of observed redds across surveyed sections
+and used this to derive a year-specific scaling factor relative to the
+long-term mean observed annual total. A global baseline redd count was
+computed as the mean redd count across all observed site–year records.
+We then calculated a single interpolated redd value for each year by
+multiplying the baseline by the year-specific scaling factor. Missing
+site–year redd counts were filled using this annual value, ensuring that
+estimates reflect interannual variability without imposing site-specific
+spatial structure.</p>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="18%" />
+<col width="12%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">year</th>
+<th align="right">total_redds_obs</th>
+<th align="right">fill_value_year</th>
+<th align="right">n_sites_missing</th>
+<th align="right">total_redds_filled</th>
+<th align="right">obs_fraction</th>
+<th align="right">redd_multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1997</td>
+<td align="right">102</td>
+<td align="right">7</td>
+<td align="right">4</td>
+<td align="right">130</td>
+<td align="right">0.7846154</td>
+<td align="right">1.274510</td>
+</tr>
+<tr class="even">
+<td align="right">1998</td>
+<td align="right">237</td>
+<td align="right">17</td>
+<td align="right">2</td>
+<td align="right">271</td>
+<td align="right">0.8745387</td>
+<td align="right">1.143460</td>
+</tr>
+<tr class="odd">
+<td align="right">1999</td>
+<td align="right">355</td>
+<td align="right">26</td>
+<td align="right">2</td>
+<td align="right">407</td>
+<td align="right">0.8722359</td>
+<td align="right">1.146479</td>
+</tr>
+<tr class="even">
+<td align="right">2000</td>
+<td align="right">349</td>
+<td align="right">25</td>
+<td align="right">2</td>
+<td align="right">399</td>
+<td align="right">0.8746867</td>
+<td align="right">1.143266</td>
+</tr>
+<tr class="odd">
+<td align="right">2001</td>
+<td align="right">703</td>
+<td align="right">51</td>
+<td align="right">2</td>
+<td align="right">805</td>
+<td align="right">0.8732919</td>
+<td align="right">1.145093</td>
+</tr>
+<tr class="even">
+<td align="right">2002</td>
+<td align="right">916</td>
+<td align="right">67</td>
+<td align="right">1</td>
+<td align="right">983</td>
+<td align="right">0.9318413</td>
+<td align="right">1.073144</td>
+</tr>
+<tr class="odd">
+<td align="right">2003</td>
+<td align="right">850</td>
+<td align="right">62</td>
+<td align="right">1</td>
+<td align="right">912</td>
+<td align="right">0.9320175</td>
+<td align="right">1.072941</td>
+</tr>
+<tr class="even">
+<td align="right">2004</td>
+<td align="right">594</td>
+<td align="right">43</td>
+<td align="right">1</td>
+<td align="right">637</td>
+<td align="right">0.9324961</td>
+<td align="right">1.072391</td>
+</tr>
+<tr class="odd">
+<td align="right">2005</td>
+<td align="right">682</td>
+<td align="right">50</td>
+<td align="right">1</td>
+<td align="right">732</td>
+<td align="right">0.9316940</td>
+<td align="right">1.073314</td>
+</tr>
+<tr class="even">
+<td align="right">2006</td>
+<td align="right">606</td>
+<td align="right">44</td>
+<td align="right">1</td>
+<td align="right">650</td>
+<td align="right">0.9323077</td>
+<td align="right">1.072607</td>
+</tr>
+<tr class="odd">
+<td align="right">2007</td>
+<td align="right">460</td>
+<td align="right">34</td>
+<td align="right">1</td>
+<td align="right">494</td>
+<td align="right">0.9311741</td>
+<td align="right">1.073913</td>
+</tr>
+<tr class="even">
+<td align="right">2008</td>
+<td align="right">181</td>
+<td align="right">13</td>
+<td align="right">1</td>
+<td align="right">194</td>
+<td align="right">0.9329897</td>
+<td align="right">1.071823</td>
+</tr>
+<tr class="odd">
+<td align="right">2009</td>
+<td align="right">110</td>
+<td align="right">8</td>
+<td align="right">1</td>
+<td align="right">118</td>
+<td align="right">0.9322034</td>
+<td align="right">1.072727</td>
+</tr>
+<tr class="even">
+<td align="right">2010</td>
+<td align="right">241</td>
+<td align="right">18</td>
+<td align="right">0</td>
+<td align="right">241</td>
+<td align="right">1.0000000</td>
+<td align="right">1.000000</td>
+</tr>
+<tr class="odd">
+<td align="right">2011</td>
+<td align="right">183</td>
+<td align="right">13</td>
+<td align="right">1</td>
+<td align="right">196</td>
+<td align="right">0.9336735</td>
+<td align="right">1.071038</td>
+</tr>
+<tr class="even">
+<td align="right">2012</td>
+<td align="right">271</td>
+<td align="right">20</td>
+<td align="right">1</td>
+<td align="right">291</td>
+<td align="right">0.9312715</td>
+<td align="right">1.073801</td>
+</tr>
+<tr class="odd">
+<td align="right">2013</td>
+<td align="right">600</td>
+<td align="right">44</td>
+<td align="right">1</td>
+<td align="right">644</td>
+<td align="right">0.9316770</td>
+<td align="right">1.073333</td>
+</tr>
+<tr class="even">
+<td align="right">2014</td>
+<td align="right">220</td>
+<td align="right">16</td>
+<td align="right">2</td>
+<td align="right">252</td>
+<td align="right">0.8730159</td>
+<td align="right">1.145455</td>
+</tr>
+<tr class="odd">
+<td align="right">2015</td>
+<td align="right">58</td>
+<td align="right">4</td>
+<td align="right">1</td>
+<td align="right">62</td>
+<td align="right">0.9354839</td>
+<td align="right">1.068966</td>
+</tr>
+<tr class="even">
+<td align="right">2016</td>
+<td align="right">47</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">53</td>
+<td align="right">0.8867925</td>
+<td align="right">1.127660</td>
+</tr>
+<tr class="odd">
+<td align="right">2017</td>
+<td align="right">129</td>
+<td align="right">9</td>
+<td align="right">1</td>
+<td align="right">138</td>
+<td align="right">0.9347826</td>
+<td align="right">1.069767</td>
+</tr>
+<tr class="even">
+<td align="right">2018</td>
+<td align="right">76</td>
+<td align="right">6</td>
+<td align="right">0</td>
+<td align="right">76</td>
+<td align="right">1.0000000</td>
+<td align="right">1.000000</td>
+</tr>
+<tr class="odd">
+<td align="right">2019</td>
+<td align="right">90</td>
+<td align="right">7</td>
+<td align="right">1</td>
+<td align="right">97</td>
+<td align="right">0.9278351</td>
+<td align="right">1.077778</td>
+</tr>
+<tr class="even">
+<td align="right">2020</td>
+<td align="right">40</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">43</td>
+<td align="right">0.9302326</td>
+<td align="right">1.075000</td>
+</tr>
+</tbody>
+</table>
+</div>
 
 
 

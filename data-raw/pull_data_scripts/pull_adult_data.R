@@ -167,7 +167,26 @@ butte_holding <- read_csv("data-raw/helper-tables/butte_holding_historical.csv")
 # in the video passage data and all the redd data were off. Until
 # this is fixed on EDI we will pull data from the spreadsheet Ryan provided
 
-data_from_ryan <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.csv")
+data_from_ryan_raw <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.csv") |> glimpse()
+
+# Interpolate Mill Redd data based on 
+# adult-holding-redd-and-carcass-surveys_mill-creek_data-raw_Mill Creek SRCS Redd Counts by Section 1997-2020 Reformatted.xlsx
+# See data-raw/analysis/mill-redd-analysis.Rmd for methodology 
+redd_interpolation_data <- read_csv(here::here("data-raw", "analysis", "mill_redd_fill_table.csv")) |> glimpse()
+
+mill_redd <- data_from_ryan_raw |> 
+  filter(data_type == "redd",
+         stream == "mill creek") |>  
+  left_join(redd_interpolation_data) |> 
+  mutate(redd_multiplier = ifelse(is.na(redd_multiplier), 1, redd_multiplier), # for years 2021-2024 where we don't have a multiplier
+         new_count = round(count * redd_multiplier, 0)) |> 
+  select(year, count = new_count, data_type, stream) |> 
+  glimpse()
+
+data_from_ryan <- data_from_ryan_raw |> 
+  filter(data_type != "redd",
+         stream != "mill creek") |> 
+  bind_rows(mill_redd)
 
 # identifier = "1672"
 # revision = list_data_package_revisions(scope, identifier, filter = "newest")
