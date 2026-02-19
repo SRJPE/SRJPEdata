@@ -21,6 +21,7 @@ reference:
 - contents: 
   - weekly_juvenile_abundance_catch_data
   - weekly_juvenile_abundance_efficiency_data
+  - feather_hatchery_release
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model 
 - contents: 
