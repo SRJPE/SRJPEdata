@@ -5,10 +5,10 @@
 
 library(tidyverse)
 library(EDIutils)
-library(googleCloudStorageR)
+# library(googleCloudStorageR)
 
-gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
-gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
+# gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
+# gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
 # Set the scope for script to use API to download data from EDI
 scope = "edi"
 
@@ -190,7 +190,7 @@ mill_redd <- data_from_ryan_raw |>
   filter(data_type == "redd",
          stream == "mill creek") |>  
   left_join(redd_interpolation_data) |> 
-  mutate(redd_multiplier = ifelse(is.na(redd_multiplier), 1, redd_multiplier), # for years 2021-2024 where we don't have a multiplier
+  mutate(redd_multiplier = ifelse(is.na(redd_multiplier), 1, redd_multiplier), # for years 2021-2024 where we don't have a multiplier. these are expected to be complete surveys
          new_count = round(count * redd_multiplier, 0)) |> 
   select(year, count = new_count, data_type, stream) |> 
   glimpse()
