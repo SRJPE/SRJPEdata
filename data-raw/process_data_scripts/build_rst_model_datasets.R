@@ -8,13 +8,12 @@ library(tidyverse)
 # Catch Formatting --------------------------------------------------------------
 # Rewrite script from catch pulled from JPE database
 # Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
-SRJPEdata::rst_catch |> glimpse()
 years_to_include_rst_data <- years_to_include_rst_data |> # if not loaded run years_to_include_analysis.Rmd vignette
   mutate(include = T)
 yearling_ruleset <- SRJPEdata::daily_yearling_ruleset
 # Remove all adipose clipped fish - we do not want to include hatchery fish
 # Remove yearling fish - we do not want to include yearlings
-updated_standard_catch_raw <- SRJPEdata::rst_catch |> 
+updated_standard_catch_raw <- rst_catch |> 
   mutate(remove = case_when(stream != "butte creek" & adipose_clipped == T ~ "remove",
                             T ~ "keep"),
          run = tolower(run),

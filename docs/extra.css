@@ -19,13 +19,13 @@ a:hover {
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-    color: #555;
+    color: #36454F;
     background-color: #9986A5;
 }
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:hover,
 .navbar-default .navbar-nav > .open > a:focus {
-    color: #555;
+    color: #36454F;
     background-color: #9986A5;
 }
 
@@ -37,12 +37,12 @@ a:hover {
 .navbar-default .navbar-brand > .active > a,
 .navbar-default .navbar-brand > .active > a:hover,
 .navbar-default .navbar-brand > .active > a:focus {
-    color: #555;
+    color: #36454F;
     background-color: #9986A5;
 }
 .navbar-default .navbar-brand > .open > a,
 .navbar-default .navbar-brand > .open > a:hover,
 .navbar-default .navbar-brand > .open > a:focus {
-    color: #555;
+    color: #36454F;
     background-color: #9986A5;
 }
