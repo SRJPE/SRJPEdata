@@ -162,6 +162,7 @@ release <- bind_rows(release_db,
   ) |>  # fork length is not on EDI but Josh needs it in weekly_efficiency
   left_join(standard_release |>
               select(site, release_id, origin_released) |>
+              rename(origin = origin_released) |> 
               distinct())  # fork length is not on EDI but Josh needs it in weekly_efficiency
 
 # recaptures --------------------------------------------------------------
