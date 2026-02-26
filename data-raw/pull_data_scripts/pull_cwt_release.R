@@ -243,7 +243,33 @@ hatchery_release_recaptures <- rst_cwt_recaptures |>
 
 recapture_locations <- hatchery_release_recaptures |> 
   select(release_location_name, release_latitude, release_longitude) |> 
-  distinct()
+  distinct() |> 
+  write_csv("data-raw/helper-tables/recapture_locations.csv")
+
+# This table is calculated in analysis/recapture_distances.R
+# WIP - is this the whole hatchery table or do we want all sites? TBD
+knight_distances <- read_csv("data-raw/helper-tables/knights_landing_cwt_distances.csv") |> 
+  left_join(hatchery_release) |> glimpse()
+
+# add week index
+bt_week_lookup <- SRJPEmodel::julian_week_to_date_lookup |>
+  mutate(week_index = if_else(
+      Jwk >= 40,
+      Jwk - 39,
+      Jwk + (53 - 39)))
+
+# TODO: is this the final table or should this be done 
+# from hatchery_release?
+hatchery_release_knight <- knight_distances |>
+  mutate(
+    julian_week  = isoweek(first_release_date),
+    week_index   = if_else(
+      julian_week >= 40,
+      julian_week - 39,
+      julian_week + (53 - 39)
+    )
+  ) |> 
+  select(-julian_week)
 
 # save data  --------------------------------------------------------------
 
