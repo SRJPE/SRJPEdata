@@ -8,7 +8,11 @@ chainage_m <- function(pt_sf) {
 }
 
 # Constants ---------------------------------------------------------------
+recapture_locations <- read_csv("data-raw/helper-tables/recapture_locations.csv")
+
+
 step_m <- 50
+crs_m <- 32610  # UTM 10N
 
 knights_landing <- st_sfc(
   st_point(c(-121.704, 38.8021)),
@@ -25,7 +29,7 @@ butte_creek_sac_conf <-  st_sfc(
   st_sf(name = "Butte Creek Conf. with Sac")
 
 battle_creek_sac_conf <-  st_sfc(
-  st_point(c(--122.175151, 40.355493)),
+  st_point(c(-122.175151, 40.355493)),
   crs = 4326
 ) |>
   st_sf(name = "Battle Creek Conf. with Sac")
@@ -263,18 +267,16 @@ dseg <- sqrt(diff(coords[,1])^2 + diff(coords[,2])^2)
 cumdist <- c(0, cumsum(dseg))  # meters from start
 
 # --- Marker chainage (compute once) ---
-d_marker <- chainage_m(knight_marker)
 conf_marker_battle <- chainage_m(battle_creek_sac_conf)
 
 battle_distances <- data.frame()
 # First calculate the distance from battle creek to confluence with Sac 
 for (i in seq_len(nrow(recap_pts))) {
-  
   green_i <- recap_pts[i, ]
   
   d_green <- chainage_m(green_i)
   
-  dist_along_m  <- abs(d_green - conf_marker_butte)
+  dist_along_m  <- abs(d_green - conf_marker_battle)
   dist_along_mi <- dist_along_m / 1609.344
   
   battle_distances <- bind_rows(
