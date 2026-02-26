@@ -230,6 +230,21 @@ rst_cwt_recaptures  |>
   filter(!is.na(first_release_date)) |> 
   count(tag_code, sort = TRUE) 
 
+
+# Pull recaptures that are included in the hatchery release table ---------
+hatchery_release_recaptures <- rst_cwt_recaptures |> 
+  mutate(tag_code = str_trim(tag_code))  |> 
+  left_join(
+    hatchery_release  |> 
+      mutate(group_tagcode = str_trim(group_tagcode)),
+    by = c("tag_code" = "group_tagcode")
+  ) |> 
+  filter(!is.na(release_location_name))
+
+recapture_locations <- hatchery_release_recaptures |> 
+  select(release_location_name, release_latitude, release_longitude) |> 
+  distinct()
+
 # save data  --------------------------------------------------------------
 
 # write_csv(feathery_hatchery_release, "data-raw/cwt_data/cwt_data_grouped.csv")
