@@ -75,7 +75,9 @@ dist_from_marker <- function(engine, pts_sf_ll, marker_sf_ll, name_col = NULL) {
 }
 
 # constants ---------------------------------------------------------------
-recapture_locations <- read_csv("data-raw/helper-tables/recapture_locations.csv")
+recapture_locations <- read_csv("data-raw/helper-tables/recapture_locations.csv") |> 
+  # remove sites below knights landing
+  filter(!(release_location_name %in% c("FEATHER BOYDS PUMP RAMP", "SAC R AT CLARKSBURG", "SAC R AT RYDE KOKET")))
 
 crs_m  <- 32610
 step_m <- 50
@@ -178,18 +180,38 @@ all_distances <- bind_rows(
 
 write_csv(all_distances, "data-raw/helper-tables/knights_landing_cwt_distances.csv")
 
-# leaflet() |>
-#   addTiles() |>
-#   addPolylines(data = rivers) |>
-#   addCircleMarkers(
-#     data = release_pts,
-#     lng = ~release_longitude,
-#     lat = ~release_latitude,
-#     radius = 4
-#   ) |>
-#   addCircleMarkers(
-#     data = knights_landing,
-#     radius = 6
-#   )
+
+# QC map ------------------------------------------------------------------
+library(leaflet)
+
+all_points <- recapture_locations |> 
+  left_join(all_distances) |> 
+  mutate(
+    geometry = st_sfc(lapply(seq_len(n()), \(i)
+                             st_point(c(release_longitude[i], release_latitude[i]))
+    ), crs = 4326)
+  ) |>
+  st_as_sf()
+
+leaflet() |>
+  addTiles() |>
+  addPolylines(data = sac_river) |>
+  addPolylines(data = butte_creek) |>
+  addPolylines(data = battle_creek) |>
+  addCircleMarkers(
+    data = all_points,
+    lng = ~release_longitude,
+    lat = ~release_latitude,
+    radius = 4, 
+    color = "darkred",
+    popup = ~paste0("name: ",  release_location_name, "<br>",
+                    "distance (mi): ", round(dist_along_mi, 1))
+  ) |>
+  addCircleMarkers(
+    data = knights_landing,
+    radius = 6, 
+    color = "darkgreen",
+    popup = "knights landing RST"
+  )
 
 

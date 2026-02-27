@@ -120,39 +120,13 @@ max_flows <- SRJPEdata::forecast_covariates |>
   rename(monthly_max_flow = value)
 
 # MW: Note that exceedance_flow_year_type will be NA until 1996
-# hatchery_release_all <- cwt_data_summary_all |>
-#   mutate(
-#     # prefer first_release_date; fall back to last_release_date
-#     release_date_use = coalesce(first_release_date, last_release_date)
-#   ) |>
-#   filter(!is.na(release_date_use))  |>
-#   group_by(
-#     release_location_name,
-#     avg_weight,
-#     avg_length,
-#     first_release_date,
-#     last_release_date,
-#     date_span,
-#     mid_release_date,
-#     delta_distance,
-#     release_latitude,
-#     release_longitude) |>
-#   summarise(
-#     group_tagcode = paste(tag_code_or_release_id, collapse = "_"),
-#     group_total_marked_N = sum(total_marked_N),
-#     group_total_unmarked_N = sum(total_unmarked_N),
-#     group_total_release_N = sum(total_release_N),
-#     release_date_use = min(release_date_use, na.rm = TRUE))|>
-#   mutate(
-#     group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
-#     month = month(release_date_use),
-#     year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |> # this is water year to align with the covariates
-#   ungroup() |>
-#   left_join(exceedence_flows) |>
-#   left_join(max_flows) |>
-#   select(-release_date_use) |>
-#   glimpse()
 hatchery_release_all <- cwt_data_summary_all |>
+  mutate(
+    # prefer first_release_date; fall back to last_release_date
+    release_date_use = coalesce(first_release_date, last_release_date)
+  ) |>
+  filter(!is.na(release_date_use))  |>
+  rename(tag_code = tag_code_or_release_id) |> 
   group_by(
     release_location_name,
     avg_weight,
@@ -163,19 +137,21 @@ hatchery_release_all <- cwt_data_summary_all |>
     mid_release_date,
     delta_distance,
     release_latitude,
-    release_longitude) |>
+    release_longitude, 
+    tag_code) |>
   summarise(
-    group_tagcode = paste(tag_code_or_release_id, collapse = "_"),
     group_total_marked_N = sum(total_marked_N),
     group_total_unmarked_N = sum(total_unmarked_N),
-    group_total_release_N = sum(total_release_N))|>
+    group_total_release_N = sum(total_release_N),
+    release_date_use = min(release_date_use, na.rm = TRUE))|>
   mutate(
     group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
-    month = month(first_release_date),
-    year = ifelse(month %in% 10:12, year(first_release_date) + 1, year(first_release_date))) |> # this is water year to align with the covariates
+    month = month(release_date_use),
+    year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |> # this is water year to align with the covariates
   ungroup() |>
   left_join(exceedence_flows) |>
   left_join(max_flows) |>
+  select(-release_date_use, -delta_distance) |>
   glimpse()
 
 feather_hatchery_release <- cwt_data_summary_all |> 
@@ -238,7 +214,7 @@ rst_cwt_recaptures <- recaptures_raw |>
   glimpse()
 
 # QC check: 
-cwt_tag_codes <- unique(hatchery_release_all$group_tagcode)
+cwt_tag_codes <- unique(hatchery_release_all$tag_code)
 rst_tag_codes <- unique(rst_cwt_recaptures$tag_code)
 
 ### returns tag codes that appear in RST recaptures but NOT in hatchery releases
@@ -249,8 +225,7 @@ rst_cwt_recaptures  |>
   mutate(tag_code = str_trim(tag_code))  |> 
   anti_join(
     hatchery_release_all  |> 
-      mutate(group_tagcode = str_trim(group_tagcode)),
-    by = c("tag_code" = "group_tagcode")
+      mutate(tag_code = str_trim(tag_code))
   ) |>  
   count(tag_code, sort = TRUE) 
 
@@ -259,8 +234,7 @@ hatchery_release_recaptures <- rst_cwt_recaptures |>
   mutate(tag_code = str_trim(tag_code))  |> 
   left_join(
     hatchery_release_all  |> 
-      mutate(group_tagcode = str_trim(group_tagcode)),
-    by = c("tag_code" = "group_tagcode")
+      mutate(tag_code = str_trim(tag_code))
   ) |> 
   filter(!is.na(release_location_name))
 
