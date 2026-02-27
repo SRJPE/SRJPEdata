@@ -120,7 +120,7 @@ max_flows <- SRJPEdata::forecast_covariates |>
   rename(monthly_max_flow = value)
 
 # MW: Note that exceedance_flow_year_type will be NA until 1996
-hatchery_release <- cwt_data_summary_all |> 
+hatchery_release_all <- cwt_data_summary_all |> 
   mutate(
     # prefer first_release_date; fall back to last_release_date
     release_date_use = coalesce(first_release_date, last_release_date)
@@ -201,10 +201,19 @@ rst_cwt_recaptures <- recaptures_raw |>
          site = "knights landing") |> 
   filter(!is.na(tag_code)) |> 
   filter(tag_code != "N/A") |> 
+  mutate(
+    julian_week  = isoweek(date),
+    week_index   = if_else(
+      julian_week >= 40,
+      julian_week - 39,
+      julian_week + (53 - 39)
+    )
+  ) |> 
+  select(-julian_week) |> 
   glimpse()
 
 # QC check: 
-cwt_tag_codes <- unique(hatchery_release$group_tagcode)
+cwt_tag_codes <- unique(hatchery_release_all$group_tagcode)
 rst_tag_codes <- unique(rst_cwt_recaptures$tag_code)
 
 ### returns tag codes that appear in RST recaptures but NOT in hatchery releases
@@ -214,65 +223,38 @@ setdiff(rst_tag_codes, cwt_tag_codes)
 rst_cwt_recaptures  |> 
   mutate(tag_code = str_trim(tag_code))  |> 
   anti_join(
-    hatchery_release  |> 
+    hatchery_release_all  |> 
       mutate(group_tagcode = str_trim(group_tagcode)),
     by = c("tag_code" = "group_tagcode")
   ) |>  
   count(tag_code, sort = TRUE) 
-
-rst_cwt_recaptures  |> 
-  mutate(tag_code = str_trim(tag_code))  |> 
-  left_join(
-    hatchery_release  |> 
-      mutate(group_tagcode = str_trim(group_tagcode)),
-    by = c("tag_code" = "group_tagcode")
-  ) |>  
-  filter(!is.na(first_release_date)) |> 
-  count(tag_code, sort = TRUE) 
-
 
 # Pull recaptures that are included in the hatchery release table ---------
 hatchery_release_recaptures <- rst_cwt_recaptures |> 
   mutate(tag_code = str_trim(tag_code))  |> 
   left_join(
-    hatchery_release  |> 
+    hatchery_release_all  |> 
       mutate(group_tagcode = str_trim(group_tagcode)),
     by = c("tag_code" = "group_tagcode")
   ) |> 
   filter(!is.na(release_location_name))
 
+# this file is saved so that we can calculate the distances to knights landing
 recapture_locations <- hatchery_release_recaptures |> 
   select(release_location_name, release_latitude, release_longitude) |> 
   distinct() |> 
   write_csv("data-raw/helper-tables/recapture_locations.csv")
 
 # This table is calculated in analysis/recapture_distances.R
-# WIP - is this the whole hatchery table or do we want all sites? TBD
-knight_distances <- read_csv("data-raw/helper-tables/knights_landing_cwt_distances.csv") |> 
-  left_join(hatchery_release) |> glimpse()
-
-# add week index
-bt_week_lookup <- SRJPEmodel::julian_week_to_date_lookup |>
-  mutate(week_index = if_else(
-      Jwk >= 40,
-      Jwk - 39,
-      Jwk + (53 - 39)))
-
-# TODO: is this the final table or should this be done 
-# from hatchery_release?
-hatchery_release_knight <- knight_distances |>
-  mutate(
-    julian_week  = isoweek(first_release_date),
-    week_index   = if_else(
-      julian_week >= 40,
-      julian_week - 39,
-      julian_week + (53 - 39)
-    )
-  ) |> 
-  select(-julian_week)
+knight_distances <- read_csv("data-raw/helper-tables/knights_landing_cwt_distances.csv") 
+  
+# build final table
+hatchery_release <- knight_distances |>
+  left_join(hatchery_release_all) |> 
+  mutate(delta_distance = dist_along_mi * 1.60934) |>  # change to river km
+  select(-dist_along_mi)
 
 # save data  --------------------------------------------------------------
-
 # write_csv(feathery_hatchery_release, "data-raw/cwt_data/cwt_data_grouped.csv")
 usethis::use_data(feather_hatchery_release, overwrite = TRUE)
 usethis::use_data(hatchery_release, overwrite = TRUE)
