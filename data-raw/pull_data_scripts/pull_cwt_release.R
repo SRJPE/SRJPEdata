@@ -120,12 +120,39 @@ max_flows <- SRJPEdata::forecast_covariates |>
   rename(monthly_max_flow = value)
 
 # MW: Note that exceedance_flow_year_type will be NA until 1996
-hatchery_release_all <- cwt_data_summary_all |> 
-  mutate(
-    # prefer first_release_date; fall back to last_release_date
-    release_date_use = coalesce(first_release_date, last_release_date)
-  ) |> 
-  filter(!is.na(release_date_use))  |> 
+# hatchery_release_all <- cwt_data_summary_all |>
+#   mutate(
+#     # prefer first_release_date; fall back to last_release_date
+#     release_date_use = coalesce(first_release_date, last_release_date)
+#   ) |>
+#   filter(!is.na(release_date_use))  |>
+#   group_by(
+#     release_location_name,
+#     avg_weight,
+#     avg_length,
+#     first_release_date,
+#     last_release_date,
+#     date_span,
+#     mid_release_date,
+#     delta_distance,
+#     release_latitude,
+#     release_longitude) |>
+#   summarise(
+#     group_tagcode = paste(tag_code_or_release_id, collapse = "_"),
+#     group_total_marked_N = sum(total_marked_N),
+#     group_total_unmarked_N = sum(total_unmarked_N),
+#     group_total_release_N = sum(total_release_N),
+#     release_date_use = min(release_date_use, na.rm = TRUE))|>
+#   mutate(
+#     group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
+#     month = month(release_date_use),
+#     year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |> # this is water year to align with the covariates
+#   ungroup() |>
+#   left_join(exceedence_flows) |>
+#   left_join(max_flows) |>
+#   select(-release_date_use) |>
+#   glimpse()
+hatchery_release_all <- cwt_data_summary_all |>
   group_by(
     release_location_name,
     avg_weight,
@@ -136,21 +163,19 @@ hatchery_release_all <- cwt_data_summary_all |>
     mid_release_date,
     delta_distance,
     release_latitude,
-    release_longitude) |> 
+    release_longitude) |>
   summarise(
     group_tagcode = paste(tag_code_or_release_id, collapse = "_"),
     group_total_marked_N = sum(total_marked_N),
     group_total_unmarked_N = sum(total_unmarked_N),
-    group_total_release_N = sum(total_release_N),
-    release_date_use = min(release_date_use, na.rm = TRUE))|> 
+    group_total_release_N = sum(total_release_N))|>
   mutate(
     group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
-    month = month(release_date_use),
-    year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |> # this is water year to align with the covariates
-  ungroup() |> 
-  left_join(exceedence_flows) |> 
-  left_join(max_flows) |> 
-  select(-release_date_use) |> 
+    month = month(first_release_date),
+    year = ifelse(month %in% 10:12, year(first_release_date) + 1, year(first_release_date))) |> # this is water year to align with the covariates
+  ungroup() |>
+  left_join(exceedence_flows) |>
+  left_join(max_flows) |>
   glimpse()
 
 feather_hatchery_release <- cwt_data_summary_all |> 
@@ -240,7 +265,7 @@ hatchery_release_recaptures <- rst_cwt_recaptures |>
   filter(!is.na(release_location_name))
 
 # this file is saved so that we can calculate the distances to knights landing
-recapture_locations <- hatchery_release_recaptures |> 
+recapture_location <- hatchery_release_recaptures |> 
   select(release_location_name, release_latitude, release_longitude) |> 
   distinct() |> 
   write_csv("data-raw/helper-tables/recapture_locations.csv")
@@ -251,7 +276,7 @@ knight_distances <- read_csv("data-raw/helper-tables/knights_landing_cwt_distanc
 # build final table
 hatchery_release <- knight_distances |>
   left_join(hatchery_release_all) |> 
-  mutate(delta_distance = dist_along_mi * 1.60934) |>  # change to river km
+  mutate(release_to_knights_landing_distance = dist_along_mi * 1.60934) |>  # change to river km
   select(-dist_along_mi)
 
 # save data  --------------------------------------------------------------

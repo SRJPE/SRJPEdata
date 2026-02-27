@@ -497,7 +497,7 @@
 #'   \item \code{last_release_data}: Last date of release
 #'   \item \code{date_span}: Number of days between the first and last release date
 #'   \item \code{mid_release_data}: Midpoint date between first and last release date
-#'   \item \code{delta_distance}: Distance to Knights Landing (RST) site of recapture (river km)
+#'   \item \code{release_to_knights_landing_distance}: Distance to Knights Landing (RST) site of recapture (river km)
 #'   \item \code{release_latitude}: Latitude of the release location
 #'   \item \code{release_longitude}: Longitude of release location
 #'   \item \code{group_tagcode}: Tag codes or IDs grouped together
