@@ -97,13 +97,16 @@ map_reaches <- aggregate_sacramento$reach_meta_aggregate %>%
 
 
 # Create Encounter History list and inp file for Sac River model------------------------------------------------------------------
+# these fish are included in the release table, but should not be included in the 
+# capture history as -001 was not detected (not in detections table) and 
+# -008 was detected but not at receiver locations we were using (GCID_blw, GCID_abv)
+fish_ids_to_exclude <- c("RBDD_WS2021-001", "RBDD_WS2021-008")
+
 sacramento_all_encounter_history <- make_fish_encounter_history(detections = sacramento_all_aggregated, 
                                                      aggregated_reciever_metadata = aggregate_sacramento$reach_meta_aggregate,
-                                                     released_fish_table = fish_data |> filter(study_id %in% sacramento_studyIDs)) |> 
-  # TODO these are not in Floras data nor in the detections
-  # I can't tell where they are getting filtered out, but they have incomplete capture histories
-  # so filtering out here to help detections and ch datasets match
-  filter(!fish_id %in% c("RBDD_WS2021-001", "RBDD_WS2021-008"))
+                                                     released_fish_table = fish_data |> 
+                                                       filter(study_id %in% sacramento_studyIDs,
+                                                              !fish_id %in% fish_ids_to_exclude))
 
 
 # Add in fish information to inp file
