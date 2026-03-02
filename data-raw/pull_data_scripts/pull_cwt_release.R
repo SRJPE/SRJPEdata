@@ -127,25 +127,9 @@ hatchery_release_all <- cwt_data_summary_all |>
   ) |>
   filter(!is.na(release_date_use))  |>
   rename(tag_code = tag_code_or_release_id) |> 
-  group_by(
-    release_location_name,
-    avg_weight,
-    avg_length,
-    first_release_date,
-    last_release_date,
-    date_span,
-    mid_release_date,
-    delta_distance,
-    release_latitude,
-    release_longitude, 
-    tag_code) |>
-  summarise(
-    group_total_marked_N = sum(total_marked_N),
-    group_total_unmarked_N = sum(total_unmarked_N),
-    group_total_release_N = sum(total_release_N),
-    release_date_use = min(release_date_use, na.rm = TRUE))|>
   mutate(
-    group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
+    mark_rate = round(total_marked_N / total_release_N, 4),
+    release_date_use = min(release_date_use, na.rm = TRUE),
     month = month(release_date_use),
     year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |> # this is water year to align with the covariates
   ungroup() |>
