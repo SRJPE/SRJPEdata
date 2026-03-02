@@ -485,7 +485,33 @@
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 'feather_hatchery_release'
 
-#' @title Escapement estimates all runns
+#' @title Hatchery Release
+#' @name hatchery_release
+#' @description This table summarizes coded wire tag (CWT) data from release location to RST site of recapture (knights landing) by release group. Data source: Regional Mark Processing Center: https://www.rmpc.org/ 
+#' @format
+#' \itemize{
+#'   \item \code{release_location_name}: Name of the location where fish were released (COLEMAN NFH, BATTLE CREEK BELOW CNFH, BATTLE CREEK NFK WILDCAT, BALDWIN CONST. YARD, SAC R LAKE REDDING PARK, SAC R BEL RBDD, SAC R RED BLUFF DIV DAM, SAC R COLUSA TO RBDD, SAC R BONNYVIEW BOAT RAMP, SAC R AT BUTTE CITY)
+#'   \item \code{avg_weight}: Average weight of fish released
+#'   \item \code{avg_length}: Average length of fish released  
+#'   \item \code{first_release_data}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
+#'   \item \code{last_release_data}: Last date of release
+#'   \item \code{date_span}: Number of days between the first and last release date
+#'   \item \code{mid_release_data}: Midpoint date between first and last release date
+#'   \item \code{release_to_knights_landing_distance}: Distance to Knights Landing (RST) site of recapture (river km)
+#'   \item \code{release_latitude}: Latitude of the release location
+#'   \item \code{release_longitude}: Longitude of release location
+#'   \item \code{tag_code}: Tag codes or release Ids
+#'   \item \code{group_total_marked_N}: Total number of marked fish included in the release
+#'   \item \code{group_total_unmarked_N}: Total number of unmarked fish included in the release
+#'   \item \code{group_total_release_N}: Total number of fish released
+#'   \item \code{group_mark_rate}: Mark rate of fish released
+#'   \item \code{month}: Month of first release date used to join environmental covariates
+#'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
+#'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+#'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+'hatchery_release'
+
+#' @title Escapement estimates all runs
 #' @name escapement_estimates_all_runs
 #' @description This table makes escapement data from GrandTab (https://wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Anadromous-Assessment) available for use. Currently only fall run are included.
 #' @format
@@ -497,3 +523,17 @@
 #'   \item \code{species}: Chinook salmon
 #'   \item \code{data_type}: Escapement estimates from GrandTab.
 'escapement_estimates_all_runs'
+
+#' @title RST Recaptures 
+#' @name rst_cwt_recaptures
+#' @description Table of recaptures from Knights Landing RST
+#' @format
+#' \itemize{
+#'   \item \code{date}: Date of capture
+#'   \item \code{forklength}: Fork length of catch in millimeters
+#'   \item \code{weight}: Weight of catch in grams
+#'   \item \code{tag_code}: Coded wire tag code
+#'   \item \code{stream}: River (Sacramento River)
+#'   \item \code{site}: Site of recapture (Knights Landing RST)
+#'   \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
+'rst_cwt_recaptures'

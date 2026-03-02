@@ -3,7 +3,7 @@
 \docType{data}
 \name{escapement_estimates_all_runs}
 \alias{escapement_estimates_all_runs}
-\title{Escapement estimates all runns}
+\title{Escapement estimates all runs}
 \format{
 \itemize{
 \item \code{run_year}: Year that salmon returned to the tributary.
