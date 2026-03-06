@@ -467,6 +467,8 @@
 #'   \item \code{release_location_name}: Name of the location where fish were released ("FEATHER AT GRIDLEY", "FEATHER AT LIVE OAK", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER BOYDS PUMP RAMP", "FEATHER R HATCHERY")
 #'   \item \code{avg_weight}: Average weight of fish released
 #'   \item \code{avg_length}: Average length of fish released  
+#'   \item \code{species}: Species of fish released ("chinook salmon")
+#'   \item \code{run}: Run of fish released ("fall", "late fall", "spring", "winter")
 #'   \item \code{first_release_data}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
 #'   \item \code{last_release_data}: Last date of release
 #'   \item \code{date_span}: Number of days between the first and last release date
@@ -479,6 +481,7 @@
 #'   \item \code{group_total_unmarked_N}: Total number of unmarked fish included in the release
 #'   \item \code{group_total_release_N}: Total number of fish released
 #'   \item \code{group_mark_rate}: Mark rate of fish released
+#'   \item \code{release_group_id}: Releases are grouped with other releases with same fish occurring on the same day but with different tag codes. Use this to join with RST recaptures.
 #'   \item \code{month}: Month of first release date used to join environmental covariates
 #'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
@@ -491,16 +494,19 @@
 #' @format
 #' \itemize{
 #'   \item \code{release_location_name}: Name of the location where fish were released (COLEMAN NFH, BATTLE CREEK BELOW CNFH, BATTLE CREEK NFK WILDCAT, BALDWIN CONST. YARD, SAC R LAKE REDDING PARK, SAC R BEL RBDD, SAC R RED BLUFF DIV DAM, SAC R COLUSA TO RBDD, SAC R BONNYVIEW BOAT RAMP, SAC R AT BUTTE CITY)
+#'   \item \code{hatchery_location_name}: Name of hatchery fish were sourced from.
+#'   \item \code{species}: Species of fish released ("chinook salmon")
+#'   \item \code{run}: Run of fish released ("fall", "late fall", "spring", "winter")
 #'   \item \code{avg_weight}: Average weight of fish released
 #'   \item \code{avg_length}: Average length of fish released  
-#'   \item \code{first_release_data}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
-#'   \item \code{last_release_data}: Last date of release
+#'   \item \code{first_release_date}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
+#'   \item \code{last_release_date}: Last date of release
 #'   \item \code{date_span}: Number of days between the first and last release date
-#'   \item \code{mid_release_data}: Midpoint date between first and last release date
-#'   \item \code{release_to_knights_landing_distance}: Distance to Knights Landing (RST) site of recapture (river km)
+#'   \item \code{mid_release_date}: Midpoint date between first and last release date
+#'   \item \code{release_to_knights_landing_distance}: Distance to Knights Landing (RST) site of recapture (river km) from release location
 #'   \item \code{release_latitude}: Latitude of the release location
 #'   \item \code{release_longitude}: Longitude of release location
-#'   \item \code{tag_code}: Tag codes or release Ids
+#'   \item \code{release_group_id}: Releases are grouped with other releases with same fish occurring on the same day but with different tag codes. Use this to join with RST recaptures.
 #'   \item \code{group_total_marked_N}: Total number of marked fish included in the release
 #'   \item \code{group_total_unmarked_N}: Total number of unmarked fish included in the release
 #'   \item \code{group_total_release_N}: Total number of fish released
@@ -536,4 +542,5 @@
 #'   \item \code{stream}: River (Sacramento River)
 #'   \item \code{site}: Site of recapture (Knights Landing RST)
 #'   \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
+#'   \item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
 'rst_cwt_recaptures'
