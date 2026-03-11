@@ -50,6 +50,7 @@ region_mapped_reach_metadata_sacramento <- reach_metadata_sacramento %>%
   filter(receiver_general_location %in% c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec","Altube Island","MillCk_RST_Rel", 
                                           "MillCk2_Rel","DeerCk_RST_Rel",
                                           "Abv_WoodsonBr","Blw_Woodson", #"Mill_Ck_Conf",
+                                          "IrvineFinch_Rel",
                                           "ButteBr","BlwButteBr","AbvButteBr",
                                           "I80-50_Br","TowerBridge", 
                                           "ToeDrainBase","Hwy84Ferry",
@@ -60,6 +61,7 @@ region_mapped_reach_metadata_sacramento <- reach_metadata_sacramento %>%
                                      receiver_general_location == 'RBDD_Rel'& receiver_region == 'Upper Sac R' ~ 'Release',
                                      receiver_general_location == 'RBDD_Rel_Rec' & receiver_region == 'Upper Sac R' ~ 'Release',
                                      receiver_general_location == "Altube Island" & receiver_region == 'Upper Sac R' ~ 'Release', 
+                                     receiver_general_location == "IrvineFinch_Rel" & receiver_region == "Upper Sac R" ~ "Release",
                                      receiver_region == 'Yolo Bypass' ~ 'Lower Sac R',
                                      receiver_region == 'North Delta' ~ 'Lower Sac R',
                                      receiver_region == 'West Delta' ~ 'End',
@@ -69,9 +71,8 @@ region_mapped_reach_metadata_sacramento <- reach_metadata_sacramento %>%
 
 
 # Aggregate receiver locations and detections ----------------------------------
-aggregate_sacramento <- aggregate_detections_sacramento(detections = sacramento_all_detections, 
-                                                        receiever_metadata = region_mapped_reach_metadata_sacramento) 
-
+aggregate_sacramento <- aggregate_detections_sacramento(detections=sacramento_all_detections, 
+                                                                      receiver_metadata = region_mapped_reach_metadata_sacramento)
 # Sacramento Analysis 
 sacramento_all_aggregated <- aggregate_sacramento$detections
 # View study reaches in map
@@ -96,9 +97,16 @@ map_reaches <- aggregate_sacramento$reach_meta_aggregate %>%
 
 
 # Create Encounter History list and inp file for Sac River model------------------------------------------------------------------
+# these fish are included in the release table, but should not be included in the 
+# capture history as -001 was not detected (not in detections table) and 
+# -008 was detected but not at receiver locations we were using (GCID_blw, GCID_abv)
+fish_ids_to_exclude <- c("RBDD_WS2021-001", "RBDD_WS2021-008")
+
 sacramento_all_encounter_history <- make_fish_encounter_history(detections = sacramento_all_aggregated, 
                                                      aggregated_reciever_metadata = aggregate_sacramento$reach_meta_aggregate,
-                                                     released_fish_table = fish_data |> filter(study_id %in% sacramento_studyIDs))
+                                                     released_fish_table = fish_data |> 
+                                                       filter(study_id %in% sacramento_studyIDs,
+                                                              !fish_id %in% fish_ids_to_exclude))
 
 
 # Add in fish information to inp file
@@ -117,8 +125,10 @@ add_covariates <- surv_model_inputs_with_fish_information %>%
   mutate(rl = case_when(release_location == "BattleCk_CNFH_Rel" ~ '1S',
                         release_location == "RBDD_Rel" ~ '2S',
                         release_location == "Altube Island" ~ '3S',
-                        release_location == "MillCk_RST_Rel" ~ '4S',
-                        release_location == "DeerCk_RST_Rel" ~ '5S'), 
+                        # TODO RB river park? in Flora's 2026 code but not in our data
+                        release_location == "IrvineFinch_Rel" ~ "5S",
+                        release_location == "MillCk_RST_Rel" ~ '6S',
+                        release_location == "DeerCk_RST_Rel" ~ '7S'), 
          wy_two_categories = case_when(year %in% c(2013,2015,2016,2018,2020, 2021,2022) ~ 0,
                          year %in% c(2017, 2019, 2023) ~ 1), #0 or 1 for 2 water year type categories: dry (C,D,BN) and wet (AN,W) water year 
          wy_three_categories = case_when(year %in% c(2015, 2021, 2022) ~ 0,
@@ -140,8 +150,10 @@ add_covariates <- surv_model_inputs_with_fish_information %>%
          dist_rlwoodson = case_when(rl == "1S" ~ 91.8, # dist from Battle Creek to Woodson Bridge
                                     rl == "2S" ~ 36.9, # dist from RBDD to Woodson Bridge
                                     rl == "3S" ~ 36.9, # same as RBDD
-                                    rl == "4S" ~ 25.7, # dist from Mill Creek to Woodson Bridge
-                                    rl == "5S" ~ 16.6), # dist from Deer Creek to Woodson Bridge
+                                    # TODO placeholder for rl "4S", # dist from RB River Park to Woodson Bridge, same as RBDD
+                                    rl == "5S" ~ 36.9, # dist from Irvine Finch to Woodson Bridge, same as RBDD
+                                    rl == "6S" ~ 25.7, # dist from Mill Creek to Woodson Bridge
+                                    rl == "7S" ~ 16.6), # dist from Deer Creek to Woodson Bridge
          dist_woodsonbutte = 88, # distance in km from Woodson Bridge to Butte Bridge
          dist_buttesac = 170, # distance in km from Butte Bridge to Sac
          dist_sacdelta = 110,

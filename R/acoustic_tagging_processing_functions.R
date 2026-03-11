@@ -136,125 +136,102 @@ get_receiver_sites_metadata <- function(all_detections) {
 }
 
 
-
 #' Aggregate Detections Data for Sacramento River Sites
 #'
 #' Replaces specific receiver locations in the detections dataframe with aggregated sites, updating their River Kilometer (RKM), Latitude (Lat), Longitude (Lon), and Region accordingly.
 #'
 #' @param detections A dataframe containing detections information.
-#' @param replace_dict A list specifying receiver locations to aggregate and their corresponding aggregated names.
-#' @param receiever_metadata A table containing metadata for general release sites. Created using `get_reciever_sites_metadata()`.
+#' @param receiver_metadata A table containing metadata for general release sites. Created using `get_reciever_sites_metadata()`.
 #'
 #' @return A dataframe of detections with aggregated receiver sites and updated metadata.
 #'
 #' @details This function replaces specified receiver locations in the detections dataframe with aggregated sites according to the provided replace dictionary. It updates the River Kilometer (RKM), Latitude (Lat), Longitude (Lon), and Region for the aggregated sites. The function creates a new dataframe containing the aggregated receiver sites' metadata, reflecting the aggregation done.
 #'
-#' @examples
-#' # Define replace dictionary
-#' replace_dict <- list(replace_with = list(c("Releasepoint"),
-#'                                          c("WoodsonBridge"),
-#'                                          c("ButteBridge"),
-#'                                          c("Sacramento"),
-#'                                          c("Endpoint")),
-#'                     replace_list = list(c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec",
-#'                                           "Altube Island","Abv_Altube1",
-#'                                           "MillCk_RST_Rel","MillCk2_Rel","DeerCk_RST_Rel"),
-#'                                         c("Mill_Ck_Conf","Abv_WoodsonBr","Blw_Woodson"),
-#'                                         c("ButteBr","BlwButteBr"),
-#'                                         c("TowerBridge","I80-50_Br",
-#'                                           "ToeDrainBase","Hwy84Ferry"),
-#'                                         c("BeniciaE","BeniciaW",
-#'                                           "ChippsE","ChippsW")))
-#'
-#' # Aggregate detections data for Sacramento River sites
-#' aggregated_detections <- aggregate_detections_sacramento(detections_data, replace_dict)
 #'
 #' @export
-aggregate_detections_sacramento <- function(detections, receiever_metadata, 
-                                            replace_dict = list(replace_with = list(c("Releasepoint"),
-                                                                  c("WoodsonBridge"),
-                                                                  c("ButteBridge"),
-                                                                  c("Sacramento"),
-                                                                  c("Endpoint")),
-                                              replace_list = list(c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec",
-                                                                    "Altube Island","Abv_Altube1",
-                                                                    "MillCk_RST_Rel","MillCk2_Rel","DeerCk_RST_Rel"), 
-                                                                  c("Abv_WoodsonBr","Blw_Woodson"),#"Mill_Ck_Conf"
-                                                                  c("ButteBr","BlwButteBr","AbvButteBr"),
-                                                                  c("TowerBridge","I80-50_Br",
-                                                                    "ToeDrainBase","Hwy84Ferry"),
-                                                                  c("BeniciaE","BeniciaW",
-                                                                    "ChippsE","ChippsW"
-                                                                  )))) {
-  # Replace receiver_general_locationin detections df according to replace_list, basically aggregate
-  # sites into one. By default this is done for ChippsE/W, BeniciaE/W, and
-  # SacTrawl1/2
-  #
-  # Arguments:
-  #  detections: a detections df
-  #  replace_dict: list of receiver locations to aggregate and, the aggregated
-  #  name
-  #
-  # Return:
-  #  a detections df that has replaced list of receiver_general_locationwith the aggregated GEN,
-  #  mean RKM, mean Lat, mean Lon. Creates reach_meta_aggregate which is the list
-  #  of receiver sites with new aggregated GEN's, along with RKM, Lat, Lon
+aggregate_detections_sacramento <- function(detections, receiver_metadata, create_detection_history = FALSE) {
   
-  # Make a copy of reach_meta (receiver metadata)
-  reach_meta_aggregate <<- receiever_metadata
+  release_location_lookup <- tibble("detection_points" = 
+                                      c("BattleCk_CNFH_Rel","RBDD_Rel","RBDD_Rel_Rec",
+                                        "Altube Island","Abv_Altube1", "IrvineFinch_Rel",
+                                        "MillCk_RST_Rel","MillCk2_Rel","DeerCk_RST_Rel", 
+                                        "Abv_WoodsonBr","Blw_Woodson",
+                                        "ButteBr","BlwButteBr","AbvButteBr",
+                                        "TowerBridge","I80-50_Br",
+                                        "ToeDrainBase","Hwy84Ferry",
+                                        "BeniciaE","BeniciaW",
+                                        "ChippsE","ChippsW"),
+                                    "detection_point_group" = c(rep("Releasepoint", 9),
+                                                                rep("WoodsonBridge", 2),
+                                                                rep("ButteBridge", 3),
+                                                                rep("Sacramento", 4),
+                                                                rep("Endpoint", 4)),
+                                    "region" = c(rep("Release", 9),
+                                                 rep("Upper Sac R", 2),
+                                                 rep("Lower Sac R", 3),
+                                                 rep("Lower Sac R", 4),
+                                                 rep("End", 4))
+  )
   
-  # Walk through each key/pair value
-  for (i in 1:length(replace_dict$replace_with)) {
-    # Unlist for easier to use format
-    replace_list <- unlist(replace_dict[[2]][i])
-    replace_with <- unlist(replace_dict[[1]][i])
-    
-    replace <- receiever_metadata %>%
-      select(receiver_general_location, receiver_general_river_km, receiver_general_latitude, receiver_general_longitude, receiver_region) %>%
-      filter(receiver_general_location %in% c(replace_list, replace_with)) %>%
-      distinct() %>%
-      select(-receiver_general_location) %>%
-      group_by(receiver_region) %>%
-      summarise_all(mean)
-    
-    # Replace replace_list GENs name with replace_with GEN, and replace all of
-    # their receiver_general_river_km with the averaged val
-    detections <- detections %>%
-      mutate(
-        receiver_general_location= ifelse(receiver_general_location%in% replace_list, replace_with, receiver_general_location),
-        receiver_general_river_km = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_general_river_km, receiver_general_river_km),
-        receiver_general_latitude = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_general_latitude, receiver_general_latitude),
-        receiver_general_longitude = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_general_longitude, receiver_general_longitude),
-        receiver_region = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_region, receiver_region)
-      )
-    
-    
-    # This new df shows receiver metadata and reflects the aggregation done
-    reach_meta_aggregate <<- reach_meta_aggregate %>%
-      mutate(
-        receiver_general_location= ifelse(receiver_general_location%in% replace_list, replace_with, receiver_general_location),
-        receiver_general_river_km = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_general_river_km, receiver_general_river_km),
-        receiver_general_latitude = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_general_latitude, receiver_general_latitude),
-        receiver_general_longitude = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_general_longitude, receiver_general_longitude),
-        receiver_region = ifelse(receiver_general_location%in% c(replace_list, replace_with), replace$receiver_region, receiver_region)) %>%
-      distinct()
-    
-    detections <- detections %>%
-      filter(receiver_general_location%in% reach_meta_aggregate$receiver_general_location) %>%
-      group_by(fish_id) %>%
-      arrange(fish_id, desc(receiver_general_river_km)) %>%
+  average_general_summary_stats <- receiver_metadata |> 
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    group_by(detection_point_group, region) |> 
+    summarise(mean_river_km = mean(receiver_general_river_km),
+              mean_lat = mean(receiver_general_latitude),
+              mean_long = mean(receiver_general_longitude)) |> 
+    ungroup()
+  
+  detections_with_mean_vals <- detections |> 
+    select(-c(receiver_general_river_km, receiver_general_latitude,
+              receiver_general_longitude)) |>  
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    left_join(average_general_summary_stats, by = c("detection_point_group", "region")) |> 
+    select(-c(receiver_region, 
+              receiver_general_location)) |> 
+    rename(receiver_general_river_km = mean_river_km,
+           receiver_general_latitude = mean_lat,
+           receiver_general_longitude = mean_long,
+           receiver_region = region,
+           receiver_general_location = detection_point_group) |> 
+    distinct_all()
+  
+  reach_meta_aggregate <- average_general_summary_stats |>
+    rename(receiver_general_location = detection_point_group,
+           receiver_general_river_km = mean_river_km,
+           receiver_general_latitude = mean_lat,
+           receiver_general_longitude = mean_long,
+           receiver_region = region) |> 
+    # need to sort so that they are ordered correctly in the capture history
+    mutate(receiver_general_location = factor(receiver_general_location, 
+                                              levels = c("Releasepoint", "WoodsonBridge", "ButteBridge", "Sacramento", "Endpoint"))) |>
+    arrange(receiver_general_location)
+  
+  if (create_detection_history == FALSE) {
+    detections_final <- detections_with_mean_vals |>
+      group_by(fish_id) |>
+      arrange(fish_id, desc(receiver_general_river_km)) |>
       ungroup()
-  }
-  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate))
+  } else if (create_detection_history == TRUE) {
+    detections_final <- detections_with_mean_vals |> 
+      group_by(fish_id, receiver_general_location) |> 
+      summarise(min_time = min(time, na.rm = TRUE)) |>
+      arrange(fish_id, min_time) |> 
+      ungroup()
+  } 
+
+return(list(detections = detections_final, 
+            reach_meta_aggregate = reach_meta_aggregate))
 }
+
 
 #' Aggregate Detections for Butte Region
 #'
 #' Replace receiver locations in the detections dataframe with aggregated locations for the Butte region.
 #'
 #' @param detections A dataframe containing detections information.
-#' @param receiever_metadata A dataframe containing receiver metadata.
-#' @param replace_dict A list specifying receiver locations to aggregate and their aggregated name.
+#' @param receiver_metadata A dataframe containing receiver metadata.
 #'
 #' @return A list containing:
 #'   - A dataframe of detections with replaced receiver locations.
@@ -263,95 +240,87 @@ aggregate_detections_sacramento <- function(detections, receiever_metadata,
 #' @details This function replaces receiver locations in the detections dataframe with aggregated locations for the Butte region according to the specified replacement dictionary. It aggregates receiver locations into one and calculates the mean River Kilometer (RKM), Latitude, Longitude, and Region for each aggregated location. The function also updates the receiver metadata accordingly.
 #'
 #' @examples
-#' # Define replacement dictionary
-#' replacement_dict <- list(replace_with = list(c("Releasepoint"),
-#'                                              c("Sacramento"),
-#'                                              c("Endpoint")),
-#'                          replace_list = list(c("UpperButte_RST_Rel","UpperButte_RST","UpperButte_SKWY",
-#'                                               "SutterBypass_Weir2_RST_Rel","SutterBypass Weir2 RST"),
-#'                                             c("TowerBridge","I80-50_Br",
-#'                                               "ToeDrainBase","Hwy84Ferry"),
-#'                                             c("BeniciaE","BeniciaW",
-#'                                               "ChippsE","ChippsW"
-#'                                             )))
 #' 
 #' # Aggregate detections for Butte region
-#' aggregated_data <- aggregate_detections_butte(detections_data, receiver_metadata, replace_dict = replacement_dict)
+#' aggregated_data <- aggregate_detections_butte(detections_data, receiver_metadata)
 #' 
 #' @export
-aggregate_detections_butte <- function(detections, receiever_metadata,
-                                replace_dict = list(replace_with = list(c("Releasepoint"),
-                                                                        c("Sacramento"),
-                                                                        c("Endpoint")),
-                                                    replace_list = list(c("UpperButte_RST_Rel","UpperButte_RST","UpperButte_SKWY",
-                                                                          "Butte_Blw_Sanborn_Rel","North_Weir_Rel","Sanborn_Slough_Rel","Laux Rd",
-                                                                          "SutterBypass_Weir2_RST_Rel","SutterBypass Weir2 RST"),
-                                                                        c("TowerBridge","I80-50_Br",
-                                                                          "ToeDrainBase","Hwy84Ferry"),
-                                                                        c("BeniciaE","BeniciaW",
-                                                                          "ChippsE","ChippsW"
-                                                                        )))) {
+aggregate_detections_butte <- function(detections, receiver_metadata, create_detection_history = FALSE) {
   
-  # Replace GEN in detections df according to replace_list, basically aggregate
-  # sites into one. By default this is done for ChippsE/W, BeniciaE/W, and
-  # SacTrawl1/2
-  #
-  # Arguments:
-  #  detections: a detections df
-  #  replace_dict: list of receiver locations to aggregate and, the aggregated
-  #  name
-  #
-  # Return:
-  #  a detections df that has replaced list of GEN with the aggregated GEN,
-  #  mean RKM, mean Lat, mean Lon. Creates reach_meta_aggregate which is the list
-  #  of receiver sites with new aggregated GEN's, along with RKM, Lat, Lon
+  release_location_lookup <- tibble("detection_points" = 
+                                      c("UpperButte_RST_Rel","UpperButte_RST","UpperButte_SKWY",
+                                        "Butte_Blw_Sanborn_Rel","North_Weir_Rel","Sanborn_Slough_Rel","Laux Rd",
+                                        "SutterBypass_Weir2_RST_Rel","SutterBypass Weir2 RST",
+                                        "TowerBridge","I80-50_Br", "ToeDrainBase","Hwy84Ferry",
+                                        "BeniciaE","BeniciaW", "ChippsE","ChippsW"
+                                      ),
+                                    "detection_point_group" = c(rep("Releasepoint", 9),
+                                                                rep("Sacramento", 4),
+                                                                rep("Endpoint", 4)),
+                                    "region" = c(rep("Release", 9),
+                                                 rep("Lower Sac R", 4),
+                                                 rep("End", 4))
+  )
   
-  # Make a copy of receiever_metadata (receiver metadata)
-  reach_meta_aggregate <<- receiever_metadata
+  average_general_summary_stats <- receiver_metadata |> 
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    group_by(detection_point_group, region) |> 
+    summarise(mean_river_km = mean(receiver_general_river_km),
+              mean_lat = mean(receiver_general_latitude),
+              mean_long = mean(receiver_general_longitude)) |> 
+    ungroup()
   
-  # Walk through each key/pair value
-  for (i in 1:length(replace_dict$replace_with)) {
-    # Unlist for easier to use format
-    replace_list <- unlist(replace_dict[[2]][i])
-    replace_with <- unlist(replace_dict[[1]][i])
-    
-    replace <- receiever_metadata %>%
-      select(receiver_general_location, receiver_general_river_km, receiver_general_latitude, receiver_general_longitude, receiver_region) %>%
-      filter(receiver_general_location %in% c(replace_list, replace_with)) %>%
-      distinct() %>%
-      select(-receiver_general_location) %>%
-      group_by(receiver_region) %>%
-      summarise_all(mean)
-    
-    # Replace replace_list GENs name with replace_with GEN, and replace all of
-    # their genrkm with the averaged val
-    detections <- detections %>%
-      mutate(
-        receiver_general_location = ifelse(receiver_general_location %in% replace_list, replace_with, receiver_general_location),
-        receiver_general_river_km = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_river_km, receiver_general_river_km),
-        receiver_general_latitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_latitude, receiver_general_latitude),
-        receiver_general_longitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_longitude, receiver_general_longitude),
-        receiver_region = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_region, receiver_region)
-      )
-    
-    
-    # This new df shows receiver metadata and reflects the aggregation done
-    reach_meta_aggregate <<- reach_meta_aggregate %>%
-      mutate(
-        receiver_general_location = ifelse(receiver_general_location %in% replace_list, replace_with, receiver_general_location),
-        receiver_general_river_km = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_river_km, receiver_general_river_km),
-        receiver_general_latitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_latitude, receiver_general_latitude),
-        receiver_general_longitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_longitude, receiver_general_longitude),
-        receiver_region = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_region, receiver_region)) %>%
-      distinct()
-    
-    detections <- detections %>%
-      filter(receiver_general_location %in% reach_meta_aggregate$receiver_general_location) %>%
-      group_by(fish_id) %>%
-      arrange(fish_id, desc(receiver_general_river_km)) %>%
+  average_general_summary_stats <- receiver_metadata |> 
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    group_by(detection_point_group, region) |> 
+    summarise(mean_river_km = mean(receiver_general_river_km),
+              mean_lat = mean(receiver_general_latitude),
+              mean_long = mean(receiver_general_longitude)) |> 
+    ungroup()
+  
+  detections_with_mean_vals <- detections |> 
+    select(-c(receiver_general_river_km, receiver_general_latitude,
+              receiver_general_longitude)) |>  
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    left_join(average_general_summary_stats, by = c("detection_point_group", "region")) |> 
+    select(-c(receiver_region, 
+              receiver_general_location)) |> 
+    rename(receiver_general_river_km = mean_river_km,
+           receiver_general_latitude = mean_lat,
+           receiver_general_longitude = mean_long,
+           receiver_region = region,
+           receiver_general_location = detection_point_group) |> 
+    distinct_all()
+  
+  reach_meta_aggregate <- average_general_summary_stats |>
+    rename(receiver_general_location = detection_point_group,
+           receiver_general_river_km = mean_river_km,
+           receiver_general_latitude = mean_lat,
+           receiver_general_longitude = mean_long,
+           receiver_region = region) |> 
+    # need to sort so that they are ordered correctly in the capture history
+    mutate(receiver_general_location = factor(receiver_general_location, 
+                                              levels = c("Releasepoint", "Sacramento", "Endpoint"))) |>
+    arrange(receiver_general_location)
+  
+  if (create_detection_history == FALSE) {
+    detections_final <- detections_with_mean_vals |>
+      group_by(fish_id) |>
+      arrange(fish_id, desc(receiver_general_river_km)) |>
       ungroup()
-  }
-  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate))
+  } else if (create_detection_history == TRUE) {
+    detections_final <- detections_with_mean_vals |> 
+      group_by(fish_id, receiver_general_location) |> 
+      summarise(min_time = min(time, na.rm = TRUE)) |>
+      arrange(fish_id, min_time) |> 
+      ungroup()
+  } 
+  
+  return(list(detections = detections_final, 
+              reach_meta_aggregate = reach_meta_aggregate))
 }
 
 #' Aggregate Detections for Feather River Region
@@ -360,7 +329,6 @@ aggregate_detections_butte <- function(detections, receiever_metadata,
 #'
 #' @param detections A dataframe containing detections information.
 #' @param receiver_metadata A dataframe containing receiver metadata.
-#' @param replace_dict A list specifying receiver locations to aggregate and their aggregated name.
 #'
 #' @return A list containing:
 #'   - A dataframe of detections with replaced receiver locations.
@@ -369,79 +337,89 @@ aggregate_detections_butte <- function(detections, receiever_metadata,
 #' @details This function replaces receiver locations in the detections dataframe with aggregated locations for the Feather River region according to the specified replacement dictionary. It aggregates receiver locations into one and calculates the mean River Kilometer (RKM), Latitude, Longitude, and Region for each aggregated location. The function also updates the receiver metadata accordingly.
 #'
 #' @examples
-#' # Define replacement dictionary
-#' replacement_dict <- list(replace_with = list(c("Releasepoint"),
-#'                                              c("Sacramento"),
-#'                                              c("Endpoint")),
-#'                          replace_list = list(c("FR_Gridley_Rel","FR_Boyds_Rel","FR_Boyds_Rel_Rec"),
-#'                                             c("TowerBridge","I80-50_Br", 
-#'                                               "ToeDrainBase","Hwy84Ferry"),
-#'                                             c("BeniciaE","BeniciaW", 
-#'                                               "ChippsE","ChippsW" 
-#'                                             )))
-#'
 #' # Aggregate detections for Feather River region
 #' aggregated_data <- aggregate_detections_feather(detections_data, receiver_metadata, replace_dict = replacement_dict)
 #'
 #' @export
-aggregate_detections_feather <- function(detections, receiver_metadata, 
-                                         replace_dict = list(replace_with = list(c("Releasepoint"),
-                                                                                c("Sacramento"),
-                                                                                c("Endpoint")),
-                                                            replace_list = list(c("FR_Gridley_Rel","FR_Boyds_Rel","FR_Boyds_Rel_Rec"),
-                                                                               c("TowerBridge","I80-50_Br", 
-                                                                                 "ToeDrainBase","Hwy84Ferry"),
-                                                                               c("BeniciaE","BeniciaW", 
-                                                                                 "ChippsE","ChippsW" 
-                                                                               )))) {
-  # Make a copy of receiver_metadata (receiver metadata)
-  reach_meta_aggregate <<- receiver_metadata
+aggregate_detections_feather <- function(detections, receiver_metadata, create_detection_history = FALSE) {
   
-  # Walk through each key/pair value
-  for (i in 1:length(replace_dict$replace_with)) {
-    # Unlist for easier use
-    replace_list <- unlist(replace_dict$replace_list[i])
-    replace_with <- unlist(replace_dict$replace_with[i])
-    
-    # Aggregate metadata for replacement
-    replace <- receiver_metadata %>%
-      select(receiver_general_location, receiver_general_river_km, receiver_general_latitude, receiver_general_longitude, receiver_region) %>%
-      filter(receiver_general_location %in% c(replace_list, replace_with)) %>%
-      distinct() %>%
-      select(-receiver_general_location) %>%
-      group_by(receiver_region) %>%
-      summarise_all(mean)
-    
-    # Replace receiver locations in detections
-    detections <- detections %>%
-      mutate(
-        receiver_general_location = ifelse(receiver_general_location %in% replace_list, replace_with, receiver_general_location),
-        receiver_general_river_km = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_river_km, receiver_general_river_km),
-        receiver_general_latitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_latitude, receiver_general_latitude),
-        receiver_general_longitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_longitude, receiver_general_longitude),
-        receiver_region = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_region, receiver_region)
-      )
-    
-    # Update receiver metadata
-    reach_meta_aggregate <<- reach_meta_aggregate %>%
-      mutate(
-        receiver_general_location = ifelse(receiver_general_location %in% replace_list, replace_with, receiver_general_location),
-        receiver_general_river_km = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_river_km, receiver_general_river_km),
-        receiver_general_latitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_latitude, receiver_general_latitude),
-        receiver_general_longitude = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_general_longitude, receiver_general_longitude),
-        receiver_region = ifelse(receiver_general_location %in% c(replace_list, replace_with), replace$receiver_region, receiver_region)
-      ) %>%
-      distinct()
-    
-    # Filter detections to ensure they align with the updated metadata
-    detections <- detections %>%
-      filter(receiver_general_location %in% reach_meta_aggregate$receiver_general_location) %>%
-      group_by(fish_id) %>%
-      arrange(fish_id, desc(receiver_general_river_km)) %>%
+  release_location_lookup <- tibble("detection_points" = 
+                                      c("FR_Gridley_Rel","FR_Boyds_Rel","FR_Boyds_Rel_Rec",
+                                        
+                                        "TowerBridge","I80-50_Br", 
+                                        "ToeDrainBase","Hwy84Ferry",
+                                        
+                                        "BeniciaE","BeniciaW", 
+                                        "ChippsE","ChippsW"
+                                      ),
+                                    "detection_point_group" = c(rep("Releasepoint", 3),
+                                                                rep("Sacramento", 4),
+                                                                rep("Endpoint", 4)),
+                                    "region" = c(rep("Release", 3),
+                                                 rep("Lower Sac R", 4),
+                                                 rep("End", 4))
+  )
+  
+  
+  average_general_summary_stats <- receiver_metadata |> 
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    group_by(detection_point_group, region) |> 
+    summarise(mean_river_km = mean(receiver_general_river_km),
+              mean_lat = mean(receiver_general_latitude),
+              mean_long = mean(receiver_general_longitude)) |> 
+    ungroup()
+  
+  average_general_summary_stats <- receiver_metadata |> 
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    group_by(detection_point_group, region) |> 
+    summarise(mean_river_km = mean(receiver_general_river_km),
+              mean_lat = mean(receiver_general_latitude),
+              mean_long = mean(receiver_general_longitude)) |> 
+    ungroup()
+  
+  detections_with_mean_vals <- detections |> 
+    select(-c(receiver_general_river_km, receiver_general_latitude,
+              receiver_general_longitude)) |>  
+    left_join(release_location_lookup, by = c("receiver_general_location" = "detection_points")) |> 
+    filter(!is.na(detection_point_group)) |> 
+    left_join(average_general_summary_stats, by = c("detection_point_group", "region")) |> 
+    select(-c(receiver_region, 
+              receiver_general_location)) |> 
+    rename(receiver_general_river_km = mean_river_km,
+           receiver_general_latitude = mean_lat,
+           receiver_general_longitude = mean_long,
+           receiver_region = region,
+           receiver_general_location = detection_point_group) |> 
+    distinct_all()
+  
+  reach_meta_aggregate <- average_general_summary_stats |>
+    rename(receiver_general_location = detection_point_group,
+           receiver_general_river_km = mean_river_km,
+           receiver_general_latitude = mean_lat,
+           receiver_general_longitude = mean_long,
+           receiver_region = region) |> 
+    # need to sort so that they are ordered correctly in the capture history
+    mutate(receiver_general_location = factor(receiver_general_location, 
+                                              levels = c("Releasepoint", "Sacramento", "Endpoint"))) |>
+    arrange(receiver_general_location)
+  
+  if (create_detection_history == FALSE) {
+    detections_final <- detections_with_mean_vals |>
+      group_by(fish_id) |>
+      arrange(fish_id, desc(receiver_general_river_km)) |>
       ungroup()
-  }
+  } else if (create_detection_history == TRUE) {
+    detections_final <- detections_with_mean_vals |> 
+      group_by(fish_id, receiver_general_location) |> 
+      summarise(min_time = min(time, na.rm = TRUE)) |>
+      arrange(fish_id, min_time) |> 
+      ungroup()
+  } 
   
-  return(list(detections = detections, reach_meta_aggregate = reach_meta_aggregate))
+  return(list(detections = detections_final, 
+              reach_meta_aggregate = reach_meta_aggregate))
 }
 
 #' Make Fish Encounter History
@@ -477,11 +455,13 @@ make_fish_encounter_history <- function(detections,
   # Get earliest detection for each fish at each GEN
   min_detects <- detections %>% 
     filter(receiver_general_location %in% aggregated_reciever_metadata$receiver_general_location) %>% 
-    group_by(fish_id, receiver_general_location, receiver_general_river_km) %>% 
+    #group_by(fish_id, receiver_general_location, receiver_general_river_km) %>% 
+    group_by(fish_id, receiver_general_location) %>% 
     summarise(min_time = min(time, na.rm = TRUE)) %>%
     arrange(fish_id, min_time) |> 
-    mutate(detect = 1) # Add col detect to min_detects, these fish get a 1
-
+    mutate(detect = 1) |>  # Add col detect to min_detects, these fish get a 1 |> 
+    ungroup()
+  
   # Get list of all tagged fish for the studyID
   fish <- released_fish_table %>%
     # filter(study_id == detections$study_id[1]) %>%
