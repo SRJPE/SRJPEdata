@@ -2,7 +2,7 @@
 title: "Filling in temperature data gaps"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Temperature Regression}
+  %\VignetteIndexEntry{Filling in temperature data gaps}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

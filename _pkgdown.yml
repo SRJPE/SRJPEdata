@@ -32,9 +32,16 @@ reference:
   - rst_trap
   - release
   - recaptures
+- subtitle: CWT Datasets
+  desc: Coded wire tag release and recapture datasets
+- contents:
+  - hatchery_release
+  - rst_cwt_recaptures
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
-- contents: annual_adult
+- contents: 
+  - annual_adult
+  - escapement_estimates_all_runs
 - subtitle: Modeling Ruleset Datasets
   desc: Helper datasets used to subset, categorize and describe model data, used to
     prepare weekly_juvenile_abundance_model_data

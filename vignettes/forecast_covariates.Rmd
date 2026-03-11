@@ -2,7 +2,7 @@
 title: "Proposed Covariate Development for Forecast and Scenario Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Covariate Development for Forecast and Scenario Models}
+  %\VignetteIndexEntry{Proposed Covariate Development for Forecast and Scenario Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

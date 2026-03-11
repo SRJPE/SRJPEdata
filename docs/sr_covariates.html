@@ -87,9 +87,97 @@
 <h2 id="selecting-stock-recruit-environmental-covariates">Selecting Stock Recruit Environmental Covariates<a class="anchor" aria-label="anchor" href="#selecting-stock-recruit-environmental-covariates"></a></h2>
 <p>FlowWest conducted initial literature review and planning to outline covariates that are expected to be important based on past research. This work can be found <a href="https://docs.google.com/spreadsheets/d/1Q4VUBE72KdPq0x65y_vUoDMj5dDHp8XwOyDNIyIJKpE/edit#gid=0" class="external-link">here</a>. FlowWest reviewed covariates with the SR JPE Modeling Advisory Team to generate the following environmental covariates table to test within the SR model.</p>
 <p><em>Table 1. Summary of covariates to test in stock recruit modeling based on preliminary literature review.</em></p>
-<pre><code><span><span class="co">#&gt; Error: '/Users/ashleyvizek/code/SRJPE/SRJPEdata/data-raw/helper-tables/covariate_definitions.csv' does not exist.</span></span>
-<span><span class="co">#&gt; Error: object 'covariate_definitions' not found</span></span></code></pre>
-</div>
+<table class="table  lightable-classic" style='color: black; font-family: "Arial Narrow", "Source Sans Pro", sans-serif; margin-left: auto; margin-right: auto;'><thead><tr><th style="text-align:left;">
+Variable Name
+</th>
+<th style="text-align:left;">
+Description
+</th>
+</tr></thead><tbody><tr><td style="text-align:left;">
+si_gdd_spawn
+</td>
+<td style="text-align:left;">
+Additive measure of temperatures during the adult upstream migration and spawning window. This window is defined as August-December. The steps involved in calculating this value include: obtain daily mean temperature values for each stream (if data are available at a finer resolution e.g. 15-min intervals then the daily mean is calculated), filter the dataset to Aug-Dec, add the daily mean values by stream and year. Missing values are filled in with either the rolling 3-day mean or if that is not available the monthly mean.
+</td>
+</tr><tr><td style="text-align:left;">
+si_above_13_temp_day
+</td>
+<td style="text-align:left;">
+Day of the year when water temperature exceeds 13C representing thermal stress during spawning and incubation in tributaries. 13C is recognized as the upper limit of water temperature for spawning and incubation. The data are not filtered to the spawning time period as this threshold is typically met before August; though Jan and Feb are filtered out as adults are not yet in the tributaries. The steps involved in calculating this value include: obtain daily max temperature values for each stream, calculate the 7-day rolling mean of max values (any missing values are filled in the weekly mean of the 7DADM), find the min date when the 7DADM is greater than 13
+</td>
+</tr><tr><td style="text-align:left;">
+si_above_13_temp_week
+</td>
+<td style="text-align:left;">
+This is the same as si_above_13_temp_day except instead of a day of the year it is the week of the year.
+</td>
+</tr><tr><td style="text-align:left;">
+si_weekly_max_temp_max
+</td>
+<td style="text-align:left;">
+Weekly max water temperature for tributaries and the mainstem Sacramento during the spawning and incubation time period. This window is defined as August-December. Note that daily max temperatures are not available for Sacramento so daily mean values are used. The steps involved in calculating this value include: obtain daily max temperature values for each stream, filter the dataset to Aug-Dec, calculate the weekly max value for each year and stream, calculate the max value across all weeks.
+</td>
+</tr><tr><td style="text-align:left;">
+si_weekly_max_temp_mean
+</td>
+<td style="text-align:left;">
+This is the same as si_weekly_max_temp_max except when summarizing across all weeks the mean value is calculated
+</td>
+</tr><tr><td style="text-align:left;">
+si_weekly_max_temp_median
+</td>
+<td style="text-align:left;">
+This is the same as si_weekly_max_temp_max except when summarizing across all weeks the median value is calculated
+</td>
+</tr><tr><td style="text-align:left;">
+si_mean_flow
+</td>
+<td style="text-align:left;">
+Mean flow during the spawning and incubation time window. This window is defined as August-December. The steps involved in calculating this value include: obtain daily max flow values for each stream, filter the dataset to Aug-Dec, find the mean flow by stream and year.
+</td>
+</tr><tr><td style="text-align:left;">
+si_max_flow
+</td>
+<td style="text-align:left;">
+This is the same as si_mean_flow except the max flow by stream and year is calculated.
+</td>
+</tr><tr><td style="text-align:left;">
+si_min_flow
+</td>
+<td style="text-align:left;">
+This is the same as si_mean_flow except the min flow by stream and year is calculated.
+</td>
+</tr><tr><td style="text-align:left;">
+si_median_flow
+</td>
+<td style="text-align:left;">
+This is the same as si_mean_flow except the median flow by stream and year is calculated.
+</td>
+</tr><tr><td style="text-align:left;">
+rr_mean_flow
+</td>
+<td style="text-align:left;">
+Mean flow during the rearing time period. This window is defined as November-July. The steps involved in calculating this value include: obtain daily max flow values, filter the dataset to Nov-July, find the mean flow by stream and year.
+</td>
+</tr><tr><td style="text-align:left;">
+rr_max_flow
+</td>
+<td style="text-align:left;">
+This is the same as rr_mean_flow except the max flow by stream and year is calculated.
+</td>
+</tr><tr><td style="text-align:left;">
+rr_min_flow
+</td>
+<td style="text-align:left;">
+This is the same as rr_mean_flow except the max flow by stream and year is calculated.
+</td>
+</tr><tr><td style="text-align:left;">
+rr_median_flow
+</td>
+<td style="text-align:left;">
+This is the same as rr_mean_flow except the max flow by stream and year is calculated.
+</td>
+</tr></tbody></table></div>
 <div class="section level2">
 <h2 id="preparing-covariates">Preparing Covariates<a class="anchor" aria-label="anchor" href="#preparing-covariates"></a></h2>
 <p>This document focuses on preparing flow and temperature covariates for use in stock recruit modeling and exploratory analysis.</p>
@@ -215,25 +303,25 @@
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">gdd_spawn</td>
-<td align="right">632.758457</td>
+<td align="right">645.113467</td>
 </tr><tr><td align="right">1998</td>
 <td align="left">feather river</td>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">weekly_max_temp_max</td>
-<td align="right">10.392171</td>
+<td align="right">10.390582</td>
 </tr><tr><td align="right">1998</td>
 <td align="left">feather river</td>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">weekly_max_temp_mean</td>
-<td align="right">7.600773</td>
+<td align="right">7.661845</td>
 </tr><tr><td align="right">1998</td>
 <td align="left">feather river</td>
 <td align="left">spawning and incubation</td>
 <td align="left">temperature</td>
 <td align="left">weekly_max_temp_median</td>
-<td align="right">7.271992</td>
+<td align="right">7.458331</td>
 </tr></tbody></table></div>
 </div>
 

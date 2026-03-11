@@ -302,7 +302,7 @@ feather_lfc <- full_join(feather_orf, feather_tfb) |>
 
 ### Flow Data Pull Tests 
 #Lower Feather data 
-lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "E", sensor_num = "20", start_date = "2010-01-01")
+lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "H", sensor_num = "20", start_date = "2010-01-01")
 
 lower_feather_river_daily_flows <- lower_feather_river_data_query |> 
          mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
@@ -367,7 +367,7 @@ feather_lfc_river_daily_temp <- feather_lfc_temp_query |>
 
 # Temperature data for HFC Feather River
 # pulling temp data for Feather River Low Flow Channel - FRA
-feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "E", sensor_num = "25",  start_date = "1997-01-01")
+feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25",  start_date = "1997-01-01")
 
 feather_hfc_river_daily_temp <- feather_hfc_temp_query |> 
          mutate(date = as_date(datetime),
@@ -533,7 +533,7 @@ yuba_river_interpolated <- read_csv(here::here("data-raw", "temperature-data", "
 ### Temp Data Pull 
 #### Gage #YR7
 ### Temp Data Pull Tests 
-yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "E", sensor_num = "146", start_date = "1999-01-01")
+yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "H", sensor_num = "146", start_date = "1999-01-01")
 
 yuba_river_daily_temp <- yuba_river_temp_query |> 
     mutate(date = as_date(datetime)) |> 
