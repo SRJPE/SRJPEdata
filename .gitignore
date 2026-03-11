@@ -1,6 +1,7 @@
 *.Rproj.user
 *.Rproj.user*
 .Rhistory
+.Rapp.history
 .RData
 .Ruserdata
 .Renviron
@@ -21,3 +22,4 @@ config.yml
 .yml
 *.md
 !db-edi-data-checks.html
+docs
