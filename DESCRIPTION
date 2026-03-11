@@ -15,5 +15,6 @@ LazyData: true
 Suggests: 
     knitr,
     rmarkdown
+    tidyverse
 VignetteBuilder: knitr
 URL: https://srjpe.github.io/SRJPEdata/
