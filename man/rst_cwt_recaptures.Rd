@@ -13,6 +13,7 @@
 \item \code{stream}: River (Sacramento River)
 \item \code{site}: Site of recapture (Knights Landing RST)
 \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
+\item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
 }
 \usage{
 rst_cwt_recaptures

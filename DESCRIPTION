@@ -13,8 +13,32 @@ Depends:
     R (>= 3.5)
 LazyData: true
 Suggests: 
+    CDECRetrieve,
+    dataRetrieval,
+    dplyr,
+    ggplot2,
+    googleCloudStorageR,
+    gsheet,
+    here,
+    hms,
+    kableExtra,
     knitr,
+    lubridate,
+    padr, 
+    plotly,
+    purrr,
+    readxl,
     rmarkdown,
-    tidyverse
+    rprojroot,
+    rsample,
+    testthat,
+    tibble,
+    usethis,
+    waterYearType,
+    weathermetrics,
+    zoo
+Remotes: 
+    FlowWest/CDECRetrieve,
+    FlowWest/WaterYearType
 VignetteBuilder: knitr
 URL: https://srjpe.github.io/SRJPEdata/

@@ -408,46 +408,6 @@
 #'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
 'survival_model_inputs'
 
-#' @title Survival Model Data
-#' @name survival_model_inputs
-#' @description Acoustic tagging data used to model survival for the SR JPE 
-#' @format
-#' \itemize{
-#'   \item \code{fish_id}: Unique identifier associated with each released fish 
-#'   \item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected 
-#'   \item \code{study_id}: Unique identifier associated with each release group 
-#'   \item \code{fish_length}: Fork length of fish in mm 
-#'   \item \code{fish_weight}: Weight of fish in grams 
-#'   \item \code{fish_type}: Type of fish used in release trial, typically indicated where that fish came from and species of fish 
-#'   \item \code{fish_release_date}: Date of release 
-#'   \item \code{release_location}: Location of release 
-#'   \item \code{year}: Year of release 
-#'   }
-#'   @source Central Valley Enhanced Acoustic Tagging Project. 
-#'   This data package queries tagging data from many studies using the ERDDAP data server.
-#'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
-'survival_model_inputs'
-
-#' @title Survival Model Data
-#' @name survival_model_inputs
-#' @description Acoustic tagging data used to model survival for the SR JPE 
-#' @format
-#' \itemize{
-#'   \item \code{fish_id}: Unique identifier associated with each released fish 
-#'   \item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected 
-#'   \item \code{study_id}: Unique identifier associated with each release group 
-#'   \item \code{fish_length}: Fork length of fish in mm 
-#'   \item \code{fish_weight}: Weight of fish in grams 
-#'   \item \code{fish_type}: Type of fish used in release trial, typically indicated where that fish came from and species of fish 
-#'   \item \code{fish_release_date}: Date of release 
-#'   \item \code{release_location}: Location of release 
-#'   \item \code{year}: Year of release 
-#'   }
-#'   @source Central Valley Enhanced Acoustic Tagging Project. 
-#'   This data package queries tagging data from many studies using the ERDDAP data server.
-#'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
-'survival_model_inputs'
-
 #' @title Site Lookup
 #' @name site_lookup
 #' @description Site lookup table for linking subsite, sites, site_groups, and streams in the SR JPE 
@@ -544,3 +504,41 @@
 #'   \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
 #'   \item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
 'rst_cwt_recaptures'
+
+#' @title Forecast covariates 
+#' @name forecast_covariates
+#' @description Table of potential forecast covariates
+#' @format
+#' \itemize{
+#'   \item \code{name}: Name of the covariate
+#'   \item \code{year}: Calendar year. Not all variables are summarized by calendar year and may be NA.
+#'   \item \code{water_year}: Water year. Not all variables are summarized by water year and may be NA.
+#'   \item \code{stream}: Stream 
+#'   \item \code{value}: Numeric covariate value
+#'   \item \code{month}: Month. Not all variables are available at the monthly level.
+#'   \item \code{text_value}: Text value for categorical variables.
+'forecast_covariates'
+
+#' @title Stock recruit covariates 
+#' @name stock_recruit_covariates
+#' @description Table of covariates used in stock recruit modeling
+#' @format
+#' \itemize{
+#'   \item \code{year}: Calendar year. 
+#'   \item \code{stream}: Stream 
+#'   \item \code{lifestage}: Lifestage that the covariate applies to
+#'   \item \code{covariate_type}: Describes the type of covariate (temperature or flow)
+#'   \item \code{covariate_structure}: Describes the structure of the covariate. 
+#'   \item \code{value}: Numeric value
+'stock_recruit_covariates'
+
+#' @title Years to exclude - RST 
+#' @name years_to_exclude_rst_data
+#' @description Years for RST monitoring locations that were identified as incomplete and not used in modeling
+#' @format
+#' \itemize{
+#'   \item \code{year}: Calendar year
+#'   \item \code{stream}: Stream 
+#'   \item \code{data_type}: Type of adult data
+#'   \item \code{reason_for_exclusion}: Provides reason for exclusion
+'years_to_exclude_adult'
