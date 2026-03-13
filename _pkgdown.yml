@@ -12,13 +12,18 @@ reference:
 - subtitle: Adult Datasets
   desc: Data used as model inputs to passage to spawner (p2s) model or directly input
     to stock recruit
-- contents: p2s_model_covariates_standard
+- contents: 
+  - p2s_model_covariates_standard
 - subtitle: Juvenile Datasets
   desc: Data used as inputs to juvenile bt-spas-x abundance model
 - contents:
   - weekly_juvenile_abundance_catch_data
   - weekly_juvenile_abundance_efficiency_data
-  - feather_hatchery_release
+- subtitle: Covariates
+  desc: Covariate input datasets
+- contents:
+  - stock_recruit_covariates
+  - forecast_covariates
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model
 - contents: survival_model_inputs
@@ -32,11 +37,13 @@ reference:
   - rst_trap
   - release
   - recaptures
+  - years_to_exclude_rst_data
 - subtitle: CWT Datasets
   desc: Coded wire tag release and recapture datasets
 - contents:
   - hatchery_release
   - rst_cwt_recaptures
+  - feather_hatchery_release
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
 - contents: 
