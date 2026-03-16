@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
   comment = "#>", 
   fig.width=8, fig.height=5)
 
-library(tidyverse)
 library(SRJPEdata)
 library(lubridate)
 library(CDECRetrieve)

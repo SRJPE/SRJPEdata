@@ -1,7 +1,3 @@
-library(tidyverse)
-library(CDECRetrieve)
-library(dataRetrieval)
-
 # If any of the queries do not work the code is set up to fail. This is on purpose
 # because the queries aren't working we shouldn't be updating data.
 
@@ -16,10 +12,10 @@ library(dataRetrieval)
 ### Flow Data Pull Tests
 battle_creek_data_query <- dataRetrieval::readNWISdv(11376550, "00060", startDate = "1995-01-01")
 battle_creek_daily_flows <- battle_creek_data_query |>  # rename to match new naming structure
-         select(Date, value =  X_00060_00003) |>  # rename to value
-         as_tibble() |> 
-         rename(date = Date) |> 
-         mutate(stream = "battle creek", # add additional columns for stream, gage info, and parameter 
+         dplyr::select(Date, value =  X_00060_00003) |>  # rename to value
+         dplyr::as_tibble() |> 
+         dplyr::rename(date = Date) |> 
+         dplyr::mutate(stream = "battle creek", # add additional columns for stream, gage info, and parameter 
                 site_group = "battle creek",
                 gage_agency = "USGS",
                 gage_number = "11376550",
@@ -32,20 +28,19 @@ battle_creek_daily_flows <- battle_creek_data_query |>  # rename to match new na
 ubc_temp_raw <- readxl::read_excel(here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"), sheet = 4)
 
 battle_creek_daily_temp <- ubc_temp_raw |> 
-  rename(date = DT,
+  dplyr::rename(date = DT,
          temp_degC = TEMP_C) |> 
-  mutate(date = as_date(date, tz = "UTC")) |> 
-  group_by(date) |> 
-  summarise(mean = mean(temp_degC, na.rm = TRUE),
+  dplyr::mutate(date = as_date(date, tz = "UTC")) |> 
+  dplyr::group_by(date) |> 
+  dplyr::summarise(mean = mean(temp_degC, na.rm = TRUE),
             max = max(temp_degC, na.rm = TRUE),
             min = min(temp_degC, na.rm = TRUE)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "battle creek",  
+  tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+  dplyr::mutate(stream = "battle creek",  
          site_group = "battle creek",
          gage_agency = "USFWS",
          gage_number = "UBC",
-         parameter = "temperature") |> 
-  glimpse()
+         parameter = "temperature") 
 
 ## Butte Creek ----
 ### Flow Data Pull 
@@ -53,13 +48,13 @@ battle_creek_daily_temp <- ubc_temp_raw |>
 
 # Grant Heneley at CDFW recommended using USGS instead of CDEC because CDEC will sometimes have weird datapoints
 # Pull data 
-butte_creek_data_query <- readNWISdv(11390000, "00060")
+butte_creek_data_query <- dataRetrieval::readNWISdv(11390000, "00060")
 butte_creek_daily_flows <- butte_creek_data_query %>%
-  select(Date, flow_cfs =  X_00060_00003) %>%
-  as_tibble() %>%
-  rename(date = Date,
+  dplyr::select(Date, flow_cfs =  X_00060_00003) %>%
+  dplyr::as_tibble() %>%
+  dplyr::rename(date = Date,
          value = flow_cfs) |>
-  mutate(value = ifelse(value < 0, NA_real_, value),
+  dplyr::mutate(value = ifelse(value < 0, NA_real_, value),
          stream = "butte creek",
          site_group = "butte creek",
          gage_agency = "USGS",
@@ -72,12 +67,12 @@ butte_creek_daily_flows <- butte_creek_data_query %>%
 ### Temp Data Pull Tests 
 butte_creek_temp_query <- dataRetrieval::readNWISdv(11390000, "00010", statCd = c("00001","00002"), startDate = "1994-01-01")
 butte_creek_daily_temp <- butte_creek_temp_query |> 
-  select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
-  as_tibble() %>% 
-  mutate(mean = (max + min) /2) |> 
-  pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
+  dplyr::select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
+  dplyr::as_tibble() %>% 
+  dplyr::mutate(mean = (max + min) /2) |> 
+  tidyr::pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
   rename(date = Date) %>% 
-  mutate(stream = "butte creek",
+  dplyr::mutate(stream = "butte creek",
          gage_agency = "USGS",
          gage_number = "11390000",
          parameter = "temperature")
@@ -92,10 +87,10 @@ butte_creek_daily_temp <- butte_creek_temp_query |>
 clear_creek_data_query <- dataRetrieval::readNWISdv(11372000, "00060", startDate = "1995-01-01")
 
 clear_creek_daily_flows <- clear_creek_data_query |> 
-         select(Date, value =  X_00060_00003) |> 
-         as_tibble() |> 
-         rename(date = Date) |>
-         mutate(stream = "clear creek",
+         dplyr::select(Date, value =  X_00060_00003) |> 
+         dplyr::as_tibble() |> 
+         dplyr::rename(date = Date) |>
+         dplyr::mutate(stream = "clear creek",
                 site_group = "clear creek",
                 gage_agency = "USGS",
                 gage_number = "11372000",
@@ -110,41 +105,39 @@ clear_creek_daily_flows <- clear_creek_data_query |>
 upperclear_temp_raw <- readxl::read_excel(here::here("data-raw","temperature-data", "battle_clear_temp.xlsx"), sheet = 2)
 
 upperclear_creek_daily_temp <- upperclear_temp_raw |> 
-  rename(date = DT,
+  dplyr::rename(date = DT,
          temp_degC = TEMP_C) |> 
-  mutate(date = as_date(date, tz = "UTC")) |>
-  group_by(date) |> 
-  summarise(mean = mean(temp_degC, na.rm = TRUE),
+  dplyr::mutate(date = as_date(date, tz = "UTC")) |>
+  dplyr::group_by(date) |> 
+  dplyr::summarise(mean = mean(temp_degC, na.rm = TRUE),
             max = max(temp_degC),
             min = min(temp_degC)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "clear creek",  
+  tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+  dplyr::mutate(stream = "clear creek",  
          site_group = "clear creek",
          site = "ucc",
          gage_agency = "USFWS",
          gage_number = "UCC",
-         parameter = "temperature") |> 
-  glimpse()
+         parameter = "temperature") 
 
 #Lower Clear Creek
 lowerclear_temp_raw <- readxl::read_excel(here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"), sheet = 3)
 
 lowerclear_creek_daily_temp <- lowerclear_temp_raw |> 
-  rename(date = DT,
+  dplyr::rename(date = DT,
          temp_degC = TEMP_C) |> 
-  mutate(date = as_date(date, tz = "UTC")) |>
-  group_by(date) |> 
-  summarise(mean = mean(temp_degC, na.rm = TRUE),
+  dplyr::mutate(date = as_date(date, tz = "UTC")) |>
+  dplyr::group_by(date) |> 
+  dplyr::summarise(mean = mean(temp_degC, na.rm = TRUE),
             max = max(temp_degC),
             min = min(temp_degC)) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-  mutate(stream = "clear creek", 
+  tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+  dplyr::mutate(stream = "clear creek", 
          site_group = "clear creek",
          site = "lcc",
          gage_agency = "USFWS",
          gage_number = "LCC",
-         parameter = "temperature") |> 
-  glimpse()
+         parameter = "temperature")
 
 ## Deer Creek ----
 ### Flow Data Pull 
@@ -156,10 +149,10 @@ lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
 deer_creek_data_query <- dataRetrieval::readNWISdv(11383500, "00060", startDate = "1986-01-01")
 
 deer_creek_daily_flows <- deer_creek_data_query|> 
-         select(Date, value =  X_00060_00003) |> 
-         as_tibble() |> 
-         rename(date = Date) |> 
-         mutate(stream = "deer creek", 
+         dplyr::select(Date, value =  X_00060_00003) |> 
+         dplyr::as_tibble() |> 
+         dplyr::rename(date = Date) |> 
+         dplyr::mutate(stream = "deer creek", 
                 site_group = "deer creek",
                 gage_agency = "USGS",
                 gage_number = "11383500",
@@ -169,18 +162,18 @@ deer_creek_daily_flows <- deer_creek_data_query|>
 ### Temp Data Pull 
 #### Gage #DVC
 ### Temp Data Pull Tests 
-deer_creek_temp_query <- cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1986-01-01")
+deer_creek_temp_query <- CDECRetrieve::cdec_query(station = "DCV", dur_code = "H", sensor_num = "25", start_date = "1986-01-01")
 
 deer_creek_daily_temp <- deer_creek_temp_query |> 
-         mutate(date = as_date(datetime),
-                temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
-         filter(temp_degC < 40, temp_degC > 0) |> 
-         group_by(date) |> 
-         summarise(mean = mean(temp_degC, na.rm = TRUE),
+         dplyr::mutate(date = as_date(datetime),
+                       temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
+         dplyr::filter(temp_degC < 40, temp_degC > 0) |> 
+         dplyr::group_by(date) |> 
+         dplyr::summarise(mean = mean(temp_degC, na.rm = TRUE),
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |>
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "deer creek",
+         tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         dplyr::mutate(stream = "deer creek",
                 site_group = "deer creek",
                 gage_agency = "CDEC",
                 gage_number = "DCV",
@@ -240,7 +233,7 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
 #          statistic = "mean")
 # write_csv(feather_flow, "data-raw/helper-tables/feather_flow_db.csv")
 
-feather_flow <- read_csv(here::here("data-raw", "helper-tables", "feather_flow_db.csv"))
+feather_flow <- readr::read_csv(here::here("data-raw", "helper-tables", "feather_flow_db.csv"))
 ### Flow Data Pull Tests 
 #Feather Low Flow Channel 
 # From Casey: There is also side flow input from the hatchery that increases flow another ~100 cfs. 
@@ -251,46 +244,46 @@ feather_flow <- read_csv(here::here("data-raw", "helper-tables", "feather_flow_d
 feather_orf_river_data_query <- dataRetrieval::readNWISdv(11406930, "00060", startDate = "1997-01-01")
 
 feather_orf_river_daily_flows <- feather_orf_river_data_query |> 
-  select(Date, orf_value =  X_00060_00003) |> 
-  as_tibble() |> 
-  rename(date = Date)
+  dplyr::select(Date, orf_value =  X_00060_00003) |> 
+  dplyr::as_tibble() |> 
+  dplyr::rename(date = Date)
 
 feather_orf_river_data_query2 <- CDECRetrieve::cdec_query(station = "ORF", dur_code = "D", sensor_num = "41", start_date = "2024-10-01")
 
 feather_orf <- feather_orf_river_daily_flows |> 
-  bind_rows(feather_orf_river_data_query2 |> 
-              select(date = datetime, orf_value = parameter_value))
+  dplyr::bind_rows(feather_orf_river_data_query2 |> 
+              dplyr::select(date = datetime, orf_value = parameter_value))
 # TFB
 # USGS site is through 9/20/2023 so needed to add a CDEC site for continuity
 feather_lfc_river_data_query <- dataRetrieval::readNWISdv(11407000, "00060", startDate = "1997-01-01")
 
 feather_lfc_river_daily_flows <- feather_lfc_river_data_query|> 
-         select(Date, tfb_value =  X_00060_00003) |> 
-         as_tibble() |> 
-  rename(date = Date)
+         dplyr::select(Date, tfb_value =  X_00060_00003) |> 
+         dplyr::as_tibble() |> 
+  dplyr::rename(date = Date)
 
 feather_lfc2_river_data_query <- CDECRetrieve::cdec_query(station = "TFB", dur_code = "D", sensor_num = "41", start_date = "2023-10-01")
 
 feather_tfb <- feather_lfc_river_daily_flows |> 
-  bind_rows(feather_lfc2_river_data_query |> 
-              select(date = datetime, tfb_value = parameter_value))
+  dplyr::bind_rows(feather_lfc2_river_data_query |> 
+              dplyr::select(date = datetime, tfb_value = parameter_value))
 
 feather_lfc2_river_daily_flows <- feather_lfc2_river_data_query |> 
-  mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
-  group_by(date = as.Date(datetime)) |> 
-  summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
+  dplyr::mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+  dplyr::group_by(date = as.Date(datetime)) |> 
+  dplyr::summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
             max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
             min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
-  pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-  mutate(stream = "feather river",  
+  tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+  dplyr::mutate(stream = "feather river",  
          site_group = "upper feather lfc", 
          gage_agency = "CDEC",
          gage_number = "TFB",
          parameter = "flow")
 
 
-feather_lfc <- full_join(feather_orf, feather_tfb) |> 
-  mutate(date = as_date(date),
+feather_lfc <- dplyr::full_join(feather_orf, feather_tfb) |> 
+  dplyr::mutate(date = as_date(date),
          value = tfb_value + orf_value,
          stream = "feather river", 
          site_group = "upper feather lfc",
@@ -298,20 +291,20 @@ feather_lfc <- full_join(feather_orf, feather_tfb) |>
          gage_number = "11407000/TFB + 11406930/ORF",
          parameter = "flow",
          statistic = "mean") |> 
-  select(-c(tfb_value, orf_value))
+  dplyr::select(-c(tfb_value, orf_value))
 
 ### Flow Data Pull Tests 
 #Lower Feather data 
 lower_feather_river_data_query <- CDECRetrieve::cdec_query(station = "FSB", dur_code = "H", sensor_num = "20", start_date = "2010-01-01")
 
 lower_feather_river_daily_flows <- lower_feather_river_data_query |> 
-         mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
-         group_by(date = as.Date(datetime)) |> 
-         summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
+         dplyr::mutate(parameter_value = ifelse(parameter_value < 0, NA_real_, parameter_value)) |> 
+         dplyr::group_by(date = as.Date(datetime)) |> 
+         dplyr::summarise(mean = ifelse(all(is.na(parameter_value)), NA, mean(parameter_value, na.rm = TRUE)),
                    max = ifelse(all(is.na(parameter_value)), NA, max(parameter_value, na.rm = TRUE)),
                    min = ifelse(all(is.na(parameter_value)), NA, min(parameter_value, na.rm = TRUE))) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
-         mutate(stream = "feather river",  
+         tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "value") |> 
+         dplyr::mutate(stream = "feather river",  
                 site_group = "lower feather river", 
                 gage_agency = "CDEC",
                 gage_number = "FSB",
@@ -322,71 +315,69 @@ lower_feather_river_daily_flows <- lower_feather_river_data_query |>
 #GRL will represent the High Flow Channel (HFC) and FRA will represent the Low Flow Channel (LFC).
 
 #Interpolation feather hfc
-feather_hfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", "feather_hfc_temp_interpolation.csv")) |> 
-  mutate(date = as_date(date)) |> 
-  mutate(parameter = "temperature",
-         site_group = "upper feather hfc") |> 
-  glimpse()
+feather_hfc_interpolated <- readr::read_csv(here::here("data-raw", "temperature-data", "feather_hfc_temp_interpolation.csv")) |> 
+  dplyr::mutate(date = as_date(date)) |> 
+  dplyr::mutate(parameter = "temperature",
+         site_group = "upper feather hfc")
 
 #Note: There is no current updated gage for Feather High Flow Channel, we initially
 #explored GRL gage from CDEC but most recent data is from 2007. Overall data coverage
 #is out of range of our interest (2003-2017)
 
 #Interpolation feather lfc
-feather_lfc_interpolated <- read_csv(here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv")) |> 
-  mutate(date = as_date(date)) |> 
-  mutate(parameter = "temperature",
-         site_group = "upper feather lfc") |> 
-  glimpse()
+feather_lfc_interpolated <- readr::read_csv(here::here("data-raw", "temperature-data", "feather_lfc_temp_interpolation.csv")) |> 
+  dplyr::mutate(date = as_date(date)) |> 
+  dplyr::mutate(parameter = "temperature",
+         site_group = "upper feather lfc")
 
 ### Temp Data Pull 
 #### Gage #FRA
 ### Temp Data Pull Tests 
 
 #pulling temp data for Feather River Low Flow Channel - FRA
-feather_lfc_temp_query <- cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1997-01-01")
+feather_lfc_temp_query <- CDECRetrieve::cdec_query(station = "FRA", dur_code = "H", sensor_num = "25", start_date = "1997-01-01")
 
 feather_lfc_river_daily_temp <- feather_lfc_temp_query |> 
-         mutate(date = as_date(datetime),
-                year = year(datetime),
-                parameter_value = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |> 
-         group_by(date) |> 
-         summarise(mean= mean(parameter_value, na.rm = TRUE),
+         dplyr::mutate(date = as_date(datetime),
+                       year = year(datetime),
+                       parameter_value = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |> 
+         dplyr::group_by(date) |> 
+         dplyr::summarise(mean= mean(parameter_value, na.rm = TRUE),
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
-         full_join(feather_lfc_interpolated) |> 
+         tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+         dplyr::full_join(feather_lfc_interpolated) |> 
          # we want to use the query values instead of the interpolated values where they exist
-         mutate(value = ifelse(!is.na(query_value), query_value, value),
+         dplyr::mutate(value = ifelse(!is.na(query_value), query_value, value),
                 gage_agency = ifelse(!is.na(query_value), "CDEC", gage_agency),
                 gage_number = ifelse(!is.na(query_value), "FRA", gage_number),
                 stream = "feather river",
                 site_group = "upper feather lfc",
                 parameter = "temperature") |> 
-         select(-query_value)
+         dplyr::select(-query_value)
 
 # Temperature data for HFC Feather River
 # pulling temp data for Feather River Low Flow Channel - FRA
-feather_hfc_temp_query <- cdec_query(station = "GRL", dur_code = "H", sensor_num = "25",  start_date = "1997-01-01")
+feather_hfc_temp_query <- CDECRetrieve::cdec_query(station = "GRL", dur_code = "H", sensor_num = "25",  start_date = "1997-01-01")
 
 feather_hfc_river_daily_temp <- feather_hfc_temp_query |> 
-         mutate(date = as_date(datetime),
+         dplyr::mutate(date = as_date(datetime),
                 year = year(datetime),
                 parameter_value = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |> 
-         group_by(date) |> 
-         summarise(mean= mean(parameter_value, na.rm = TRUE),
+         dplyr::group_by(date) |> 
+         dplyr::summarise(mean= mean(parameter_value, na.rm = TRUE),
                    max = max(parameter_value, na.rm = TRUE),
                    min = min(parameter_value, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
-         full_join(feather_hfc_interpolated) |> 
+         tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+         dplyr::full_join(feather_hfc_interpolated) |> 
          # we want to use the query values instead of the interpolated values where they exist
-         mutate(value = ifelse(!is.na(query_value), query_value, value),
+         dplyr::mutate(value = ifelse(!is.na(query_value), query_value, value),
                 gage_agency = ifelse(!is.na(query_value), "CDEC", gage_agency),
                 gage_number = ifelse(!is.na(query_value), "GRL", gage_number),
                 stream = "feather river",
                 site_group = "upper feather hfc",
                 parameter = "temperature") |> 
-         select(-query_value)
+         dplyr::select(-query_value)
 
 ## Mill Creek ----
 ### Flow Data Pull 
@@ -399,10 +390,10 @@ feather_hfc_river_daily_temp <- feather_hfc_temp_query |>
 mill_creek_data_query <- dataRetrieval::readNWISdv(11381500, "00060", startDate = "1995-01-01")
 
 mill_creek_daily_flows <- mill_creek_data_query |> 
-         select(Date, value =  X_00060_00003) |>  
-         as_tibble() |> 
-         rename(date = Date) |> 
-         mutate(stream = "mill creek", 
+         dplyr::select(Date, value =  X_00060_00003) |>  
+         dplyr::as_tibble() |> 
+         dplyr::rename(date = Date) |> 
+         dplyr::mutate(stream = "mill creek", 
                 site_group = "mill creek",
                 gage_agency = "USGS",
                 gage_number = "11381500",
@@ -412,18 +403,18 @@ mill_creek_daily_flows <- mill_creek_data_query |>
 ### Temp Data Pull 
 #### Gage #MLM
 ### Temp Data Pull Tests 
-mill_creek_temp_query <- cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1995-01-01")
+mill_creek_temp_query <- CDECRetrieve::cdec_query(station = "MLM", dur_code = "H", sensor_num = "25", start_date = "1995-01-01")
 
 mill_creek_daily_temp <- mill_creek_temp_query |> 
-         mutate(date = as_date(datetime),
-                temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
-         filter(temp_degC < 40, temp_degC > 0) |>
-         group_by(date) |> 
-         summarise(mean = mean(temp_degC, na.rm = TRUE),
+         dplyr::mutate(date = as_date(datetime),
+                       temp_degC = SRJPEdata::fahrenheit_to_celsius(parameter_value)) |>
+         dplyr::filter(temp_degC < 40, temp_degC > 0) |>
+         dplyr::group_by(date) |> 
+         dplyr::summarise(mean = mean(temp_degC, na.rm = TRUE),
                    max = max(temp_degC, na.rm = TRUE),
                    min = min(temp_degC, na.rm = TRUE)) |> 
-         pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
-         mutate(stream = "mill creek",
+         tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "value") |>
+         dplyr::mutate(stream = "mill creek",
                 site_group = "mill creek",
                 gage_agency = "CDEC",
                 gage_number = "MLM",
@@ -439,10 +430,10 @@ mill_creek_daily_temp <- mill_creek_temp_query |>
 sac_river_data_query <- dataRetrieval::readNWISdv(11390500, "00060", startDate = "1994-01-01")
 
 sac_river_daily_flows <- sac_river_data_query |>  
-         select(Date, value =  X_00060_00003) |>  
-         as_tibble() |> 
-         rename(date = Date) |> 
-         mutate(stream = "sacramento river",
+         dplyr::select(Date, value =  X_00060_00003) |>  
+         dplyr::as_tibble() |> 
+         dplyr::rename(date = Date) |> 
+         dplyr::mutate(stream = "sacramento river",
                 gage_agency = "USGS",
                 gage_number = "11390500",
                 parameter = "flow",
@@ -457,12 +448,12 @@ sac_river_daily_flows <- sac_river_data_query |>
 sac_river_temp_query <- dataRetrieval::readNWISdv(11390500, "00010", statCd = c("00001","00002"), startDate = "1994-01-01")
 
 sac_river_daily_temp_raw <- sac_river_temp_query |> 
-  select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
-  as_tibble() %>% 
-  mutate(mean = (max + min) /2) |> 
-  pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
-  rename(date = Date) %>% 
-  mutate(stream = "sacramento river",
+  dplyr::select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
+  dplyr::as_tibble() %>% 
+  dplyr::mutate(mean = (max + min) /2) |> 
+  tidyr::pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
+  dplyr::rename(date = Date) %>% 
+  dplyr::mutate(stream = "sacramento river",
          gage_agency = "USGS",
          gage_number = "11390500",
          parameter = "temperature")
@@ -491,10 +482,10 @@ sac_river_daily_temp <- sac_river_daily_temp_raw
 rbdd_data_query <- dataRetrieval::readNWISdv(11377100, "00060", startDate = "1994-01-01")
 
 rbdd_daily_flows <- rbdd_data_query |>  
-  select(Date, value =  X_00060_00003) |>  
-  as_tibble() |> 
-  rename(date = Date) |> 
-  mutate(stream = "sacramento river",
+  dplyr::select(Date, value =  X_00060_00003) |>  
+  dplyr::as_tibble() |> 
+  dplyr::rename(date = Date) |> 
+  dplyr::mutate(stream = "sacramento river",
          site_group = "red bluff diversion dam",
          gage_agency = "USGS",
          gage_number = "11377100",
@@ -514,10 +505,10 @@ rbdd_daily_flows <- rbdd_data_query |>
 yuba_river_data_query <- dataRetrieval::readNWISdv(11421000, "00060", startDate = "1999-01-01")
 
 yuba_river_daily_flows <- yuba_river_data_query |>  
-         select(Date, value =  X_00060_00003)  |>  
-         as_tibble() |> 
-         rename(date = Date) |> 
-         mutate(stream = "yuba river",  
+         dplyr::select(Date, value =  X_00060_00003)  |>  
+         dplyr::as_tibble() |> 
+         dplyr::rename(date = Date) |> 
+         dplyr::mutate(stream = "yuba river",  
                 site_group = "yuba river",
                 gage_agency = "USGS",
                 gage_number = "11421000",
@@ -526,32 +517,31 @@ yuba_river_daily_flows <- yuba_river_data_query |>
 
 ### Temp Data Pull 
 #### Interpolation pull for Yuba
-yuba_river_interpolated <- read_csv(here::here("data-raw", "temperature-data", "yuba_temp_interpolation.csv")) |> 
-  mutate(parameter = "temperature") |> 
-  glimpse()
+yuba_river_interpolated <- readr::read_csv(here::here("data-raw", "temperature-data", "yuba_temp_interpolation.csv")) |> 
+  dplyr::mutate(parameter = "temperature")
 
 ### Temp Data Pull 
 #### Gage #YR7
 ### Temp Data Pull Tests 
-yuba_river_temp_query <- cdec_query(station = "YR7", dur_code = "H", sensor_num = "146", start_date = "1999-01-01")
+yuba_river_temp_query <- CDECRetrieve::cdec_query(station = "YR7", dur_code = "H", sensor_num = "146", start_date = "1999-01-01")
 
 yuba_river_daily_temp <- yuba_river_temp_query |> 
-    mutate(date = as_date(datetime)) |> 
-    mutate(year = year(datetime)) |> 
-    group_by(date) |> 
-    summarise(mean= mean(parameter_value, na.rm = TRUE),
+    dplyr::mutate(date = as_date(datetime)) |> 
+    dplyr::mutate(year = year(datetime)) |> 
+    dplyr::group_by(date) |> 
+    dplyr::summarise(mean= mean(parameter_value, na.rm = TRUE),
               max = max(parameter_value, na.rm = TRUE),
               min = min(parameter_value, na.rm = TRUE)) |> 
-    pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
-      full_join(yuba_river_interpolated) |> 
+    tidyr::pivot_longer(mean:min, names_to = "statistic", values_to = "query_value") |>
+      dplyr::full_join(yuba_river_interpolated) |> 
       # we want to use the query values instead of the interpolated values where they exist
-      mutate(value = ifelse(!is.na(query_value), query_value, value),
+      dplyr::mutate(value = ifelse(!is.na(query_value), query_value, value),
              gage_agency = ifelse(!is.na(query_value), "CDEC", gage_agency),
              gage_number = ifelse(!is.na(query_value), "YR7", gage_number),
              stream = "yuba river",
              site_group = "yuba river",
              parameter = "temperature") |> 
-      select(-query_value)
+      dplyr::select(-query_value)
 
 
 # Define the required object names
@@ -571,24 +561,21 @@ if (!all(sapply(required_objects, exists))) {
 # If all objects exist, continue with the rest of the code
 print("All required objects exist. Proceeding...")
 
-# Load data.table library
-library(data.table)
 # Combine all flow data from different streams
 # Created a site group variable so that the hfc and lfc will bind with the correct sites
 # so need to bind feather to the site lookup separately
-flow_daily <- rbindlist(list(battle_creek_daily_flows,
+flow_daily <- data.table::rbindlist(list(battle_creek_daily_flows,
                   butte_creek_daily_flows, 
                   clear_creek_daily_flows,
                   deer_creek_daily_flows,
                   mill_creek_daily_flows,
-                  sac_river_daily_flows |> mutate(site_group = "tisdale"),
-                  sac_river_daily_flows |> mutate(site_group = "knights landing"),
+                  sac_river_daily_flows |> dplyr::mutate(site_group = "tisdale"),
+                  sac_river_daily_flows |> dplyr::mutate(site_group = "knights landing"),
                   rbdd_daily_flows,
                   yuba_river_daily_flows,
                   feather_flow, # data from DWR
                   feather_lfc, # sum of TFB and ORF
-                  lower_feather_river_daily_flows), use.names = TRUE, fill = TRUE) |> 
-  glimpse()
+                  lower_feather_river_daily_flows), use.names = TRUE, fill = TRUE) 
 
 ## QC plot 
 # ggplot(flow |> 
@@ -598,20 +585,19 @@ flow_daily <- rbindlist(list(battle_creek_daily_flows,
 #   facet_wrap(~stream)
 
 #Combine all temperature data from different streams
-temp <- rbindlist(list(battle_creek_daily_temp,
+temp <- data.table::rbindlist(list(battle_creek_daily_temp,
                        butte_creek_daily_temp,
                        deer_creek_daily_temp,
                        mill_creek_daily_temp,
-                       sac_river_daily_temp |> mutate(site_group = "tisdale"),
-                       sac_river_daily_temp |> mutate(site_group = "knights landing"),
+                       sac_river_daily_temp |> dplyr::mutate(site_group = "tisdale"),
+                       sac_river_daily_temp |> dplyr::mutate(site_group = "knights landing"),
                        yuba_river_daily_temp,
                        feather_lfc_river_daily_temp,
                        feather_hfc_river_daily_temp,
                        # TODO do we need a lower feather river temp? 
                        upperclear_creek_daily_temp,
                        lowerclear_creek_daily_temp), use.names = TRUE, fill = TRUE) |> 
-  select(-site) |> 
-  glimpse()
+  dplyr::select(-site)
 
 # Quick QC plot
 # ggplot(temp |> 
@@ -619,14 +605,14 @@ temp <- rbindlist(list(battle_creek_daily_temp,
 #        aes(x= date, y = value, color=site_group)) +
 #   geom_line() +
 #   facet_wrap(~stream)
-setDT(temp)
-setDT(flow_daily)
+data.table::setDT(temp)
+data.table::setDT(flow_daily)
 
 # Bind the rows of temp and flow with use.names=TRUE to match by column name
-combined_data <- rbindlist(list(temp, flow_daily), use.names = TRUE, fill = TRUE) |> distinct()
+combined_data <- data.table::rbindlist(list(temp, flow_daily), use.names = TRUE, fill = TRUE) |> dplyr::distinct()
 
 # Reshape the data to 'wider' format (like pivot_wider)
-reshaped_data <- dcast(combined_data, ... ~ statistic, value.var = "value")
+reshaped_data <-data.table::dcast(combined_data, ... ~ statistic, value.var = "value")
 
 # Group by week and year, and perform the summarization
 updated_environmental_data <- reshaped_data[
@@ -646,31 +632,31 @@ updated_environmental_data <- reshaped_data[
 print(head(updated_environmental_data))
 
 longer_updated_environmental_data <- updated_environmental_data |> 
-  filter(!is.na(week)) |> 
-  mutate(max = ifelse(max == "-Inf", NA, max),
+  dplyr::filter(!is.na(week)) |> 
+  dplyr::mutate(max = ifelse(max == "-Inf", NA, max),
          min = ifelse(min == "Inf", NA, min)) |> 
-  pivot_longer(max:min, names_to = "statistic", values_to = "value") |> glimpse()
+  tidyr::pivot_longer(max:min, names_to = "statistic", values_to = "value") |> glimpse()
 
 # For Knights Landing we pull RST temperature to fill in data gaps
 kl_rst <- longer_updated_environmental_data |> 
-  filter(gage_number == "reported at RST" & site_group == "knights landing") |> 
-  rename(rst_value = value, 
+  dplyr::filter(gage_number == "reported at RST" & site_group == "knights landing") |> 
+  dplyr::rename(rst_value = value, 
          gage_number_rst = gage_number,
          gage_agency_rst = gage_agency)
 kl_temp <- longer_updated_environmental_data |> 
-  filter(gage_number != "reported at RST" & site_group == "knights landing" & parameter == "temperature") |> 
-  full_join(kl_rst) |> 
-  mutate(gage_number = ifelse(is.na(value) & !is.na(rst_value), gage_number_rst, gage_number),
+  dplyr::filter(gage_number != "reported at RST" & site_group == "knights landing" & parameter == "temperature") |> 
+  dplyr::full_join(kl_rst) |> 
+  dplyr::mutate(gage_number = ifelse(is.na(value) & !is.na(rst_value), gage_number_rst, gage_number),
          gage_agency = ifelse(is.na(value) & !is.na(rst_value), gage_agency_rst, gage_agency),
          value = ifelse(is.na(value) & !is.na(rst_value), rst_value, value)) |> 
-  select(-c(gage_number_rst, gage_agency_rst, rst_value))
+  dplyr::select(-c(gage_number_rst, gage_agency_rst, rst_value))
 environmental_data <- longer_updated_environmental_data |> 
   # remove knights landing temperature
-  mutate(rm = ifelse(site_group == "knights landing" & parameter == "temperature", "remove","keep")) |> 
-  filter(rm != "remove" | is.na(rm)) |> 
-  select(-rm) |> 
+  dplyr::mutate(rm = ifelse(site_group == "knights landing" & parameter == "temperature", "remove","keep")) |> 
+  dplyr::filter(rm != "remove" | is.na(rm)) |> 
+  dplyr::select(-rm) |> 
   # add on knights landing temperature where gaps have been filled in
-  bind_rows(kl_temp)
+  dplyr::bind_rows(kl_temp)
 
 #Save package
 usethis::use_data(environmental_data, overwrite = TRUE)
