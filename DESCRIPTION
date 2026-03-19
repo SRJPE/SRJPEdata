@@ -12,10 +12,13 @@ RoxygenNote: 7.3.3
 Depends: 
     R (>= 3.5)
 LazyData: true
+Imports:
+    dplyr,
+    rerddap,
+    tidyr
 Suggests: 
     CDECRetrieve,
     dataRetrieval,
-    dplyr,
     ggplot2,
     googleCloudStorageR,
     gsheet,
@@ -33,6 +36,7 @@ Suggests:
     rsample,
     testthat,
     tibble,
+    tidyverse,
     usethis,
     waterYearType,
     weathermetrics,

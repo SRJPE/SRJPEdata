@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 
 library(SRJPEdata)
 library(lubridate)
+library(ggplot2)
 library(CDECRetrieve)
 library(dplyr)
 library(dataRetrieval)
