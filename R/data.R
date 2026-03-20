@@ -473,6 +473,8 @@
 #'   \item \code{group_mark_rate}: Mark rate of fish released
 #'   \item \code{month}: Month of first release date used to join environmental covariates
 #'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
+#'   \item \code{water_year}: Water year of release date (where month 10-12 are year + 1)
+#'   \item \code{stream}: Stream of release location (relevant to SR JPE streams, some may be NA) used for joining the covariates
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 'hatchery_release'
@@ -501,6 +503,9 @@
 #'   \item \code{tag_code}: Coded wire tag code
 #'   \item \code{stream}: River (Sacramento River)
 #'   \item \code{site}: Site of recapture (Knights Landing RST)
+#'   \item \code{year}: Year of recapture (Knights Landing RST)
+#'   \item \code{julian_week}: Week of recapture (Knights Landing RST)
+#'   \item \code{run_year}: Run year of recapture (where week >= 45 are year + 1)
 #'   \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
 #'   \item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
 'rst_cwt_recaptures'
