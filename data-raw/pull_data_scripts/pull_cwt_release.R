@@ -131,26 +131,28 @@ cwt_release_group_lookup <- cwt_data_summary_all |>
 # Josh prefers the table that is grouped by release and wanted to include environmental
 # covariates that Flora uses in survival/TT model which are the 3_category_flow_exceedance_year_type and monthly_max_flow
 exceedence_flows <- SRJPEdata::forecast_covariates |>
-  filter(name == "3_category_flow_exceedance_year_type",
-         stream == "feather river") |>
+  filter(name == "3_category_flow_exceedance_year_type") |>
   mutate(value = case_when(text_value == "Wet" ~ 2,
                            text_value == "Average" ~ 1,
                            TRUE ~ 0)) |>
   # Flora's code calls year the same thing as water year (assumption)
-  select(year = water_year, value) |>
-  arrange(year) |> 
+  select(water_year, value, stream) |>
+  arrange(water_year) |> 
   rename(exceedance_flow_year_type = value)
 
 max_flows <- SRJPEdata::forecast_covariates |>
-  filter(name == "monthly_max_flow",
-         stream == "feather river") |>
+  filter(name == "monthly_max_flow") |>
   arrange(stream, year, month) |>
-  select(year, month, value) |> 
+  select(stream, year, month, value) |> 
   rename(monthly_max_flow = value)
 
 
 # Releases - summarized by similar releases ------------------------------------------
 # MW: Note that exceedance_flow_year_type will be NA until 1996
+# We need to associate release location with a stream in order to join the covariates
+release_location_stream_lookup <- read_csv(here::here("data-raw","helper-tables","cwt_data","release_location_lookup.csv")) |> 
+  rename(release_location_name = `Release Location`)
+
 hatchery_release_all <- cwt_data_summary_all |>
   group_by(
     release_location_name,
@@ -175,8 +177,10 @@ summarise(
     release_date_use = coalesce(first_release_date, last_release_date),
     group_mark_rate = round(group_total_marked_N / group_total_release_N, 4),
     month = month(release_date_use),
-    year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |>
+    year = year(release_date_use),
+    water_year = ifelse(month %in% 10:12, year(release_date_use) + 1, year(release_date_use))) |>
   ungroup() |>
+  left_join(release_location_stream_lookup) |> 
   left_join(exceedence_flows) |>
   left_join(max_flows) |>
   select(-release_date_use) |>
@@ -215,14 +219,16 @@ rst_cwt_recaptures <- recaptures_raw |>
   filter(!is.na(tag_code)) |> 
   filter(tag_code != "N/A") |> 
   mutate(
-    julian_week  = isoweek(date),
+    year= year(date),
+    julian_week  = week(date),
+    run_year = ifelse(julian_week >= 45, year + 1, year),
     week_index   = if_else(
-      julian_week >= 40,
-      julian_week - 39,
-      julian_week + (53 - 39)
+      julian_week >= 45,
+      julian_week - 44,
+      julian_week + (53 - 44)
     )
   ) |> 
-  select(-julian_week) |> 
+  #select(-julian_week) |> 
   left_join(cwt_release_group_lookup) |> 
   glimpse()
 

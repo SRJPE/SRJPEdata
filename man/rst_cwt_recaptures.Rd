@@ -12,6 +12,9 @@
 \item \code{tag_code}: Coded wire tag code
 \item \code{stream}: River (Sacramento River)
 \item \code{site}: Site of recapture (Knights Landing RST)
+\item \code{year}: Year of recapture (Knights Landing RST)
+\item \code{julian_week}: Week of recapture (Knights Landing RST)
+\item \code{run_year}: Run year of recapture (where week >= 45 are year + 1)
 \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
 \item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
 }

@@ -26,6 +26,8 @@
 \item \code{group_mark_rate}: Mark rate of fish released
 \item \code{month}: Month of first release date used to join environmental covariates
 \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
+\item \code{water_year}: Water year of release date (where month 10-12 are year + 1)
+\item \code{stream}: Stream of release location (relevant to SR JPE streams, some may be NA) used for joining the covariates
 \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 }
