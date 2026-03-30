@@ -1,0 +1,147 @@
+---
+title: "QC of RST efficiency trial data"
+format: 
+    html:
+        embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+The goal is to identify efficiency trials that were incomplete due to the trap being non-operational after fish were released. This might happen when flows are very high. We evaluate this in two ways:
+(1) Count the number of consecutive days the trap was operational after release using the RST trap and catch data
+(2) Pull flow data for the 4 days after release and identify any where flow is high (defined as above 10,000 cfs though this may be lower in some locations)
+
+Notes about additional TODO items:
+
+- Stream Teams have a column "includeinAnalysis". We need to better understand the ruleset of this and consider comparing these to the trials flagged.
+- Produce plots of what efficiency looks like with and without the flagged trials included to get a better sense of the impact
+
+```{r, include = F}
+library(tidyverse)
+
+release <- SRJPEdata::release |> 
+    select(date_released, release_id, stream, site)
+
+release_plus_4 <- release |> 
+    mutate(
+        date_released = as_date(date_released),
+        date_1 = date_released + 1,
+        date_2 = date_released + 2,
+        date_3 = date_released + 3,
+        date_4 = date_released + 4) |> 
+            pivot_longer(cols = c(date_released, date_1, date_2, date_3, date_4), values_to = "date", names_to = "date_release_type")
+
+catch <- SRJPEdata::rst_catch |> 
+    select(date, stream, site) |> 
+    distinct() |> 
+    mutate(catch = T)
+
+release_plus_4_catch <- release_plus_4 |> 
+    filter(date_release_type != "date_released") |> # we do not need the trap to functioning on the day of release
+    left_join(catch)
+
+flag_release <- filter(release_plus_4_catch, is.na(catch))
+
+summary <- flag_release |> 
+    ungroup() |> 
+    select(release_id, stream, site) |> 
+    distinct()
+
+summary_stream <- flag_release |> 
+    ungroup() |> 
+    group_by(stream) |> 
+    tally()
+```
+
+# Flag potential issues with release trials
+
+**Approach 1**
+
+336 released trials were flagged as potentially being non-operational for 1-4 days after release.
+
+```{r}
+knitr::kable(summary)
+```
+
+The majority of these are coming from the Feather River
+
+```{r}
+knitr::kable(summary_stream)
+```
+
+```{r, include = F}
+flow <- SRJPEdata::environmental_data |> 
+    filter(parameter == "flow") |> 
+    select(-c(gage_number, gage_agency, parameter)) |> 
+    pivot_wider(id_cols = c(week, year, stream, site_group), values_from = "value", names_from = "statistic")
+
+flow_release <- release_plus_4 |> 
+    filter(date_release_type == "date_released") |> 
+    mutate(
+        week = week(date),
+        year = year(date),
+        site_group = case_when(
+            stream %in% c("butte creek", "battle creek", "clear creek", "mill creek", "deer creek", "yuba river") ~ stream,
+            site == "knights landing" ~ "knights landing",
+            site == "tisdale" ~ "tisdale",
+            site == "red bluff diversion dam" ~ "red bluff diversion dam",
+            site %in% c("eye riffle", "steep riffle", "gateway riffle") ~ "upper feather lfc",
+            site %in% c("herringer riffle", "live oak", "sunset pumps") ~ "upper feather hfc"
+        )
+        ) |> 
+    left_join(flow)
+
+flag_release_2 <- flow_release |> 
+    filter(mean > 10000) 
+
+summary_2 <- flag_release_2 |> 
+    ungroup() |> 
+    select(release_id, stream, site) |> 
+    distinct()
+
+summary_stream_2 <- flag_release_2 |> 
+    ungroup() |> 
+    group_by(stream) |> 
+    tally()
+```
+
+**Approach 2**
+
+252 release trials were flagged as flow being potentially too high to operate the traps.
+
+```{r}
+knitr::kable(summary_2)
+```
+
+The majority of these were on the Sacramento River.
+
+```{r}
+knitr::kable(summary_stream_2)
+```
+
+# Synthesis
+
+```{r, include = F}
+overlap_flag <- flag_release |> 
+    select(release_id, stream, site) |> 
+    mutate(trap_flag = T) |> 
+    full_join(flag_release_2 |> 
+    select(release_id, stream, site) |> 
+    mutate(flow_flag = T))
+
+high_priority <- filter(overlap_flag, trap_flag == T & flow_flag == T) |> 
+    distinct()
+
+high_priority |> 
+    group_by(stream, site) |> 
+    tally()
+```
+
+There were 65 release trials that were flagged for both issues with missing trap data and having high flows. These are the highest priority for QC and potential removal. These occur in the Feather River and Sacramento River.
+
+```{r}
+knitr::kable(high_priority |> 
+    select(-c(trap_flag, flow_flag)))
+```
