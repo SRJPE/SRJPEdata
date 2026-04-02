@@ -105,7 +105,7 @@ exclusion_summary_1 <- exclusion_catch |>
     exclude_70 = sum(exclude_70 == F),
     exclude_75 = sum(exclude_75 == F)
   )
-
+  
 exclusion_summary_final <- exclusion_summary_1 |>
   filter(!site %in% c("powerhouse", "adams dam") & stream != "feather river") |>
   bind_rows(feather_river)
