@@ -145,3 +145,46 @@ There were 65 release trials that were flagged for both issues with missing trap
 knitr::kable(high_priority |> 
     select(-c(trap_flag, flow_flag)))
 ```
+
+## Compare efficiency with and without flagged trials
+
+```{r, include = F}
+efficiency <- 
+  left_join(SRJPEdata::release, 
+            SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
+              group_by(stream, site, site_group, release_id) |> 
+              summarize(count = sum(count, na.rm = T)),
+            by = c("release_id", "stream", "site", "site_group")) |> 
+    left_join(high_priority |> 
+    mutate(release_qc_flag = T)) |> 
+    mutate(
+        week = week(date_released),
+        year = year(date_released),
+        efficiency = count/number_released)
+
+efficiency_averages <- 
+    efficiency |> 
+    group_by(stream, site, week) |> 
+    summarize(efficiency = mean(efficiency, na.rm = T)) |> 
+    mutate(qc_type = "all trials") |> 
+    bind_rows(efficiency |> 
+    filter(is.na(release_qc_flag)) |> 
+    group_by(stream, site, week) |> 
+    summarize(efficiency = mean(efficiency, na.rm = T)) |> 
+    mutate(qc_type = "high priority removed"))
+```
+
+When removing the high priority release trials we do not see an impact of average efficiency.
+```{r}
+efficiency_averages |> 
+    filter(site != "yuba river") |> 
+    ggplot(aes(x = week, y = efficiency, color = qc_type)) +
+    geom_line() +
+    facet_wrap(~site, scales = "free_y")
+```
+
+```{r}
+
+
+
+```
