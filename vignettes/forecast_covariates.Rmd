@@ -248,7 +248,7 @@ peak_flow_monthly <- standard_flow |>
   mutate(month = month(date),
          year = year(date),
          name = "monthly_max_flow") |>  
-  group_by(stream, month, year, name) |> 
+  group_by(stream, site_group, month, year, name) |> 
   summarize(value = max(value, na.rm = T))
 ```
 
