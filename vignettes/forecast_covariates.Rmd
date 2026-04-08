@@ -243,13 +243,21 @@ rs_shasta_monthly |>
 
 ```{r, include = F}
 # This requires running "pull_environmental_data.R"
+# For Sacramento River we want separate values by site, others can be summarized by stream
 peak_flow_monthly <- standard_flow |> 
-  filter(statistic == "mean") |> 
+  filter(statistic == "mean", stream == "sacramento river") |> 
   mutate(month = month(date),
          year = year(date),
          name = "monthly_max_flow") |>  
   group_by(stream, site_group, month, year, name) |> 
-  summarize(value = max(value, na.rm = T))
+  summarize(value = max(value, na.rm = T)) |> 
+  bind_rows(standard_flow |> 
+  filter(statistic == "mean", stream != "sacramento river") |> 
+  mutate(month = month(date),
+         year = year(date),
+         name = "monthly_max_flow") |>  
+  group_by(stream, month, year, name) |> 
+  summarize(value = max(value, na.rm = T)))
 ```
 
 Plot the last 10 years
