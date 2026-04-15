@@ -6,15 +6,17 @@ library(lubridate)
 library(tidyverse)
 
 # Catch Formatting --------------------------------------------------------------
-# Rewrite script from catch pulled from JPE database
-# Glimpse catch and chosen_site_years_to_model (prev known as stream_site_year_weeks_to_include.csv), now cached in vignettes/years_to_include_analysis.Rmd
-years_to_include_rst_data <- years_to_include_rst_data |> # if not loaded run years_to_include_analysis.Rmd vignette
-  mutate(include = T)
+
+# Processing: 
+# Filter out (1) adipose clipped fish, (2) yearlings
+# Add rows for weeks that were not sampled where catch is NA
+# Decision - Do not filter out "years to exclude" here to allow experimentation with modeling
+
 yearling_ruleset <- SRJPEdata::daily_yearling_ruleset
 # Remove all adipose clipped fish - we do not want to include hatchery fish
 # Remove yearling fish - we do not want to include yearlings
-updated_standard_catch_raw <- rst_catch |> 
-  mutate(remove = case_when(stream != "butte creek" & adipose_clipped == T ~ "remove",
+updated_standard_catch_raw <- SRJPEdata::rst_catch |> 
+  mutate(remove = case_when(stream != "butte creek" & adipose_clipped == T ~ "remove", # remove adipose clipped fish (hatcher), Butte told us these should not be removed for them
                             T ~ "keep"),
          run = tolower(run),
          day = day(date),
@@ -36,7 +38,7 @@ updated_standard_catch <- updated_standard_catch_raw |> # all NA fork length wou
 # For the BTSPAS model we need to include all weeks that were not sampled. The code
 # below sets up a table of all weeks (based on min sampling year and max sampling year)
 # This is joined at the end
-rst_all_weeks <- rst_catch |> 
+rst_all_weeks <- SRJPEdata::rst_catch |> 
   group_by(stream, site, subsite) |> 
   summarise(min = min(date, na.rm = T),
             max = max(date, na.rm = T)) |> 
@@ -50,24 +52,12 @@ rst_all_weeks <- rst_catch |>
          year = year(date)) |> 
   distinct(stream, site, year, week) |> 
   #cross_join(tibble(life_stage = c("fry","smolt","yearling"))) |> 
-  mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
-  left_join(years_to_include_rst_data) |> # need to make sure to filter out years that have been excluded
-  filter(include == T) |> 
-  select(-include)
+  mutate(run_year = ifelse(week >= 45, year + 1, year))
 
-# Add is_yearling and lifestage from the lifestage_ruleset.Rmd vignette
-### ----------------------------------------------------------------------------
-
-# Filter to use inclusion criteria ---------------------------------------------
-
-catch_with_inclusion_criteria <- updated_standard_catch |> 
-  mutate(run_year = ifelse(week(date) >= 45, year(date) + 1, year(date))) |> 
-  left_join(years_to_include_rst_data) |> 
-  filter(include == T)
 
 # summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
-weekly_standard_catch <- catch_with_inclusion_criteria |> 
+weekly_standard_catch <- updated_standard_catch |> 
   mutate(week = week(date),
          year = year(date)) |> 
   group_by(stream, site, site_group, week, year) %>% 
@@ -79,34 +69,17 @@ weekly_standard_catch <- catch_with_inclusion_criteria |>
 
 # Trap Formatting ---------------------------------------------------------
 # Weekly effort from vignette/trap_effort.Rmd
-weekly_effort_by_site <- weekly_hours_fished |> 
+weekly_effort_by_site <- SRJPEdata::weekly_hours_fished |> 
   group_by(stream, site, site_group, week, year) %>% 
   summarize(hours_fished = sum(hours_fished, na.rm = TRUE)) |> # weekly data is at the subsite level, we need to add together the subsites
   ungroup()
 
 # Environmental -----------------------------------------------------------
-env_with_sites <- environmental_data |> 
+env_with_sites <- SRJPEdata::environmental_data |> 
   left_join(site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
   glimpse()
-# 
-# weekly_flow <- env_with_sites |> 
-#   filter(parameter == "flow",
-#          statistic == "mean") |> 
-#   mutate(week = week(date),
-#          year = year(date)) |> 
-#   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
-#   summarize(mean_flow = mean(value, na.rm = T)) |> glimpse()
 
-# Filter, mutate, and summarize using data.table syntax
 weekly_flow <- env_with_sites |> filter(parameter == "flow")
-
-# weekly_temperature <- env_with_sites |> 
-#   filter(parameter == "temperature",
-#          statistic == "mean")  |> 
-#   mutate(week = week(date),
-#          year = year(date)) |> 
-#   group_by(week, year, stream, site, site_group, gage_agency, gage_number) |> 
-#   summarize(mean_temperature = mean(value, na.rm = T)) |> glimpse()
 
 # Note I don't think we are currently using temperature
 weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
@@ -117,16 +90,16 @@ weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
 
 # Josh needs origin released but need to summarize it by week
 weekly_origin <- 
-  left_join(release, 
-            recaptures |> # need to summarize first so you don't get duplicated release data when joining
+  left_join(SRJPEdata::release, 
+            SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
               group_by(stream, site, release_id) |> 
               summarize(count = sum(count, na.rm = T)),
             by = c("release_id", "stream", "site")) |> 
   mutate(week_released = week(date_released), 
         year_released = year(date_released),
-        hatchery = ifelse(origin_released == "hatchery", 1, 0),
-        natural = ifelse(origin_released == "natural", 1, 0),
-        mixed = ifelse(origin_released == "mixed", 1, 0)) |> 
+        hatchery = ifelse(origin == "hatchery", 1, 0),
+        natural = ifelse(origin == "natural", 1, 0),
+        mixed = ifelse(origin == "mixed", 1, 0)) |> 
   select(stream, site, week_released, year_released, hatchery, natural, mixed) |> 
   group_by(stream, site, week_released, year_released) |> 
   summarize(hatchery = sum(hatchery),
@@ -141,8 +114,8 @@ weekly_origin <-
   select(stream, site, week_released, year_released, origin_released)
 
 weekly_efficiency <- 
-  left_join(release, 
-            recaptures |> # need to summarize first so you don't get duplicated release data when joining
+  left_join(SRJPEdata::release, 
+            SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
               group_by(stream, site, site_group, release_id) |> 
               summarize(count = sum(count, na.rm = T)),
             by = c("release_id", "stream", "site", "site_group")) |> 
@@ -293,29 +266,6 @@ weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data_raw
   filter(remove == F) |> 
   select(-remove) 
 
-# filter to only include complete season data 
-if (month(Sys.Date()) %in% c(9:12, 1:5)) {
-  weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data |> 
-    filter(run_year <= year(Sys.Date()))
-}
-
-tryCatch({
-  site <- weekly_juvenile_abundance_model_data$site |> unique()
-  check_for_full_season <- function(selected_site) {
-    filtered_data <- weekly_juvenile_abundance_model_data |> 
-      filter(site == selected_site)
-    max_year <- max(filtered_data$run_year)
-    max_week <- filtered_data |> 
-      filter(run_year == max_year, week < 45) |> 
-      pull(week) |> 
-      max()
-    if (max_week < 20) {
-      warning(paste("The data for", selected_site, "in", max_year, "only goes to week", max_week, "and should not be used as a full season."))
-    } 
-  }
-  # map through sites purrr::map(site, check_for_full_season) |> reduce(append)
-})
-
 # Split up into 2 data objects, efficiency, and catch 
 # Catch 
 weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |> 
@@ -346,13 +296,6 @@ if(nrow(eff_trial_data_check) > 0) {
 # remove erroneous rows
 weekly_juvenile_abundance_efficiency_data <- weekly_juvenile_abundance_efficiency_data_raw |> 
   filter(number_released >= number_recaptured)
-
-ck <- weekly_juvenile_abundance_catch_data |>
-  select(year, week, stream, site, count) |>
-  rename(srjpedata = count) |>
-  full_join(SRJPEdata::weekly_juvenile_abundance_catch_data |>
-              select(year, week, stream, site, count))
-filter(ck, srjpedata != count)
 
 # write to package 
 usethis::use_data(weekly_juvenile_abundance_catch_data, overwrite = TRUE) 
