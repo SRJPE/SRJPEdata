@@ -143,6 +143,7 @@ rst_catch <- full_join(catch_dates, rst_catch_prep) |>
     life_stage != "adult",
     # remove the adult fish (mostly on Butte)
     butte_fyke_filter != "fyke only",!is.na(stream),
+    !site %in% c("shawn's beach", "powerhouse"), # remove this feather river and battle creek site that is not used
     !is.na(date) # there are currently (12/19) 3 NA dates from battle/clear with count 0, believe this is an issue with trap data rather than catch
   ) |>  
   select(-c(butte_fyke_filter))
