@@ -3,7 +3,6 @@ library(DBI)
 library(tidyverse)
 library(lubridate)
 library(SRJPEdata)
-library(googleCloudStorageR)
 
 # CONNECT TO DB & VIEW TABLES --------------------------------------------------
 # Use DBI - dbConnect to connect to database - keep user id and password sectret
