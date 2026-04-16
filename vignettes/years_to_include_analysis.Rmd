@@ -15,8 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>", 
   fig.width=8, fig.height=5)
 
-# Install the package from the current directory
-devtools::install(".", upgrade = "never")
+if (requireNamespace("devtools", quietly = TRUE)) devtools::load_all(".", quiet = TRUE)
 library(SRJPEdata)
 
 library(tidyverse)
