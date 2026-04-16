@@ -1,0 +1,425 @@
+---
+title: "Re-evaluate years to exclude criteria"
+format:
+    html:
+        embed-resources: true
+        toc: true
+        toc-depth: 3
+        toc-title: "Contents"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+## Overview
+
+The goal of this is to re-evaluate the *years to exclude ruleset* and identify a consistent threshold to apply to all years and sites.
+
+> **Context:** This ruleset has evolved over time. It started by receiving feedback from the stream teams about what years should be included. This (application)[https://flowwest.shinyapps.io/jpe-rst-workshop-shiny/] was created to guide this conversation. At the time a monitoring window was not being applied to BTSPASX. Later a more consistent threshold was applied where at least 20 weeks needed to be included within a year. Meanwhile BTSPASX moved to using a window for the weeks to be included: 45-53, 1-22. The threshold was not being applied with the week window. Additionally, there were some exceptions to threshold based on feedback from stream teams. This has continued to be a challenge and has a big impact on modeling. We decided it was best to apply a consistent threshold. Here we evaluate tradeoffs associated with different threshold levels.
+
+::: {.callout-note}  
+**Proposed decision**
+Define the ruleset as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site"
+
+**Follow up questions**
+- Does missing a large number of weeks consecutively make a big difference for the model? I am asking because I am inclined to use the 60% threshold (which is more consistent with what we previously had) though there are some cases where there are big gaps with 4+ weeks missing in a row.
+- What is the risk of making the criteria even lower, at least 13 weeks? This would make the biggest difference for Deer and Mill creeks.
+:::
+
+```{r, include = F}
+library(tidyverse)
+
+exclusion_catch <- SRJPEdata::rst_catch |>
+  filter(!is.na(count)) |> # remove when trap is not fishing
+  mutate(
+    week = week(date),
+    year = year(date),
+    run_year = ifelse(week >= 45, year + 1, year)
+  ) |>
+  filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
+  select(stream, site, subsite, site_group, week, run_year) |>
+  distinct() |>
+  group_by(stream, site, subsite, site_group, run_year) |>
+  summarise(number_weeks = n()) |>
+  ungroup() |>
+  group_by(stream, site, site_group, run_year) |>
+  summarize(number_weeks = max(number_weeks)) |> # find max number of weeks when group by site
+  mutate(
+    exclude_20 = ifelse(number_weeks < 6, TRUE, FALSE),
+    exclude_40 = ifelse(number_weeks < 13, TRUE, FALSE),
+    exclude_60 = ifelse(number_weeks < 19, TRUE, FALSE),
+    exclude_65 = ifelse(number_weeks < 21, TRUE, FALSE),
+    exclude_70 = ifelse(number_weeks < 22, TRUE, FALSE),
+    exclude_75 = ifelse(number_weeks < 24, TRUE, FALSE)
+  )
+
+feather_river <- SRJPEdata::rst_catch |>
+  filter(stream == "feather river", !is.na(count)) |>
+  mutate(
+    week = week(date),
+    year = year(date),
+    run_year = ifelse(week >= 45, year + 1, year)
+  ) |>
+  filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
+  select(stream, site, site_group, week, run_year) |>
+  distinct() |>
+  group_by(stream, site, site_group, run_year) |>
+  summarise(number_weeks = n()) |>
+  mutate(
+    exclude_20 = ifelse(number_weeks < 6, TRUE, FALSE),
+    exclude_40 = ifelse(number_weeks < 13, TRUE, FALSE),
+    exclude_60 = ifelse(number_weeks < 19, TRUE, FALSE),
+    exclude_65 = ifelse(number_weeks < 21, TRUE, FALSE),
+    exclude_70 = ifelse(number_weeks < 22, TRUE, FALSE),
+    exclude_75 = ifelse(number_weeks < 24, TRUE, FALSE)
+  ) |>
+  group_by(stream, site_group, run_year) |>
+  summarize(
+    exclude_20 = all(exclude_20),                                                                                                                                  
+    exclude_40 = all(exclude_40),                                                                                                                                  
+    exclude_60 = all(exclude_60),                                                                                                                                  
+    exclude_65 = all(exclude_65),                                                                                                                                  
+    exclude_70 = all(exclude_70),                                                                                                                                  
+    exclude_75 = all(exclude_75)  
+  ) |>
+  group_by(stream, site_group) |>
+  summarize(
+    total_years = length(unique(run_year)),
+    exclude_20 = sum(exclude_20 == F),
+    exclude_40 = sum(exclude_40 == F),
+    exclude_60 = sum(exclude_60 == F),
+    exclude_65 = sum(exclude_65 == F),
+    exclude_70 = sum(exclude_70 == F),
+    exclude_75 = sum(exclude_75 == F)
+  )
+
+exclusion_summary_1 <- exclusion_catch |>
+  group_by(stream, site, site_group) |>
+  summarize(
+    total_years = length(unique(run_year)),
+    exclude_20 = sum(exclude_20 == F),
+    exclude_40 = sum(exclude_40 == F),
+    exclude_60 = sum(exclude_60 == F),
+    exclude_65 = sum(exclude_65 == F),
+    exclude_70 = sum(exclude_70 == F),
+    exclude_75 = sum(exclude_75 == F)
+  )
+  
+exclusion_summary_final <- exclusion_summary_1 |>
+  filter(!site %in% c("powerhouse", "adams dam") & stream != "feather river") |>
+  bind_rows(feather_river)
+
+```
+
+## Threshold Comparison
+
+### Years included per threshold
+
+Number of years that would be included for criteria ranging from 20–75% of 32 weeks:
+
+| Threshold | Min weeks required |
+|-----------|-------------------|
+| 20%       | at least 6/32     |
+| 40%       | at least 13/32    |
+| 60%       | at least 19/32    |
+| 65%       | at least 21/32    |
+| 70%       | at least 22/32    |
+| 75%       | at least 24/32    |
+
+
+```{r}
+knitr::kable(exclusion_summary_final)
+```
+
+### Impact of reducing threshold from 75% to 60%
+
+The table below shows the additional years that would be included if the threshold is reduced from 75% to 60%.
+
+```{r}
+comparison <- exclusion_summary_final |>
+  mutate(difference_60_75 = exclude_60 - exclude_75) |>
+  select(stream, site, site_group, difference_60_75)
+knitr::kable(comparison)
+```
+
+The threshold level makes the most difference for Butte Creek, Mill Creek, and Feather River. The sections below examine the years for each stream that would be removed under the 75% threshold.
+
+## Stream-Level Analysis
+
+```{r, include = F}
+weeks_year <- SRJPEdata::rst_catch |>
+  filter(!is.na(count)) |>
+  mutate(
+    week = week(date),
+    year = year(date),
+    run_year = ifelse(week >= 45, year + 1, year)
+  ) |>
+    filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
+  select(stream, site, subsite, site_group, week, run_year) |>
+  distinct() |>
+  group_by(stream, site, subsite, site_group, run_year) |>
+  summarise(number_weeks = n()) |>
+  ungroup() |>
+  group_by(stream, site, site_group, run_year) |>
+  summarize(number_weeks = max(number_weeks))
+
+catch <- SRJPEdata::rst_catch |>
+  filter(!is.na(count)) |>
+  mutate(
+    day = day(date),
+    month = month(date),
+    year = year(date),
+    water_year = ifelse(month %in% 10:12, year + 1, year),
+    fake_date = as_date(paste(ifelse(month %in% 10:12, 1999, 2000), month, day))
+  ) |>
+  group_by(fake_date, water_year, site, date) |>
+  summarize(count = sum(count))
+
+bar_plot <- function(site_select, year_select) {
+  p <- catch |>
+    filter(site == site_select, water_year %in% year_select) |>
+    ggplot(aes(x = fake_date, y = count)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    theme_minimal() +
+    facet_wrap(~water_year, scales = "free_y")
+  plotly::ggplotly(p)
+}
+
+week_plot <- function(site_select, year_select) {
+  p <- SRJPEdata::rst_catch |>
+    filter(!is.na(count)) |>
+    mutate(
+      week = week(date),
+      week_index = if_else(
+        week >= 45,
+        week - 44,
+        week + (53 - 44)
+      ),
+      year = year(date),
+      run_year = ifelse(week >= 45, year + 1, year)
+    ) |>
+        filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
+    select(stream, site, week_index, run_year) |>
+    distinct() |>
+    filter(site == site_select, run_year %in% year_select) |>
+    ggplot(aes(x = week_index, y = run_year)) +
+    geom_point() +
+    theme_minimal()
+  plotly::ggplotly(p)
+}
+
+start_end <- SRJPEdata::rst_catch |>
+  filter(!is.na(count)) |>
+  mutate(
+    week = week(date),
+    week_index = if_else(
+      week >= 45,
+      week - 44,
+      week + (53 - 44)
+    ),
+    year = year(date),
+    run_year = ifelse(week >= 45, year + 1, year)
+  ) |>
+    filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
+  group_by(stream, site, run_year) |>
+  summarize(start_date = min(date), end_date = max(date))
+```
+
+::: {.panel-tabset}
+
+### Butte Creek
+
+**Additional years excluded under 75% threshold:** 1996, 1998, 2006, 2007, 2008
+
+#### Weeks per year in the week window
+
+```{r}
+butte_years <- weeks_year |>
+  filter(site == "okie dam")
+
+knitr::kable(butte_years)
+```
+
+#### Catch in years excluded under 75%
+
+```{r}
+bar_plot("okie dam", c(1996, 1998, 2006, 2007, 2008))
+```
+
+#### Weeks sampled in years excluded under 75%
+
+```{r}
+week_plot("okie dam", c(1996, 1998, 2006, 2007, 2008))
+
+filter(start_end, site == "okie dam", run_year %in% c(1996, 1998, 2006, 2007, 2008))
+```
+
+### Mill Creek
+
+**Additional years excluded under 75% threshold:** 1996, 2003, 2022, 2023, 2025
+
+#### Weeks per year in the week window
+
+```{r}
+mill_years <- weeks_year |>
+  filter(site == "mill creek")
+
+knitr::kable(mill_years)
+```
+
+#### Catch in years excluded under 75%
+
+```{r}
+bar_plot("mill creek", c(1996, 2003, 2022, 2023, 2025))
+```
+
+#### Weeks sampled in years excluded under 75%
+
+```{r}
+week_plot("mill creek", c(1996, 2003, 2022, 2023, 2025))
+
+filter(start_end, site == "mill creek", run_year %in% c(1996, 2003, 2022, 2023, 2025))
+```
+
+### Feather River
+
+::: {.panel-tabset}
+
+#### Eye Riffle
+
+**Additional years excluded under 75% threshold:** 1998
+
+##### Weeks per year in the week window
+
+```{r}
+eye_years <- weeks_year |>
+  filter(site == "eye riffle")
+
+knitr::kable(eye_years)
+```
+
+##### Catch in years excluded under 75%
+
+```{r}
+bar_plot("eye riffle", c(1998))
+```
+
+##### Weeks sampled in years excluded under 75%
+
+```{r}
+week_plot("eye riffle", c(1998))
+
+filter(start_end, site == "eye riffle", run_year %in% c(1998))
+```
+
+#### Steep Riffle
+
+**Additional years excluded under 75% threshold:** 2007
+
+##### Weeks per year in the week window
+
+```{r}
+steep_years <- weeks_year |>
+  filter(site == "steep riffle")
+
+knitr::kable(steep_years)
+```
+
+##### Catch in years excluded under 75%
+
+```{r}
+bar_plot("steep riffle", c(2007))
+```
+
+##### Weeks sampled in years excluded under 75%
+
+```{r}
+week_plot("steep riffle", c(2007))
+
+filter(start_end, site == "steep riffle", run_year %in% c(2007))
+```
+
+#### Gateway Riffle
+
+**Additional years excluded under 75% threshold:** 2014
+
+##### Weeks per year in the week window
+
+```{r}
+gateway_years <- weeks_year |>
+  filter(site == "gateway riffle")
+
+knitr::kable(gateway_years)
+```
+
+##### Catch in years excluded under 75%
+
+```{r}
+bar_plot("gateway riffle", c(2014))
+```
+
+##### Weeks sampled in years excluded under 75%
+
+```{r}
+week_plot("gateway riffle", c(2014))
+
+filter(start_end, site == "gateway riffle", run_year %in% c(2014))
+```
+
+:::
+
+:::
+
+## Years to Exclude Summary (60% threshold)
+
+Using the **60% threshold** (at least 19 of 32 weeks sampled within a run year), the table below flags all site × year combinations that do not meet the criteria. Years marked `exclude = TRUE` would be removed.
+
+```{r}
+years_to_exclude <- weeks_year |>
+  filter(!site %in% c("powerhouse", "adams dam")) |> 
+  mutate(exclude = number_weeks < 19) |>
+  arrange(stream, site, run_year)
+
+knitr::kable(years_to_exclude)
+```
+
+### Excluded years only
+
+```{r}
+years_to_exclude |>
+  filter(exclude) |>
+  select(stream, site, site_group, run_year, number_weeks) |>
+  arrange(stream, site, run_year) |>
+  knitr::kable()
+```
+
+### Edge cases - site/years with 18 weeks
+
+**Deer Creek**
+
+#### Catch in 2009
+
+```{r}
+bar_plot("deer creek", c(2009))
+```
+
+#### Weeks sampled 
+
+```{r}
+week_plot("deer creek", c(2009))
+```
+
+**Mill Creek**
+
+#### Catch in 2004 & 2009
+
+```{r}
+bar_plot("mill creek", c(2004, 2009))
+```
+
+#### Weeks sampled 
+
+```{r}
+week_plot("mill creek", c(2004, 2009))
+```
