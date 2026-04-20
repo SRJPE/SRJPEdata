@@ -538,9 +538,9 @@
 #'   \item \code{value}: Numeric value
 'stock_recruit_covariates'
 
-#' @title Years to exclude - RST 
-#' @name years_to_exclude_rst_data
-#' @description Years for RST monitoring locations that were identified as incomplete and not used in modeling
+#' @title Years to exclude - Adult 
+#' @name years_to_exclude_adult
+#' @description Years for adult data that were identified as incomplete and not used in modeling
 #' @format
 #' \itemize{
 #'   \item \code{year}: Calendar year
@@ -548,3 +548,36 @@
 #'   \item \code{data_type}: Type of adult data
 #'   \item \code{reason_for_exclusion}: Provides reason for exclusion
 'years_to_exclude_adult'
+
+#' @title Years to exclude - RST data 
+#' @name years_to_exclude_rst_data
+#' @description Years for RST data that were identified as incomplete and not used in modeling
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream 
+#'   \item \code{site}: RST monitoring site
+#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
+#'   \item \code{number_weeks}: Number of weeks sampled in the run_year, for reference
+#'   \item \code{exclusion_type}: Provides the exclusion ruleset applied
+#'   \item \code{apply_to}: Differentiates between years that can be excluded broadly ("all runs") or those specific to spring run ("spring")
+'years_to_exclude_rst_data'
+
+#' @title Years to include - RST data, applies to all runs
+#' @name years_to_include_rst_data
+#' @description Years for RST data that can be included in modeling (inverse of years to exclude where apply_to == "all runs")
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream 
+#'   \item \code{site}: RST monitoring site
+#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
+'years_to_include_rst_data'
+
+#' @title Years to include - RST data, applies to spring run
+#' @name years_to_include_rst_data_spring
+#' @description Years for RST data that can be included in modeling spring run (inverse of years to exclude where apply_to == "spring")
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream 
+#'   \item \code{site}: RST monitoring site
+#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
+'years_to_include_rst_data_spring'
