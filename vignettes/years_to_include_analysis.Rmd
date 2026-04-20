@@ -33,7 +33,7 @@ years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "year
 
 The Spring Run Juvenile Production Estimate uses historical rotary screw trap and adult survey data. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and adult years to include.
 
-Historically this process differed for each tributary and was based on the rules below. This ruleset was complicated and difficult to maintain. In April 2026 we decided to transition to a consistent ruleset to apply across all years and streams. We compared a number of thresholds and determined that a rule where at least 60% of the weeks (45:53, 1:22) were sampled was appropriate - it was not too stringent and did not include too many gaps.
+Historically this process differed for each tributary and was based on the rules below. This ruleset was complicated and difficult to maintain. In April 2026 we decided to transition to a consistent ruleset to apply across all years and streams. We compared a number of thresholds and determined that a rule where at least 60% of the weeks (45:53, 1:22) were sampled was appropriate - it was not too stringent and did not include too many gaps. In addition, any sites that do not have any mark-recapture efficiency trials are removed.
 
 ## RST Data - Historical Ruleset
 
@@ -121,24 +121,22 @@ plotly::ggplotly(heat_map)
 
 ### RST Data - Current Ruleset
 
-Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site" or 60% of weeks sampled.
+Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site" or 60% of weeks sampled. Sites that do not have any (across all years) mark-repcature efficiency trials are also excluded.
 
 ```{r, echo = FALSE}
-exclusion_catch <- SRJPEdata::rst_catch |>
+# Find sites with efficiency data. Any site that has NO efficiency trials will be excluded
+stream_site_with_efficiency_data <- SRJPEdata::weekly_efficiency |> 
+  distinct(stream, site) |> 
+  mutate(if_efficiency_data = T)
+
+# Assign stream/site/year as exclude or not based on criteria
+exclusion_catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |>
   filter(!is.na(count)) |> # remove when trap is not fishing
-  mutate(
-    week = week(date),
-    year = year(date),
-    run_year = ifelse(week >= 45, year + 1, year)
-  ) |>
   filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
-  select(stream, site, subsite, site_group, week, run_year) |>
+  select(stream, site, week, run_year) |> 
   distinct() |>
-  group_by(stream, site, subsite, site_group, run_year) |>
-  summarise(number_weeks = n()) |>
-  ungroup() |>
-  group_by(stream, site, site_group, run_year) |>
-  summarize(number_weeks = max(number_weeks)) |> # find max number of weeks when group by site
+  group_by(stream, site, run_year) |>
+  summarise(number_weeks = n()) |> 
   # other exclusion rules are included in case this changes in the future
   mutate(
     exclude_20 = ifelse(number_weeks < 6, TRUE, FALSE),
@@ -148,8 +146,11 @@ exclusion_catch <- SRJPEdata::rst_catch |>
     exclude_70 = ifelse(number_weeks < 22, TRUE, FALSE),
     exclude_75 = ifelse(number_weeks < 24, TRUE, FALSE)
   ) 
+
 years_to_exclude_rst_data <- exclusion_catch |> 
   filter(exclude_60 == T) |> 
+  left_join(stream_site_with_efficiency_data) |>
+  filter(!is.na(if_efficiency_data)) |> 
   select(stream, site, run_year, number_weeks) |> 
   mutate(exclusion_type = "60% of weeks sampled")
 
