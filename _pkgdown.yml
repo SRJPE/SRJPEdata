@@ -28,7 +28,6 @@ reference:
   - stock_recruit_covariates
   - forecast_covariates
   - years_to_exclude_adult
-  - years_to_include_adult
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model
 - contents: survival_model_inputs
