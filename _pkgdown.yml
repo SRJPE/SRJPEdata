@@ -19,11 +19,15 @@ reference:
 - contents:
   - weekly_juvenile_abundance_catch_data
   - weekly_juvenile_abundance_efficiency_data
+  - years_to_include_rst_data
+  - years_to_include_rst_data_spring
+  - years_to_exclude_rst_data
 - subtitle: Covariates
   desc: Covariate input datasets
 - contents:
   - stock_recruit_covariates
   - forecast_covariates
+  - years_to_exclude_adult
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model
 - contents: survival_model_inputs

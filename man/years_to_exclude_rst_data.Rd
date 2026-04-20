@@ -3,19 +3,20 @@
 \docType{data}
 \name{years_to_exclude_rst_data}
 \alias{years_to_exclude_rst_data}
-\alias{years_to_exclude_adult}
-\title{Years to exclude - RST}
+\title{Years to exclude - RST data}
 \format{
 \itemize{
-\item \code{year}: Calendar year
 \item \code{stream}: Stream
-\item \code{data_type}: Type of adult data
-\item \code{reason_for_exclusion}: Provides reason for exclusion
+\item \code{site}: RST monitoring site
+\item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
+\item \code{number_weeks}: Number of weeks sampled in the run_year, for reference
+\item \code{exclusion_type}: Provides the exclusion ruleset applied
+\item \code{apply_to}: Differentiates between years that can be excluded broadly ("all runs") or those specific to spring run ("spring")
 }
 \usage{
-years_to_exclude_adult
+years_to_exclude_rst_data
 }
 \description{
-Years for RST monitoring locations that were identified as incomplete and not used in modeling
+Years for RST data that were identified as incomplete and not used in modeling
 }
 \keyword{datasets}
