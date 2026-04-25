@@ -271,13 +271,14 @@ feather_orf_usgs_raw <- dataRetrieval::read_waterdata_daily(
 feather_orf_usgs <- feather_orf_usgs_raw |>
        dplyr::select(time, value) |>
        dplyr::as_tibble() |>
-       dplyr::rename(date = time)
+       dplyr::rename(date = time) |> 
+       dplyr::mutate(date = as.Date(date))
 
 feather_orf_cdec <- CDECRetrieve::cdec_query(
        station = "ORF",
        dur_code = "D",
        sensor_num = "41",
-       start_date = "2024-10-01"
+       start_date = "2025-10-01"
 )
 
 feather_orf_usgs_cdec <- feather_orf_usgs |>
@@ -287,7 +288,7 @@ feather_orf_usgs_cdec <- feather_orf_usgs |>
               feather_orf_cdec |>
                      dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
                      dplyr::rename(date = datetime, value = parameter_value) |>
-                     dplyr::mutate(gage_agency = "CDEC", gage_number = "ORF")
+                     dplyr::mutate(gage_agency = "CDEC", gage_number = "ORF", date = as.Date(date))
        )
 # TFB
 feather_tfb_usgs_raw <- dataRetrieval::read_waterdata_daily(
@@ -298,7 +299,8 @@ feather_tfb_usgs_raw <- dataRetrieval::read_waterdata_daily(
 feather_tfb_usgs <- feather_tfb_usgs_raw |>
        dplyr::select(time, value) |>
        dplyr::as_tibble() |>
-       dplyr::rename(date = time)
+       dplyr::rename(date = time) |> 
+       dplyr::mutate(date = as.Date(date))
 
 feather_tfb_cdec <- CDECRetrieve::cdec_query(
        station = "TFB",
@@ -314,8 +316,8 @@ feather_tfb_usgs_cdec <- feather_tfb_usgs |>
               feather_tfb_cdec |>
                      dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
                      dplyr::rename(date = datetime, value = parameter_value) |>
-                     dplyr::mutate(gage_agency = "CDEC", gage_number = "TFB")
-       )
+                     dplyr::mutate(gage_agency = "CDEC", gage_number = "TFB", date = as.Date(date))
+       ) 
 # TAO
 feather_tao_usgs_raw <- dataRetrieval::read_waterdata_daily(
        "USGS-11406920",
@@ -340,6 +342,7 @@ feather_hfc <- feather_orf_usgs_cdec |>
                      dplyr::select(date, tao = value)
        ) |> 
        dplyr::mutate(value = orf + tfb + tao,
+                     date = as.Date(date),
                      stream = "feather river",
                      site_group = "upper feather hfc",
                      gage_agency = "USGS/CDEC",
@@ -361,7 +364,7 @@ feather_lfc <- feather_orf_usgs_cdec |>
                      dplyr::select(date, tfb = value)
        ) |>
        dplyr::mutate(
-              date = as_date(date),
+              date = as.Date(date),
               value = orf + tfb,
               stream = "feather river",
               site_group = "upper feather lfc",
@@ -774,8 +777,8 @@ required_objects <- c(
        "clear_creek_data_query",
        "deer_creek_data_query",
        "deer_creek_temp_query",
-       "feather_flow",
-       "feather_lfc_river_data_query",
+       "feather_hfc",
+       "feather_lfc",
        "lower_feather_river_data_query",
        "feather_lfc_temp_query",
        "feather_hfc_temp_query",
@@ -818,14 +821,8 @@ flow_daily <- data.table::rbindlist(
        ),
        use.names = TRUE,
        fill = TRUE
-)
-
-## QC plot
-# ggplot(flow |>
-#          filter(statistic == "mean"),
-#        aes(x= date, y = value, color=site_group)) +
-#   geom_line() +
-#   facet_wrap(~stream)
+) |> 
+       dplyr::filter(lubridate::year(date) > 1990) 
 
 #Combine all temperature data from different streams
 temp <- data.table::rbindlist(
@@ -849,12 +846,6 @@ temp <- data.table::rbindlist(
 ) |>
        dplyr::select(-site)
 
-# Quick QC plot
-# ggplot(temp |>
-#          filter(statistic == "mean"),
-#        aes(x= date, y = value, color=site_group)) +
-#   geom_line() +
-#   facet_wrap(~stream)
 data.table::setDT(temp)
 data.table::setDT(flow_daily)
 
@@ -872,6 +863,7 @@ reshaped_data <- data.table::dcast(
        ... ~ statistic,
        value.var = "value"
 )
+
 
 # Group by week and year, and perform the summarization
 updated_environmental_data <- reshaped_data[,
