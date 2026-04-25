@@ -1,0 +1,322 @@
+---
+title: "QC Feather Flows"
+format:
+    html:
+        embed-resources: true
+---
+
+Kassie Henley (DWR) provided guidance that the CDEC GRL gage is not representative, especially during low flows. Instead they use Hatchery (FRB) + Oroville (ORF) + Thermalito Afterbay (TAO). FRB and ORF are available via CDEC but TAO previously has not been. They manage their own internal database which they provided to us in May 2025. 
+
+- We used the DWR database to generate HFC flows (Hatch.Oroville + TAO) however this was different than the Excel Kassie provided. Why are they different? To answer this, I looked at the database in Access (to verify that no loading issues existed). I pulled the Oroville and Hatchery columns separately. 
+- We also discovered that TAO data is available on USGS. I compared this data to that in the database to identify if they are similar. 
+
+**Key Takeaways**
+
+- There is an issue with the `Hatch.Oroville` column which is related to how dates were being read in though was not affecting the other columns. For the 2026 database I exported the `Flows Master` table to Excel first though data for 2024 for this column did not exist so I was not able to compare. Decided that this column should not be used and instead the `Hatchery` also called `Hatchery (CDEC ORF; USGS 11406930)` and `Oroville` also called `Oroville (CDEC TFB; USGS 11406999)` should be used. The better practice however would be to pull these directly from CDEC for use in the SRJPE.
+- I compared the TAO data from USGS with the TAO data from the 2026 DWR database and there are some differences primarily in 2011, 2012, and 2017. I do not think the differences are big enough to warrant using data that is not publically available as it will slow down the workflow.
+- ORF and TFB pulled directly from USGS/CDEC are a good match with the DWR database (as expected). We will pull data directly from these sources as it is more transparent.
+
+# Compare April 2025 and Excel
+
+When use Hatch.Oroville I do not get correct values but when use Hatchery and Oroville separately I do. I looked at the db in Access and it looks like some of the dates are not being loaded in correctly and that this is happening for the Hatch.Oroville column. 
+
+```{r, include = F}
+## April 2025 database
+library(Hmisc)
+library(lubridate)
+library(tidyverse)
+feather_flow_db <- here::here("data-raw", "TEMP_data", "feather_flow_db.accdb")
+mdb.get(feather_flow_db, tables = T)
+feather_flow_raw <- mdb.get(feather_flow_db, tables = "Flows Master")
+feather_gage_raw <- mdb.get(feather_flow_db, tables = "Gauge Locations")
+# Assume that Hatch.Oroville is FRB+ORF then need to add TAO
+detach(package:Hmisc)
+feather_flow <- feather_flow_raw |> 
+  group_by(Date) |> 
+  summarize(hatch_oroville = mean(Hatch.Oroville, na.rm = T),
+            TAO = mean(TAO, na.rm = T)) |> 
+  mutate(value = hatch_oroville+TAO) |> 
+  select(-c(hatch_oroville, TAO)) |> 
+  rename(date = Date) |> 
+  filter(date <= "2025-03-31") |> 
+  mutate(stream = "feather river", 
+         site_group = "upper feather hfc",
+         gage_agency = "DWR Feather",
+         gage_number = "FRB+ORF+TAO",
+         parameter = "flow",
+         statistic = "mean")
+
+feather_flow |> 
+    filter(year(date) == 2024)
+```
+
+```{r, include = F}
+## Excel from Kassie
+feather_flow_excel <- readxl::read_xlsx(here::here("data-raw", "TEMP_data", "FR_Flows_2024.xlsx"))
+
+feather_flow_excel |> 
+    filter(year(Date) == 2024)
+```
+
+```{r, include = F}
+compare <- feather_flow |> 
+    select(date, value) |> 
+    mutate(date = ymd(date)) |> 
+    rename(april_2025_db = value) |> 
+    left_join(feather_flow_excel |> 
+    select(Date, `HFC (Total FR)`) |> 
+    mutate(date = as_date(Date),
+    feather_excel = `HFC (Total FR)`) |> 
+        select(date, feather_excel)) |> 
+    mutate(compare_difference = april_2025_db - feather_excel) |>  view()
+```
+
+Comparison of the 2024 Excel from Kassie and the Hatch.Oroville column
+```{r, echo = F, message = F, warning = F}
+knitr::kable(compare |> 
+    filter(year(date) == 2024))
+```
+
+
+```{r, include = F}
+## Look at other columns in 2025 DB
+feather_flow2 <- feather_flow_raw |> 
+  group_by(Date) |> 
+  summarize(hatch = mean(Hatchery, na.rm = T),
+            oro = mean(Oroville, na.rm = T),
+            TAO = mean(TAO, na.rm = T)) |> 
+  mutate(value = hatch + oro +TAO) |> 
+  select(-c(hatch, oro, TAO)) |> 
+  rename(date = Date) |> 
+  filter(date <= "2025-03-31") |> 
+  mutate(stream = "feather river", 
+         site_group = "upper feather hfc",
+         gage_agency = "DWR Feather",
+         gage_number = "FRB+ORF+TAO",
+         parameter = "flow",
+         statistic = "mean")
+
+feather_flow2 |> 
+    filter(year(date) == 2024)
+
+compare2 <- feather_flow2 |> 
+    select(date, value) |> 
+    mutate(date = ymd(date)) |> 
+    rename(april_2025_db = value) |> 
+    left_join(feather_flow_excel |> 
+    select(Date, `HFC (Total FR)`) |> 
+    mutate(date = as_date(Date),
+    feather_excel = `HFC (Total FR)`) |> 
+        select(date, feather_excel)) |> 
+    mutate(compare_difference = april_2025_db - feather_excel) |>  view()
+```
+
+Comparison of the 2024 Excel from Kassie and the Hatchery, Oroville column
+```{r, echo = F, message = F, warning = F}
+knitr::kable(compare2 |> 
+    filter(year(date) == 2024))
+```
+
+```{r, include = F}
+feather_2026_db_export <- readxl::read_xlsx(here::here("data-raw","TEMP_data","Flows_2_23_26_flows_master.xlsx"), col_types = c("numeric","date","date","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric"))
+
+feather_20261 <- feather_2026_db_export |>
+    group_by(Date) |> 
+  summarize(hatch = mean(`Hatchery (CDEC ORF; USGS 11406930)`, na.rm = T),
+            oro = mean(`Oroville (CDEC TFB; USGS 11406999)`, na.rm = T),
+            TAO = mean(TAO, na.rm = T)) |> 
+  mutate(value = hatch + oro + TAO) |> 
+  select(-c(hatch, oro, TAO)) |> 
+  rename(date = Date) |> 
+  filter(date <= "2025-03-31") |> 
+  mutate(stream = "feather river", 
+         site_group = "upper feather hfc",
+         gage_agency = "DWR Feather",
+         gage_number = "FRB+ORF+TAO",
+         parameter = "flow",
+         statistic = "mean")
+
+compare3 <- feather_20261 |> 
+    select(date, value) |> 
+    mutate(date = as_date(date)) |> 
+    rename(april_2026 = value) |> 
+    left_join(feather_flow_excel |> 
+    select(Date, `HFC (Total FR)`) |> 
+    mutate(date = ymd(Date),
+    feather_excel = `HFC (Total FR)`) |> 
+        select(date, feather_excel)) |> 
+    mutate(compare = april_2026 - feather_excel)
+
+feather_20262 <- feather_2026_db_export |>
+    group_by(Date) |> 
+  summarize(hatch = mean(`USGS 11407000`, na.rm = T),
+            TAO = mean(TAO, na.rm = T)) |> 
+  mutate(value = hatch + TAO) |> 
+  select(-c(hatch,TAO)) |> 
+  rename(date = Date) |> 
+  filter(date <= "2025-03-31") |> 
+  mutate(stream = "feather river", 
+         site_group = "upper feather hfc",
+         gage_agency = "DWR Feather",
+         gage_number = "FRB+ORF+TAO",
+         parameter = "flow",
+         statistic = "mean")
+
+compare4 <- feather_20262 |> 
+    select(date, value) |> 
+    mutate(date = as_date(date)) |> 
+    rename(april_2026 = value) |> 
+    left_join(feather_flow_excel |> 
+    select(Date, `HFC (Total FR)`) |> 
+    mutate(date = ymd(Date),
+    feather_excel = `HFC (Total FR)`) |> 
+        select(date, feather_excel)) |> 
+    mutate(compare = april_2026 - feather_excel) |> view()
+```
+
+# TAO on USGS
+
+Can we use all publically available data?
+
+To answer this we compare [USGS TAO](https://waterdata.usgs.gov/monitoring-location/USGS-11406920/#dataTypeId=daily-00060-0&period=periodOfRecord&showFieldMeasurements=true) with TAO data from DWR Feather River database.
+
+```{r, include = F}
+feather_tao_query <- dataRetrieval::read_waterdata_daily("USGS-11406920", "00060")
+feather_tao_river_daily_flows <- feather_tao_query |> 
+  dplyr::select(time, tao_value = value) |> 
+  dplyr::as_tibble() |> 
+  dplyr::rename(date = time)
+
+# Pulling from excel export of the 2026 database just to be sure
+feather_tao_db <- feather_2026_db_export |> 
+  group_by(Date) |> 
+  summarize(TAO = mean(TAO, na.rm = T))
+
+compare2 <- feather_tao_db |> 
+    rename(date = Date) |> 
+    select(date, TAO) |> 
+    mutate(date = ymd(date)) |> 
+    left_join(feather_tao_river_daily_flows) |> 
+    mutate(compare = TAO - tao_value)
+
+# There is variation in TAO values
+compare2 |> 
+    ggplot(aes(x = date, y = TAO)) +
+    geom_line()
+```
+
+```{r, echo = F, message = F, warning = F}
+ck <- compare2 |> 
+    ggplot(aes(x = date, y = compare)) +
+    geom_line()
+
+plotly::ggplotly(ck)
+
+ck2 <- compare2 |>
+    filter(year(date) >= 2011 & year(date) <= 2025) |> 
+    mutate(year = as.factor(year(date))) |> 
+    ggplot(aes(x = year, y = compare)) +
+    geom_boxplot()
+
+ck2
+```
+
+# Compare ORF to database
+
+Note that data on USGS goes through 2024 so supplement with CDEC data. Data on CDEC only seem to go through 2022.
+Good match so use data from USGS and CDEC.
+
+Plot of ORF flow from DWR database
+```{r, echo = F, warning = F, message = F}
+# Double check that we are not losing any information by pulling Hatchery and Oroville from CDEC
+feather_2026_db_export |> 
+    filter(year(Date) > 1990) |> 
+    ggplot(aes(x = Date, y = `Hatchery (CDEC ORF; USGS 11406930)`)) +
+    geom_point()
+```
+
+```{r, include = F}
+feather_orf_usgs_raw <- dataRetrieval::read_waterdata_daily("USGS-11406930", "00060")
+
+feather_orf_usgs <- feather_orf_usgs_raw |> 
+  dplyr::select(time, value) |> 
+  dplyr::as_tibble() |> 
+  dplyr::rename(date = time)
+feather_orf_usgs |> 
+    filter(year(date) > 1990) |> 
+    ggplot(aes(x = date, y = value)) +
+    geom_point()
+feather_orf_cdec <- CDECRetrieve::cdec_query(station = "ORF", dur_code = "D", sensor_num = "41", start_date = "2024-10-01")
+
+feather_orf_usgs_cdec <- feather_orf_usgs |> 
+    select(-geometry) |> 
+    mutate(gage_agency = "USGS",
+    gage_number = "USGS-11406930") |> 
+    bind_rows(feather_orf_cdec |> 
+    rename(date = datetime,
+    value = parameter_value) |> 
+        mutate(gage_agency = "CDEC",
+        gage_number = "ORF")) |> 
+        dplyr::mutate(stream = "feather river",  
+         site_group = "upper feather hfc", 
+         parameter = "flow")
+```
+
+Plot of flow from USGS and CDEC
+```{r, echo = F, warning = F, message = F}
+feather_orf_usgs_cdec |> 
+    filter(year(date) > 1990) |>
+    ggplot(aes(x = date, y = value)) +
+    geom_point() 
+```
+
+# Compare TFB
+Note that data on USGS goes through 2023 so supplement with CDEC data. Data on CDEC only seem to go through 2022.
+
+Good match so use data from USGS and CDEC.
+
+Plot of TFB flow from DWR database
+```{r, echo = F, warning = F, message = F}
+# Double check that we are not losing any information by pulling Hatchery and Oroville from CDEC
+feather_2026_db_export |> 
+    filter(year(Date) > 1990) |> 
+    ggplot(aes(x = Date, y = `Oroville (CDEC TFB; USGS 11406999)`)) +
+    geom_point()
+```
+
+```{r, include = F}
+feather_tfb_usgs_raw <- dataRetrieval::read_waterdata_daily("USGS-11407000", "00060")
+
+feather_tfb_usgs <- feather_tfb_usgs_raw |> 
+  dplyr::select(time, value) |> 
+  dplyr::as_tibble() |> 
+  dplyr::rename(date = time)
+feather_tfb_usgs |> 
+    
+    ggplot(aes(x = date, y = value)) +
+    geom_point()
+feather_tfb_cdec <- CDECRetrieve::cdec_query(station = "TFB", dur_code = "D", sensor_num = "41", start_date = "2023-10-01")
+
+feather_tfb_usgs_cdec <- feather_tfb_usgs |> 
+    select(-geometry) |> 
+    mutate(gage_agency = "USGS",
+    gage_number = "USGS-11407000") |> 
+    bind_rows(feather_tfb_cdec |> 
+    rename(date = datetime,
+    value = parameter_value) |> 
+        mutate(gage_agency = "CDEC",
+        gage_number = "TFB")) |> 
+        dplyr::mutate(stream = "feather river",  
+         site_group = "upper feather hfc", 
+         parameter = "flow")
+```
+
+Plot of flow from USGS and CDEC
+```{r, echo = F, warning = F, message = F}
+feather_tfb_usgs_cdec |> 
+    filter(year(date) > 1990) |> 
+    ggplot(aes(x = date, y = value)) +
+    geom_point() 
+```
+
+
