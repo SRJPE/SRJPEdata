@@ -213,8 +213,8 @@ create_row_id <- function(data, id_cols) {
     return(as.character(data[[id_cols]]))
   }
   
-  # Create composite key
-  do.call(paste, c(data[id_cols], sep = "_"))
+  # Create composite key — use a separator unlikely to appear in data values
+  do.call(paste, c(data[id_cols], sep = "|||"))
 }
 
 compare_attributes <- function(old_data, new_data, allowed_changes = c("class", "row.names")) {
@@ -460,42 +460,39 @@ compare_data_files <- function(old_file, new_file) {
   
   cat("Comparing", length(matching_ids), "matching rows...\n")
   
-  # For large datasets, use vectorized comparison instead of loops
+  # For large datasets, use vectorized join-based comparison instead of loops
   if (length(matching_ids) > 1000) {
-    cat("Using optimized vectorized comparison for large dataset\n")
-    
-    # Filter to matching rows only
-    old_matched <- old_data[old_data$row_id %in% matching_ids, ]
-    new_matched <- new_data[new_data$row_id %in% matching_ids, ]
-    
-    # Sort both by row_id to align
-    old_matched <- old_matched[order(old_matched$row_id), ]
-    new_matched <- new_matched[order(new_matched$row_id), ]
-    
-    # Compare each column vectorized
+    cat("Using optimized join-based comparison for large dataset\n")
+
+    # Filter to matching rows only, keeping only needed columns
+    old_matched <- old_data[old_data$row_id %in% matching_ids, c("row_id", cols_to_check)]
+    new_matched <- new_data[new_data$row_id %in% matching_ids, c("row_id", cols_to_check)]
+
+    # Join on row_id — handles duplicate keys correctly via natural join semantics
+    merged <- merge(old_matched, new_matched, by = "row_id", suffixes = c("_old", "_new"))
+
+    # Compare each column vectorized on the joined result
     for (col in cols_to_check) {
-      old_vals <- old_matched[[col]]
-      new_vals <- new_matched[[col]]
-      
+      old_vals <- merged[[paste0(col, "_old")]]
+      new_vals <- merged[[paste0(col, "_new")]]
+
       # Vectorized comparison
       if (is.numeric(old_vals) && is.numeric(new_vals)) {
-        # Numeric comparison with tolerance
         diffs <- abs(old_vals - new_vals)
         diffs[is.na(old_vals) & is.na(new_vals)] <- 0  # Both NA = same
         changed <- which(diffs >= NUMERIC_TOLERANCE | (is.na(old_vals) != is.na(new_vals)))
       } else {
-        # Non-numeric comparison
         same_na <- is.na(old_vals) & is.na(new_vals)
         same_val <- old_vals == new_vals
         same_val[is.na(same_val)] <- FALSE
         changed <- which(!same_na & !same_val)
       }
-      
+
       # Record modifications
       if (length(changed) > 0) {
         for (idx in changed) {
           modifications[[length(modifications) + 1]] <- list(
-            row_id = old_matched$row_id[idx],
+            row_id = merged$row_id[idx],
             column = col,
             old_value = old_vals[idx],
             new_value = new_vals[idx]
@@ -503,7 +500,7 @@ compare_data_files <- function(old_file, new_file) {
         }
       }
     }
-    
+
   } else {
     # Original row-by-row comparison for smaller datasets
     cat("Using row-by-row comparison for small dataset\n")
