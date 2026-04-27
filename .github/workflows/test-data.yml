@@ -31,7 +31,16 @@ jobs:
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: '4.3.0'
-          
+          use-public-rspm: true
+
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-r-4.3.0-${{ hashFiles('DESCRIPTION') }}
+          restore-keys: |
+            ${{ runner.os }}-r-4.3.0-
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -238,7 +247,13 @@ jobs:
           files: |
             data/*.rda
             data/*.RData
-      
+
+      - name: List all data files
+        id: all-data-files
+        run: |
+          ALL=$(find data -name "*.rda" -o -name "*.RData" 2>/dev/null | sort | tr '\n' ' ')
+          echo "all_files=${ALL}" >> $GITHUB_OUTPUT
+
       - name: Compare data files
         if: steps.changed-files.outputs.any_changed == 'true'
         id: comparison
@@ -317,32 +332,42 @@ jobs:
             }
             
             if (comparisonExitCode === '0') {
-              statusSummary += '✅ **Data Comparison:** No unauthorized modifications\n';
+              statusSummary += '✅ **Data Comparison:** No existing values changed\n';
             } else if (dataApproved) {
-              statusSummary += '⚠️ **Data Comparison:** Changes manually approved\n';
+              statusSummary += '⚠️ **Data Comparison:** Existing values changed — manually approved\n';
             } else {
-              statusSummary += '❌ **Data Comparison:** Unauthorized modifications (requires approval)\n';
+              statusSummary += '❌ **Data Comparison:** Existing values changed (requires approval)\n';
             }
             
             statusSummary += '\n---\n\n';
             
             let detailedReport = '';
             
+            const allDataFiles = '${{ steps.all-data-files.outputs.all_files }}'.trim().split(/\s+/).filter(Boolean);
+            const changedDataFiles = '${{ steps.changed-files.outputs.all_changed_files }}'.trim().split(/\s+/).filter(Boolean);
+            const unchangedDataFiles = allDataFiles.filter(f => !changedDataFiles.includes(f));
+
+            let dataSection = '';
+
             if (comparisonExitCode !== '0') {
-              let dataMessage = '';
+              let approvalNote = '';
               if (dataApproved) {
-                dataMessage = '⚠️ **Data modifications detected but manually approved.** The PR has the `data-changes-approved` label.';
+                approvalNote = '> ⚠️ **Existing values were changed — manually approved** via `data-changes-approved` label.';
               } else {
-                dataMessage = `❌ **Data modifications detected and not approved.**
-            
-            **To approve these changes:**
-            1. Review the comparison report below carefully
-            2. Verify the modifications are intentional and correct
-            3. Add the \`data-changes-approved\` label to this PR
-            4. The check will automatically pass once the label is added`;
+                approvalNote = `> ❌ **Existing values were changed and not yet approved.**\n>\n> To approve: review the per-file details below, then add the \`data-changes-approved\` label to this PR.`;
               }
-              
-              detailedReport += `### 📊 Data File Comparison\n\n${dataMessage}\n\n${comparisonReport}\n\n---\n\n`;
+              dataSection = `### 📊 Data File Comparison\n\n${approvalNote}\n\n${comparisonReport}`;
+            } else if (changedDataFiles.length > 0) {
+              dataSection = `### 📊 Data File Comparison\n\n${comparisonReport}`;
+            }
+
+            if (unchangedDataFiles.length > 0) {
+              const unchangedList = unchangedDataFiles.map(f => `\`${f}\``).join(', ');
+              dataSection += `\n\n**Not changed in this PR:** ${unchangedList}`;
+            }
+
+            if (dataSection) {
+              detailedReport += dataSection + '\n\n---\n\n';
             }
             
             if (credentialIssues > 0) {
@@ -395,7 +420,7 @@ jobs:
             - **Credential Scan:** Prevents accidental commit of secrets
             - **Package Structure:** Ensures R package standards
             - **Tests:** Verifies code functionality
-            - **Data Comparison:** Protects data integrity
+            - **Data Comparison:** Checks that existing values in .rda files are not changed unexpectedly; new rows are informational only
             
             </details>`;
             

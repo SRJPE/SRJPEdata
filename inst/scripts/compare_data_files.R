@@ -213,8 +213,8 @@ create_row_id <- function(data, id_cols) {
     return(as.character(data[[id_cols]]))
   }
   
-  # Create composite key
-  do.call(paste, c(data[id_cols], sep = "_"))
+  # Create composite key — use a separator unlikely to appear in data values
+  do.call(paste, c(data[id_cols], sep = "|||"))
 }
 
 compare_attributes <- function(old_data, new_data, allowed_changes = c("class", "row.names")) {
@@ -278,6 +278,7 @@ compare_data_files <- function(old_file, new_file) {
     issues = list(),
     summary = list()
   )
+  results$summary$id_columns <- ID_COLUMNS
   
   # Check if old file exists
   if (!file.exists(old_file)) {
@@ -460,42 +461,39 @@ compare_data_files <- function(old_file, new_file) {
   
   cat("Comparing", length(matching_ids), "matching rows...\n")
   
-  # For large datasets, use vectorized comparison instead of loops
+  # For large datasets, use vectorized join-based comparison instead of loops
   if (length(matching_ids) > 1000) {
-    cat("Using optimized vectorized comparison for large dataset\n")
-    
-    # Filter to matching rows only
-    old_matched <- old_data[old_data$row_id %in% matching_ids, ]
-    new_matched <- new_data[new_data$row_id %in% matching_ids, ]
-    
-    # Sort both by row_id to align
-    old_matched <- old_matched[order(old_matched$row_id), ]
-    new_matched <- new_matched[order(new_matched$row_id), ]
-    
-    # Compare each column vectorized
+    cat("Using optimized join-based comparison for large dataset\n")
+
+    # Filter to matching rows only, keeping only needed columns
+    old_matched <- old_data[old_data$row_id %in% matching_ids, c("row_id", cols_to_check)]
+    new_matched <- new_data[new_data$row_id %in% matching_ids, c("row_id", cols_to_check)]
+
+    # Join on row_id — handles duplicate keys correctly via natural join semantics
+    merged <- merge(old_matched, new_matched, by = "row_id", suffixes = c("_old", "_new"))
+
+    # Compare each column vectorized on the joined result
     for (col in cols_to_check) {
-      old_vals <- old_matched[[col]]
-      new_vals <- new_matched[[col]]
-      
+      old_vals <- merged[[paste0(col, "_old")]]
+      new_vals <- merged[[paste0(col, "_new")]]
+
       # Vectorized comparison
       if (is.numeric(old_vals) && is.numeric(new_vals)) {
-        # Numeric comparison with tolerance
         diffs <- abs(old_vals - new_vals)
         diffs[is.na(old_vals) & is.na(new_vals)] <- 0  # Both NA = same
         changed <- which(diffs >= NUMERIC_TOLERANCE | (is.na(old_vals) != is.na(new_vals)))
       } else {
-        # Non-numeric comparison
         same_na <- is.na(old_vals) & is.na(new_vals)
         same_val <- old_vals == new_vals
         same_val[is.na(same_val)] <- FALSE
         changed <- which(!same_na & !same_val)
       }
-      
+
       # Record modifications
       if (length(changed) > 0) {
         for (idx in changed) {
           modifications[[length(modifications) + 1]] <- list(
-            row_id = old_matched$row_id[idx],
+            row_id = merged$row_id[idx],
             column = col,
             old_value = old_vals[idx],
             new_value = new_vals[idx]
@@ -503,7 +501,7 @@ compare_data_files <- function(old_file, new_file) {
         }
       }
     }
-    
+
   } else {
     # Original row-by-row comparison for smaller datasets
     cat("Using row-by-row comparison for small dataset\n")
@@ -562,9 +560,20 @@ compare_data_files <- function(old_file, new_file) {
   return(results)
 }
 
+format_row_id <- function(row_id, id_columns) {
+  # Display row identity as labeled key=value pairs instead of raw composite string
+  if (is.null(id_columns) || length(id_columns) == 0) {
+    return(paste0("Row `", row_id, "`"))
+  }
+  parts <- strsplit(row_id, "\\|\\|\\|")[[1]]
+  if (length(parts) != length(id_columns)) {
+    return(paste0("Row `", row_id, "`"))
+  }
+  paste0("`", paste(paste0(id_columns, "=", parts), collapse = ", "), "`")
+}
+
 format_report <- function(results_list) {
-  report_lines <- c()
-  
+
   overall_status <- if (all(sapply(results_list, function(x) x$status %in% c("PASS", "NEW_FILE")))) {
     "✅ PASS"
   } else if (any(sapply(results_list, function(x) x$status == "FAIL"))) {
@@ -572,142 +581,152 @@ format_report <- function(results_list) {
   } else {
     "⚠️ WARNING"
   }
-  
+
   report_lines <- c(
     paste("**Overall Status:**", overall_status),
-    "",
     paste("**Files Compared:**", length(results_list)),
     ""
   )
-  
+
+  # ---- Summary table ----
+  report_lines <- c(report_lines,
+    "| File | Status | New Rows | Deleted Rows | Values Modified |",
+    "|------|--------|----------|--------------|-----------------|"
+  )
+
   for (result in results_list) {
-    status_emoji <- switch(result$status,
-                           "PASS" = "✅",
-                           "NEW_FILE" = "🆕",
-                           "FAIL" = "❌",
-                           "ERROR" = "⚠️",
-                           "WARNING" = "⚠️",
-                           "❓"
+    status_cell <- switch(result$status,
+      "PASS"     = "✅ Pass",
+      "NEW_FILE" = "🆕 New file",
+      "FAIL"     = "❌ Fail",
+      "ERROR"    = "⚠️ Error",
+      "WARNING"  = "⚠️ Warning",
+      "❓"
     )
-    
-    report_lines <- c(
-      report_lines,
-      paste0("### ", status_emoji, " ", result$file_name),
-      ""
+    new_rows_val  <- result$summary$rows_added
+    new_rows_cell <- if (!is.null(new_rows_val) && new_rows_val > 0) paste0("+", new_rows_val) else "—"
+
+    del_rows_val  <- result$summary$rows_deleted
+    del_rows_cell <- if (!is.null(del_rows_val) && del_rows_val > 0) as.character(del_rows_val) else "—"
+
+    n_mods     <- if (!is.null(result$summary$n_modifications)) result$summary$n_modifications else 0
+    mods_cell  <- if (n_mods > 0) as.character(n_mods) else "—"
+
+    report_lines <- c(report_lines,
+      paste0("| `", result$file_name, "` | ", status_cell,
+             " | ", new_rows_cell, " | ", del_rows_cell, " | ", mods_cell, " |")
     )
-    
-    # Object info
-    if (!is.null(result$summary$old_object_name)) {
-      report_lines <- c(
-        report_lines,
-        paste("- **Object name:**", result$summary$new_object_name)
-      )
-    }
-    
-    # Summary info
+  }
+
+  report_lines <- c(report_lines, "")
+
+  # ---- Per-file details (collapsible) ----
+  for (result in results_list) {
+    has_issues  <- result$status %in% c("FAIL", "WARNING", "ERROR")
+    status_icon <- switch(result$status,
+      "PASS"     = "✅",
+      "NEW_FILE" = "🆕",
+      "FAIL"     = "❌",
+      "ERROR"    = "⚠️",
+      "WARNING"  = "⚠️",
+      "❓"
+    )
+
+    detail_lines <- c()
+
+    # Dimensions
     if (!is.null(result$summary$old_rows)) {
-      report_lines <- c(
-        report_lines,
+      detail_lines <- c(detail_lines,
         paste("- **Old version:**", result$summary$old_rows, "rows ×", result$summary$old_cols, "columns"),
         paste("- **New version:**", result$summary$new_rows, "rows ×", result$summary$new_cols, "columns")
       )
-      
-      if (!is.null(result$summary$rows_added) && result$summary$rows_added > 0) {
-        report_lines <- c(report_lines, paste("- **New rows added:**", result$summary$rows_added))
-      }
-      
-      if (!is.null(result$summary$rows_deleted) && result$summary$rows_deleted > 0) {
-        report_lines <- c(report_lines, paste("- **Rows deleted:** ⚠️", result$summary$rows_deleted))
-      }
-      
-      if (!is.null(result$summary$columns_added) && length(result$summary$columns_added) > 0) {
-        report_lines <- c(report_lines, paste("- **Columns added:**", paste(result$summary$columns_added, collapse = ", ")))
-      }
-      
       if (!is.null(result$summary$matching_rows)) {
-        report_lines <- c(report_lines, paste("- **Matching rows checked:**", result$summary$matching_rows))
+        detail_lines <- c(detail_lines, paste("- **Rows compared:**", result$summary$matching_rows))
+      }
+      if (!is.null(result$summary$columns_added) && length(result$summary$columns_added) > 0) {
+        detail_lines <- c(detail_lines,
+          paste("- **Columns added:**", paste(result$summary$columns_added, collapse = ", "))
+        )
       }
     }
-    
+
     if (!is.null(result$summary$message)) {
-      report_lines <- c(report_lines, paste("- ", result$summary$message))
+      detail_lines <- c(detail_lines, paste("- ", result$summary$message))
     }
-    
-    # Issues
-    if (length(result$issues) > 0 && result$status %in% c("FAIL", "WARNING")) {
-      report_lines <- c(report_lines, "", "**⚠️ Issues Found:**", "")
-      
-      # Check for attribute issues
-      attr_issues <- result$issues[sapply(result$issues, function(x) 
+
+    if (has_issues && length(result$issues) > 0) {
+
+      # Attribute issues
+      attr_issues <- result$issues[sapply(result$issues, function(x)
         !is.null(x$type) && x$type %in% c("MISSING_ATTRIBUTES", "NEW_ATTRIBUTES", "MODIFIED_ATTRIBUTE"))]
-      
       if (length(attr_issues) > 0) {
-        report_lines <- c(report_lines, "**Attribute changes:**", "")
+        detail_lines <- c(detail_lines, "", "**Attribute changes:**")
         for (issue in attr_issues) {
-          report_lines <- c(report_lines, paste("-", issue$message))
+          detail_lines <- c(detail_lines, paste("-", issue$message))
         }
-        report_lines <- c(report_lines, "")
       }
-      
-      # Group modifications by column
+
+      # Value modifications — grouped and labelled by column
       mods <- result$issues[sapply(result$issues, function(x) !is.null(x$column))]
-      
       if (length(mods) > 0) {
         cols_modified <- unique(sapply(mods, function(x) x$column))
-        
-        report_lines <- c(
-          report_lines,
-          paste("**Modified columns:**", paste(cols_modified, collapse = ", ")),
+        detail_lines <- c(detail_lines, "",
+          paste("**Columns with changed values:**",
+                paste(paste0("`", cols_modified, "`"), collapse = ", ")),
           ""
         )
-        
-        # Show first 5 modifications
         n_show <- min(5, length(mods))
-        report_lines <- c(report_lines, "**Sample modifications:**", "")
-        
-        for (i in 1:n_show) {
+        for (i in seq_len(n_show)) {
           mod <- mods[[i]]
-          report_lines <- c(
-            report_lines,
-            paste0(i, ". Row `", mod$row_id, "`, Column `", mod$column, "`"),
-            paste0("   - Old: `", mod$old_value, "`"),
-            paste0("   - New: `", mod$new_value, "`"),
+          row_label <- format_row_id(mod$row_id, result$summary$id_columns)
+          detail_lines <- c(detail_lines,
+            paste0(i, ". ", row_label),
+            paste0("   - `", mod$column, "`: `", mod$old_value, "` → `", mod$new_value, "`"),
             ""
           )
         }
-        
         if (length(mods) > 5) {
-          report_lines <- c(report_lines, paste("... and", length(mods) - 5, "more modifications"))
+          detail_lines <- c(detail_lines,
+            paste0("_... and ", length(mods) - 5, " more changed values_")
+          )
         }
       }
-      
-      # Check for deleted rows issue
-      deleted_issue <- result$issues[sapply(result$issues, function(x) !is.null(x$type) && x$type == "DELETED_ROWS")]
+
+      # Deleted rows
+      deleted_issue <- result$issues[sapply(result$issues,
+        function(x) !is.null(x$type) && x$type == "DELETED_ROWS")]
       if (length(deleted_issue) > 0) {
         issue <- deleted_issue[[1]]
-        report_lines <- c(
-          report_lines,
-          "",
-          paste("**Deleted rows:**", length(issue$row_ids), "rows were removed"),
-          paste("Sample IDs:", paste(head(issue$row_ids, 5), collapse = ", "))
+        detail_lines <- c(detail_lines, "",
+          paste("**Rows deleted:**", length(issue$row_ids), "rows removed from this file"),
+          paste("Sample IDs:", paste(head(issue$row_ids, 3), collapse = "; "))
         )
       }
-      
-      # Check for other issues
-      other_issues <- result$issues[sapply(result$issues, function(x) 
-        !is.null(x$type) && x$type %in% c("OBJECT_NAME_CHANGED", "COLUMNS_REMOVED", "LOAD_ERROR", "TYPE_MISMATCH"))]
-      
-      if (length(other_issues) > 0) {
-        report_lines <- c(report_lines, "")
-        for (issue in other_issues) {
-          report_lines <- c(report_lines, paste("-", issue$message))
+
+      # Structural issues
+      struct_issues <- result$issues[sapply(result$issues, function(x)
+        !is.null(x$type) && x$type %in% c(
+          "OBJECT_NAME_CHANGED", "COLUMNS_REMOVED", "LOAD_ERROR",
+          "TYPE_MISMATCH", "MISSING_ID_COLUMNS"))]
+      if (length(struct_issues) > 0) {
+        detail_lines <- c(detail_lines, "")
+        for (issue in struct_issues) {
+          detail_lines <- c(detail_lines, paste("-", issue$message))
         }
       }
     }
-    
-    report_lines <- c(report_lines, "", "---", "")
+
+    report_lines <- c(report_lines,
+      "<details>",
+      paste0("<summary>", status_icon, " <strong>", result$file_name, "</strong></summary>"),
+      "",
+      detail_lines,
+      "",
+      "</details>",
+      ""
+    )
   }
-  
+
   return(paste(report_lines, collapse = "\n"))
 }
 
