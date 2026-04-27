@@ -36,7 +36,13 @@ ubc_temp_raw <- readxl::read_excel(
        sheet = 4
 )
 
-battle_creek_daily_temp <- ubc_temp_raw |>
+ubc_temp_raw2 <- readxl::read_excel(
+       here::here("data-raw", "temperature-data", "battle_clear_2022_2026.xlsx"),
+       sheet = 3
+) |> 
+       dplyr::rename(TEMP_C = `Temp C`)
+
+battle_creek_daily_temp <- dplyr::bind_rows(ubc_temp_raw, ubc_temp_raw2) |>
        dplyr::rename(date = DT, temp_degC = TEMP_C) |>
        dplyr::mutate(date = as_date(date, tz = "UTC")) |>
        dplyr::group_by(date) |>
@@ -140,7 +146,12 @@ upperclear_temp_raw <- readxl::read_excel(
        sheet = 2
 )
 
-upperclear_creek_daily_temp <- upperclear_temp_raw |>
+upperclear_temp_raw2 <- readxl::read_excel(
+       here::here("data-raw", "temperature-data", "battle_clear_2022_2026.xlsx"),
+       sheet = 1
+)
+
+upperclear_creek_daily_temp <- dplyr::bind_rows(upperclear_temp_raw, upperclear_temp_raw2) |>
        dplyr::rename(date = DT, temp_degC = TEMP_C) |>
        dplyr::mutate(date = as_date(date, tz = "UTC")) |>
        dplyr::group_by(date) |>
@@ -169,7 +180,12 @@ lowerclear_temp_raw <- readxl::read_excel(
        sheet = 3
 )
 
-lowerclear_creek_daily_temp <- lowerclear_temp_raw |>
+lowerclear_temp_raw2 <- readxl::read_excel(
+       here::here("data-raw", "temperature-data", "battle_clear_2022_2026.xlsx"),
+       sheet = 2
+)
+
+lowerclear_creek_daily_temp <- dplyr::bind_rows(lowerclear_temp_raw, lowerclear_temp_raw2) |>
        dplyr::rename(date = DT, temp_degC = TEMP_C) |>
        dplyr::mutate(date = as_date(date, tz = "UTC")) |>
        dplyr::group_by(date) |>
