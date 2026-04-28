@@ -36,7 +36,7 @@ stock_recruit_year_lookup <- full_join(rst_data, adult_data) |>
   # BUTTE CREEK
   filter(site != "adams dam") |> # okie should be used in SR, see site_overview vignette for why
   # CLEAR CREEK
-  filter(site != "lcc") |> # lcc should be used in SR, see site_overview vignette for why
+  filter(site != "lcc") |> # ucc should be used in SR, see site_overview vignette for why
   # FEATHER RIVER
   filter(site != "steep riffle", 
          site != "lower feather river", 
