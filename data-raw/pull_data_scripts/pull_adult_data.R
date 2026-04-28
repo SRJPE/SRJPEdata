@@ -1,176 +1,38 @@
 # Pull adult data from EDI (or other repositories)
 # Adult data were originally stored in the SR JPE database
-# however, for the short-term (until it is understand what and how we want to use those data
-# it is easier to update the data on EDI and pull directly 
+# however, for the short-term (until we understand what and how we want to use those data
+# it is easier to update the data on EDI and pull directly) 
 
 library(tidyverse)
 library(EDIutils)
-# library(googleCloudStorageR)
 
-# gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
-# gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
 # Set the scope for script to use API to download data from EDI
 scope = "edi"
 
 # Battle/Clear
 # Upstream passage and redd data
 # These data will be published on EDI but currently are not
-# In the interim we will pull from the standard format datasets
+# In the interim we will pull from the standard format datasets which originally were saved on GCP - "standard-format-data/standard_daily_redd.csv"
 
-# gcs_get_object(object_name = "standard-format-data/standard_daily_redd.csv",
-#                bucket = gcs_get_global_bucket(),
-#                saveToDisk = "data-raw/data-prep/standard-format-data/standard_daily_redd.csv",
-#                overwrite = TRUE)
-# standard_daily_redd <- read_csv("data-raw/data-prep/standard-format-data/standard_daily_redd.csv")
-# 
-# battle_clear_redd <- standard_daily_redd |> 
-#   # remove any NA entries - there should not be any now that Feather issue fixed
-#   # remove any non chinook species
-#   filter(!is.na(date), species %in% c("chinook", "not recorded", "unknown")) |> 
-#   select(date, latitude, longitude, reach, redd_id, age, velocity, run, stream, redd_count) |> 
-#   # change format to date instead of datetime
-#   mutate(date = as.Date(date),
-#          redd_count = ifelse(is.na(redd_count),0,redd_count)) |> 
-#   filter(stream %in% c("battle creek", "clear creek")) |>
-#   filter(run %in% c("spring", "not recorded"),
-#          # species %in% c("not recorded", NA, "chinook", "unknown"),
-#          stream %in% c("battle creek", "clear creek"),
-#          !reach %in% c("R6", "R6A", "R6B", "R7")) |> #TODO remove once reaches are standardized
-#   group_by(year = year(date), stream) |> 
-#   distinct(redd_id) |> 
-#   mutate(redd_count = 1) |> 
-#   summarize(count = sum(redd_count)) |> 
-#   as.data.frame() |> 
-#   add_row(year = 2022,
-#           stream = "clear creek",
-#           count = 6) |> 
-#   add_row(year = 2023,
-#           stream = "clear creek",
-#           count = 0) |> 
-#   add_row(year = 2024,
-#           stream = "clear creek",
-#           count = 4) |> 
-#   mutate(data_type = "redd")
-# write_csv(battle_clear_redd, "data-raw/helper-tables/battle_clear_redd_historical.csv")
-
+# Instruction for updating - when Battle and Clear provided an updated value, open the csv, add the new value and save.
 battle_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |> 
   filter(stream == "battle creek")
 
-clear_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |>  # Sam provided updated data for Clear redd on 5/21/2025 so use these instead
+clear_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |>  
   filter(stream == "clear creek")
 
-# gcs_get_object(object_name = "standard-format-data/standard_adult_passage_estimate.csv",
-#                bucket = gcs_get_global_bucket(),
-#                saveToDisk = "data-raw/data-prep/standard-format-data/standard_adult_passage_estimate.csv",
-#                overwrite = TRUE)
-# standard_passage_estimates <- read_csv("data-raw/data-prep/standard-format-data/standard_adult_passage_estimate.csv")
+battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
 
-# upstream_passage_estimates_battle_clear <- standard_passage_estimates |>
-#   filter(!is.na(passage_estimate), stream %in% c("battle creek", "clear creek")) |> 
-#   select(year, stream, passage_estimate) |> 
-#   # TODO these should be added to the database though we are likely moving away from db for adult data because too hard to maintain
-#   add_row(year = 2022,
-#           stream = "clear creek",
-#           passage_estimate = 195) |> 
-#   add_row(year = 2023,
-#           stream = "clear creek",
-#           passage_estimate = 0) |> 
-#   # source of below data is e-mail chain from ashley / sam provins / gabby week of 1/14/2025
-#   add_row(year = 2022,
-#           stream = "battle creek",
-#           passage_estimate = 152) |> 
-#   add_row(year = 2023,
-#           stream = "battle creek",
-#           passage_estimate = 7) |> # one of these was a feather river spring run
-#   add_row(year = 2024,
-#           stream = "battle creek",
-#           passage_estimate = 30) |> 
-#   add_row(year = 2024,
-#           stream = "clear creek",
-#           passage_estimate = 6) |> 
-#   rename(count = passage_estimate) |> 
-#   mutate(data_type = "upstream_estimate")
-# write_csv(upstream_passage_estimates_battle_clear, "data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
-
-battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv") |>
-  add_row(year = 2025,
-          stream = "battle creek",
-          count = 160,
-          data_type = "upstream_estimate") |> 
-  add_row(year = 2025,
-          stream = "clear creek",
-          count = 69,
-          data_type = "upstream_estimate")
 # Butte
 # Carcass estimates
 # Only agreed to publishing carcass estimates which are available on GrandTab
 # The timing of availability on GrandTab is unknown so reach out to Grant/Anna
 # and to request data on similar timeline as EDI workflow
-# Currently Butte Creek is the only location where we will use the historically generated tables
-# These were generated in JPE-datasets (https://github.com/SRJPE/JPE-datasets/tree/main/data/model-db)
-
-# The following script was run once
-# These seed tables were stored on GCP (https://console.cloud.google.com/storage/browser/jpe-dev-bucket/model-db?pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))&authuser=1&project=jpe-development&supportedpurview=project)
-# The carcass_estimates table was downloaded and saved to the repository.
-# gcs_auth(json_file = Sys.getenv("GCS_AUTH_FILE"))
-# gcs_global_bucket(bucket = Sys.getenv("GCS_DEFAULT_BUCKET"))
-# 
-# gcs_get_object(object_name = "model-db/carcass_estimates.csv",
-#                bucket = gcs_get_global_bucket(),
-#                saveToDisk = "data-raw/helper-tables/carcass_estimates.csv",
-#                overwrite = TRUE)
-# gcs_get_object(object_name = "model-db/survey_location.csv",
-#                bucket = gcs_get_global_bucket(),
-#                saveToDisk = "data-raw/helper-tables/survey_location.csv",
-#                overwrite = TRUE)
-
-# carcass_estimates <- read_csv("data-raw/helper-tables/carcass_estimates.csv")
-# survey_location <- read_csv("data-raw/helper-tables/survey_location.csv")
-# 
-# butte_historical <- carcass_estimates |> 
-#   left_join(survey_location, by = c("survey_location_id" = "id")) |> 
-#   select(stream, year, carcass_estimate, lower_bound_estimate, upper_bound_estimate, confidence_level) |> 
-#   filter(stream == "butte creek") 
-# 
-# write_csv(butte_historical, "data-raw/helper-tables/butte_carcass_historical.csv")
 
 # New years for Butte
-# The process for updating years for Butte will be to read in a csv or manually add the data (simple format)
-# These data can then be appended to the historical data
-butte_historical <- read_csv("data-raw/helper-tables/butte_carcass_historical.csv")
-butte_carcass <- butte_historical |> 
-  add_row(stream = "butte creek",
-          year = 2023,
-          carcass_estimate = 44,
-          lower_bound_estimate = 33,
-          upper_bound_estimate = 61,
-          confidence_level = 90) |> 
-  add_row(stream = "butte creek",
-          year = 2024,
-          carcass_estimate = 28,
-          lower_bound_estimate = 20,
-          upper_bound_estimate = 40,
-          confidence_level = 90) |> 
-  add_row(stream = "butte creek",
-          year = 2025,
-          carcass_estimate = 6861) |> 
-  rename(count = carcass_estimate) |> 
-  mutate(data_type = "carcass_estimate")
+# The process for updating years for Butte will be to read in a csv or manually add the data to the csv
+butte_carcass <- read_csv("data-raw/helper-tables/butte_carcass_historical.csv")
 
-# Holding data for Butte
-# gcs_get_object(object_name = "standard-format-data/standard_holding.csv",
-#                bucket = gcs_get_global_bucket(),
-#                saveToDisk = "data-raw/data-prep/standard-format-data/standard_holding.csv",
-#                overwrite = TRUE)
-# standard_holding <- read_csv("data-raw/data-prep/standard-format-data/standard_holding.csv")
-# 
-# butte_holding <- standard_holding |> 
-#   filter(stream == "butte creek") |> 
-#   select(year, count, stream) |> 
-#   mutate(data_type = "holding")
-# write_csv(butte_holding, "data-raw/helper-tables/butte_holding_historical.csv")
-
-butte_holding <- read_csv("data-raw/helper-tables/butte_holding_historical.csv")
 # Deer/Mill
 # Upstream passage data, redd (mill), holding (deer)
 # These data are on EDI and should be updated following the EDI workflow
@@ -179,12 +41,12 @@ butte_holding <- read_csv("data-raw/helper-tables/butte_holding_historical.csv")
 # in the video passage data and all the redd data were off. Until
 # this is fixed on EDI we will pull data from the spreadsheet Ryan provided
 
-data_from_ryan_raw <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.csv") |> glimpse()
+data_from_ryan_raw <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.csv")
 
 # Interpolate Mill Redd data based on 
 # adult-holding-redd-and-carcass-surveys_mill-creek_data-raw_Mill Creek SRCS Redd Counts by Section 1997-2020 Reformatted.xlsx
 # See data-raw/analysis/mill-redd-analysis.Rmd for methodology 
-redd_interpolation_data <- read_csv(here::here("data-raw", "analysis", "mill_redd_fill_table.csv")) |> glimpse()
+redd_interpolation_data <- read_csv(here::here("data-raw", "analysis", "mill_redd_fill_table.csv"))
 
 mill_redd <- data_from_ryan_raw |> 
   filter(data_type == "redd",
