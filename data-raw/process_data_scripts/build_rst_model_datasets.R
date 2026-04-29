@@ -182,6 +182,17 @@ weekly_efficiency <-
   left_join(weekly_origin) |>
   glimpse()
 
+# calculate average hours fished for weeks when efficiency trials were conducted by site across all weeks and years
+average_hours_fished_efficiency <- weekly_efficiency |>
+      group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
+      summarize(
+        number_released = sum(number_released),
+        number_recaptured = sum(number_recaptured)
+      ) |> 
+      left_join(weekly_effort_by_site, by = c("stream", "site", "week_released" = "week", "year_released" = "year")) |> 
+  group_by(site) |> 
+  summarize(average_hours_fished_during_efficiency_trials = mean(hours_fished, na.rm = T))
+
 # reformat flow data and summarize weekly
 flow_reformatted_raw <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
   left_join(
@@ -205,7 +216,7 @@ flow_reformatted <- flow_reformatted_raw |>
 # Combine all 3 tables together
 weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
   left_join(weekly_effort_by_site, by = c("stream", "site", "week", "year")) |>
-  # Join efficnecy data to catch data
+  # Join efficiency data to catch data
   left_join(
     weekly_efficiency |>
       group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
@@ -215,6 +226,7 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
       ),
     by = c("stream", "site", "week" = "week_released", "year" = "year_released")
   ) |>
+  left_join(average_hours_fished_efficiency, by = c("site")) |>  # add the average_hours_fished_during_efficiency_trials
   # join flow data to dataset, full_join because we want to keep flow even for missing weeks
   full_join(flow_reformatted, by = c("stream", "site", "week", "year")) |>
   # select columns that josh uses
@@ -231,23 +243,17 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
     flow_cfs
   ) |>
   group_by(site) |>
-  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |>
+  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> # this is used to fill in gaps where hours fished data is missing
   ungroup() |>
   mutate(
     run_year = ifelse(week >= 45, year + 1, year),
-    catch_standardized_by_hours_fished = ifelse(
-      (hours_fished == 0 | is.na(hours_fished)),
-      count,
-      round(count * average_stream_hours_fished / hours_fished, 0)
-    ),
     hours_fished = ifelse(
       (hours_fished == 0 | is.na(hours_fished)) & count >= 0,
       average_stream_hours_fished,
       hours_fished
     ),
     hours_fished = ifelse(is.na(count), 0, hours_fished) # adds 0 hours fished for padded weeks with NA catch
-  ) |> # add logic for situations where trap data is missing
-  glimpse()
+  ) 
 
 # calculate mean and sd used to standardize flows. should be mean and
 # sd of efficiency flows except for lbc
