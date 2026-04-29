@@ -6,7 +6,6 @@
 
 library(tidyverse)
 library(EDIutils)
-library(googleCloudStorageR)
 
 pull_edi <- function(id, index, version) {
   scope <- "edi"
@@ -168,41 +167,6 @@ deer_mill_recapture_edi <- recapture_edi |>
 
 # The data were filtered to Knights Landing and saved to make workflow easier
 # as these will not change
-
-# knl_catch_standard <- standard_catch |> 
-#   filter(site == "knights landing", year(date) < 2004) |> 
-#   mutate(site_group = "knights landing") |> 
-#   rename(life_stage = lifestage) |> 
-#   select(date, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped, dead, fork_length, weight, species)
-# 
-# knl_trap_standard <- standard_trap |> 
-#   filter(site == "knights landing", year(trap_stop_date) < 2004) |> 
-#   mutate(site_group = "knights landing") |> 
-#   rename(total_revolutions = sample_period_revolutions,
-#          rpm_start = rpms_start,
-#          rpm_end = rpms_end) |> 
-#   select(trap_start_date, trap_stop_date, stream, site, subsite, site_group, total_revolutions, visit_type, trap_functioning, fish_processed, rpm_start, rpm_end, include)
-# 
-# knl_recapture_standard <- standard_recapture |> 
-#   filter(site == "knights landing", year(date_recaptured) < 2004) |> 
-#   mutate(site_group = site) |> 
-#   rename(date = date_recaptured,
-#          count = number_recaptured,
-#          fork_length = median_fork_length_recaptured) |> 
-#   select(date, release_id, stream, site, subsite, site_group, count, fork_length)
-# 
-# knl_release_standard <- standard_release |> 
-#   filter(site == "knights landing", year(date_released) < 2004) |> 
-#   rename(origin = origin_released,
-#          run = run_released,
-#          life_stage = lifestage_released) |> 
-#   mutate(site_group = "knights landing") |> 
-#   select(date_released, release_id, stream, site, site_group, number_released, origin, run, life_stage)
-
-# write_csv(knl_catch_standard, "data-raw/helper-tables/google_bucket/knl_catch_standard.csv")
-# write_csv(knl_trap_standard, "data-raw/helper-tables/google_bucket/knl_trap_standard.csv")
-# write_csv(knl_recapture_standard, "data-raw/helper-tables/google_bucket/knl_recapture_standard.csv")
-# write_csv(knl_release_standard, "data-raw/helper-tables/google_bucket/knl_release_standard.csv")
 
 knl_catch_standard <- read_csv("data-raw/helper-tables/google_bucket/knl_catch_standard.csv")
 knl_trap_standard <- read_csv("data-raw/helper-tables/google_bucket/knl_trap_standard.csv")
