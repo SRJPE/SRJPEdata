@@ -31,7 +31,9 @@ battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_es
 
 # New years for Butte
 # The process for updating years for Butte will be to read in a csv or manually add the data to the csv
-butte_carcass <- read_csv("data-raw/helper-tables/butte_carcass_historical.csv")
+butte_carcass <- read_csv("data-raw/helper-tables/butte_carcass_historical.csv") |> 
+  rename(count = carcass_estimate) |> 
+  mutate(data_type = "carcass estimate")
 
 # Deer/Mill
 # Upstream passage data, redd (mill), holding (deer)
