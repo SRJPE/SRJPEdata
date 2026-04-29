@@ -176,7 +176,6 @@ annual_adult_raw <- bind_rows(battle_redd,
                           clear_redd,
                           battle_clear_passage,
                           butte_carcass,
-                          butte_holding,
                           data_from_ryan,
                           feather_spring_spawner,
                           yuba_spring_passage_estimates)
