@@ -736,7 +736,7 @@ yuba_river_interpolated <- readr::read_csv(here::here(
 ### Temp Data Pull Tests
 yuba_river_temp_query <- CDECRetrieve::cdec_query(
        station = "YR7",
-       dur_code = "H",
+       dur_code = "E",
        sensor_num = "146",
        start_date = "1999-01-01"
 )
