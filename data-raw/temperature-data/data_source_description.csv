@@ -1,0 +1,12 @@
+﻿stream,site,data source description
+battle creek,ubc,data pulled from EDI and stored in jpe-db; except for recaptures table which does not have a unique id and is not stored in the database. These are pulled directly from EDI into SRJPEdata
+butte creek,okie dam,years > 2015 are pulled from EDI and stored in the jpe-db; years <= 2015 are pulled directly from EDI into SRJPEdata
+clear creek,lcc; ucc,data pulled from EDI and stored in jpe-db; except for recaptures table which does not have a unique id and is not stored in the database. These are pulled directly from EDI into SRJPEdata
+deer creek,deer creek,10-14-1992 through 6-20-2023 are pulled directly from EDI into SRJPEdata; recent years are pulled from the datatackle database
+feather river,eye riffle; live oak; herringer riffle; steep riffle; gateway riffle; sunset pumps; shawn's beach,data pulled from EDI and stored in jpe-db
+mill creek,mill creek,12-09-1995 through 6-22-2023 are pulled directly from EDI into SRJPEdata; recent years are pulled from the datatackle database
+yuba river,hallwood,11-22-2022 through present are pulled from EDI and stored in jpe-db; 1999-11-25 through 2009-08-15 are pulled directly from EDI into SRJPEdata
+sacramento river,knights landing,01-30-2004 pulled from EDI and stored in jpe-db; 1995-11-21 through 2003-12-31 are pulled from standard datasets created during early QC of data. These historical data are not yet published on EDI.
+sacramento river,tisdale,data pulled from EDI and stored in jpe-db
+sacramento river,delta entry,data are not yet integrated but plan to pull from EDI and store in jpe-db
+sacramento river,lower feather river,data pulled from EDI and stored in jpe-db
