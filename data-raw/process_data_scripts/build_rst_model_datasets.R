@@ -208,7 +208,6 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
       ),
     by = c("stream", "site", "week" = "week_released", "year" = "year_released")
   ) |>
-  left_join(average_hours_fished_efficiency, by = c("site")) |>  # add the average_hours_fished_during_efficiency_trials
   # join flow data to dataset, full_join because we want to keep flow even for missing weeks
   full_join(flow_reformatted, by = c("stream", "site", "week", "year")) |>
   # select columns that josh uses
@@ -222,7 +221,6 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
     number_released,
     number_recaptured,
     hours_fished,
-    average_hours_fished_during_efficiency_trials,
     flow_cfs
   ) |>
   group_by(site) |>
@@ -237,7 +235,8 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
     ),
     hours_fished = ifelse(is.na(count), 0, hours_fished) # adds 0 hours fished for padded weeks with NA catch
   ) |> 
-  select(-average_stream_hours_fished)
+  select(-average_stream_hours_fished) |> 
+  left_join(average_hours_fished_efficiency, by = c("site"))  # add the average_hours_fished_during_efficiency_trials
 
 # calculate mean and sd used to standardize flows. should be mean and
 # sd of efficiency flows except for lbc
@@ -346,7 +345,8 @@ weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
     count = case_when(
       is.na(count) & if_sampled == T ~ 0,
       is.na(count) & if_sampled == F ~ NA,
-      T ~ count
+      T ~ count,
+    
     )
   ) |>  
   select(-if_sampled)
