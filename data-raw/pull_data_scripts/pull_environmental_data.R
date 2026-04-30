@@ -243,7 +243,7 @@ deer_creek_temp_query <- CDECRetrieve::cdec_query(
        station = "DCV",
        dur_code = "H",
        sensor_num = "25",
-       start_date = "1986-01-01"
+       start_date = "1998-01-01"
 )
 
 deer_creek_daily_temp <- deer_creek_temp_query |>
