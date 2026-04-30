@@ -392,7 +392,9 @@ weekly_juvenile_abundance_efficiency_data_raw <- weekly_juvenile_abundance_model
     number_released,
     number_recaptured,
     standardized_efficiency_flow,
-    flow_cfs
+    flow_cfs,
+    hours_fished,
+    average_hours_fished_during_efficiency_trials
   ) |>
   filter(!is.na(number_released) & !is.na(number_recaptured)) |>
   distinct(
