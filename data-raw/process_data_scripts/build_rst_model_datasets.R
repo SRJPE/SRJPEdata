@@ -108,15 +108,12 @@ env_with_sites <- SRJPEdata::environmental_data |>
 
 weekly_flow <- env_with_sites |> filter(parameter == "flow")
 
-# Note I don't think we are currently using temperature
-weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
-
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
 # this dataset will be saved separately to retain the fork length and origin variables
 
 # Josh needs origin released but need to summarize it by week
-weekly_origin <-
+weekly_efficiency <-
   left_join(
     SRJPEdata::release,
     SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
@@ -127,6 +124,7 @@ weekly_origin <-
   mutate(
     week_released = week(date_released),
     year_released = year(date_released),
+    # summarize this way because there may be multiple releases per week and need to find origin for week rather than just release trial
     hatchery = ifelse(origin == "hatchery", 1, 0),
     natural = ifelse(origin == "natural", 1, 0),
     mixed = ifelse(origin == "mixed", 1, 0)
@@ -134,19 +132,27 @@ weekly_origin <-
   select(
     stream,
     site,
+    site_group,
     week_released,
     year_released,
+    number_released,
+    count,
+    median_fork_length_released,
     hatchery,
     natural,
     mixed
   ) |>
-  group_by(stream, site, week_released, year_released) |>
+  group_by(stream, site, site_group, week_released, year_released) |>
   summarize(
     hatchery = sum(hatchery),
     natural = sum(natural),
-    mixed = sum(mixed)
+    mixed = sum(mixed),
+    number_released = sum(number_released, na.rm = TRUE),
+    number_recaptured = sum(count, na.rm = TRUE),
+    median_fork_length_released = median(median_fork_length_released, na.rm = T)
   ) |>
   mutate(
+# again, need to find the origin across releases within a week
     origin_released = case_when(
       mixed > 0 ~ "mixed",
       hatchery == 0 & natural == 0 & mixed == 0 ~ NA,
@@ -156,31 +162,18 @@ weekly_origin <-
       T ~ "mixed"
     )
   ) |>
-  select(stream, site, week_released, year_released, origin_released)
+  select(stream, site, site_group, week_released, year_released, origin_released, number_released, number_recaptured, median_fork_length_released)
 
-weekly_efficiency <-
-  left_join(
-    SRJPEdata::release,
-    SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
-      group_by(stream, site, site_group, release_id) |>
-      summarize(count = sum(count, na.rm = T)),
-    by = c("release_id", "stream", "site", "site_group")
-  ) |>
-  group_by(
-    stream,
-    site,
-    site_group,
-    week_released = week(date_released),
-    year_released = year(date_released)
-  ) |>
-  summarize(
-    number_released = sum(number_released, na.rm = TRUE),
-    number_recaptured = sum(count, na.rm = TRUE),
-    median_fork_length_released = median(median_fork_length_released, na.rm = T)
-  ) |>
-  ungroup() |>
-  left_join(weekly_origin) |>
-  glimpse()
+# calculate average hours fished for weeks when efficiency trials were conducted by site across all weeks and years
+average_hours_fished_efficiency <- weekly_efficiency |>
+      group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
+      summarize(
+        number_released = sum(number_released),
+        number_recaptured = sum(number_recaptured)
+      ) |> 
+      left_join(weekly_effort_by_site, by = c("stream", "site", "week_released" = "week", "year_released" = "year")) |> 
+  group_by(site) |> 
+  summarize(average_hours_fished_during_efficiency_trials = mean(hours_fished, na.rm = T))
 
 # reformat flow data and summarize weekly
 flow_reformatted_raw <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
@@ -205,7 +198,7 @@ flow_reformatted <- flow_reformatted_raw |>
 # Combine all 3 tables together
 weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
   left_join(weekly_effort_by_site, by = c("stream", "site", "week", "year")) |>
-  # Join efficnecy data to catch data
+  # Join efficiency data to catch data
   left_join(
     weekly_efficiency |>
       group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
@@ -215,6 +208,7 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
       ),
     by = c("stream", "site", "week" = "week_released", "year" = "year_released")
   ) |>
+  left_join(average_hours_fished_efficiency, by = c("site")) |>  # add the average_hours_fished_during_efficiency_trials
   # join flow data to dataset, full_join because we want to keep flow even for missing weeks
   full_join(flow_reformatted, by = c("stream", "site", "week", "year")) |>
   # select columns that josh uses
@@ -228,26 +222,22 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
     number_released,
     number_recaptured,
     hours_fished,
+    average_hours_fished_during_efficiency_trials,
     flow_cfs
   ) |>
   group_by(site) |>
-  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |>
+  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> # this is used to fill in gaps where hours fished data is missing
   ungroup() |>
   mutate(
     run_year = ifelse(week >= 45, year + 1, year),
-    catch_standardized_by_hours_fished = ifelse(
-      (hours_fished == 0 | is.na(hours_fished)),
-      count,
-      round(count * average_stream_hours_fished / hours_fished, 0)
-    ),
     hours_fished = ifelse(
       (hours_fished == 0 | is.na(hours_fished)) & count >= 0,
       average_stream_hours_fished,
       hours_fished
     ),
     hours_fished = ifelse(is.na(count), 0, hours_fished) # adds 0 hours fished for padded weeks with NA catch
-  ) |> # add logic for situations where trap data is missing
-  glimpse()
+  ) |> 
+  select(-average_stream_hours_fished)
 
 # calculate mean and sd used to standardize flows. should be mean and
 # sd of efficiency flows except for lbc
@@ -402,7 +392,9 @@ weekly_juvenile_abundance_efficiency_data_raw <- weekly_juvenile_abundance_model
     number_released,
     number_recaptured,
     standardized_efficiency_flow,
-    flow_cfs
+    flow_cfs,
+    hours_fished,
+    average_hours_fished_during_efficiency_trials
   ) |>
   filter(!is.na(number_released) & !is.na(number_recaptured)) |>
   distinct(
@@ -423,7 +415,7 @@ eff_trial_data_check <- weekly_juvenile_abundance_efficiency_data_raw |>
   filter(number_recaptured > number_released)
 
 if (nrow(eff_trial_data_check) > 0) {
-  warning(paste(
+  print(paste(
     nrow(eff_trial_data_check),
     "row(s) in the efficiency data have more recaptures than releases. Filtering here but should be addressed."
   ))

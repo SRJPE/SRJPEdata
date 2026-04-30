@@ -7,6 +7,9 @@ knitr::knit("vignettes/temp_regression.Rmd")
 # Next source environmental data 
 source("data-raw/pull_data_scripts/pull_environmental_data.R")
 
+# adult data
+source("data-raw/pull_data_scripts/pull_adult_data.R")
+
 # And genetics data from DB
 # Need config file 
 # NOTE: missing field sheet data & 2023 data, should revisit after this is added to confirm that everything looks good

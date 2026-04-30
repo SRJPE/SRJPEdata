@@ -15,6 +15,7 @@ standard_release <- read_csv("data-raw/helper-tables/standard_release.csv")
 # processing code to assign the trap_visit_time_start for data from datatackle
 rst_trap_query_pilot_processed <- rst_trap_query_pilot |>
   filter(trap_visit_time_end > as_date("2023-09-01")) |> # removes the entries from Jan 2023 (those go in previous season)
+  filter(stream %in% c("mill creek", "deer creek")) |> # TODO Mill and Deer are the only streams on production for DataTackle. Add other streams when needed.
   arrange(trap_name, trap_visit_time_end) |>
   mutate(
     trap_visit_time_restart = case_when(
@@ -77,7 +78,10 @@ rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot_processed, edi_trap) |>
 # rst_catch ---------------------------------------------------------------
 
 # Bind rows
-rst_catch_prep <- bind_rows(rst_catch, rst_catch_query_pilot, edi_catch)
+rst_catch_prep <- bind_rows(rst_catch, 
+                            rst_catch_query_pilot |> 
+                              filter(stream %in% c("mill creek", "deer creek")), # TODO Mill and Deer are the only streams on production for DataTackle. Add other streams when needed.
+                            edi_catch)
 
 # special processing for butte creek
 # find dates where the rst is fishing to use as a filter
@@ -152,25 +156,28 @@ rst_catch <- full_join(catch_dates, rst_catch_prep) |>
 
 release <- bind_rows(release_db,
                      release_query_pilot |>
-                       mutate(release_id = as.character(release_id)),
+                       mutate(release_id = as.character(release_id)) |> 
+                       filter(stream %in% c("mill creek", "deer creek")), # TODO Mill and Deer are the only streams on production for DataTackle. Add other streams when needed.
                      edi_release)  |>
-  filter(!is.na(number_released)) |> # there should not be any NAs
+  filter(!is.na(number_released)) |>  # there should not be any NAs
   left_join(
     standard_release |>
       filter(!is.na(median_fork_length_released)) |>
       select(site, release_id, median_fork_length_released) |>
       distinct()
-  ) |>  # fork length is not on EDI but Josh needs it in weekly_efficiency
+  ) |>  # try to fill in any missing fork length information
   left_join(standard_release |>
               select(site, release_id, origin_released) |>
               rename(origin = origin_released) |> 
-              distinct())  # fork length is not on EDI but Josh needs it in weekly_efficiency
+              distinct())  # try to fill in any missing origin information
 
 # recaptures --------------------------------------------------------------
 
 recaptures <- bind_rows(
   recaptures_db,
-  recaptures_query_pilot |> mutate(release_id = as.character(release_id)),
+  recaptures_query_pilot |>
+    mutate(release_id = as.character(release_id)) |> 
+    filter(stream %in% c("mill creek", "deer creek")), # TODO Mill and Deer are the only streams on production for DataTackle. Add other streams when needed.
   edi_recapture
 ) |> glimpse()
 
