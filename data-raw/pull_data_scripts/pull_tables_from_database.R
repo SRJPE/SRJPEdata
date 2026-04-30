@@ -73,7 +73,7 @@ try(if(!exists("rst_trap_query"))
  try(release_query <- dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
                                                 tl.subsite, tl.site_group, rs.number_released, r.definition as run, 
                                                 rs.median_fork_length_released,
-                                                ls.definition as life_stage, o.definition as origin
+                                                ls.definition as life_stage, o.definition as origin, rs.include_in_analysis
                                                 FROM release rs 
                                                 left join trap_location tl on rs.trap_location_id = tl.id 
                                                 left join run r on rs.run_id = r.id
