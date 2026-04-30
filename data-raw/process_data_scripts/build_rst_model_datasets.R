@@ -108,15 +108,12 @@ env_with_sites <- SRJPEdata::environmental_data |>
 
 weekly_flow <- env_with_sites |> filter(parameter == "flow")
 
-# Note I don't think we are currently using temperature
-weekly_temperature <- env_with_sites |> filter(parameter == "temperature")
-
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
 # this dataset will be saved separately to retain the fork length and origin variables
 
 # Josh needs origin released but need to summarize it by week
-weekly_origin <-
+weekly_efficiency <-
   left_join(
     SRJPEdata::release,
     SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
@@ -127,6 +124,7 @@ weekly_origin <-
   mutate(
     week_released = week(date_released),
     year_released = year(date_released),
+    # summarize this way because there may be multiple releases per week and need to find origin for week rather than just release trial
     hatchery = ifelse(origin == "hatchery", 1, 0),
     natural = ifelse(origin == "natural", 1, 0),
     mixed = ifelse(origin == "mixed", 1, 0)
@@ -134,19 +132,27 @@ weekly_origin <-
   select(
     stream,
     site,
+    site_group,
     week_released,
     year_released,
+    number_released,
+    count,
+    median_fork_length_released,
     hatchery,
     natural,
     mixed
   ) |>
-  group_by(stream, site, week_released, year_released) |>
+  group_by(stream, site, site_group, week_released, year_released) |>
   summarize(
     hatchery = sum(hatchery),
     natural = sum(natural),
-    mixed = sum(mixed)
+    mixed = sum(mixed),
+    number_released = sum(number_released, na.rm = TRUE),
+    number_recaptured = sum(count, na.rm = TRUE),
+    median_fork_length_released = median(median_fork_length_released, na.rm = T)
   ) |>
   mutate(
+# again, need to find the origin across releases within a week
     origin_released = case_when(
       mixed > 0 ~ "mixed",
       hatchery == 0 & natural == 0 & mixed == 0 ~ NA,
@@ -156,31 +162,7 @@ weekly_origin <-
       T ~ "mixed"
     )
   ) |>
-  select(stream, site, week_released, year_released, origin_released)
-
-weekly_efficiency <-
-  left_join(
-    SRJPEdata::release,
-    SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
-      group_by(stream, site, site_group, release_id) |>
-      summarize(count = sum(count, na.rm = T)),
-    by = c("release_id", "stream", "site", "site_group")
-  ) |>
-  group_by(
-    stream,
-    site,
-    site_group,
-    week_released = week(date_released),
-    year_released = year(date_released)
-  ) |>
-  summarize(
-    number_released = sum(number_released, na.rm = TRUE),
-    number_recaptured = sum(count, na.rm = TRUE),
-    median_fork_length_released = median(median_fork_length_released, na.rm = T)
-  ) |>
-  ungroup() |>
-  left_join(weekly_origin) |>
-  glimpse()
+  select(stream, site, site_group, week_released, year_released, origin_released, number_released, number_recaptured, median_fork_length_released)
 
 # calculate average hours fished for weeks when efficiency trials were conducted by site across all weeks and years
 average_hours_fished_efficiency <- weekly_efficiency |>
