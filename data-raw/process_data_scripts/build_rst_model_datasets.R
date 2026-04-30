@@ -240,6 +240,7 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
     number_released,
     number_recaptured,
     hours_fished,
+    average_hours_fished_during_efficiency_trials,
     flow_cfs
   ) |>
   group_by(site) |>
@@ -253,7 +254,8 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
       hours_fished
     ),
     hours_fished = ifelse(is.na(count), 0, hours_fished) # adds 0 hours fished for padded weeks with NA catch
-  ) 
+  ) |> 
+  select(-average_stream_hours_fished)
 
 # calculate mean and sd used to standardize flows. should be mean and
 # sd of efficiency flows except for lbc
