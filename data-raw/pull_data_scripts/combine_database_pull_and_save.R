@@ -159,17 +159,17 @@ release <- bind_rows(release_db,
                        mutate(release_id = as.character(release_id)) |> 
                        filter(stream %in% c("mill creek", "deer creek")), # TODO Mill and Deer are the only streams on production for DataTackle. Add other streams when needed.
                      edi_release)  |>
-  filter(!is.na(number_released)) |> # there should not be any NAs
+  filter(!is.na(number_released)) |>  # there should not be any NAs
   left_join(
     standard_release |>
       filter(!is.na(median_fork_length_released)) |>
       select(site, release_id, median_fork_length_released) |>
       distinct()
-  ) |>  # fork length is not on EDI but Josh needs it in weekly_efficiency
+  ) |>  # try to fill in any missing fork length information
   left_join(standard_release |>
               select(site, release_id, origin_released) |>
               rename(origin = origin_released) |> 
-              distinct())  # fork length is not on EDI but Josh needs it in weekly_efficiency
+              distinct())  # try to fill in any missing origin information
 
 # recaptures --------------------------------------------------------------
 
