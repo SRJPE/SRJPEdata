@@ -1,0 +1,310 @@
+---
+title: "QC of RST efficiency trial data"
+format:
+  html:
+    embed-resources: true
+---
+
+This document performs QC on efficiency data focused on three things:
+
+1. Potential interuptions in efficiency trials
+2. Using the "include_in_analysis" field
+3. Potential differences in day and night releases
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 2
+                  "#899DA4", "#C93312", "#DC863B", # royal 1 (- 3)
+                  "#F1BB7B", "#FD6467", "#5B1A18", # Grand Budapest 1 (-4)
+                  "#D8B70A", "#02401B", "#A2A475", # Cavalcanti 1
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4", #Grand Budapest 2
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
+)
+```
+
+# Potential interruptions in efficiency trials
+
+The goal is to identify efficiency trials that were incomplete due to the trap being non-operational after fish were released. This might happen when flows are very high. We evaluate this in two ways:
+(1) Count the number of consecutive days the trap was operational after release using the RST trap and catch data
+(2) Pull flow data for the 4 days after release and identify any where flow is high (defined as above 10,000 cfs though this may be lower in some locations)
+
+```{r, include = F}
+library(tidyverse)
+
+release <- SRJPEdata::release |>
+    select(date_released, release_id, stream, site)
+
+release_plus_4 <- release |>
+    mutate(
+        date_released = as_date(date_released),
+        date_1 = date_released + 1,
+        date_2 = date_released + 2,
+        date_3 = date_released + 3,
+        date_4 = date_released + 4) |>
+            pivot_longer(cols = c(date_released, date_1, date_2, date_3, date_4), values_to = "date", names_to = "date_release_type")
+
+catch <- SRJPEdata::rst_catch |>
+    select(date, stream, site) |>
+    distinct() |>
+    mutate(catch = T)
+
+release_plus_4_catch <- release_plus_4 |>
+    filter(date_release_type != "date_released") |> # we do not need the trap to functioning on the day of release
+    left_join(catch)
+release_plus_1_catch <- release_plus_4 |>
+    filter(!date_release_type %in% c("date_released", "date_2","date_3","date_4")) |> 
+    left_join(catch)
+
+flag_release <- filter(release_plus_4_catch, is.na(catch))
+flag_release_1 <- filter(release_plus_1_catch, is.na(catch))
+
+summary <- flag_release |>
+    ungroup() |>
+    select(release_id, stream, site) |>
+    distinct()
+summary_1 <- flag_release_1 |>
+    ungroup() |>
+    select(release_id, stream, site) |>
+    distinct()
+
+summary_stream <- summary |>
+    ungroup() |>
+    group_by(stream) |>
+    tally()
+
+summary_stream_1 <- summary_1 |>
+    ungroup() |>
+    group_by(stream) |>
+    tally() |> glimpse()
+```
+
+**Approach 1**
+
+- 338 release trials were flagged as potentially being non-operational for 1-4 days after release.
+- 77 release trials were flagged as potentially being non-operational 1 day after release
+
+*Table of potential trials that were not operational 1 day after release*
+```{r}
+knitr::kable(summary_1)
+```
+
+The majority of these are coming from the Feather River and Sacramento River
+
+*Table of potential trials that were not operational 1 day after release summarized by stream*
+```{r}
+knitr::kable(summary_stream_1)
+```
+
+```{r, include = F}
+flow <- SRJPEdata::environmental_data |>
+    filter(parameter == "flow") |>
+    select(-c(gage_number, gage_agency, parameter)) |>
+    pivot_wider(id_cols = c(week, year, stream, site_group), values_from = "value", names_from = "statistic")
+
+flow_release <- release_plus_4 |>
+    filter(date_release_type == "date_released") |>
+    mutate(
+        week = week(date),
+        year = year(date),
+        site_group = case_when(
+            stream %in% c("butte creek", "battle creek", "clear creek", "mill creek", "deer creek", "yuba river") ~ stream,
+            site == "knights landing" ~ "knights landing",
+            site == "tisdale" ~ "tisdale",
+            site == "red bluff diversion dam" ~ "red bluff diversion dam",
+            site %in% c("eye riffle", "steep riffle", "gateway riffle") ~ "upper feather lfc",
+            site %in% c("herringer riffle", "live oak", "sunset pumps") ~ "upper feather hfc"
+        )
+        ) |>
+    left_join(flow)
+
+flag_release_2 <- flow_release |>
+    filter(mean > 10000)
+
+summary_2 <- flag_release_2 |>
+    ungroup() |>
+    select(release_id, stream, site) |>
+    distinct()
+
+summary_stream_2 <- summary_2 |>
+    ungroup() |>
+    group_by(stream) |>
+    tally()
+```
+
+**Approach 2**
+
+192 release trials were flagged as flow being potentially too high to operate the traps.
+
+```{r}
+knitr::kable(summary_2)
+```
+
+The majority of these were on the Sacramento River.
+
+```{r}
+knitr::kable(summary_stream_2)
+```
+
+```{r, include = F}
+overlap_flag <- flag_release |>
+    select(release_id, stream, site) |>
+    mutate(trap_flag = T) |>
+    full_join(flag_release_2 |>
+    select(release_id, stream, site) |>
+    mutate(flow_flag = T))
+
+high_priority <- filter(overlap_flag, trap_flag == T & flow_flag == T) |>
+    distinct()
+
+high_priority |>
+    group_by(stream, site) |>
+    tally()
+
+overlap_flag_1 <- flag_release_1 |>
+    select(release_id, stream, site) |>
+    mutate(trap_flag = T) |>
+    full_join(flag_release_2 |>
+    select(release_id, stream, site) |>
+    mutate(flow_flag = T))
+
+high_priority_1 <- filter(overlap_flag_1, trap_flag == T & flow_flag == T) |>
+    distinct()
+
+high_priority_1 |>
+    group_by(stream, site) |>
+    tally()
+```
+
+There were 51 release trials that were flagged for both issues with missing trap data (1-4 days after release) and having high flows. When using the criteria of non-operational 1-day after release, there were 20 flagged trials.
+
+These are the highest priority for QC and potential removal. These occur in the Feather River and Sacramento River.
+
+*Table of high priority flags using the 1-4 day criteria*
+```{r}
+knitr::kable(high_priority |>
+    select(-c(trap_flag, flow_flag)))
+```
+
+## Compare efficiency with and without flagged trials
+
+High priority flagged trials = non-operational 1-4 days after release and high flows
+
+```{r, include = F}
+efficiency <-
+  left_join(SRJPEdata::release,
+            SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
+              group_by(stream, site, site_group, release_id) |>
+              summarize(count = sum(count, na.rm = T)),
+            by = c("release_id", "stream", "site", "site_group")) |>
+    left_join(high_priority |>
+                mutate(release_qc_flag = T)) |>
+    mutate(
+        week = week(date_released),
+        year = year(date_released),
+        efficiency = count/number_released)
+
+efficiency_averages <-
+    efficiency |>
+    group_by(stream, site, week) |>
+    summarize(efficiency = mean(efficiency, na.rm = T)) |>
+    mutate(qc_type = "all trials") |>
+    bind_rows(efficiency |>
+    filter(is.na(release_qc_flag)) |>
+    group_by(stream, site, week) |>
+    summarize(efficiency = mean(efficiency, na.rm = T)) |>
+    mutate(qc_type = "high priority removed"))
+```
+
+When removing the high priority release trials we see some small differences in average efficiency, mostly for Knights Landing.
+
+```{r}
+efficiency_averages |>
+    ggplot(aes(x = week, y = efficiency, color = qc_type)) +
+    geom_line() +
+    scale_color_manual(values = c("#D8B70A", "#7294D4"))+
+    facet_wrap(~site, scales = "free_y")
+```
+
+# Use the "include_in_analysis" field
+
+There is a "include_in_analysis" column available for the `release` table. Only Feather River uses this and has marked 74 trials as not to be used in analysis. There is one trial for Knights Landing.
+
+It is unclear why these trials are not used in analysis. We are testing if removing these has an impact on efficiency.
+
+```{r, include = F}
+SRJPEdata::release |> filter(include_in_analysis == F) |> glimpse()
+```
+
+When comparing efficiency for "include_in_analysis" it does not appear to make a big difference.
+
+```{r}
+efficiency |>
+    mutate(include_in_analysis = ifelse(is.na(include_in_analysis), T, include_in_analysis)) |>
+    filter(efficiency <= 1, stream == "feather river") |>
+    ggplot(aes(x = as.factor(include_in_analysis), y = efficiency)) +
+    geom_boxplot() +
+    facet_wrap(~site)
+
+```
+
+# Day and night release exploration
+
+We use our original standard format datasets that include time of release. If this ends up being important we can figure out how to get these added to the `release` table.
+
+There are very few releases done at night (200 out of 2,098).
+
+```{r, include = F}
+standard_release <- read_csv(here::here("data-raw","helper-tables","standard_release.csv"))
+
+night_release_lookup <- left_join(standard_release |>
+                                select(stream, site, release_id),
+    standard_release |>
+    mutate(date_released = as_date(date_released),
+           night_end = hms::as_hms(suncalc::getSunlightTimes(date = date_released,
+                                              lat = 38.575764,
+                                              lon = -121.478851, tz = "America/Los_Angeles", keep = "nightEnd") |>
+             pull(nightEnd)),
+           night = hms::as_hms(suncalc::getSunlightTimes(date = date_released,
+                                              lat = 38.575764,
+                                              lon = -121.478851, tz = "America/Los_Angeles", keep = "night") |>
+             pull(night))
+    ) |>
+    filter(time_released < night_end |
+             time_released >= night) |>
+    select(stream, site, release_id) |>
+    mutate(night_release = T)) |>
+    mutate(night_release = ifelse(is.na(night_release), F, night_release))
+
+night_release_lookup |>
+    group_by(night_release) |>
+    tally()
+
+release_recapture <-  left_join(
+    SRJPEdata::release,
+    SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
+      group_by(stream, site, release_id) |>
+      summarize(number_recaptured = sum(count, na.rm = T)),
+    by = c("release_id", "stream", "site")
+  ) |>
+  mutate(
+    week_released = week(date_released),
+    year_released = year(date_released),
+    efficiency = number_recaptured/number_released) |>
+  left_join(night_release_lookup)
+```
+
+Most night releases occur at Battle or Clear Creek. There is a small difference in efficiency at Butte Creek between night and day releases.
+
+```{r, echo = F, warning = F, message = F}
+night_release_lookup |>
+    filter(night_release == T) |>
+    group_by(site) |>
+    tally()
+
+release_recapture |>
+    filter(!is.na(night_release), efficiency <=1) |>
+    ggplot(aes(x = as.factor(night_release), y = efficiency)) +
+    geom_boxplot() +
+    facet_wrap(~site)
+```
