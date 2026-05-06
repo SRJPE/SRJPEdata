@@ -43,12 +43,9 @@ rst_trap_query_pilot_processed <- rst_trap_query_pilot |>
     debris_volume = debris_volume_gal
   ) |>
   select(
-    trap_visit_id,
     stream,
     site,
     subsite,
-    trap_name,
-    is_paper_entry,
     trap_start_date,
     trap_stop_date,
     trap_start_time,
