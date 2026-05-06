@@ -12,10 +12,10 @@ library(tidyverse)
 # Add rows for weeks that were not sampled where catch is NA
 # Decision - Do not filter out "years to exclude" here to allow experimentation with modeling
 
-yearling_ruleset <- SRJPEdata::daily_yearling_ruleset
+yearling_ruleset <- daily_yearling_ruleset
 # Remove all adipose clipped fish - we do not want to include hatchery fish
 # Remove yearling fish - we do not want to include yearlings
-updated_standard_catch_raw <- SRJPEdata::rst_catch |>
+updated_standard_catch_raw <- rst_catch |>
   mutate(
     remove = case_when(
       stream != "butte creek" & adipose_clipped == T ~ "remove", # remove adipose clipped fish (hatcher), Butte told us these should not be removed for them
@@ -47,7 +47,7 @@ updated_standard_catch <- updated_standard_catch_raw |> # all NA fork length wou
 # below sets up a table of all possible weeks (based on min sampling year and max sampling year). This is joined at the end
 
 # Lookup that includes all weeks for streams and sites
-rst_all_weeks <- SRJPEdata::rst_catch |>
+rst_all_weeks <- rst_catch |>
   group_by(stream, site, subsite) |>
   summarise(min = min(date, na.rm = T), max = max(date, na.rm = T)) |>
   mutate(
@@ -66,7 +66,7 @@ rst_all_weeks <- SRJPEdata::rst_catch |>
 # occurred but we no longer have counts.
 
 # Lookup that includes weeks where sampling occurred and when it did not
-weeks_sampled <- SRJPEdata::rst_catch |>
+weeks_sampled <- rst_catch |>
   filter(!is.na(count)) |> # remove when trap is not fishing
   mutate(
     week = week(date),
@@ -96,14 +96,14 @@ weekly_standard_catch <- updated_standard_catch |>
 
 # Trap Formatting ---------------------------------------------------------
 # Weekly effort from vignette/trap_effort.Rmd
-weekly_effort_by_site <- SRJPEdata::weekly_hours_fished |>
+weekly_effort_by_site <- weekly_hours_fished |>
   group_by(stream, site, site_group, week, year) %>%
   summarize(hours_fished = sum(hours_fished, na.rm = TRUE)) |> # weekly data is at the subsite level, we need to add together the subsites
   ungroup()
 
 # Environmental -----------------------------------------------------------
-env_with_sites <- SRJPEdata::environmental_data |>
-  left_join(SRJPEdata::site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
+env_with_sites <- environmental_data |>
+  left_join(site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
   glimpse()
 
 weekly_flow <- env_with_sites |> filter(parameter == "flow")
@@ -115,8 +115,8 @@ weekly_flow <- env_with_sites |> filter(parameter == "flow")
 # Josh needs origin released but need to summarize it by week
 weekly_efficiency <-
   left_join(
-    SRJPEdata::release,
-    SRJPEdata::recaptures |> # need to summarize first so you don't get duplicated release data when joining
+    release,
+    recaptures |> # need to summarize first so you don't get duplicated release data when joining
       group_by(stream, site, release_id) |>
       summarize(count = sum(count, na.rm = T)),
     by = c("release_id", "stream", "site")
