@@ -126,6 +126,7 @@ Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and
 ```{r, echo = FALSE}
 # Find sites with efficiency data. Any site that has NO efficiency trials will be excluded
 stream_site_with_efficiency_data <- SRJPEdata::weekly_efficiency |>
+  ungroup() |> 
   distinct(stream, site) |>
   mutate(if_efficiency_data = T)
 
