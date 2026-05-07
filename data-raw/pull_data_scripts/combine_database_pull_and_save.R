@@ -37,34 +37,29 @@ rst_trap_query_pilot_processed <- rst_trap_query_pilot |>
     trap_start_time = as_hms(trap_visit_time_start),
     trap_stop_date = as_date(trap_visit_time_end),
     trap_stop_time = as_hms(trap_visit_time_end),
-    subsite = site
+    subsite = site,
+    rpm_start = rpm_at_start,
+    rpm_end = rpm_at_end,
+    debris_volume = debris_volume_gal
   ) |>
   select(
-    trap_visit_id,
     stream,
     site,
     subsite,
-    trap_name,
-    is_paper_entry,
     trap_start_date,
     trap_stop_date,
     trap_start_time,
     trap_stop_time,
-    #trap_visit_time_start,
-    #trap_visit_time_end,
-    #trap_visit_time_restart,
     fish_processed,
-    why_fish_not_processed,
     sample_gear,
-    cone_depth,
     trap_functioning,
     why_trap_not_functioning,
     trap_status_at_end,
     total_revolutions,
-    rpm_at_start,
-    rpm_at_end,
+    rpm_start,
+    rpm_end,
     in_half_cone_configuration,
-    debris_volume_gal
+    debris_volume
   )
 
 rst_trap <- bind_rows(rst_trap, rst_trap_query_pilot_processed, edi_trap) |> 

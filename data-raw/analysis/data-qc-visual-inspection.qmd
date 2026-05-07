@@ -1,0 +1,559 @@
+---
+title: "Data QC - Visual Inspection"
+format:
+    html:
+        embed-resources: true
+        toc: true
+        toc-depth: 3
+        toc-title: "Contents"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(knitr)
+
+# Helper: IQR-based outlier flag
+flag_outliers <- function(x, multiplier = 3) {
+  q <- quantile(x, c(0.25, 0.75), na.rm = TRUE)
+  iqr <- q[2] - q[1]
+  x < (q[1] - multiplier * iqr) | x > (q[2] + multiplier * iqr)
+}
+```
+
+## Overview
+
+This document provides visual QC checks for the primary SR JPE data objects. The goal is to identify potential **outliers**, **data gaps**, and **anomalies** that may warrant follow-up. Each section covers one data object.
+
+---
+
+# 1. rst_catch
+
+RST catch monitoring data across all tributary and mainstem sites.
+
+```{r rst-catch-prep}
+catch <- SRJPEdata::rst_catch |>
+  mutate(
+    year = year(date),
+    month = month(date),
+    week = week(date),
+    run_year = ifelse(week >= 45, year + 1, year)
+  )
+
+# Daily total catch per site
+daily_catch <- catch |>
+  filter(!is.na(count)) |>
+  group_by(date, stream, site, run_year) |>
+  summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop") |>
+  mutate(outlier = flag_outliers(total_count))
+
+# Weekly catch for trend plots
+weekly_catch <- catch |>
+  filter(!is.na(count)) |>
+  group_by(stream, site, run_year, week) |>
+  summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop")
+```
+
+## 1a. Total catch over time by site
+
+```{r rst-catch-time}
+p <- catch |>
+  filter(!is.na(count)) |>
+  group_by(date, stream, site) |>
+  summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop") |>
+  ggplot(aes(x = date, y = total_count, color = site)) +
+  geom_line(alpha = 0.6) +
+  scale_y_log10() +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_x") +
+  theme(legend.position = "none") +
+  labs(title = "Daily total catch by site (log scale)", x = NULL, y = "Total count (log10)", color = "Site")
+
+ggplotly(p)
+```
+
+## 1b. Potential outlier catch days (>3x IQR above 75th percentile, by site)
+
+```{r rst-catch-outliers}
+outlier_days <- daily_catch |>
+  filter(outlier) |>
+  arrange(desc(total_count)) |>
+  select(date, stream, site, run_year, total_count)
+
+kable(outlier_days, caption = paste0("Days with outlier catch values (n = ", nrow(outlier_days), ")"))
+```
+
+## 1c. Annual catch by site
+
+```{r rst-catch-annual}
+annual_catch <- catch |>
+  filter(!is.na(count)) |>
+  group_by(stream, site, run_year) |>
+  summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop")
+
+p2 <- annual_catch |>
+  ggplot(aes(x = run_year, y = total_count, color = site)) +
+  geom_line() +
+  geom_point(size = 1) +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_y") +
+  theme(legend.position = "none") +
+  labs(title = "Annual catch by site and stream", x = "Run year", y = "Total count")
+
+ggplotly(p2)
+```
+
+## 1d. Data gaps — weeks with no catch data within the run year window (weeks 45–53 & 1–22)
+
+```{r rst-catch-gaps}
+# Expected weeks in window
+window_weeks <- c(45:53, 1:22)
+
+weeks_observed <- catch |>
+  filter(!is.na(count), week %in% window_weeks) |>
+  select(stream, site, run_year, week) |>
+  distinct()
+
+# Sites and run years present in data
+site_run_years <- weeks_observed |>
+  distinct(stream, site, run_year)
+
+# All expected combinations
+expected <- site_run_years |>
+  crossing(week = window_weeks) |>
+  left_join(weeks_observed |> mutate(sampled = TRUE), by = c("stream", "site", "run_year", "week")) |>
+  mutate(sampled = replace_na(sampled, FALSE))
+
+gap_summary <- expected |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_weeks_sampled = sum(sampled),
+    n_weeks_missing = sum(!sampled),
+    pct_missing = round(100 * mean(!sampled), 1),
+    .groups = "drop"
+  ) |>
+  filter(n_weeks_missing > 0) |>
+  arrange(desc(pct_missing))
+
+p3 <- gap_summary |>
+  ggplot(aes(x = run_year, y = n_weeks_sampled)) +
+  geom_line(color = "steelblue", alpha = 0.7) +
+  geom_point(color = "steelblue", size = 1.5) +
+  geom_hline(yintercept = 19, linetype = "dashed", color = "red") +
+  facet_wrap(~site, scales = "free_x") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 4)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Weeks sampled per run year (window: wks 45-53 & 1-22)",
+    subtitle = "Red dashed line = 19-week threshold",
+    x = "Run year", y = "Weeks sampled"
+  )
+
+ggplotly(p3)
+```
+
+```{r rst-catch-gaps-table}
+kable(
+  gap_summary |> filter(n_weeks_sampled < 19) |> arrange(stream, site, run_year),
+  caption = "Site-years below the 19-week sampling threshold"
+)
+```
+
+---
+
+# 2. release
+
+RST efficiency trial release data.
+
+```{r release-prep}
+rel <- SRJPEdata::release |>
+  mutate(year = year(date_released))
+```
+
+## 3a. Number released over time by stream
+
+```{r release-time}
+p7 <- rel |>
+  ggplot(aes(x = date_released, y = number_released, color = stream)) +
+  geom_point(alpha = 0.5) +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free") +
+  labs(title = "Number released per trial over time", x = NULL, y = "Number released")
+
+ggplotly(p7)
+```
+
+## 3b. Number released — outliers
+
+```{r release-outliers}
+rel_outliers <- rel |>
+  filter(!is.na(number_released)) |>
+  mutate(outlier = flag_outliers(number_released)) |>
+  filter(outlier) |>
+  select(date_released, stream, site, number_released, run, life_stage) |>
+  arrange(desc(number_released))
+
+kable(rel_outliers, caption = paste0("Release trial outliers by number released (n = ", nrow(rel_outliers), ")"))
+```
+
+## 3c. Trials per year by stream
+
+```{r release-annual}
+p8 <- rel |>
+  count(stream, site, year) |>
+  ggplot(aes(x = year, y = n, color = site)) +
+  geom_line() +
+  geom_point(size = 1) +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_y") +
+  theme(legend.position = "none") +
+  labs(title = "Release trials per year by site", x = "Year", y = "Number of trials")
+
+ggplotly(p8)
+```
+
+## 3d. Years with no release trials
+
+```{r release-gaps}
+rel_coverage <- rel |>
+  distinct(stream, site, year) |>
+  group_by(stream, site) |>
+  summarise(
+    min_year = min(year),
+    max_year = max(year),
+    n_years = n(),
+    expected_years = max_year - min_year + 1,
+    gap_years = expected_years - n_years,
+    .groups = "drop"
+  ) |>
+  filter(gap_years > 0) |>
+  arrange(desc(gap_years))
+
+kable(rel_coverage, caption = "Sites with gaps in release trial coverage")
+```
+
+---
+
+# 4. recaptures
+
+RST efficiency trial recapture data.
+
+```{r recaptures-prep}
+recap <- SRJPEdata::recaptures |>
+  mutate(year = year(date))
+
+# Join to release to compute efficiency
+rel_summary <- SRJPEdata::release |>
+  group_by(release_id, stream, site) |>
+  summarise(number_released = sum(number_released, na.rm = TRUE), .groups = "drop")
+
+recap_summary <- recap |>
+  filter(!is.na(count)) |>
+  group_by(release_id, stream, site) |>
+  summarise(number_recaptured = sum(count, na.rm = TRUE), .groups = "drop")
+
+efficiency_trials <- rel_summary |>
+  left_join(recap_summary, by = c("release_id", "stream", "site")) |>
+  mutate(
+    number_recaptured = replace_na(number_recaptured, 0),
+    efficiency = number_recaptured / number_released,
+    date_released = SRJPEdata::release$date_released[match(release_id, SRJPEdata::release$release_id)]
+  ) |>
+  filter(!is.na(date_released))
+```
+
+## 4a. Efficiency over time by stream
+
+```{r recaptures-efficiency-time}
+p9 <- efficiency_trials |>
+  filter(efficiency <= 1) |>
+  ggplot(aes(x = date_released, y = efficiency, color = stream)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "loess", se = FALSE, linetype = "dashed") +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_x") +
+  labs(title = "Trial efficiency over time by stream", x = NULL, y = "Efficiency (recaptured / released)")
+
+ggplotly(p9)
+```
+
+## 4b. Suspiciously high efficiency (> 0.5)
+
+```{r recaptures-high-efficiency}
+high_eff <- efficiency_trials |>
+  filter(efficiency > 0.5) |>
+  arrange(desc(efficiency)) |>
+  select(release_id, date_released, stream, site, number_released, number_recaptured, efficiency)
+
+kable(high_eff, caption = paste0("Trials with efficiency > 0.5 (n = ", nrow(high_eff), ")"))
+```
+
+## 4c. Trials with zero recaptures
+
+```{r recaptures-zero}
+zero_recap <- efficiency_trials |>
+  filter(number_recaptured == 0) |>
+  count(stream, site) |>
+  arrange(desc(n))
+
+kable(zero_recap, caption = "Number of trials with zero recaptures by stream/site")
+```
+
+---
+
+# 5. weekly_juvenile_abundance_catch_data
+
+Weekly summarized catch for BT-SPAS-X model input.
+
+```{r wja-catch-prep}
+wja_catch <- SRJPEdata::weekly_juvenile_abundance_catch_data
+```
+
+## 5a. Weekly count over time by stream
+
+```{r wja-catch-time}
+p11 <- wja_catch |>
+  filter(!is.na(count)) |>
+  mutate(approx_date = make_date(run_year, 1, 1) + weeks(week - 1)) |>
+  ggplot(aes(x = approx_date, y = count, color = stream)) +
+  geom_line(alpha = 0.6) +
+  scale_y_log10() +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_x") +
+  labs(title = "Weekly catch (log scale) by stream", x = NULL, y = "Count (log10)")
+
+ggplotly(p11)
+```
+
+## 5b. Count outliers by site
+
+```{r wja-catch-outliers}
+wja_count_outliers <- wja_catch |>
+  filter(!is.na(count)) |>
+  group_by(stream, site) |>
+  mutate(outlier = flag_outliers(count)) |>
+  ungroup() |>
+  filter(outlier) |>
+  select(run_year, week, stream, site, count) |>
+  arrange(desc(count))
+
+kable(wja_count_outliers, caption = paste0("Weekly count outliers (n = ", nrow(wja_count_outliers), ")"))
+```
+
+## 5c. Annual hours fished by site
+
+```{r wja-catch-hours}
+annual_hours <- wja_catch |>
+  filter(!is.na(hours_fished)) |>
+  group_by(stream, site, run_year) |>
+  summarise(total_hours = sum(hours_fished, na.rm = TRUE), .groups = "drop")
+
+p12 <- annual_hours |>
+  ggplot(aes(x = run_year, y = total_hours, color = site)) +
+  geom_line(alpha = 0.7) +
+  geom_point(size = 1.5) +
+  facet_wrap(~stream, scales = "free") +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 4)) +
+  theme_minimal() +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Annual hours fished by site", x = "Run year", y = "Total hours fished")
+
+ggplotly(p12)
+```
+
+## 5d. Flow (cfs) over time
+
+```{r wja-catch-flow}
+p13 <- wja_catch |>
+  filter(!is.na(flow_cfs)) |>
+  mutate(approx_date = make_date(run_year, 1, 1) + weeks(week - 1)) |>
+  ggplot(aes(x = approx_date, y = flow_cfs, color = stream)) +
+  geom_line(alpha = 0.5) +
+  scale_y_log10() +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_x") +
+  labs(title = "Weekly flow (cfs, log scale) by stream", x = NULL, y = "Flow CFS (log10)")
+
+ggplotly(p13)
+```
+
+## 5e. Weeks sampled heatmap by site
+
+Each cell represents one week within a run year. Green = sampled (non-NA count), white = not sampled.
+
+```{r wja-catch-heatmap, fig.height=20}
+# Reindex weeks so run year window reads left to right (wk 45 = index 1)
+heatmap_data <- wja_catch |>
+  mutate(
+    week_index = if_else(week >= 45, week - 44L, week + 9L)
+  )
+
+# All site x run_year x week_index combinations that exist in the data
+all_combos <- heatmap_data |>
+  distinct(stream, site, run_year) |>
+  crossing(week_index = 1:31)
+
+sampled <- heatmap_data |>
+  filter(!is.na(count)) |>
+  distinct(stream, site, run_year, week_index) |>
+  mutate(sampled = TRUE)
+
+plot_data <- all_combos |>
+  left_join(sampled, by = c("stream", "site", "run_year", "week_index")) |>
+  mutate(sampled = replace_na(sampled, FALSE))
+
+p <- plot_data |>
+  ggplot(aes(x = week_index, y = factor(run_year), fill = sampled,
+             text = paste0("Run year: ", run_year, "<br>Week index: ", week_index))) +
+  geom_tile(color = "white", linewidth = 0.3) +
+  scale_fill_manual(values = c("TRUE" = "#4CAF50", "FALSE" = "#EEEEEE"),
+                    labels = c("Sampled", "Not sampled")) +
+  scale_x_continuous(breaks = c(1, 5, 10, 15, 20, 25, 31),
+                     labels = c("wk45", "wk49", "wk3", "wk8", "wk13", "wk18", "wk22")) +
+  facet_wrap(~site, ncol = 2, scales = "free_y") +
+  theme_minimal(base_size = 9) +
+  theme(panel.grid = element_blank(), legend.position = "top") +
+  labs(title = "Weeks sampled per run year by site",
+       subtitle = "Week index 1 = week 45 (Nov); index 31 = week 22 (Jun)",
+       x = "Week (run-year indexed)", y = "Run year", fill = NULL)
+
+ggplotly(p, tooltip = "text")
+```
+
+---
+
+# 6. weekly_juvenile_abundance_efficiency_data
+
+Weekly efficiency data for BT-SPAS-X model input.
+
+```{r wja-eff-prep}
+wja_eff <- SRJPEdata::weekly_juvenile_abundance_efficiency_data
+```
+
+## 6a. Efficiency (recaptured / released) over time
+
+```{r wja-eff-time}
+wja_eff_rates <- wja_eff |>
+  filter(!is.na(number_released), !is.na(number_recaptured), number_released > 0) |>
+  mutate(
+    efficiency = number_recaptured / number_released,
+    approx_date = make_date(run_year, 1, 1) + weeks(week - 1)
+  )
+
+p14 <- wja_eff_rates |>
+  ggplot(aes(x = approx_date, y = efficiency, color = stream)) +
+  geom_point(alpha = 0.5) +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_x") +
+  labs(title = "Weekly efficiency over time by stream", x = NULL, y = "Efficiency")
+
+ggplotly(p14)
+```
+
+## 6b. Efficiency outliers
+
+```{r wja-eff-outliers}
+eff_outliers <- wja_eff_rates |>
+  group_by(stream, site) |>
+  mutate(outlier = flag_outliers(efficiency)) |>
+  ungroup() |>
+  filter(outlier | efficiency > 1) |>
+  select(run_year, week, stream, site, number_released, number_recaptured, efficiency) |>
+  arrange(desc(efficiency))
+
+kable(eff_outliers, caption = paste0("Efficiency outliers (n = ", nrow(eff_outliers), ")"))
+```
+
+## 6c. Trials per run year by stream
+
+```{r wja-eff-trials}
+p15 <- wja_eff |>
+  filter(!is.na(number_released)) |>
+  count(stream, site, run_year) |>
+  ggplot(aes(x = run_year, y = n, color = site)) +
+  geom_line() +
+  geom_point(size = 1) +
+  theme_minimal() +
+  facet_wrap(~stream, scales = "free_y") +
+  theme(legend.position = "none") +
+  labs(title = "Efficiency trials per run year", x = "Run year", y = "Number of weekly efficiency obs")
+
+ggplotly(p15)
+```
+
+## 6d. Standardized efficiency flow distribution
+
+```{r wja-eff-flow}
+p16 <- wja_eff |>
+  filter(!is.na(standardized_efficiency_flow)) |>
+  ggplot(aes(x = standardized_efficiency_flow, fill = stream)) +
+  geom_histogram(bins = 40, alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~stream, scales = "free_y") +
+  theme_minimal() +
+  labs(title = "Standardized efficiency flow distribution", x = "Standardized flow", y = "Count")
+
+ggplotly(p16)
+```
+
+---
+
+# 7. years_to_exclude_rst_data
+
+Years flagged as incomplete for RST data.
+
+```{r yex-rst-prep}
+yex_rst <- SRJPEdata::years_to_exclude_rst_data
+```
+
+## 7a. Table of excluded years
+
+```{r yex-rst-table}
+kable(yex_rst |> arrange(stream, site, run_year), caption = "All excluded RST site-years")
+```
+
+## 7b. Excluded years by stream and site
+
+```{r yex-rst-heatmap}
+# All possible site-years from rst_catch
+all_site_years <- SRJPEdata::rst_catch |>
+  filter(!is.na(count)) |>
+  mutate(
+    week = week(date),
+    run_year = ifelse(week >= 45, year(date) + 1, year(date))
+  ) |>
+  distinct(stream, site, run_year) |>
+  filter(!site %in% c("powerhouse", "adams dam"))
+
+site_year_status <- all_site_years |>
+  left_join(
+    yex_rst |> mutate(excluded = TRUE) |> select(stream, site, run_year, excluded),
+    by = c("stream", "site", "run_year")
+  ) |>
+  mutate(excluded = replace_na(excluded, FALSE))
+
+p17 <- site_year_status |>
+  ggplot(aes(x = run_year, y = site, fill = excluded)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = c("FALSE" = "#4CAF50", "TRUE" = "#F44336"),
+                    labels = c("Included", "Excluded")) +
+  theme_minimal() +
+  labs(title = "RST site-year inclusion status", x = "Run year", y = NULL, fill = "Status")
+
+ggplotly(p17)
+```
+
+## 7c. Number of excluded years by stream
+
+```{r yex-rst-summary}
+yex_rst |>
+  count(stream, site, exclusion_type, apply_to, name = "n_excluded_years") |>
+  arrange(desc(n_excluded_years)) |>
+  kable(caption = "Excluded years by stream, site, and exclusion type")
+```
+
