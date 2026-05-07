@@ -232,9 +232,7 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
       (hours_fished == 0 | is.na(hours_fished)) & count >= 0,
       average_stream_hours_fished,
       hours_fished
-    ),
-    hours_fished = ifelse(is.na(count), 0, hours_fished) # adds 0 hours fished for padded weeks with NA catch
-  ) |> 
+    )) |> 
   select(-average_stream_hours_fished) |> 
   left_join(average_hours_fished_efficiency, by = c("site"))  # add the average_hours_fished_during_efficiency_trials
 
@@ -300,8 +298,7 @@ tributary_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows
 efficiency_standard_flows <- bind_rows(
   mainstem_standardized_efficiency_flows,
   tributary_standardized_efficiency_flows
-) |>
-  glimpse()
+) 
 
 weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |>
   left_join(standardizing_lookup, by = "site") |>
@@ -324,8 +321,7 @@ btspasx_special_priors_data <- read.csv(here::here(
   "Special_Priors.csv"
 )) |>
   mutate(site = sub(".*_", "", Stream_Site)) |>
-  select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max) |>
-  glimpse()
+  select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max) 
 
 # Fill in missing weeks that were sampled or not sampled ---------------------------------------------------------
 # JOIN special priors with weekly model data
@@ -341,15 +337,21 @@ weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
   ) |> # maximum possible value for log N across strata
   select(-special_prior) |>
   full_join(weeks_sampled) |> 
+  group_by(site) |>
+  mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> # this is used to fill in gaps where hours fished data is missing
+  ungroup() |> 
   mutate(
     count = case_when(
       is.na(count) & if_sampled == T ~ 0,
       is.na(count) & if_sampled == F ~ NA,
-      T ~ count,
-    
+      T ~ count),
+    hours_fished = case_when(
+      is.na(hours_fished) & if_sampled == T ~ average_stream_hours_fished,
+      if_sampled == F ~ NA,
+      T ~ hours_fished
     )
   ) |>  
-  select(-if_sampled)
+  select(-c(if_sampled, average_stream_hours_fished))
 
 
 # when we join rst_all_weeks we end up with some run years that have all NA sampling
