@@ -124,7 +124,7 @@ then a new trap visit entry was recorded once the trap started working again. Th
 are some erroneous values. These will be addressed at the end of the script by setting limits.
 
 ```{r, echo = FALSE}
-method_one_hours_fished <- SRJPEdata::rst_trap |>  
+method_one_hours_fished <- rst_trap |>  
   select(trap_start_date, trap_start_time, trap_stop_date, trap_stop_time, 
          stream, site, subsite, site_group)  |>  
   arrange(site, subsite, trap_stop_date, trap_stop_time) |>  
@@ -229,7 +229,7 @@ weekly_hours_fished_raw <- hours_fished_combined %>%
 # we need to check to make sure there is not missing trap data (no hours fished when we have catch)
 # 607 obs
 
-weeks_with_missing_trap_data <- SRJPEdata::rst_catch |> 
+weeks_with_missing_trap_data <- rst_catch |> 
   mutate(week = week(date),
          year = year(date)) |> 
   group_by(stream, site, subsite, site_group, week, year) |> 
