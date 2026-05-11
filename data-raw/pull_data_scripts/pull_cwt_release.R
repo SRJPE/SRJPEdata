@@ -320,7 +320,7 @@ rst_cwt_recaptures <- recaptures_raw |>
   filter(tag_code != "N/A") |>
   mutate(
     year = year(date),
-    julian_week = week(date),
+    julian_week = lubridate::week(date),
     run_year = ifelse(julian_week >= 45, year + 1, year),
     week_index = if_else(
       julian_week >= 45,

@@ -113,7 +113,7 @@ test_that("test that there is data for each site week combo", {
     mutate(date = as_date(date)) |> 
     dplyr::select(-name) |> 
     padr::pad(interval = "day", group = c("stream", "site")) |> 
-    mutate(week = week(date),
+    mutate(week = lubridate::week(date),
            year = year(date)) |> 
     distinct(stream, site, year, week) |> 
     mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 

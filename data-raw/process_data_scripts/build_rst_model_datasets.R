@@ -58,7 +58,7 @@ rst_all_weeks <- rst_catch |>
   mutate(date = as_date(date)) |>
   select(-name) |>
   padr::pad(interval = "day", group = c("stream", "site")) |>
-  mutate(week = week(date), year = year(date)) |>
+  mutate(week = lubridate::week(date), year = year(date)) |>
   distinct(stream, site, year, week) |>
   mutate(run_year = ifelse(week >= 45, year + 1, year))
 
@@ -69,7 +69,7 @@ rst_all_weeks <- rst_catch |>
 weeks_sampled <- rst_catch |>
   filter(!is.na(count)) |> # remove when trap is not fishing
   mutate(
-    week = week(date),
+    week = lubridate::week(date),
     year = year(date),
     run_year = ifelse(week >= 45, year + 1, year)
   ) |>
@@ -83,7 +83,7 @@ weeks_sampled <- rst_catch |>
 # Summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
 weekly_standard_catch <- updated_standard_catch |>
-  mutate(week = week(date), year = year(date)) |>
+  mutate(week = lubridate::week(date), year = year(date)) |>
   group_by(stream, site, site_group, week, year) %>%
   summarize(
     mean_fork_length = mean(fork_length, na.rm = T),
@@ -122,7 +122,7 @@ weekly_efficiency <-
     by = c("release_id", "stream", "site")
   ) |>
   mutate(
-    week_released = week(date_released),
+    week_released = lubridate::week(date_released),
     year_released = year(date_released),
     # summarize this way because there may be multiple releases per week and need to find origin for week rather than just release trial
     hatchery = ifelse(origin == "hatchery", 1, 0),

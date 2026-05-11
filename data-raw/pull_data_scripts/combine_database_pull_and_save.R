@@ -103,7 +103,7 @@ rst_catch <- full_join(catch_dates, rst_catch_prep) |>
   mutate(
     fork_length = ifelse(fork_length == 0, NA, fork_length),
     # looks like there were some cases where fork length is 0. this should be handled more upstream but fixing it here for now
-    julian_week = week(date),
+    julian_week = lubridate::week(date),
     julian_year = year(date),
     # adding week for noble
     life_stage = ifelse(is.na(life_stage), "not recorded", life_stage),
