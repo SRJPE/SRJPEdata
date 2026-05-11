@@ -7,16 +7,31 @@
 library(tidyverse)
 library(EDIutils)
 
-pull_edi <- function(id, index, version) {
+pull_edi <- function(id, index, version = NULL, max_attempts = 3) {
   scope <- "edi"
   identifier <- id
-  # latest_version <- list_data_package_revisions(scope, identifier) |>
-  #   tail(1)
-  latest_version <- version
+  latest_version <- if (is.null(version)) {
+    list_data_package_revisions(scope, identifier) |> tail(1)
+  } else {
+    version
+  }
   package_id <- paste(scope, identifier, latest_version, sep = ".")
   res <- read_data_entity_names(packageId = package_id)
-  raw <- read_data_entity(packageId = package_id, entityId = res$entityId[index])
-  edi <- read_csv(file = raw)
+  for (attempt in seq_len(max_attempts)) {
+    result <- tryCatch({
+      raw <- read_data_entity(packageId = package_id, entityId = res$entityId[index])
+      read_csv(file = raw)
+    }, error = function(e) {
+      if (attempt < max_attempts) {
+        message("Attempt ", attempt, " failed: ", conditionMessage(e), ". Retrying in 5 seconds...")
+        Sys.sleep(5)
+        NULL
+      } else {
+        stop(e)
+      }
+    })
+    if (!is.null(result)) return(result)
+  }
 }
 
 
@@ -90,8 +105,7 @@ butte_trap_edi <- trap_edi |>
 # We are unable to load the recapture dataset into the db because it does not
 # have a unique identifier
 
-# TODO insert code to grab most recent version
-recapture_edi <- pull_edi("1509", 3, 2)
+recapture_edi <- pull_edi("1509", 3) # pull most recent version
 
 battle_clear_recapture_edi <- recapture_edi |> 
   mutate(stream = case_when(grepl("clear creek", site) ~ "clear creek",
@@ -105,17 +119,21 @@ battle_clear_recapture_edi <- recapture_edi |>
                           site == "upper clear creek" ~ "ucc"),
          subsite = site,
          life_stage = NA,
+         run = NA,
+         adipose_clipped = NA,
          weight = NA) |> 
   rename(date = date_recaptured,
-         run = fws_run,
-         adipose_clipped = hatchery_origin,
          count = number_recaptured,
          fork_length = median_fork_length_recaptured) |> 
   select(date, release_id, stream, site, subsite, site_group, count, run, life_stage, adipose_clipped,
-         dead, fork_length, weight, species)
+         dead, fork_length, weight, species) |> 
+ # QC fix. Natasha notified 7/24/2025 and this has still not been resolved on their end
+  mutate(count = case_when(date == "2018-02-15" & count == 1180 ~ 11,
+                            T ~ count))
 
 
 # Deer & Mill -------------------------------------------------------------
+# Historical data from Deer and Mill are pulled directly from EDI because they do not have unique identifiers. Version is static.
 catch_edi <- pull_edi("1504", 1, 3)
 recapture_edi <- pull_edi("1504", 2, 3)
 release_edi <- pull_edi("1504", 3, 3)
