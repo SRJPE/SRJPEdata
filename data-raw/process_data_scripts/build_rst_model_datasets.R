@@ -313,29 +313,8 @@ weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |>
   ) |>
   select(-c(mean_eff_flow, sd_eff_flow))
 
-
-# ADD special priors data in
-btspasx_special_priors_data <- read.csv(here::here(
-  "data-raw",
-  "helper-tables",
-  "Special_Priors.csv"
-)) |>
-  mutate(site = sub(".*_", "", Stream_Site)) |>
-  select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max) 
-
 # Fill in missing weeks that were sampled or not sampled ---------------------------------------------------------
-# JOIN special priors with weekly model data
-# first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
 weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
-  left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
-  mutate(
-    lgN_prior = ifelse(
-      !is.na(special_prior),
-      special_prior,
-      log(((count / 1000) + 1) / 0.025)
-    )
-  ) |> # maximum possible value for log N across strata
-  select(-special_prior) |>
   full_join(weeks_sampled) |> 
   group_by(site) |>
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> # this is used to fill in gaps where hours fished data is missing
