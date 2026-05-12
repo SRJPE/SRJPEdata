@@ -12,7 +12,7 @@ test_that("years_to_include_rst_data includes all sites", {
   current_coverage <- years_to_include_rst_data$site |> unique() |> sort()
   # TODO confirm that we do not want adams dam in there at all
   expected_coverage <- c("deer creek", "eye riffle", "gateway riffle", 
-                         "hallwood", "herringer riffle", "knights landing", "lbc", 
+                         "hallwood", "herringer riffle", "knights landing",  
                          "lcc", "live oak", "mill creek", "okie dam",
                         "steep riffle", "sunset pumps", 
                          "tisdale", "ubc", "ucc")
