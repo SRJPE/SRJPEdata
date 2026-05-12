@@ -239,15 +239,15 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
 # calculate mean and sd used to standardize flows. should be mean and
 # sd of efficiency flows except for lbc
 
-# for lbc, use mean and sd of catch flow because we have no efficiency flows
-standardizing_lbc <- weekly_model_data_wo_efficiency_flows |>
-  filter(site == "lbc") |>
+# for lbc and adams dam, use mean and sd of catch flow because we have no efficiency flows
+standardizing_lbc_ad <- weekly_model_data_wo_efficiency_flows |>
+  filter(site %in% c("lbc", "adams dam")) |>
+  group_by(site) |> 
   summarise(
     mean_eff_flow = mean(flow_cfs, na.rm = T),
     sd_eff_flow = sd(flow_cfs, na.rm = T)
   ) |>
-  ungroup() |>
-  mutate(site = "lbc")
+  ungroup()
 
 # all others
 standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
@@ -262,7 +262,7 @@ standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
     sd_eff_flow = sd(flow_cfs, na.rm = T)
   ) |>
   ungroup() |>
-  bind_rows(standardizing_lbc)
+  bind_rows(standardizing_lbc_ad)
 
 # Add in standardized efficiency flows
 mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
