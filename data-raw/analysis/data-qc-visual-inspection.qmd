@@ -1,5 +1,6 @@
 ---
 title: "Data QC - Visual Inspection"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 format:
     html:
         embed-resources: true
@@ -85,7 +86,27 @@ outlier_days <- daily_catch |>
   arrange(desc(total_count)) |>
   select(date, stream, site, run_year, total_count)
 
-kable(outlier_days, caption = paste0("Days with outlier catch values (n = ", nrow(outlier_days), ")"))
+recent_cutoff <- max(outlier_days$run_year, na.rm = TRUE) - 2
+
+recent_outliers <- outlier_days |> filter(run_year >= recent_cutoff)
+historic_outliers <- outlier_days |> filter(run_year < recent_cutoff)
+
+kable(recent_outliers,
+      caption = paste0("Outlier catch days — past 3 run years (", recent_cutoff, "–present, n = ", nrow(recent_outliers), ")"))
+
+kable(
+  historic_outliers |>
+    group_by(stream, site) |>
+    summarise(
+      n_outlier_days  = n(),
+      run_years       = paste(sort(unique(run_year)), collapse = ", "),
+      max_count       = max(total_count),
+      median_count    = median(total_count),
+      .groups = "drop"
+    ) |>
+    arrange(stream, site),
+  caption = paste0("Historical outlier catch days summary — prior to ", recent_cutoff, " (n = ", nrow(historic_outliers), " days across ", n_distinct(historic_outliers$run_year), " run years)")
+)
 ```
 
 ## 1c. Annual catch by site
