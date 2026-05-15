@@ -165,7 +165,7 @@ data <- read_csv(here::here("data-raw", "helper-tables","yuba_daily_corrected_pa
 # process into format as previously defined by database
 yuba_passage_estimates <- data |> 
   mutate(run = ifelse(run %in% c("early spring", "late spring"), "spring", run)) |> 
-  group_by(year = year(date), run) |> 
+  group_by(year = biological_year, run) |> 
   dplyr::summarize(passage_estimate = sum(count, na.rm = T)) |> 
   mutate(stream = "yuba river")
 
