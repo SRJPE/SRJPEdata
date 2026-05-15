@@ -33,6 +33,51 @@ This document provides visual QC checks for the primary SR JPE data objects. The
 
 ---
 
+# Summary: Model Input Data Coverage
+
+## Catch data (`weekly_juvenile_abundance_catch_data`)
+
+```{r summary-catch, results='asis'}
+catch_summary <- SRJPEdata::weekly_juvenile_abundance_catch_data |>
+  group_by(stream, site) |>
+  summarise(
+    run_years      = paste(sort(unique(run_year)), collapse = ", "),
+    n_weeks_total  = n(),
+    n_count_na     = sum(is.na(count)),
+    n_count_zero   = sum(!is.na(count) & count == 0),
+    n_count_gt0    = sum(!is.na(count) & count > 0),
+    .groups = "drop"
+  ) |>
+  arrange(stream, site)
+
+kable(
+  catch_summary,
+  col.names = c("Stream", "Site", "Run years", "Total weeks", "Count NA", "Count = 0", "Count > 0"),
+  caption   = "Coverage summary for weekly_juvenile_abundance_catch_data"
+)
+```
+
+## Efficiency data (`weekly_juvenile_abundance_efficiency_data`)
+
+```{r summary-efficiency, results='asis'}
+eff_summary <- SRJPEdata::weekly_juvenile_abundance_efficiency_data |>
+  group_by(stream, site) |>
+  summarise(
+    run_years = paste(sort(unique(run_year)), collapse = ", "),
+    n_weeks   = n(),
+    .groups   = "drop"
+  ) |>
+  arrange(stream, site)
+
+kable(
+  eff_summary,
+  col.names = c("Stream", "Site", "Run years", "Total weeks"),
+  caption   = "Coverage summary for weekly_juvenile_abundance_efficiency_data"
+)
+```
+
+---
+
 # 1. rst_catch
 
 RST catch monitoring data across all tributary and mainstem sites.
