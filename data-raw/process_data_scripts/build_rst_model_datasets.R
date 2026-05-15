@@ -58,7 +58,7 @@ rst_all_weeks <- rst_catch |>
   mutate(date = as_date(date)) |>
   select(-name) |>
   padr::pad(interval = "day", group = c("stream", "site")) |>
-  mutate(week = week(date), year = year(date)) |>
+  mutate(week = lubridate::week(date), year = year(date)) |>
   distinct(stream, site, year, week) |>
   mutate(run_year = ifelse(week >= 45, year + 1, year))
 
@@ -69,7 +69,7 @@ rst_all_weeks <- rst_catch |>
 weeks_sampled <- rst_catch |>
   filter(!is.na(count)) |> # remove when trap is not fishing
   mutate(
-    week = week(date),
+    week = lubridate::week(date),
     year = year(date),
     run_year = ifelse(week >= 45, year + 1, year)
   ) |>
@@ -83,7 +83,7 @@ weeks_sampled <- rst_catch |>
 # Summarize by week -----------------------------------------------------------
 # Removed lifestage and yearling for now - can add back in but do not need for btspasx model input so removing
 weekly_standard_catch <- updated_standard_catch |>
-  mutate(week = week(date), year = year(date)) |>
+  mutate(week = lubridate::week(date), year = year(date)) |>
   group_by(stream, site, site_group, week, year) %>%
   summarize(
     mean_fork_length = mean(fork_length, na.rm = T),
@@ -122,7 +122,7 @@ weekly_efficiency <-
     by = c("release_id", "stream", "site")
   ) |>
   mutate(
-    week_released = week(date_released),
+    week_released = lubridate::week(date_released),
     year_released = year(date_released),
     # summarize this way because there may be multiple releases per week and need to find origin for week rather than just release trial
     hatchery = ifelse(origin == "hatchery", 1, 0),
@@ -239,15 +239,15 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
 # calculate mean and sd used to standardize flows. should be mean and
 # sd of efficiency flows except for lbc
 
-# for lbc, use mean and sd of catch flow because we have no efficiency flows
-standardizing_lbc <- weekly_model_data_wo_efficiency_flows |>
-  filter(site == "lbc") |>
+# for lbc and adams dam, use mean and sd of catch flow because we have no efficiency flows
+standardizing_lbc_ad <- weekly_model_data_wo_efficiency_flows |>
+  filter(site %in% c("lbc", "adams dam")) |>
+  group_by(site) |> 
   summarise(
     mean_eff_flow = mean(flow_cfs, na.rm = T),
     sd_eff_flow = sd(flow_cfs, na.rm = T)
   ) |>
-  ungroup() |>
-  mutate(site = "lbc")
+  ungroup()
 
 # all others
 standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
@@ -262,7 +262,7 @@ standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
     sd_eff_flow = sd(flow_cfs, na.rm = T)
   ) |>
   ungroup() |>
-  bind_rows(standardizing_lbc)
+  bind_rows(standardizing_lbc_ad)
 
 # Add in standardized efficiency flows
 mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
@@ -313,29 +313,8 @@ weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |>
   ) |>
   select(-c(mean_eff_flow, sd_eff_flow))
 
-
-# ADD special priors data in
-btspasx_special_priors_data <- read.csv(here::here(
-  "data-raw",
-  "helper-tables",
-  "Special_Priors.csv"
-)) |>
-  mutate(site = sub(".*_", "", Stream_Site)) |>
-  select(site, run_year = RunYr, week = Jweek, special_prior = lgN_max) 
-
 # Fill in missing weeks that were sampled or not sampled ---------------------------------------------------------
-# JOIN special priors with weekly model data
-# first, assign special prior (if relevant), else set to default, then fill in for weeks without catch
 weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
-  left_join(btspasx_special_priors_data, by = c("run_year", "week", "site")) |>
-  mutate(
-    lgN_prior = ifelse(
-      !is.na(special_prior),
-      special_prior,
-      log(((count / 1000) + 1) / 0.025)
-    )
-  ) |> # maximum possible value for log N across strata
-  select(-special_prior) |>
   full_join(weeks_sampled) |> 
   group_by(site) |>
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> # this is used to fill in gaps where hours fished data is missing

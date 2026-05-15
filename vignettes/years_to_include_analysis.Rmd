@@ -51,7 +51,7 @@ The heat map below shows when sampling occurs for all streams. It shows that sam
 ```{r, echo = FALSE}
 # Need to join catch_data_week to make sure all weeks get included in the 
 # sampling window heatmap
-catch_date_week <- SRJPEdata::rst_catch %>% 
+catch_date_week <- rst_catch %>% 
   mutate(day = day(date),
          month = month(date),
          fake_date = as_date(paste0("2000-", month, "-", day))) %>%
@@ -72,7 +72,7 @@ date_range <- catch_date_week %>%
          max_date = format(max_date, "%b %d"),
          date_range = paste(min_date,"-",max_date))
 
-catch_summary <- SRJPEdata::rst_catch %>%
+catch_summary <- rst_catch %>%
   select(date, stream) %>%
   distinct() %>% 
   mutate(week = week(date),
@@ -125,13 +125,13 @@ Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and
 
 ```{r, echo = FALSE}
 # Find sites with efficiency data. Any site that has NO efficiency trials will be excluded
-stream_site_with_efficiency_data <- SRJPEdata::weekly_efficiency |>
+stream_site_with_efficiency_data <- weekly_efficiency |>
   ungroup() |> 
   distinct(stream, site) |>
   mutate(if_efficiency_data = T)
 
 # Assign stream/site/year as exclude or not based on criteria
-exclusion_catch <- SRJPEdata::weekly_juvenile_abundance_catch_data |>
+exclusion_catch <- weekly_juvenile_abundance_catch_data |>
   filter(!is.na(count)) |> # remove when trap is not fishing
   filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
   select(stream, site, week, run_year) |>

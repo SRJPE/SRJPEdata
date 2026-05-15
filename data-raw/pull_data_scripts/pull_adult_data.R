@@ -145,29 +145,36 @@ feather_spring_spawner <- feather_adult_raw |>
 # These data are on EDI and should be updated following the EDI workflow
 # https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1707.1 
 
-identifier = "1707"
-revision = list_data_package_revisions(scope, identifier, filter = "newest")
-package_id <- paste(scope, identifier, revision, sep = ".")
+# Uncomment these lines when transition back to using EDI
+# identifier = "1707"
+# revision = list_data_package_revisions(scope, identifier, filter = "newest")
+# package_id <- paste(scope, identifier, revision, sep = ".")
 
 # List data entities of the data package
-res <- read_data_entity_names(package_id)
+# res <- read_data_entity_names(package_id)
 
 # Download the daily corrected passage
-name <- "yuba_daily_corrected_passage.csv"
-entity_id <- res$entityId[res$entityName == name]
-raw <- read_data_entity(package_id, entity_id)
-data <- read_csv(file = raw)
+# name <- "yuba_daily_corrected_passage.csv"
+# entity_id <- res$entityId[res$entityName == name]
+# raw <- read_data_entity(package_id, entity_id)
+# data <- read_csv(file = raw)
+
+# This file was pulled from jpe-yuba-adult draft update
+data <- read_csv(here::here("data-raw", "helper-tables","yuba_daily_corrected_passage.csv"))
 
 # process into format as previously defined by database
 yuba_passage_estimates <- data |> 
   mutate(run = ifelse(run %in% c("early spring", "late spring"), "spring", run)) |> 
-  group_by(year = year(date), run) |> 
+  group_by(year = biological_year, run) |> 
   dplyr::summarize(passage_estimate = sum(count, na.rm = T)) |> 
   mutate(stream = "yuba river")
 
+# As of May 11 2026 we are in process of publishing additional Yuba River adult data on EDI
+# to not slow down the release of SRJPEdata 1.0.0 we pull these data from the helper files
+# this will be reverted to pulling from EDI after the next update is published
 yuba_spring_passage_estimates <- yuba_passage_estimates |> 
   filter(run == "spring",
-         !year %in% c(2016, 2017, 2019)) |> 
+         !year %in% c(2016, 2017, 2019, 2025)) |> 
   rename(count = passage_estimate) |> 
   ungroup() |> 
   mutate(data_type = "upstream_estimate") |> 

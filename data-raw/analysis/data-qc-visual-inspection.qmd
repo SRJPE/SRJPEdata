@@ -1,5 +1,6 @@
 ---
 title: "Data QC - Visual Inspection"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 format:
     html:
         embed-resources: true
@@ -29,6 +30,51 @@ flag_outliers <- function(x, multiplier = 3) {
 ## Overview
 
 This document provides visual QC checks for the primary SR JPE data objects. The goal is to identify potential **outliers**, **data gaps**, and **anomalies** that may warrant follow-up. Each section covers one data object.
+
+---
+
+# Summary: Model Input Data Coverage
+
+## Catch data (`weekly_juvenile_abundance_catch_data`)
+
+```{r summary-catch, results='asis'}
+catch_summary <- SRJPEdata::weekly_juvenile_abundance_catch_data |>
+  group_by(stream, site) |>
+  summarise(
+    run_years      = paste(sort(unique(run_year)), collapse = ", "),
+    n_weeks_total  = n(),
+    n_count_na     = sum(is.na(count)),
+    n_count_zero   = sum(!is.na(count) & count == 0),
+    n_count_gt0    = sum(!is.na(count) & count > 0),
+    .groups = "drop"
+  ) |>
+  arrange(stream, site)
+
+kable(
+  catch_summary,
+  col.names = c("Stream", "Site", "Run years", "Total weeks", "Count NA", "Count = 0", "Count > 0"),
+  caption   = "Coverage summary for weekly_juvenile_abundance_catch_data"
+)
+```
+
+## Efficiency data (`weekly_juvenile_abundance_efficiency_data`)
+
+```{r summary-efficiency, results='asis'}
+eff_summary <- SRJPEdata::weekly_juvenile_abundance_efficiency_data |>
+  group_by(stream, site) |>
+  summarise(
+    run_years = paste(sort(unique(run_year)), collapse = ", "),
+    n_weeks   = n(),
+    .groups   = "drop"
+  ) |>
+  arrange(stream, site)
+
+kable(
+  eff_summary,
+  col.names = c("Stream", "Site", "Run years", "Total weeks"),
+  caption   = "Coverage summary for weekly_juvenile_abundance_efficiency_data"
+)
+```
 
 ---
 
@@ -85,7 +131,27 @@ outlier_days <- daily_catch |>
   arrange(desc(total_count)) |>
   select(date, stream, site, run_year, total_count)
 
-kable(outlier_days, caption = paste0("Days with outlier catch values (n = ", nrow(outlier_days), ")"))
+recent_cutoff <- max(outlier_days$run_year, na.rm = TRUE) - 2
+
+recent_outliers <- outlier_days |> filter(run_year >= recent_cutoff)
+historic_outliers <- outlier_days |> filter(run_year < recent_cutoff)
+
+kable(recent_outliers,
+      caption = paste0("Outlier catch days — past 3 run years (", recent_cutoff, "–present, n = ", nrow(recent_outliers), ")"))
+
+kable(
+  historic_outliers |>
+    group_by(stream, site) |>
+    summarise(
+      n_outlier_days  = n(),
+      run_years       = paste(sort(unique(run_year)), collapse = ", "),
+      max_count       = max(total_count),
+      median_count    = median(total_count),
+      .groups = "drop"
+    ) |>
+    arrange(stream, site),
+  caption = paste0("Historical outlier catch days summary — prior to ", recent_cutoff, " (n = ", nrow(historic_outliers), " days across ", n_distinct(historic_outliers$run_year), " run years)")
+)
 ```
 
 ## 1c. Annual catch by site

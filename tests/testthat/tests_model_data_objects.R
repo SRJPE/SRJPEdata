@@ -20,21 +20,6 @@ test_that("weekly_juvenile_efficeincy_catch_data data coverage at the tributary 
   expect_equal(current_coverage, expected_coverage)
 })
 
-# years to exclude are actually excluded
-test_that("weekly_juvenile_abundance_catch_data has the appropriate run years are included", {
-  current_site_year_raw <- weekly_juvenile_abundance_catch_data |> 
-    #filter(life_stage != "yearling") |> 
-    #filter(count > 0) |> 
-    distinct(stream, site, run_year) |> 
-    mutate(site_year = paste0(site, "-", run_year))
-  current_site_year <- sort(current_site_year_raw$site_year)
-  chosen_site_year_raw <- years_to_include_rst_data |> 
-    mutate(site_year = paste0(site, "-", run_year)) |> 
-    filter(!site_year %in% c("live oak-2002", "steep riffle-2015"))
-  chosen_site_year <- sort(chosen_site_year_raw$site_year)
-  expect_equal(current_site_year, chosen_site_year)
-})
-
 
 # no missing values when there is catch data (even if catch is 0)
 # Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
@@ -45,17 +30,11 @@ test_that("there is no missing values (hours fished...ect) when there is catch d
   site_na = anyNA(catch$site) # note 2/14 fixing this in db update
   flow_na = anyNA(catch$flow_cfs) # note 2/14 there are only 15 with missing data
   std_flow_na = anyNA(catch$standardized_flow) # same as above
-  # fl_na = anyNA(catch$mean_fork_length)
   hf_na = anyNA(catch$hours_fished)
-  as_hf_na = anyNA(catch$average_stream_hours_fished)
   ry_na = anyNA(catch$run_year)
-  cshf_na = anyNA(catch$catch_standardized_by_hours_fished)
   
-  nas = c(stream_na, site_na, flow_na, 
-          # fl_na, commented out for now, should be okay if fl nas, primarily should be using lifestage instead
-           hf_na, as_hf_na, 
-          ry_na, cshf_na)
-  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+  nas = c(stream_na, site_na, flow_na, hf_na, ry_na)
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE), 
                nas)
 })
 
@@ -68,74 +47,75 @@ test_that("still have flow and hours fished even if no catch", {
   site_na = anyNA(catch$site)
   flow_na = anyNA(catch$flow_cfs)
   std_flow_na = anyNA(catch$standardized_flow)
-  # fl_na = anyNA(catch$mean_fork_length)
-  hf_na = anyNA(catch$hours_fished)
-  as_hf_na = anyNA(catch$average_stream_hours_fished)
   ry_na = anyNA(catch$run_year)
-  # cshf_na = anyNA(catch$catch_standardized_by_hours_fished) - this should be NA
   
-  nas = c(stream_na, site_na, flow_na, 
-          # fl_na, 
-          hf_na, as_hf_na, 
-          ry_na)
-  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE), 
+  nas = c(stream_na, site_na, flow_na, std_flow_na,ry_na)
+  expect_equal(c(FALSE, FALSE, FALSE, FALSE, FALSE), 
                nas)
 })
 
 # check no -INf 
 # no missing values when there is catch data (even if catch is 0)
-# Currently fails, there are nas in flow, standard flow, fork length, lifestage, hours fished, catch standardized by hours fished
 test_that("there is no -Inf values (hours fished...ect) when there is catch data (even if catch is 0)", {
   catch <- weekly_juvenile_abundance_catch_data 
   flow_na = any(catch$flow_cfs  == -Inf)
   std_flow_na = any(catch$standardized_flow == -Inf)
-  hf_na = any(catch$hours_fished == -Inf)
-  as_hf_na = any(catch$average_stream_hours_fished == -Inf)
-  cshf_na = any(catch$catch_standardized_by_hours_fished == -Inf)
+  hf_na = any(catch$hours_fished == -Inf) # will be NA because there are NA when count is NA
   
-  nas = c(flow_na, std_flow_na, 
-          hf_na, as_hf_na, cshf_na)
-  expect_equal(c(FALSE, FALSE, FALSE, FALSE, NA), 
+  nas = c(flow_na, std_flow_na, hf_na)
+  expect_equal(c(FALSE, FALSE, NA), 
                nas)
 })
 
-
-# test that there is data for each site week combo
-test_that("test that there is data for each site week combo", {
-  # check that there is data for each site week combo
-  rst_all_weeks <- rst_catch |> 
-    group_by(stream, site, subsite) |> 
-    summarise(min = min(date),
-              max = max(date)) |> 
-    mutate(min = paste0(year(min),"-01-01"),
-           max = paste0(year(max),"-12-31")) |> 
-    pivot_longer(cols = c(min, max), values_to = "date") |> 
-    mutate(date = as_date(date)) |> 
-    dplyr::select(-name) |> 
-    padr::pad(interval = "day", group = c("stream", "site")) |> 
-    mutate(week = week(date),
-           year = year(date)) |> 
-    distinct(stream, site, year, week) |> 
-    mutate(run_year = ifelse(week >= 45, year + 1, year)) |> 
-    left_join(years_to_include_rst_data |> # need to make sure to filter out years that have been excluded
-                mutate(include = T)) |> 
-    filter(include == T) |> 
-    select(-include)
+test_that("no rows have more recaptures than releases", {
+  efficiency <- weekly_juvenile_abundance_efficiency_data |> 
+    filter(number_recaptured > number_released) 
+  erroneous_rows <- nrow(efficiency)
   
-  catch <- weekly_juvenile_abundance_catch_data |> 
-    dplyr::select(stream, site, year, week, run_year) |> distinct()
-  
-  all_weeks_n_rows <- nrow(rst_all_weeks)
-  catch_n_rows <- nrow(catch)
-  expect_equal(all_weeks_n_rows, 
-               catch_n_rows)
+  expect_equal(erroneous_rows, 
+               0)
 })
 
-# test_join <- current_site_year_raw |>
-#   rename(current_site_year = site_year) |>
-#   full_join(chosen_site_year_raw)
+# check no count values for no hours_fished
+# no missing values when there is catch data (even if catch is 0)
+test_that("there are no rows where we have count > 0 when there was no effort", {
+  catch <- weekly_juvenile_abundance_catch_data |> 
+    filter(is.na(hours_fished) | hours_fished == 0)
+  count_na <- !anyNA(catch$count)
+  
+  nas = count_na
+  expect_equal(FALSE, 
+               nas)
+})
 
-# no missing values where we have catch
-#test_that("weekly_juvenile_abundance_data does not have missing values where we have catch")
-# if data for one lifestage, count is not missing for others
-# we have all weeks
+# including a draft test for using simple expansion methods to check for high values. not in final form and not necessary for v1.0
+# simple expanded catch values are in reasonable ranges (not too high)
+test_that("count values are reasonable", {
+  
+  efficiency_summary <- weekly_juvenile_abundance_efficiency_data |>
+    filter(!is.na(number_recaptured),
+           !is.na(number_released)) |> 
+    mutate(simple_eff = number_recaptured / number_released) |> 
+    group_by(site) |> 
+    summarise(mean_simple_eff = mean(simple_eff)) |> 
+    ungroup()
+
+  expanded_catch <- weekly_juvenile_abundance_catch_data |>
+    filter(!is.na(count)) |> 
+    left_join(efficiency_summary, by = "site") |> 
+    mutate(simple_expansion = count / mean_simple_eff)
+    
+  expanded_catch_summary <- expanded_catch |> 
+    group_by(site) |> 
+    summarise(mean_simple_expansion = mean(simple_expansion),
+              sd_simple_expansion = sd(simple_expansion)) |> 
+    ungroup()
+  
+  expanded_catch_check <- expanded_catch |> 
+    select(site, week, run_year, simple_expansion) |> 
+    left_join(expanded_catch_summary, by = "site") |> 
+    mutate(upper_limit = mean_simple_expansion + (2 * sd_simple_expansion),
+           flag_upper = ifelse(simple_expansion > upper_limit, TRUE, FALSE))
+  
+  expect_true(all(expanded_catch_check$flag_upper))
+})
