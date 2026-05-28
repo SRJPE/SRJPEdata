@@ -146,21 +146,18 @@ feather_spring_spawner <- feather_adult_raw |>
 # https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1707.1 
 
 # Uncomment these lines when transition back to using EDI
-# identifier = "1707"
-# revision = list_data_package_revisions(scope, identifier, filter = "newest")
-# package_id <- paste(scope, identifier, revision, sep = ".")
+identifier = "1707"
+revision = list_data_package_revisions(scope, identifier, filter = "newest")
+package_id <- paste(scope, identifier, revision, sep = ".")
 
 # List data entities of the data package
-# res <- read_data_entity_names(package_id)
+res <- read_data_entity_names(package_id)
 
 # Download the daily corrected passage
-# name <- "yuba_daily_corrected_passage.csv"
-# entity_id <- res$entityId[res$entityName == name]
-# raw <- read_data_entity(package_id, entity_id)
-# data <- read_csv(file = raw)
-
-# This file was pulled from jpe-yuba-adult draft update
-data <- read_csv(here::here("data-raw", "helper-tables","yuba_daily_corrected_passage.csv"))
+name <- "yuba_daily_corrected_passage.csv"
+entity_id <- res$entityId[res$entityName == name]
+raw <- read_data_entity(package_id, entity_id)
+data <- read_csv(file = raw)
 
 # process into format as previously defined by database
 yuba_passage_estimates <- data |> 
