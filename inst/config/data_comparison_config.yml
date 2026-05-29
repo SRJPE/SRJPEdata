@@ -66,17 +66,6 @@ forecast_covariates.rda:
   numeric_tolerance: 1
   check_attributes: true
 
-# P2S covariates
-p2s_model_covariates.rda:
-  id_columns:
-    - year
-    - stream
-    - wy_type
-  allowed_to_change:
-  date_columns:
-  numeric_tolerance: 1
-  check_attributes: true
-
 # Recaptures
 recaptures.rda:
   id_columns:

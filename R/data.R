@@ -1,23 +1,3 @@
-#' @title Passage to Spawner Model Covariates Standard
-#' @name p2s_model_covariates_standard
-#' @description The passage to spawner model covariates standard table contains environmental
-#' covariates for use in the Passage to Spawner (P2S) model. The environmental variables are 
-#' standardized within a column to center around 0. Selection and preparation of the 
-#' covariates are detailed in \code{vignette("prep_environmental_covariates.Rmd", package = "SRJPEdata")}.
-#' @format A tibble with 192 rows and 7 columns 
-#' \itemize{
-#'   \item \code{year}: year 
-#'   \item \code{stream}: stream associated with covariate data
-#'   \item \code{wy_type}: water year type, binary variable describing wet(1) or dry(0)
-#'   \item \code{max_flow_std}: standardized maximum flow data for adult migration period (March - August) 
-#'   \item \code{gdd_std}: standardized cumulative degree days above 20 degrees Celsius 
-#'   for adult migration (Sacramento March - May) and holding (Tributaries May - August)
-#'   \item \code{passage_index}: standardized total adult returns (not currently utilized by model)
-#'   \item \code{median_passage_timing_std}: standardized median return week (not currently utilized by model)
-#'   }
-'p2s_model_covariates_standard'
-
-
 #' @title Weekly BT-SPAS-X Model Efficency Data
 #' @name weekly_juvenile_abundance_efficiency_data
 #' @description Weekly Rotary Screw Trap (RST) efficiency data and weekly standardized flow, 
