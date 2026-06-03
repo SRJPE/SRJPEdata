@@ -20,7 +20,6 @@ devtools::load_all()
 devtools::document()
 # Incorporate new data in rule sets/covariates 
 # Source all vignettes 
-knitr::knit("vignettes/prep_environmental_covariates.Rmd")
 knitr::knit("vignettes/trap_effort.Rmd")
 # knitr::knit("vignettes/yearling_ruleset.Rmd") Don't think this needs to be updated each time
 knitr::knit("vignettes/years_to_include_analysis.Rmd") 
@@ -28,10 +27,6 @@ knitr::knit("vignettes/sr_covariates.Rmd") # this takes a long time because sour
 knitr::knit("vignettes/forecast_covariates.Rmd") # this takes a long time because sources pull_environmental_data because daily data is needed, figure out a better workflow
 # rebuild site to save updated data objects in package
 devtools::load_all()
-
-# Source prep data scripts 
-# source("data-raw/process_data_scripts/build_adult_model_datasets.R") #TODO, error here, talk to liz about if this is needed
-# Error because database pull for upstream passage returns empty table
 
 source("data-raw/process_data_scripts/build_rst_model_datasets.R")
 source("data-raw/process_data_scripts/build_sr_model_datasets.R")
