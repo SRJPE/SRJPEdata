@@ -388,6 +388,38 @@
 #'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
 'survival_model_inputs'
 
+#' @title Travel Time Model Data - Sacramento
+#' @name detection_history_sacramento
+#' @description Acoustic tagging data used to model travel time as part of the survival model for the SR JPE 
+#' @format
+#' \itemize{
+#'   \item \code{fish_id}: Unique identifier associated with each released fish 
+#'   \item \code{TTfR1}: Time in days from detection at the release point to Woodson Bridge. 
+#'   \item \code{TTfR2}: Time in days from detection at the release point to Butte Bridge. 
+#'   \item \code{TTfR3}: Time in days from detection at the release point to the Sacramento River. 
+#'   \item \code{TTfR4}: Time in days from detection at the release point to the Endpoint. 
+#'   \item \code{stream}: Stream associated with the study IDs, here is `sacramento`.
+#'   }
+#'   @source Central Valley Enhanced Acoustic Tagging Project. 
+#'   This data package queries tagging data from many studies using the ERDDAP data server.
+#'   See `data-raw/pull_acoustic_tagging_data.R` and `data-raw/create_detection_history.R` for more details.
+'detection_history_sacramento'
+
+#' @title Travel Time Model Data - Feather River and Butte Creek
+#' @name detection_history_feather_butte
+#' @description Acoustic tagging data used to model travel time as part of the survival model for the SR JPE 
+#' @format
+#' \itemize{
+#'   \item \code{fish_id}: Unique identifier associated with each released fish 
+#'   \item \code{TTfR1}: Time in days from detection at the release point to the Sacramento River. 
+#'   \item \code{TTfR2}: Time in days from detection at the release point to the Endpoint. 
+#'   \item \code{stream}: Stream associated with the study IDs, either `feather` or `butte`.
+#'   }
+#'   @source Central Valley Enhanced Acoustic Tagging Project. 
+#'   This data package queries tagging data from many studies using the ERDDAP data server.
+#'   See `data-raw/pull_acoustic_tagging_data.R` and `data-raw/create_detection_history.R` for more details.
+'detection_history_feather_butte'
+
 #' @title Site Lookup
 #' @name site_lookup
 #' @description Site lookup table for linking subsite, sites, site_groups, and streams in the SR JPE 
