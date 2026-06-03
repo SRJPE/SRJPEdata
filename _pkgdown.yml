@@ -31,6 +31,9 @@ reference:
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model
 - contents: survival_model_inputs
+- subtitle: Genetics Datasets
+  desc: Data used as inputs to PLAD model
+- contents: completed_genetic_samples
 - title: Helper Data
   desc: Data used as helper datasets to generate model data
 - subtitle: Juvenile Datasets
