@@ -3,9 +3,12 @@
 source("data-raw/pull_data_scripts/combine_database_pull_and_save.R")
 
 # temp regression vignette needs to come before the environmental data
-knitr::knit("vignettes/temp_regression.Rmd")
+knitr::knit("vignettes/temp_regression.Rmd") # ideally this will be phased out with better temp data
 # Next source environmental data 
 source("data-raw/pull_data_scripts/pull_environmental_data.R")
+
+# adult data
+source("data-raw/pull_data_scripts/pull_adult_data.R") # only update once a year
 
 # And genetics data from DB
 # Need config file 
@@ -17,18 +20,13 @@ devtools::load_all()
 devtools::document()
 # Incorporate new data in rule sets/covariates 
 # Source all vignettes 
-knitr::knit("vignettes/prep_environmental_covariates.Rmd")
 knitr::knit("vignettes/trap_effort.Rmd")
-knitr::knit("vignettes/yearling_ruleset.Rmd") 
+# knitr::knit("vignettes/yearling_ruleset.Rmd") Don't think this needs to be updated each time
 knitr::knit("vignettes/years_to_include_analysis.Rmd") 
-knitr::knit("vignettes/sr_covariates.Rmd") # this takes a long time because sources pull_environmental_data because daily data is needed
-knitr::knit("vignettes/forecast_covariates.Rmd") # this takes a long time because sources pull_environmental_data because daily data is needed
+knitr::knit("vignettes/sr_covariates.Rmd") # this takes a long time because sources pull_environmental_data because daily data is needed, figure out a better workflow
+knitr::knit("vignettes/forecast_covariates.Rmd") # this takes a long time because sources pull_environmental_data because daily data is needed, figure out a better workflow
 # rebuild site to save updated data objects in package
 devtools::load_all()
-
-# Source prep data scripts 
-# source("data-raw/process_data_scripts/build_adult_model_datasets.R") #TODO, error here, talk to liz about if this is needed
-# Error because database pull for upstream passage returns empty table
 
 source("data-raw/process_data_scripts/build_rst_model_datasets.R")
 source("data-raw/process_data_scripts/build_sr_model_datasets.R")

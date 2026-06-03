@@ -1,23 +1,3 @@
-#' @title Passage to Spawner Model Covariates Standard
-#' @name p2s_model_covariates_standard
-#' @description The passage to spawner model covariates standard table contains environmental
-#' covariates for use in the Passage to Spawner (P2S) model. The environmental variables are 
-#' standardized within a column to center around 0. Selection and preparation of the 
-#' covariates are detailed in \code{vignette("prep_environmental_covariates.Rmd", package = "SRJPEdata")}.
-#' @format A tibble with 192 rows and 7 columns 
-#' \itemize{
-#'   \item \code{year}: year 
-#'   \item \code{stream}: stream associated with covariate data
-#'   \item \code{wy_type}: water year type, binary variable describing wet(1) or dry(0)
-#'   \item \code{max_flow_std}: standardized maximum flow data for adult migration period (March - August) 
-#'   \item \code{gdd_std}: standardized cumulative degree days above 20 degrees Celsius 
-#'   for adult migration (Sacramento March - May) and holding (Tributaries May - August)
-#'   \item \code{passage_index}: standardized total adult returns (not currently utilized by model)
-#'   \item \code{median_passage_timing_std}: standardized median return week (not currently utilized by model)
-#'   }
-'p2s_model_covariates_standard'
-
-
 #' @title Weekly BT-SPAS-X Model Efficency Data
 #' @name weekly_juvenile_abundance_efficiency_data
 #' @description Weekly Rotary Screw Trap (RST) efficiency data and weekly standardized flow, 
@@ -459,6 +439,8 @@
 #'   \item \code{release_location_name}: Name of the location where fish were released ("FEATHER AT GRIDLEY", "FEATHER AT LIVE OAK", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER BOYDS PUMP RAMP", "FEATHER R HATCHERY")
 #'   \item \code{avg_weight}: Average weight of fish released
 #'   \item \code{avg_length}: Average length of fish released  
+#'   \item \code{species}: Species of fish released ("chinook salmon")
+#'   \item \code{run}: Run of fish released ("fall", "late fall", "spring", "winter")
 #'   \item \code{first_release_data}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
 #'   \item \code{last_release_data}: Last date of release
 #'   \item \code{date_span}: Number of days between the first and last release date
@@ -471,8 +453,248 @@
 #'   \item \code{group_total_unmarked_N}: Total number of unmarked fish included in the release
 #'   \item \code{group_total_release_N}: Total number of fish released
 #'   \item \code{group_mark_rate}: Mark rate of fish released
+#'   \item \code{release_group_id}: Releases are grouped with other releases with same fish occurring on the same day but with different tag codes. Use this to join with RST recaptures.
 #'   \item \code{month}: Month of first release date used to join environmental covariates
 #'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 'feather_hatchery_release'
+
+#' @title Hatchery Release
+#' @name hatchery_release
+#' @description This table summarizes coded wire tag (CWT) data from release location to RST site of recapture (knights landing) by release group. Data source: Regional Mark Processing Center: https://www.rmpc.org/ 
+#' @format
+#' \itemize{
+#'   \item \code{release_location_name}: Name of the location where fish were released (COLEMAN NFH, BATTLE CREEK BELOW CNFH, BATTLE CREEK NFK WILDCAT, BALDWIN CONST. YARD, SAC R LAKE REDDING PARK, SAC R BEL RBDD, SAC R RED BLUFF DIV DAM, SAC R COLUSA TO RBDD, SAC R BONNYVIEW BOAT RAMP, SAC R AT BUTTE CITY)
+#'   \item \code{hatchery_location_name}: Name of hatchery fish were sourced from.
+#'   \item \code{species}: Species of fish released ("chinook salmon")
+#'   \item \code{run}: Run of fish released ("fall", "late fall", "spring", "winter")
+#'   \item \code{avg_weight}: Average weight of fish released
+#'   \item \code{avg_length}: Average length of fish released  
+#'   \item \code{first_release_date}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
+#'   \item \code{last_release_date}: Last date of release
+#'   \item \code{date_span}: Number of days between the first and last release date
+#'   \item \code{mid_release_date}: Midpoint date between first and last release date
+#'   \item \code{release_to_knights_landing_distance}: Distance to Knights Landing (RST) site of recapture (river km) from release location
+#'   \item \code{release_latitude}: Latitude of the release location
+#'   \item \code{release_longitude}: Longitude of release location
+#'   \item \code{release_group_id}: Releases are grouped with other releases with same fish occurring on the same day but with different tag codes. Use this to join with RST recaptures.
+#'   \item \code{group_total_marked_N}: Total number of marked fish included in the release
+#'   \item \code{group_total_unmarked_N}: Total number of unmarked fish included in the release
+#'   \item \code{group_total_release_N}: Total number of fish released
+#'   \item \code{group_mark_rate}: Mark rate of fish released
+#'   \item \code{month}: Month of first release date used to join environmental covariates
+#'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
+#'   \item \code{water_year}: Water year of release date (where month 10-12 are year + 1)
+#'   \item \code{stream}: Stream of release location (relevant to SR JPE streams, some may be NA) used for joining the covariates
+#'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+#'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+'hatchery_release'
+
+#' @title Escapement estimates all runs
+#' @name escapement_estimates_all_runs
+#' @description This table makes escapement data from GrandTab (https://wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Anadromous-Assessment) available for use. Currently only fall run are included.
+#' @format
+#' \itemize{
+#'   \item \code{run_year}: Year that salmon returned to the tributary. 
+#'   \item \code{stream}: Stream that salmon returned to. This has been filtered to SR JPE tributaries. See GrandTab for a full list of locations.
+#'   \item \code{estimates}: Escapement estimate. Note that these values are generated through a variety of methods.
+#'   \item \code{run}: Run of Chinook salmon. Currently only fall are included. See `annual_adult` for the best spring run estimates
+#'   \item \code{species}: Chinook salmon
+#'   \item \code{data_type}: Escapement estimates from GrandTab.
+'escapement_estimates_all_runs'
+
+#' @title RST Recaptures 
+#' @name rst_cwt_recaptures
+#' @description Table of recaptures from Knights Landing RST
+#' @format
+#' \itemize{
+#'   \item \code{date}: Date of capture
+#'   \item \code{forklength}: Fork length of catch in millimeters
+#'   \item \code{weight}: Weight of catch in grams
+#'   \item \code{tag_code}: Coded wire tag code
+#'   \item \code{stream}: River (Sacramento River)
+#'   \item \code{site}: Site of recapture (Knights Landing RST)
+#'   \item \code{year}: Year of recapture (Knights Landing RST)
+#'   \item \code{julian_week}: Week of recapture (Knights Landing RST)
+#'   \item \code{run_year}: Run year of recapture (where week >= 45 are year + 1)
+#'   \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
+#'   \item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
+'rst_cwt_recaptures'
+
+#' @title Forecast covariates 
+#' @name forecast_covariates
+#' @description Table of potential forecast covariates
+#' @format
+#' \itemize{
+#'   \item \code{name}: Name of the covariate
+#'   \item \code{year}: Calendar year. Not all variables are summarized by calendar year and may be NA.
+#'   \item \code{water_year}: Water year. Not all variables are summarized by water year and may be NA.
+#'   \item \code{stream}: Stream 
+#'   \item \code{value}: Numeric covariate value
+#'   \item \code{month}: Month. Not all variables are available at the monthly level.
+#'   \item \code{text_value}: Text value for categorical variables.
+#'   \item \code{site_group}: Site group that the value applies to. Only used for the "monthly_max_flow" parameter. For some streams there are multiple gages and this variable is used to differentiate.
+'forecast_covariates'
+
+#' @title Stock recruit covariates 
+#' @name stock_recruit_covariates
+#' @description Table of covariates used in stock recruit modeling
+#' @format
+#' \itemize{
+#'   \item \code{year}: Calendar year. 
+#'   \item \code{stream}: Stream 
+#'   \item \code{lifestage}: Lifestage that the covariate applies to
+#'   \item \code{covariate_type}: Describes the type of covariate (temperature or flow)
+#'   \item \code{covariate_structure}: Describes the structure of the covariate. 
+#'   \item \code{value}: Numeric value
+'stock_recruit_covariates'
+
+#' @title Years to exclude - Adult 
+#' @name years_to_exclude_adult
+#' @description Years for adult data that were identified as incomplete and not used in modeling
+#' @format
+#' \itemize{
+#'   \item \code{year}: Calendar year
+#'   \item \code{stream}: Stream 
+#'   \item \code{data_type}: Type of adult data
+#'   \item \code{reason_for_exclusion}: Provides reason for exclusion
+'years_to_exclude_adult'
+
+#' @title Years to exclude - RST data 
+#' @name years_to_exclude_rst_data
+#' @description Years for RST data that were identified as incomplete and not used in modeling
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream 
+#'   \item \code{site}: RST monitoring site
+#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
+#'   \item \code{number_weeks}: Number of weeks sampled in the run_year, for reference
+#'   \item \code{exclusion_type}: Provides the exclusion ruleset applied
+#'   \item \code{apply_to}: Differentiates between years that can be excluded broadly ("all runs") or those specific to spring run ("spring")
+'years_to_exclude_rst_data'
+
+#' @title Years to include - RST data, applies to all runs
+#' @name years_to_include_rst_data
+#' @description Years for RST data that can be included in modeling (inverse of years to exclude where apply_to == "all runs")
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream 
+#'   \item \code{site}: RST monitoring site
+#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
+'years_to_include_rst_data'
+
+#' @title Years to include - RST data, applies to spring run
+#' @name years_to_include_rst_data_spring
+#' @description Years for RST data that can be included in modeling spring run (inverse of years to exclude where apply_to == "spring")
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream 
+#'   \item \code{site}: RST monitoring site
+#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
+'years_to_include_rst_data_spring'
+
+#' Completed Genetic Samples
+#'
+#' Results of rapid genetic identification of outmigrating juvenile Chinook
+#' salmon (*Oncorhynchus tshawytscha*) collected at RST sites
+#' across the Sacramento River Basin (water years 2022–2026). Run assignments
+#' are derived from SHERLOCK and GT-seq analyses, with associated capture metadata and length-at-date
+#' (LAD)-based field assignments. 
+#'
+#' @format A data frame with 7,477 rows and 24 variables:
+#' \describe{
+#'   \item{sample_id}{character. Unique identifier of the sample processed.
+#'     Composed of location code, season, sample event, sample bin (size class),
+#'     and sample number separated by an underscore.}
+#'
+#'   \item{datetime_collected}{POSIXct. Date and time of sample collection
+#'     (format: \code{YYYY-MM-DD hh:mm:ss}). Range: 2022-01-10 to 2025-05-11.}
+#'
+#'   \item{fork_length_mm}{numeric. Fork length of the sampled fish, in
+#'     millimeters. Range: 23–176.}
+#'
+#'   \item{field_run_type}{character. Run type assigned in the field using
+#'     length-at-date (LAD) criteria. One of: \code{FALL}, \code{LATEFALL},
+#'     \code{SPRING}, \code{WINTER}, \code{UNKNOWN}, \code{NA}.}
+#'
+#'   \item{final_run_designation}{character. Final run type assigned via
+#'     combined SHERLOCK and GT-seq analysis. One of: \code{FALL OR LATE FALL},
+#'     \code{SPRING}, \code{GREB1L HETEROZYGOTE}, \code{WINTER}.}
+#'
+#'   \item{shlk_chr28_genotype}{character. SHERLOCK genotype result at the
+#'     \emph{Greb1L} locus on chromosome 28 (OTS28), indicating early- vs.
+#'     late-migration timing. One of: \code{EARLY}, \code{LATE},
+#'     \code{HETEROZYGOTE}, \code{NA}.}
+#'
+#'   \item{shlk_chr16_genotype}{character. SHERLOCK genotype result at the
+#'     OTS16 locus on chromosome 16, used to differentiate spring-run and
+#'     winter-run individuals among early-migrating fish. One of: \code{SPRING},
+#'     \code{WINTER}, \code{INDETERMINATE}, \code{NA}.}
+#'
+#'   \item{shlk_run_designation}{character. Run designation derived from
+#'     SHERLOCK genetic assay results and decision logic. One of:
+#'     \code{SPRING}, \code{EARLY/LATE HETEROZYGOUS}, \code{SPRING/WINTER},
+#'     \code{FALL/LATEFALL}, \code{WINTER}, \code{NA}.}
+#'
+#'   \item{gtseq_chr28_geno}{character. GT-seq genotype at the \emph{Greb1L}
+#'     locus on chromosome 28, indicating early- vs. late-migration timing.
+#'     One of: \code{EARLY}, \code{LATE}, \code{HETEROZYGOTE}, \code{NA}.}
+#'
+#'   \item{pop_structure_id}{character. Central Valley salmonid population
+#'     structure assignment from GT-seq (RUBIAS). One of: \code{FALL},
+#'     \code{LATEFALL}, \code{SPRING}, \code{WINTER}, \code{NA}.}
+#'
+#'   \item{cv_fall}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_late_fall}{numeric. Summed posterior assignment probability
+#'     (PofZ) to the Central Valley Late Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_spring}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_winter}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley (Sacramento River) Winter reporting unit.
+#'     Range: 0–1.}
+#'
+#'   \item{tributary}{character. Spring-run tributary assignment from RUBIAS.
+#'     One of: \code{ButteSp}, \code{Feather River Lineage Spring},
+#'     \code{MillDeerSp}, \code{NA}.}
+#'
+#'   \item{buttefall}{numeric. Posterior assignment probability (PofZ) to the
+#'     Butte River Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{frh_fall}{numeric. Posterior assignment probability (PofZ) to the
+#'     Feather River Hatchery Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{frh_sp}{numeric. Posterior assignment probability (PofZ) to the
+#'     Feather River Hatchery Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{mill_deer_fall}{numeric. Posterior assignment probability (PofZ)
+#'     to the Mill/Deer Fall reporting unit. Range: 0–0.999.}
+#'
+#'   \item{san_joaquin_fall}{numeric. Posterior assignment probability (PofZ)
+#'     to the San Joaquin Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{butte_sp}{numeric. Posterior assignment probability (PofZ) to the
+#'     Butte River Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{mill_deer_sp}{numeric. Posterior assignment probability (PofZ) to
+#'     the Mill/Deer Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{coleman_f}{numeric. Posterior assignment probability (PofZ) to the
+#'     Coleman Hatchery Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{sac_win}{numeric. Posterior assignment probability (PofZ) to the
+#'     Sacramento River Winter reporting unit. Range: 0–1.}
+#' }
+#'
+#'
+#' @source
+#' California Department of Water Resources (DWR) and partners. EDI Data
+#' Package \code{edi.2335.1}.
+#' \url{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.2335.1}
+#'
+#'
+'completed_genetic_samples'
