@@ -561,3 +561,108 @@
 #'   \item \code{site}: RST monitoring site
 #'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
 'years_to_include_rst_data_spring'
+
+#' Completed Genetic Samples
+#'
+#' Results of rapid genetic identification of outmigrating juvenile Chinook
+#' salmon (*Oncorhynchus tshawytscha*) collected at RST sites
+#' across the Sacramento River Basin (water years 2022–2026). Run assignments
+#' are derived from SHERLOCK and GT-seq analyses, with associated capture metadata and length-at-date
+#' (LAD)-based field assignments. 
+#'
+#' @format A data frame with 7,477 rows and 24 variables:
+#' \describe{
+#'   \item{sample_id}{character. Unique identifier of the sample processed.
+#'     Composed of location code, season, sample event, sample bin (size class),
+#'     and sample number separated by an underscore.}
+#'
+#'   \item{datetime_collected}{POSIXct. Date and time of sample collection
+#'     (format: \code{YYYY-MM-DD hh:mm:ss}). Range: 2022-01-10 to 2025-05-11.}
+#'
+#'   \item{fork_length_mm}{numeric. Fork length of the sampled fish, in
+#'     millimeters. Range: 23–176.}
+#'
+#'   \item{field_run_type}{character. Run type assigned in the field using
+#'     length-at-date (LAD) criteria. One of: \code{FALL}, \code{LATEFALL},
+#'     \code{SPRING}, \code{WINTER}, \code{UNKNOWN}, \code{NA}.}
+#'
+#'   \item{final_run_designation}{character. Final run type assigned via
+#'     combined SHERLOCK and GT-seq analysis. One of: \code{FALL OR LATE FALL},
+#'     \code{SPRING}, \code{GREB1L HETEROZYGOTE}, \code{WINTER}.}
+#'
+#'   \item{shlk_chr28_genotype}{character. SHERLOCK genotype result at the
+#'     \emph{Greb1L} locus on chromosome 28 (OTS28), indicating early- vs.
+#'     late-migration timing. One of: \code{EARLY}, \code{LATE},
+#'     \code{HETEROZYGOTE}, \code{NA}.}
+#'
+#'   \item{shlk_chr16_genotype}{character. SHERLOCK genotype result at the
+#'     OTS16 locus on chromosome 16, used to differentiate spring-run and
+#'     winter-run individuals among early-migrating fish. One of: \code{SPRING},
+#'     \code{WINTER}, \code{INDETERMINATE}, \code{NA}.}
+#'
+#'   \item{shlk_run_designation}{character. Run designation derived from
+#'     SHERLOCK genetic assay results and decision logic. One of:
+#'     \code{SPRING}, \code{EARLY/LATE HETEROZYGOUS}, \code{SPRING/WINTER},
+#'     \code{FALL/LATEFALL}, \code{WINTER}, \code{NA}.}
+#'
+#'   \item{gtseq_chr28_geno}{character. GT-seq genotype at the \emph{Greb1L}
+#'     locus on chromosome 28, indicating early- vs. late-migration timing.
+#'     One of: \code{EARLY}, \code{LATE}, \code{HETEROZYGOTE}, \code{NA}.}
+#'
+#'   \item{pop_structure_id}{character. Central Valley salmonid population
+#'     structure assignment from GT-seq (RUBIAS). One of: \code{FALL},
+#'     \code{LATEFALL}, \code{SPRING}, \code{WINTER}, \code{NA}.}
+#'
+#'   \item{cv_fall}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_late_fall}{numeric. Summed posterior assignment probability
+#'     (PofZ) to the Central Valley Late Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_spring}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_winter}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley (Sacramento River) Winter reporting unit.
+#'     Range: 0–1.}
+#'
+#'   \item{tributary}{character. Spring-run tributary assignment from RUBIAS.
+#'     One of: \code{ButteSp}, \code{Feather River Lineage Spring},
+#'     \code{MillDeerSp}, \code{NA}.}
+#'
+#'   \item{buttefall}{numeric. Posterior assignment probability (PofZ) to the
+#'     Butte River Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{frh_fall}{numeric. Posterior assignment probability (PofZ) to the
+#'     Feather River Hatchery Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{frh_sp}{numeric. Posterior assignment probability (PofZ) to the
+#'     Feather River Hatchery Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{mill_deer_fall}{numeric. Posterior assignment probability (PofZ)
+#'     to the Mill/Deer Fall reporting unit. Range: 0–0.999.}
+#'
+#'   \item{san_joaquin_fall}{numeric. Posterior assignment probability (PofZ)
+#'     to the San Joaquin Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{butte_sp}{numeric. Posterior assignment probability (PofZ) to the
+#'     Butte River Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{mill_deer_sp}{numeric. Posterior assignment probability (PofZ) to
+#'     the Mill/Deer Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{coleman_f}{numeric. Posterior assignment probability (PofZ) to the
+#'     Coleman Hatchery Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{sac_win}{numeric. Posterior assignment probability (PofZ) to the
+#'     Sacramento River Winter reporting unit. Range: 0–1.}
+#' }
+#'
+#'
+#' @source
+#' California Department of Water Resources (DWR) and partners. EDI Data
+#' Package \code{edi.2335.1}.
+#' \url{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.2335.1}
+#'
+#'
+'completed_genetic_samples'
