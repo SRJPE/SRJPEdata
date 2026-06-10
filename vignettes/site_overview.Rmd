@@ -246,4 +246,173 @@ yuba_sr <- stock_recruit_site_table |>
 knitr::kable(yuba_sr)
 ```
 
-### 
+###
+
+## RST Monitoring Protocols
+
+All sites use rotary screw traps (RSTs) to capture and enumerate juvenile Chinook salmon emigrating downstream. Despite operating under a shared general framework, each program has distinct equipment, sampling schedules, and efficiency trial methods reflecting local hydrology, fish populations, and staffing resources.
+
+### Common Protocol Elements
+
+All monitoring programs share the following core practices:
+
+- **Daily servicing:** Traps are serviced once per 24-hour period, with more frequent checks required during high debris loads or large fish catches.
+- **Flow-based shutdowns:** Trapping is suspended during unsafe high-flow conditions.
+- **Environmental data:** Water temperature (°C) is collected at all sites. Most sites also collect turbidity; Sacramento River sites additionally collect dissolved oxygen, conductivity, and velocity.
+- **Fork length measurement:** All sites record fork length (mm) for Chinook salmon, with run assignment based on length-at-date criteria (Greene 1992 at most sites; Fisher 1992 at Knights Landing and Tisdale).
+- **Plus counts:** Fish not individually measured are enumerated by hand count.
+- **Efficiency trial assumptions:** All programs assume negligible mortality between the release point and the trap.
+- **Mark-recapture periods:** Most programs conduct efficiency trials December through April or May.
+
+### Key Differences Across Programs
+
+**Trap size and configuration**
+
+Trap size varies by stream. The Battle Creek and Clear Creek programs use 5-foot diameter RSTs; Clear Creek RSTs are operated in a "half-cone" configuration during high salmon abundance to reduce live-box crowding. The Feather River, Yuba River, Butte Creek, and Sacramento River programs use 8-foot diameter RSTs. Butte Creek operates both an 8-foot RST and a Diversion Screen Trap (DST) at the Okie Dam site. The number of traps also varies: Battle Creek and Clear Creek operate 1–2 RSTs per site; Feather River operates up to 3 (two in tandem in the High Flow Channel plus one in the Low Flow Channel); Yuba River operates up to 3; Knights Landing and Tisdale each use two in-line RSTs.
+
+**Monitoring season**
+
+The operational calendar differs across streams:
+
+| Stream | Monitoring Season |
+|---|---|
+| Battle Creek (UBC) | Year-round |
+| Clear Creek | November – June 30 |
+| Butte Creek | October – June |
+| Deer Creek | October – June |
+| Mill Creek | October – June |
+| Feather River | November – July |
+| Yuba River | November – June |
+| Sacramento River (Knights Landing) | September – June |
+| Sacramento River (Tisdale) | October – June |
+
+**Fish measurement subsampling**
+
+Measurement protocols differ in the number of fish measured and subsampling thresholds. Feather River and Yuba River measure up to 50 randomly selected Chinook per run type and up to 50 steelhead. Battle Creek and Clear Creek measure all fish when catch is below ~250 individuals, using a sequential halving procedure for larger catches. Mill and Deer creeks measure only 10 randomly selected Chinook and 10 non-salmonids. Butte Creek measures 50 Chinook and the first 10 steelhead. Knights Landing measures up to 100 Chinook per run.
+
+**Efficiency trial fish source**
+
+The origin of fish used for mark-recapture trials differs:
+
+| Stream | Primary fish source for efficiency trials |
+|---|---|
+| Feather River | Natural-origin fall-run Chinook (primary) |
+| Yuba River | Natural-origin Chinook (primary); Feather River Hatchery fish as surrogates when catch is low |
+| Clear Creek (LCC/UCC) | Natural-origin Chinook |
+| Battle Creek (UBC) | Hatchery-origin fish from Coleman National Fish Hatchery (CNFH) |
+| Butte Creek | Natural-origin Chinook from RST and DST |
+| Mill Creek | Hatchery-origin fall-run from CNFH |
+| Deer Creek | Hatchery-origin fall-run from CNFH |
+| Knights Landing | Trap-captured Chinook; CNFH fish when catch is insufficient |
+| Tisdale | Trap-captured Chinook; CNFH fish when catch is insufficient |
+
+**Efficiency trial frequency and minimum fishing requirement**
+
+Protocols for most programs describe an intended trial frequency of once per week during the core monitoring period (typically December–April or May). Mill and Deer creeks describe bi-weekly trials (February–May) and require a minimum of 7 consecutive days of fishing after a release before a trial is considered valid. All other programs require a minimum of 3 consecutive days.
+
+In practice, the number of trials conducted per year varies considerably across sites and years, as shown in the table below. Higher counts at Clear Creek and Feather River reflect multiple RST sites operating concurrently within the same stream and year.
+
+```{r efficiency-trial-summary, echo = FALSE}
+trials_by_site <- release |>
+  mutate(
+    date     = as.Date(date_released),
+    month    = month(date),
+    cal_year = year(date),
+    run_year = if_else(month >= 12L, cal_year + 1L, cal_year)
+  ) |>
+  filter(month %in% c(12, 1, 2, 3, 4, 5, 6)) |>
+  count(stream, site, run_year, name = "n_trials")
+
+trial_summary <- trials_by_site |>
+  group_by(stream, site) |>
+  summarise(
+    `First year` = min(run_year),
+    `Avg trials/year` = round(mean(n_trials), 1),
+    `Min` = min(n_trials),
+    `Max` = max(n_trials),
+    .groups = "drop"
+  ) |>
+  mutate(
+    stream = tools::toTitleCase(stream),
+    site   = tools::toTitleCase(site)
+  ) |>
+  rename(Stream = stream, Site = site)
+
+knitr::kable(trial_summary,
+  caption = "Summary of efficiency trial releases per run year (December–June) by site.
+             Run year is defined as December of year Y through June of year Y+1."
+)
+```
+
+Several notable patterns emerge from the observed trial counts:
+
+**Feather River and Yuba River.** Site-level averages for Eye Riffle (~16/year) and Herringer Riffle (~18/year) are consistent with a roughly weekly December–April schedule. Yuba River (Hallwood) averages ~21 trials/year across the three years of available data (2023–2025), also consistent with the stated weekly protocol. Note that stream-level counts are inflated in years when multiple sites (e.g., Steep Riffle and Eye Riffle, or Gateway Riffle and Herringer Riffle) were operated concurrently.
+
+**Clear Creek.** Both LCC and UCC conducted trials independently, which accounts for the high stream-level counts in some years. Site-level averages of ~15 (LCC) and ~11 (UCC) per year are broadly consistent with weekly trials over a ~15–20 week window, though counts have declined in recent years (2019–2025 often ≤6 per site), suggesting fewer trials are being conducted than the protocol describes.
+
+**Battle Creek (UBC).** Trial counts are highly variable, ranging from 1 to 53 per year. Early years of intensive monitoring (2008–2009: 51–53 trials) give way to a sustained decline; from 2016 onward the annual count has rarely exceeded 7. This shift likely reflects changes in program resources or protocol but is not documented in the protocols file. Users relying on efficiency data from recent Battle Creek years should be aware of this reduced intensity.
+
+**Butte Creek.** The average of ~5 trials per year (range 2–8) is well below what a weekly December–May schedule would produce (~20 expected). Efficiency trial data are only available from 2021 onward in this package, so it is unclear whether earlier years had more intensive sampling. The low counts may also reflect that Butte Creek traps natural-origin fish, making trial frequency contingent on sufficient in-season catch.
+
+**Mill and Deer creeks.** Both programs average ~4 trials per year, consistent with the stated bi-weekly February–May schedule (~4–5 trials expected over ~9 weeks). These programs have the shortest efficiency trial records of the tributary sites (Mill Creek from 2022, Deer Creek from 2023).
+
+**Sacramento River (Knights Landing and Tisdale).** Knights Landing averaged ~20 trials per year in the late 1990s through early 2000s but has declined to 1–7 trials per year since 2019. Tisdale averages ~6 trials per year with data available from 2012, though coverage is intermittent across years. These reduced counts represent a meaningful constraint on the reliability of efficiency estimates for mainstem Sacramento River sites in recent years and should be considered when interpreting juvenile abundance estimates for this location.
+
+**Marking method**
+
+Bismarck Brown Y (BBY) whole-body stain is used at all sites. Several programs use a second mark to create unique identifiers or to distinguish release groups: Feather River and Yuba River use BBY combined with colored Visible Implant Elastomer (VIE) tags; Battle Creek and Clear Creek combine BBY staining with a fin clip for dual-marked fish; Knights Landing uses BBY or Methylene Blue stain, and VIE tags for hatchery fish; Tisdale alternates between BBY and VIE. Mill, Deer, and Butte creeks use BBY stain only. All programs using multiple marks rotate mark combinations so that a unique mark is not reused within 7 days.
+
+**Release distance upstream**
+
+Release sites range from 0.2 miles upstream (Upper Clear Creek) to approximately 1 mile upstream (Mill Creek, Deer Creek, Butte Creek, Tisdale). Feather River, Yuba River, and Knights Landing release fish approximately 0.5 miles upstream. Battle Creek and Clear Creek release points vary by RST: 0.2 miles for UCC, 0.4 miles for LCC, and 1.0 miles for UBC.
+
+### Data Availability by Stream
+
+The table below summarizes the years of catch data and efficiency trial data available in the `rst_catch` and `release` datasets, respectively.
+
+```{r protocol-data-availability, echo = FALSE}
+catch_years <- rst_catch |>
+  mutate(yr = year(as.Date(date))) |>
+  group_by(stream) |>
+  summarise(
+    catch_start = min(yr, na.rm = TRUE),
+    catch_end   = max(yr, na.rm = TRUE)
+  )
+
+efficiency_years <- release |>
+  mutate(yr = year(as.Date(date_released))) |>
+  group_by(stream) |>
+  summarise(
+    efficiency_start = min(yr, na.rm = TRUE),
+    efficiency_end   = max(yr, na.rm = TRUE)
+  )
+
+data_summary <- left_join(catch_years, efficiency_years, by = "stream") |>
+  mutate(
+    stream = tools::toTitleCase(stream),
+    `Catch data` = paste0(catch_start, "\u2013", catch_end),
+    `Efficiency trial data` = paste0(efficiency_start, "\u2013", efficiency_end)
+  ) |>
+  select(Stream = stream, `Catch data`, `Efficiency trial data`)
+
+knitr::kable(data_summary,
+  caption = "Years of RST catch and efficiency trial data available by stream."
+)
+```
+
+Catch records extend back to 1992 on Deer Creek and to the mid-1990s for most other streams. Efficiency trial data are available from 1999 onwards on the Feather River and from 1996 on the Sacramento River. Several programs have shorter efficiency trial records due to more recent program start dates or data not yet being incorporated into this package: Butte Creek efficiency trials are available from 2021, Mill Creek from 2022, and Deer Creek and Yuba River from 2023.
+
+### Source Data and EDI Packages
+
+All RST source data are publicly available through the [Environmental Data Initiative (EDI)](https://edirepository.org). The table below lists the EDI package for each watershed; full metadata, data dictionaries, and methods documentation can be accessed at the links provided. Note that Battle and Clear creeks share a single EDI package, as do Deer and Mill creeks.
+
+| Watershed | EDI Package | Link |
+|---|---|---|
+| Battle Creek | edi.1509 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1) |
+| Butte Creek | edi.1497 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1) |
+| Clear Creek | edi.1509 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1) |
+| Deer Creek | edi.1504 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1) |
+| Feather River | edi.1239 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1239.6) |
+| Mill Creek | edi.1504 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1504.1) |
+| Sacramento River | edi.1501 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1501.1) |
+| Yuba River | edi.1529 | [portal.edirepository.org](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1529.2) |
