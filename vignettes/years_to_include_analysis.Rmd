@@ -121,7 +121,7 @@ plotly::ggplotly(heat_map)
 
 ## RST Data - Current Ruleset
 
-Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site" or 60% of weeks sampled. Sites that do not have any (across all years) mark-repcature efficiency trials are also excluded.
+Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site" or 60% of weeks sampled. Sites that do not have any (across all years) mark-repcature efficiency trials are also excluded. Additionally, years with less than 3 weeks with catch > 0 are excluded.
 
 ```{r, echo = FALSE}
 # Find sites with efficiency data. Any site that has NO efficiency trials will be excluded
@@ -129,6 +129,16 @@ stream_site_with_efficiency_data <- weekly_efficiency |>
   ungroup() |> 
   distinct(stream, site) |>
   mutate(if_efficiency_data = T)
+
+# Find years where less than 3 weeks with catch > 0 are excluded
+low_catch_years <- weekly_juvenile_abundance_catch_data |>
+  filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX 
+  filter(count > 0) |> 
+  group_by(run_year, site) |> 
+  tally() |> 
+  filter(n < 3) |> 
+  mutate(if_low_catch = T) |> 
+  select(-n)
 
 # Assign stream/site/year as exclude or not based on criteria
 exclusion_catch <- weekly_juvenile_abundance_catch_data |>
@@ -148,10 +158,12 @@ exclusion_catch <- weekly_juvenile_abundance_catch_data |>
     exclude_75 = ifelse(number_weeks < 24, TRUE, FALSE)
   ) |> 
   left_join(stream_site_with_efficiency_data) |> 
-  mutate(if_efficiency_data = if_else(is.na(if_efficiency_data), F, T)) 
+  mutate(if_efficiency_data = if_else(is.na(if_efficiency_data), F, T)) |> 
+  left_join(low_catch_years) |> 
+  mutate(if_low_catch = ifelse(is.na(if_low_catch), F, T))
 
 years_to_exclude_rst_data_all <- exclusion_catch |>
-  filter(exclude_60 == T | if_efficiency_data == F) |> 
+  filter(exclude_60 == T | if_efficiency_data == F | if_low_catch == T) |> 
   select(stream, site, run_year, number_weeks) |>
   mutate(exclusion_type = "60% of weeks sampled", apply_to = "all runs")
 
@@ -213,7 +225,7 @@ The table below shows a section of this table applicable to all runs:
 
 ```{r, echo = FALSE}
 years_to_include_rst_data <- exclusion_catch |>
-  filter(exclude_60 == F & if_efficiency_data == T) |>
+  filter(exclude_60 == F & if_efficiency_data == T & if_low_catch == F) |>
   select(stream, site, run_year)
 
 knitr::kable(head(years_to_include_rst_data, 10))
