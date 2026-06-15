@@ -20,5 +20,4 @@ jobs:
       subitem_status_col: ${{ vars.MONDAY_SUBITEM_STATUS_COL }}
       subitem_owner_col:  ${{ vars.MONDAY_SUBITEM_OWNER_COL }}
     secrets:
-      GITHUB_TOKEN:     ${{ secrets.GITHUB_TOKEN }}
       MONDAY_API_TOKEN: ${{ secrets.MONDAY_API_TOKEN }}
