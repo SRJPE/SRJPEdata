@@ -1,0 +1,264 @@
+---
+title: "Efficiency by origin of fish released"
+format:
+  html:
+    embed-resources: true
+---
+
+This document compares RST efficiency trial values by origin of fish released
+(`origin_released` in `SRJPEdata::weekly_efficiency`). The goal is to assess
+whether hatchery, natural, or mixed-origin fish yield meaningfully different
+efficiency estimates, which has implications for how efficiency trials are
+selected or pooled in the SRJPE model.
+
+Efficiency is calculated as `number_recaptured / number_released` for each
+weekly trial.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089",
+                  "#899DA4", "#C93312", "#DC863B",
+                  "#F1BB7B", "#FD6467", "#5B1A18",
+                  "#D8B70A", "#02401B", "#A2A475",
+                  "#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4",
+                  "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87"
+)
+
+origin_colors <- c("natural" = "#74A089", "hatchery" = "#C93312",
+                   "mixed" = "#D8B70A", "unknown" = "#899DA4")
+```
+
+```{r load-data, include=FALSE}
+library(tidyverse)
+
+efficiency <- SRJPEdata::weekly_efficiency |>
+  mutate(
+    efficiency = number_recaptured / number_released,
+    origin_released = factor(origin_released, levels = c("natural", "hatchery", "mixed"))
+  )
+```
+
+# Overview of origin coverage
+
+```{r origin-summary}
+efficiency |>
+  count(year_released, stream, site, origin_released, name = "n_trials") |>
+  arrange(stream, site, year_released, origin_released) |>
+  rename(Year = year_released, Stream = stream, Site = site,
+         Origin = origin_released, `N trials` = n_trials) |>
+  knitr::kable(caption = "Number of weekly trials by year, stream, site, and origin")
+```
+
+Most sites release only natural-origin fish. Hatchery and mixed-origin releases
+are concentrated at Sacramento River (Knights Landing, Tisdale), Yuba River
+(Hallwood), Deer Creek, Mill Creek, and recent years on the Feather River.
+Clear Creek has no recorded origin for any trial (`NA` throughout).
+
+```{r origin-na-note}
+n_na <- sum(is.na(efficiency$origin_released))
+n_total <- nrow(efficiency)
+```
+
+**`r n_na` of `r n_total` trials (`r round(100 * n_na / n_total)`%) have
+`NA` for `origin_released`**, including all Clear Creek trials and older records
+at Battle Creek, Sacramento River (pre-2015), and several Feather River sites.
+These are excluded from origin comparisons below.
+
+# Overall efficiency distribution by origin
+
+```{r overall-boxplot, fig.height=4, fig.width=6}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1) |>
+  ggplot(aes(x = origin_released, y = efficiency, fill = origin_released)) +
+  geom_boxplot(outlier.shape = 21, outlier.size = 1.5, alpha = 0.8) +
+  scale_fill_manual(values = origin_colors, guide = "none") +
+  labs(x = "Origin", y = "Efficiency (recaptured / released)",
+       title = "Efficiency by origin — all sites combined") +
+  theme_bw()
+```
+
+```{r overall-summary-table}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1) |>
+  group_by(origin_released) |>
+  summarize(
+    n_trials      = n(),
+    median_eff    = round(median(efficiency, na.rm = TRUE), 4),
+    mean_eff      = round(mean(efficiency, na.rm = TRUE), 4),
+    sd_eff        = round(sd(efficiency, na.rm = TRUE), 4),
+    pct_zero      = round(100 * mean(efficiency == 0), 1),
+    .groups = "drop"
+  ) |>
+  knitr::kable(
+    col.names = c("Origin", "N trials", "Median eff.", "Mean eff.", "SD", "% zero recapture"),
+    caption = "Summary statistics by origin (efficiency > 1 excluded)"
+  )
+```
+
+# Efficiency by origin within each stream
+
+```{r by-stream-boxplot, fig.height=10, fig.width=9}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1) |>
+  ggplot(aes(x = origin_released, y = efficiency, fill = origin_released)) +
+  geom_boxplot(outlier.shape = 21, outlier.size = 1.2, alpha = 0.8) +
+  scale_fill_manual(values = origin_colors, guide = "none") +
+  facet_wrap(~ stream, scales = "free_y", ncol = 2) +
+  labs(x = "Origin", y = "Efficiency",
+       title = "Efficiency by origin within each stream") +
+  theme_bw() +
+  theme(strip.text = element_text(size = 9))
+```
+
+# Efficiency by origin within each site
+
+```{r by-site-boxplot, fig.height=14, fig.width=10}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1) |>
+  ggplot(aes(x = origin_released, y = efficiency, fill = origin_released)) +
+  geom_boxplot(outlier.shape = 21, outlier.size = 1.2, alpha = 0.8) +
+  scale_fill_manual(values = origin_colors, guide = "none") +
+  facet_wrap(~ site, scales = "free_y", ncol = 3) +
+  labs(x = "Origin", y = "Efficiency",
+       title = "Efficiency by origin within each site") +
+  theme_bw() +
+  theme(strip.text = element_text(size = 8))
+```
+
+# Efficiency over time by origin
+
+Comparing efficiency trends across years helps distinguish whether origin
+differences are confounded with temporal trends (e.g., hatchery releases only
+occurring in recent years at some sites).
+
+```{r time-series-by-origin, fig.height=14, fig.width=10}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1) |>
+  group_by(stream, site, year_released, origin_released) |>
+  summarize(mean_efficiency = mean(efficiency, na.rm = TRUE), .groups = "drop") |>
+  ggplot(aes(x = year_released, y = mean_efficiency,
+             color = origin_released, shape = origin_released)) +
+  geom_point(size = 2) +
+  geom_line(linewidth = 0.5) +
+  scale_color_manual(values = origin_colors) +
+  facet_wrap(~ site, scales = "free_y", ncol = 2) +
+  labs(x = "Year", y = "Mean annual efficiency",
+       color = "Origin", shape = "Origin",
+       title = "Mean annual efficiency by origin and site") +
+  theme_bw() +
+  theme(strip.text = element_text(size = 8),
+        legend.position = "bottom")
+```
+
+# Sites with multiple origins — direct comparison
+
+For sites where both hatchery and natural releases occur, we can make a more
+direct comparison.
+
+```{r multi-origin-sites}
+multi_origin_sites <- efficiency |>
+  filter(!is.na(origin_released)) |>
+  distinct(site, origin_released) |>
+  count(site) |>
+  filter(n > 1) |>
+  pull(site)
+```
+
+Sites with more than one origin: **`r paste(multi_origin_sites, collapse = ", ")`**.
+
+```{r multi-origin-boxplot, fig.height=6, fig.width=9}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1,
+         site %in% multi_origin_sites) |>
+  ggplot(aes(x = origin_released, y = efficiency, fill = origin_released)) +
+  geom_boxplot(outlier.shape = 21, outlier.size = 1.5, alpha = 0.8) +
+  scale_fill_manual(values = origin_colors, guide = "none") +
+  facet_wrap(~ site, scales = "free_y") +
+  labs(x = "Origin", y = "Efficiency",
+       title = "Efficiency by origin — sites with multiple origins only") +
+  theme_bw() +
+  theme(strip.text = element_text(size = 9))
+```
+
+```{r multi-origin-table}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1,
+         site %in% multi_origin_sites) |>
+  group_by(site, origin_released) |>
+  summarize(
+    n_trials   = n(),
+    median_eff = round(median(efficiency, na.rm = TRUE), 4),
+    mean_eff   = round(mean(efficiency, na.rm = TRUE), 4),
+    sd_eff     = round(sd(efficiency, na.rm = TRUE), 4),
+    .groups    = "drop"
+  ) |>
+  knitr::kable(
+    col.names = c("Site", "Origin", "N trials", "Median eff.", "Mean eff.", "SD"),
+    caption   = "Efficiency summary for sites with multiple origins"
+  )
+```
+
+# Efficiency by week of year and origin
+
+Seasonal patterns in efficiency may differ by origin if hatchery fish are
+released in different weeks than natural fish.
+
+```{r weekly-pattern, fig.height=6, fig.width=9}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1) |>
+  group_by(week_released, origin_released) |>
+  summarize(
+    mean_eff = mean(efficiency, na.rm = TRUE),
+    n        = n(),
+    .groups  = "drop"
+  ) |>
+  filter(n >= 3) |>
+  ggplot(aes(x = week_released, y = mean_eff,
+             color = origin_released, linewidth = n)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(aes(size = n), alpha = 0.7) +
+  scale_color_manual(values = origin_colors) +
+  labs(x = "Week of year", y = "Mean efficiency",
+       color = "Origin", size = "N trials",
+       title = "Mean efficiency by week and origin (all sites, n ≥ 3 trials per week)") +
+  theme_bw() +
+  theme(legend.position = "bottom")
+```
+
+# Summary
+
+```{r summary-stats-wide}
+efficiency |>
+  filter(!is.na(origin_released), efficiency <= 1) |>
+  group_by(origin_released) |>
+  summarize(
+    n_trials   = n(),
+    n_sites    = n_distinct(site),
+    n_years    = n_distinct(year_released),
+    median_eff = round(median(efficiency, na.rm = TRUE), 4),
+    mean_eff   = round(mean(efficiency, na.rm = TRUE), 4),
+    .groups    = "drop"
+  ) |>
+  knitr::kable(
+    col.names = c("Origin", "N trials", "N sites", "N years",
+                  "Median eff.", "Mean eff."),
+    caption   = "Cross-site summary by origin"
+  )
+```
+
+Key takeaways:
+
+- **Natural-origin** releases dominate the dataset and are available across nearly
+  all sites and years.
+- **Hatchery and mixed** releases are limited to a small number of sites
+  (Sacramento River, Yuba River, Deer Creek, Mill Creek, and recent Feather River).
+  Direct comparisons are constrained by this imbalance.
+- Where both origins are present at the same site (e.g., Knights Landing,
+  Tisdale, Hallwood, eye riffle, herringer riffle), mean efficiency values are
+  generally similar between natural and hatchery fish, though variability is high.
+- **Mixed-origin** trials have few replicates; differences from natural or
+  hatchery should be interpreted cautiously.
+- Origin differences are partially confounded with time: hatchery releases at
+  most sites begin only in recent years, and efficiency has changed over time
+  independently.
