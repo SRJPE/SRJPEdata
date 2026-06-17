@@ -67,7 +67,7 @@ years_to_include_rst_data <- exclusion_catch |>
 rst_model_years <- bind_rows(years_to_exclude_rst_data, years_to_include_rst_data)
 
 # Save data object 
-use_this::use_data(rst_model_years, overwrite = TRUE)
+usethis::use_data(rst_model_years, overwrite = TRUE)
 
 ### ADULT DATA -----------------------------------------------------------------
 # years to exclude already applied to pull_adult_data.R

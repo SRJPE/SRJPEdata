@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   comment = "#>", 
   fig.width=8, fig.height=5)
 
-if (requireNamespace("devtools", quietly = TRUE)) devtools::load_all(".", quiet = TRUE)
+# if (requireNamespace("devtools", quietly = TRUE)) devtools::load_all(".", quiet = TRUE)
 library(SRJPEdata)
 
 library(tidyverse)
@@ -105,7 +105,7 @@ heat_map <- ggplot(plot_data, aes(x = fake_date, y = wy, fill = n_streams, text 
   theme_minimal() + 
   ylab('water year') +
   xlab("") + 
-  # scale_fill_viridis_b(option = "A", n.breaks = 8, direction = -1) +
+  scale_fill_viridis_b(n.breaks = 8, direction = -1) +
   labs(fill = "Number of streams")
 plotly::ggplotly(heat_map) 
 # heat_map
@@ -126,7 +126,8 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site" or 60% of weeks sampled. Sites that do not have any (across all years) mark-repcature efficiency trials are also excluded.
 
 ```{r, echo = FALSE}
-years_exclude_nice_names <- SRJPEdata::years_to_exclude_rst_data |>
+years_exclude_nice_names <- SRJPEdata::rst_model_years |>
+  filter(exclude == T) |> 
   select(
     "Stream" = stream,
     "Site" = site,
@@ -136,19 +137,21 @@ years_exclude_nice_names <- SRJPEdata::years_to_exclude_rst_data |>
 knitr::kable(head(years_exclude_nice_names, 10))
 ```
 
-*... with `r nrow(years_to_exclude_rst_data) - 10` more rows*
+*... with `r nrow(years_exclude_nice_names) - 10` more rows*
 
 #### Spring run specific ruleset
 
 Although the focus of this effort is on spring run Chinook salmon, the SR JPE modeling was designed to be applicable for modeling all runs as PLAD run designations are available for all runs. The "years to exclude" ruleset is broadly applicable, however, there are some specific cases where there may be site/years beyond those identified in the "years to exclude ruleset" that are not expected for perform well, specifically for spring run. This may happen when the number of weeks sampling is met but there is a large gap in sampling during the peak of spring run outmigration. We developed an additional list to track these cases and apply to modeling.
 
 ```{r, echo = FALSE}
-knitr::kable(SRJPEdata::years_to_exclude_rst_data |> filter(grepl("spring run specific", exclusion_type)))
+knitr::kable(SRJPEdata::rst_model_years |>
+    filter(exclude == T) |>  
+    filter(grepl("spring run specific", exclusion_type)))
 ```
 
-### years_to_exclude_rst_data object
+### rst_model_years object
 
-We combine the "years to exclude" ruleset and the spring run specific ruleset into one data object `years_to_exclude_rst_data` and add a column called `apply_to`. This column will be `all runs` for the broad ruleset or could be specific to a particular run (e.g. will be `spring` for spring run specific cases)
+RST modeling years data object can be found at `SRJPEdata::rst_model_years`
 
 ## Adult Data 
 
@@ -179,19 +182,20 @@ We used these rules as preliminary way to identify potentially incomplete years 
 
 ### Years to exclude
 
-We utilized strategies to come up with a list of years to exclude from modeling for adult data. See a section of the "years to exclude" table below.
+We utilized strategies to come up with a list of years to exclude from modeling for adult data. See a section of the `adult_model_years`table filtered to show years to exclude below.
 
 ```{r, echo = FALSE}
 
-years_exclude_nice_names_adult <- SRJPEdata::years_to_exclude_adult |> select("Stream" = stream, 
-                                                    "Year" = year, 
-                                                    "Data Type" = data_type,
-                                                    "Exclusion Type" = reason_for_exclusion)
+years_exclude_nice_names_adult <- SRJPEdata::adult_model_years |> 
+  filter(exclude == T) |> select("Stream" = stream, 
+                                "Year" = year, 
+                                "Data Type" = data_type,
+                                "Exclusion Type" = reason_for_exclusion)
 knitr::kable(head(years_exclude_nice_names_adult, 10))
 ```
 
 *... with `r nrow(years_exclude_nice_names_adult) - 10` more rows*
 
-## years_to_exclude_adult_data object
+## adult_model_years object
 
-Years to exclude adult data object can be found at `SRJPEdata::years_to_exclude_adult_data`
+Adult modeling years data object can be found at `SRJPEdata::adult_model_years`
