@@ -36,17 +36,7 @@ years_to_exclude_rst_data_all <- exclusion_catch |>
   select(stream, site, run_year, number_weeks) |>
   mutate(exclusion_type = "60% of weeks sampled", apply_to = "all runs")
 
-years_exclude_nice_names <- years_to_exclude_rst_data_all |>
-  select(
-    "Stream" = stream,
-    "Site" = site,
-    "Run Year" = run_year,
-    "Exclusion Type" = exclusion_type
-  )
-knitr::kable(head(years_exclude_nice_names, 10))
-
-
-
+# ADD spring specific row 
 years_to_exclude_rst_data <- years_to_exclude_rst_data_all |>
   ungroup() |>
   add_row(
@@ -64,12 +54,34 @@ years_to_exclude_rst_data <- years_to_exclude_rst_data_all |>
     number_weeks = 21,
     exclusion_type = "spring run specific - 9 weeks missing Nov 04 to Jan 01",
     apply_to = "spring"
-  )
+  ) |> 
+  mutate(exclude = TRUE)
 
-knitr::kable(years_to_exclude_rst_data |> filter(grepl("spring run specific", exclusion_type)))
+# Add years to include
+years_to_include_rst_data <- exclusion_catch |>
+  filter(exclude_60 == F & if_efficiency_data == T) |>
+  select(stream, site, run_year)  |> 
+  mutate(exclude = FALSE)
 
-# Write Data 
-usethis::use_data(years_to_exclude_rst_data, overwrite = TRUE)
+# Combine for overall table 
+rst_model_years <- bind_rows(years_to_exclude_rst_data, years_to_include_rst_data)
 
+# Save data object 
+use_this::use_data(rst_model_years, overwrite = TRUE)
 
 ### ADULT DATA -----------------------------------------------------------------
+# years to exclude already applied to pull_adult_data.R
+
+years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
+  mutate(exclude = TRUE)
+
+years_to_include_adult <- annual_adult |> 
+  mutate(data_type = case_when(data_type == "upstream_estimate" ~ "upstream passage",
+                               data_type == "carcass_estimate" ~ "carcass",
+                               T ~ data_type)) |> 
+  select(year, stream, data_type) |> 
+  mutate(exclude = FALSE)
+
+adult_model_years <- bind_rows(years_to_exclude_adult, years_to_include_adult)
+
+usethis::use_data(adult_model_years, overwrite = TRUE)
