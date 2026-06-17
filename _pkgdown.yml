@@ -18,9 +18,7 @@ reference:
 - contents:
   - weekly_juvenile_abundance_catch_data
   - weekly_juvenile_abundance_efficiency_data
-  - years_to_include_rst_data
-  - years_to_include_rst_data_spring
-  - years_to_exclude_rst_data
+  - rst_model_years
 - subtitle: Covariates
   desc: Covariate input datasets
 - contents:
@@ -29,12 +27,16 @@ reference:
   - years_to_exclude_adult
 - subtitle: Survival Datasets
   desc: Data used as inputs to survival model
-- contents: survival_model_inputs
+- contents: 
+  - survival_model_inputs
+  - detection_history_feather_butte
+  - detection_history_sacramento
 - subtitle: Genetics Datasets
   desc: Data used as inputs to PLAD model
 - contents: completed_genetic_samples
 - title: Helper Data
   desc: Data used as helper datasets to generate model data
+  contents: adult_model_years
 - subtitle: Juvenile Datasets
   desc: RST monitoring datasets
 - contents:
@@ -43,7 +45,7 @@ reference:
   - rst_trap
   - release
   - recaptures
-  - years_to_exclude_rst_data
+  - rst_model_years
 - subtitle: CWT Datasets
   desc: Coded wire tag release and recapture datasets
 - contents:

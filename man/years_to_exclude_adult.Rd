@@ -3,18 +3,20 @@
 \docType{data}
 \name{years_to_exclude_adult}
 \alias{years_to_exclude_adult}
-\title{Years to exclude - Adult}
+\alias{adult_model_years}
+\title{Adult Modeling Years}
 \format{
 \itemize{
 \item \code{year}: Calendar year
 \item \code{stream}: Stream
 \item \code{data_type}: Type of adult data
 \item \code{reason_for_exclusion}: Provides reason for exclusion
+\item \code{exclude}: Boolean value to describe if a year should be excluded or not
 }
 \usage{
-years_to_exclude_adult
+adult_model_years
 }
 \description{
-Years for adult data that were identified as incomplete and not used in modeling
+Dataframe to compile all years, streams, & sites of adult data and indicate if a year should be used for modeling.
 }
 \keyword{datasets}
