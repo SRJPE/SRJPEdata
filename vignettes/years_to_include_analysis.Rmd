@@ -123,7 +123,7 @@ The modeling team hosted a modeling windows workshop where we discussed approach
 
 ### Years to exclude - Current Ruleset
 
-Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site" or 60% of weeks sampled. Sites that do not have any (across all years) mark-repcature efficiency trials are also excluded.
+Ruleset defined as "at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site" or 60% of weeks sampled. Sites that do not have any (across all years) mark-repcature efficiency trials are also excluded. Additionally, years with less than 3 weeks with catch > 0 are excluded.
 
 ```{r, echo = FALSE}
 years_exclude_nice_names <- SRJPEdata::rst_model_years |>
@@ -153,8 +153,8 @@ knitr::kable(SRJPEdata::rst_model_years |>
 
 RST modeling years data object can be found at `SRJPEdata::rst_model_years`
 
-## Adult Data 
 
+## Adult Data 
 We treated adult data a little differently to account for the two main types of adult data - adult survey data (holding, redd, carcass) and adult passage data (video passage).
 
 Below are the methods we used for excluding years by adult data type:

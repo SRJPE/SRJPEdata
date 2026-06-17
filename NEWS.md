@@ -1,3 +1,13 @@
+# SRJPEdata 1.0.1                                                                                                                                                                    
+                                                                                                                                                                                
+Updates included in this patch:                                                                                                                                                      
+
+The patch updates the criteria for "years to exclude" to remove years with less than 3 weeks with catch data which results in the following changes.
+
+- Updates `years_to_include_rst_data`: adds Feather River (Herringer Riffle) 2026 and removes Mill Creek 2025                                                                      
+- Updates `years_to_exclude_rst_data`: adds Mill Creek 2025 (21 weeks sampled, 1 week with catch data) and updates Mill Creek 2026 number of weeks sampled (16 → 17); removes Feather River (Herringer Riffle) 2026 as this year meets the criteria
+- Updates `years_to_include_adult`: corrects Yuba River 2023 upstream passage count (0 → 348) and adds Yuba River 2024 upstream passage count (668) 
+
 # SRJPEdata 1.0.0
 
 This release contains:

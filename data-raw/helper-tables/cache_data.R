@@ -11,6 +11,16 @@ stream_site_with_efficiency_data <- weekly_efficiency |>
   distinct(stream, site) |>
   mutate(if_efficiency_data = T)
 
+# Find years where less than 3 weeks with catch > 0 are excluded
+low_catch_years <- weekly_juvenile_abundance_catch_data |>
+  filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX 
+  filter(count > 0) |> 
+  group_by(run_year, site) |> 
+  tally() |> 
+  filter(n < 3) |> 
+  mutate(if_low_catch = T) |> 
+  select(-n)
+
 # Assign stream/site/year as exclude or not based on criteria
 exclusion_catch <- weekly_juvenile_abundance_catch_data |>
   filter(!is.na(count)) |> # remove when trap is not fishing
@@ -29,12 +39,20 @@ exclusion_catch <- weekly_juvenile_abundance_catch_data |>
     exclude_75 = ifelse(number_weeks < 24, TRUE, FALSE)
   ) |> 
   left_join(stream_site_with_efficiency_data) |> 
+  left_join(low_catch_years) |> 
+  mutate(if_low_catch = ifelse(is.na(if_low_catch), F, T)) |> 
   mutate(if_efficiency_data = if_else(is.na(if_efficiency_data), F, T)) 
 
 years_to_exclude_rst_data_all <- exclusion_catch |>
-  filter(exclude_60 == T | if_efficiency_data == F) |> 
-  select(stream, site, run_year, number_weeks) |>
-  mutate(exclusion_type = "60% of weeks sampled", apply_to = "all runs")
+  filter(exclude_60 == T | if_efficiency_data == F | if_low_catch == T) |>
+  rowwise() |>
+  mutate(
+    exclusion_type = paste(
+      c("no efficiency data", "low catch", "60% of weeks sampled")[
+        c(!if_efficiency_data, if_low_catch, exclude_60)], collapse = "; "),
+    apply_to = "all runs") |>
+  ungroup() |>
+  select(stream, site, run_year, number_weeks, exclusion_type, apply_to)
 
 # ADD spring specific row 
 years_to_exclude_rst_data <- years_to_exclude_rst_data_all |>
