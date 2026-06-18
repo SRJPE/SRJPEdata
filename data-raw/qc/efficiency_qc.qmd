@@ -1,0 +1,407 @@
+---
+title: "Efficiency Trial Annual QC"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    embed-resources: true
+params:
+  review_run_year: 2026
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(lubridate)
+library(here)
+library(glue)
+library(DT)
+
+if (file.exists(here::here("DESCRIPTION"))) {
+  devtools::load_all(here::here(), quiet = TRUE)
+} else {
+  library(SRJPEdata)
+}
+
+source(here::here("data-raw", "qc", "qc_helpers.R"))
+
+review_run_year <- params$review_run_year
+```
+
+## Overview
+
+Reviewing efficiency trial data. Run year being reviewed: **`r review_run_year`**.
+
+Data sources: `weekly_efficiency` (raw trial data), `weekly_juvenile_abundance_efficiency_data` (model-ready), `years_to_exclude_rst_data`.
+
+```{r}
+#| label: overview-table
+#| echo: false
+
+weekly_efficiency |>
+  mutate(run_year = as_run_year(
+    as.Date(paste0(year_released, "-01-01") ) + lubridate::weeks(week_released - 1)
+  )) |>
+  group_by(stream, site) |>
+  summarise(
+    min_run_year   = min(run_year, na.rm = TRUE),
+    max_run_year   = max(run_year, na.rm = TRUE),
+    total_trials   = n(),
+    total_released = sum(number_released, na.rm = TRUE),
+    .groups        = "drop"
+  ) |>
+  arrange(stream, site) |>
+  knitr::kable(caption = "Efficiency trial records by stream and site")
+```
+
+```{r}
+#| label: prep-data
+#| echo: false
+
+# Add run_year to weekly_efficiency using week/year convention
+eff <- weekly_efficiency |>
+  mutate(run_year = if_else(week_released >= 45,
+                             year_released + 1L,
+                             year_released))
+```
+
+---
+
+## Check 1: Recaptures Exceeding Releases
+
+Flag trials where `number_recaptured > number_released`. These rows are already filtered out during the model data build, but logging them creates a traceable record for upstream correction.
+
+```{r}
+#| label: check-recaptures-exceed
+
+recap_exceed <- eff |>
+  filter(number_recaptured > number_released) |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_records    = n(),
+    max_ratio    = round(max(number_recaptured / number_released), 2),
+    .groups      = "drop"
+  )
+
+new_recap_exceed <- log_issues(
+  recap_exceed |>
+    mutate(
+      data_type   = "efficiency",
+      issue_type  = "recaptures_exceed_releases",
+      field       = "number_recaptured",
+      severity    = "critical",
+      description = glue("{n_records} trial(s) in run year {run_year} at {site} ({stream}) have more recaptures than releases. Max recapture/release ratio: {max_ratio}. These rows are filtered at build time.")
+    )
+)
+```
+
+```{r}
+#| label: plot-release-recapture
+#| echo: false
+#| fig-height: 5
+
+eff_plot <- eff |>
+  mutate(flagged = number_recaptured > number_released)
+
+ggplot(eff_plot, aes(x = number_released, y = number_recaptured, color = flagged)) +
+  geom_point(alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  scale_color_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+                     labels = c("Normal", "Flagged"), name = NULL) +
+  facet_wrap(~stream, scales = "free", ncol = 2) +
+  labs(title = "Releases vs. recaptures per trial (dashed = 1:1 line)",
+       x = "Number released", y = "Number recaptured") +
+  theme_minimal()
+```
+
+`r if (nrow(recap_exceed) == 0) "No trials with recaptures exceeding releases." else glue("{sum(recap_exceed$n_records)} trial(s) flagged across {nrow(recap_exceed)} site/run-year combination(s).")`
+
+---
+
+## Check 2: Low Release Count
+
+Flag trials where fewer than 50 fish were released. Small releases produce high-variance efficiency estimates.
+
+```{r}
+#| label: check-low-release
+
+low_release <- eff |>
+  filter(number_released < 50) |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_records   = n(),
+    min_release = min(number_released),
+    .groups     = "drop"
+  )
+
+new_low_release <- log_issues(
+  low_release |>
+    mutate(
+      data_type   = "efficiency",
+      issue_type  = "low_release_count",
+      field       = "number_released",
+      severity    = "minor",
+      description = glue("{n_records} trial(s) with <50 fish released in run year {run_year} at {site} ({stream}). Minimum release count: {min_release}")
+    )
+)
+```
+
+```{r}
+#| label: plot-release-histogram
+#| echo: false
+#| fig-height: 5
+
+ggplot(eff, aes(x = number_released, fill = number_released < 50)) +
+  geom_histogram(bins = 40, alpha = 0.8) +
+  scale_fill_manual(values = c("FALSE" = "steelblue", "TRUE" = "#fdae61"),
+                    labels = c(">= 50", "< 50 (flagged)"), name = NULL) +
+  geom_vline(xintercept = 50, linetype = "dashed", color = "#d73027") +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Distribution of release counts (dashed = 50 fish threshold)",
+       x = "Number released", y = "Count") +
+  theme_minimal()
+```
+
+`r if (nrow(low_release) == 0) "No low-release trials detected." else glue("{sum(low_release$n_records)} trial(s) with <50 releases flagged.")`
+
+---
+
+## Check 3: Zero Recaptures
+
+Flag trials with zero recaptures. Can be real (very low efficiency) but may also indicate a data entry issue.
+
+```{r}
+#| label: check-zero-recaptures
+
+zero_recap <- eff |>
+  filter(number_recaptured == 0) |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_records = n(),
+    .groups   = "drop"
+  )
+
+new_zero_recap <- log_issues(
+  zero_recap |>
+    mutate(
+      data_type   = "efficiency",
+      issue_type  = "zero_recaptures",
+      field       = "number_recaptured",
+      severity    = "minor",
+      description = glue("{n_records} trial(s) with 0 recaptures in run year {run_year} at {site} ({stream})")
+    )
+)
+```
+
+```{r}
+#| label: plot-zero-recaptures
+#| echo: false
+#| fig-height: 6
+
+zero_recap_by_year <- eff |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    total_trials      = n(),
+    zero_recap_trials = sum(number_recaptured == 0),
+    .groups           = "drop"
+  )
+
+ggplot(zero_recap_by_year, aes(x = run_year, y = zero_recap_trials)) +
+  geom_col(fill = "#fdae61") +
+  facet_wrap(~stream + site, scales = "free_y", ncol = 2) +
+  labs(title = "Trials with zero recaptures by site and run year",
+       x = "Run year", y = "Number of zero-recapture trials") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+`r if (nrow(zero_recap) == 0) "No zero-recapture trials detected." else glue("{sum(zero_recap$n_records)} zero-recapture trial(s) flagged.")`
+
+---
+
+## Check 4: Trial Coverage Per Run Year
+
+Flag stream/site/run_years with fewer than 3 efficiency trials in the BTSPAS window (weeks 45–53 and 1–22). Indicates sparse coverage that may limit model reliability.
+
+```{r}
+#| label: check-trial-coverage
+
+trial_coverage <- weekly_juvenile_abundance_efficiency_data |>
+  filter(week %in% c(45:53, 1:22)) |>
+  group_by(stream, site, run_year) |>
+  summarise(n_trials = n(), .groups = "drop")
+
+excluded_lookup <- years_to_exclude_rst_data |>
+  distinct(stream, site, run_year) |>
+  mutate(already_excluded = TRUE)
+
+low_coverage <- trial_coverage |>
+  filter(n_trials < 3) |>
+  left_join(excluded_lookup, by = c("stream", "site", "run_year")) |>
+  mutate(already_excluded = replace_na(already_excluded, FALSE))
+
+new_low_coverage <- log_issues(
+  low_coverage |>
+    mutate(
+      n_records   = n_trials,
+      data_type   = "efficiency",
+      issue_type  = "low_trial_coverage",
+      field       = "n_trials",
+      severity    = "moderate",
+      description = glue("Only {n_trials} efficiency trial(s) in BTSPAS window for run year {run_year} at {site} ({stream}). Already excluded from modeling: {already_excluded}")
+    )
+)
+```
+
+```{r}
+#| label: plot-trial-coverage
+#| echo: false
+#| fig-height: 8
+
+coverage_plot <- trial_coverage |>
+  left_join(excluded_lookup, by = c("stream", "site", "run_year")) |>
+  mutate(
+    already_excluded = replace_na(already_excluded, FALSE),
+    label = case_when(
+      n_trials >= 3              ~ "Adequate (>=3)",
+      n_trials < 3 & already_excluded  ~ "Low (excluded)",
+      n_trials < 3 & !already_excluded ~ "Low (not excluded)"
+    )
+  )
+
+ggplot(coverage_plot, aes(x = run_year, y = site, fill = label)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(
+    values = c("Adequate (>=3)"        = "steelblue",
+               "Low (excluded)"        = "#fdae61",
+               "Low (not excluded)"    = "#d73027"),
+    name = NULL
+  ) +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Efficiency trial count in BTSPAS window by site and run year",
+       x = "Run year", y = NULL) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom")
+```
+
+`r if (nrow(low_coverage) == 0) "No low-coverage run years detected." else glue("{nrow(low_coverage)} site/run-year combination(s) flagged ({sum(low_coverage$already_excluded)} already excluded from modeling).")`
+
+---
+
+## Check 5: Efficiency Rate Outliers
+
+For each site with at least 5 years of history, flag run_years where the mean simple efficiency (`number_recaptured / number_released`) is more than 3 SD above the site historical mean.
+
+```{r}
+#| label: check-efficiency-outliers
+
+eff_rates <- eff |>
+  filter(number_released > 0, number_recaptured <= number_released) |>
+  mutate(simple_eff = number_recaptured / number_released) |>
+  group_by(stream, site, run_year) |>
+  summarise(mean_eff = mean(simple_eff, na.rm = TRUE), .groups = "drop")
+
+site_eff_stats <- eff_rates |>
+  group_by(stream, site) |>
+  summarise(
+    n_years  = n(),
+    hist_mean = mean(mean_eff, na.rm = TRUE),
+    hist_sd   = sd(mean_eff, na.rm = TRUE),
+    .groups   = "drop"
+  ) |>
+  filter(n_years >= 5)
+
+eff_outliers <- eff_rates |>
+  inner_join(site_eff_stats, by = c("stream", "site")) |>
+  filter(mean_eff > hist_mean + 3 * hist_sd)
+
+new_eff_outliers <- log_issues(
+  eff_outliers |>
+    mutate(
+      n_records   = 1L,
+      data_type   = "efficiency",
+      issue_type  = "extreme_value",
+      field       = "number_recaptured",
+      severity    = "minor",
+      description = glue("Mean efficiency of {round(mean_eff, 3)} in run year {run_year} at {site} ({stream}) is >3 SD above site historical mean ({round(hist_mean, 3)}, SD = {round(hist_sd, 3)})")
+    )
+)
+```
+
+```{r}
+#| label: plot-efficiency-timeseries
+#| echo: false
+#| fig-height: 8
+
+flagged_eff <- eff_outliers |> select(stream, site, run_year)
+
+ggplot(eff_rates, aes(x = run_year, y = mean_eff)) +
+  geom_line(color = "grey60") +
+  geom_point(
+    aes(color = paste(stream, site, run_year) %in%
+          paste(flagged_eff$stream, flagged_eff$site, flagged_eff$run_year)),
+    size = 2
+  ) +
+  scale_color_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+                     labels = c("Normal", "Flagged"), name = NULL) +
+  facet_wrap(~stream + site, scales = "free_y", ncol = 2) +
+  labs(title = "Mean annual simple efficiency by site with flagged years",
+       x = "Run year", y = "Mean efficiency (recaptured / released)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+`r if (nrow(eff_outliers) == 0) "No efficiency rate outliers detected." else glue("{nrow(eff_outliers)} site/run-year combination(s) flagged.")`
+
+---
+
+## Issues Logged This Run
+
+```{r}
+#| label: issues-summary
+#| echo: false
+
+all_new <- bind_rows(
+  new_recap_exceed, new_low_release, new_zero_recap,
+  new_low_coverage, new_eff_outliers
+)
+
+if (nrow(all_new) == 0) {
+  cat("No new issues logged this run.")
+} else {
+  DT::datatable(
+    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, description),
+    caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
+
+### All Open Efficiency Issues
+
+```{r}
+#| label: open-issues
+#| echo: false
+
+full_log   <- readr::read_csv(here::here("data-raw", "qc", "qc_log.csv"), show_col_types = FALSE)
+open_eff   <- full_log |> filter(data_type == "efficiency", status == "open")
+
+if (nrow(open_eff) == 0) {
+  cat("No open efficiency issues in the log.")
+} else {
+  DT::datatable(
+    open_eff |> select(log_id, date_identified, stream, site, run_year,
+                       issue_type, field, severity, description, reviewer_notes),
+    caption = glue("{nrow(open_eff)} open efficiency issue(s)"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```

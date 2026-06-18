@@ -1,0 +1,353 @@
+---
+title: "Flow & Temperature Annual QC"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    embed-resources: true
+params:
+  review_run_year: 2026
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(lubridate)
+library(here)
+library(glue)
+library(DT)
+
+if (file.exists(here::here("DESCRIPTION"))) {
+  devtools::load_all(here::here(), quiet = TRUE)
+} else {
+  library(SRJPEdata)
+}
+
+source(here::here("data-raw", "qc", "qc_helpers.R"))
+
+review_run_year <- params$review_run_year
+
+EXPECTED_STREAMS <- c(
+  "battle creek", "butte creek", "clear creek", "deer creek",
+  "feather river", "mill creek", "sacramento river", "yuba river"
+)
+
+# RST season weeks (BTSPAS window: weeks 45-53 then 1-22)
+RST_WEEKS <- c(45:53, 1:22)
+```
+
+## Overview
+
+Reviewing flow and temperature data. Run year being reviewed: **`r review_run_year`**.
+
+Data source: `environmental_data` — weekly data with columns `year`, `week`, `stream`, `site_group`, `parameter`, `statistic`, `value`.
+
+```{r}
+#| label: overview-table
+#| echo: false
+
+environmental_data |>
+  group_by(stream, parameter, statistic) |>
+  summarise(
+    min_year  = min(year, na.rm = TRUE),
+    max_year  = max(year, na.rm = TRUE),
+    n_records = n(),
+    .groups   = "drop"
+  ) |>
+  arrange(stream, parameter, statistic) |>
+  knitr::kable(caption = "Environmental data coverage by stream, parameter, and statistic")
+```
+
+```{r}
+#| label: prep-data
+#| echo: false
+
+# Add run_year: week >= 45 belongs to the following calendar year's run
+env <- environmental_data |>
+  mutate(run_year = if_else(week >= 45L, year + 1L, year))
+
+flow_data <- env |> filter(parameter == "flow", statistic == "mean")
+temp_data <- env |> filter(parameter == "temperature", statistic == "mean")
+```
+
+---
+
+## Check 1: Stream Coverage
+
+Verify all expected streams have flow data for the most recent run year in the dataset.
+
+```{r}
+#| label: check-stream-coverage
+
+current_run_year_data <- max(flow_data$run_year, na.rm = TRUE)
+
+stream_coverage <- flow_data |>
+  filter(run_year == current_run_year_data) |>
+  group_by(stream) |>
+  summarise(
+    n_weeks  = n(),
+    max_year = max(year),
+    max_week = max(week[year == max(year)]),
+    .groups  = "drop"
+  )
+
+missing_streams <- tibble(stream = EXPECTED_STREAMS) |>
+  anti_join(stream_coverage, by = "stream")
+
+new_missing_streams <- log_issues(
+  missing_streams |>
+    mutate(
+      site        = NA_character_,
+      run_year    = current_run_year_data,
+      n_records   = 0L,
+      data_type   = "flow",
+      issue_type  = "gap",
+      field       = "stream_coverage",
+      severity    = "critical",
+      description = glue("Stream '{stream}' has no flow data in run year {current_run_year_data}")
+    )
+)
+```
+
+```{r}
+#| label: table-stream-coverage
+#| echo: false
+
+tibble(stream = EXPECTED_STREAMS) |>
+  left_join(stream_coverage, by = "stream") |>
+  mutate(
+    present  = if_else(is.na(n_weeks), "MISSING", "Present"),
+    last_obs = if_else(is.na(max_year), NA_character_,
+                       glue("year {max_year} week {max_week}"))
+  ) |>
+  select(stream, present, n_weeks, last_obs) |>
+  knitr::kable(caption = glue("Flow coverage in run year {current_run_year_data}"))
+```
+
+`r if (nrow(missing_streams) == 0) "All expected streams present." else glue("{nrow(missing_streams)} stream(s) missing from run year {current_run_year_data}.")`
+
+---
+
+## Check 2: Flow — Missing Weeks in RST Season Window
+
+For each stream/run_year, count how many weeks in the BTSPAS window (weeks 45–53 and 1–22) are missing flow data. Flag run_years where >20% of the 31 possible window weeks are missing (`gap`) or where 3+ consecutive weeks are missing (`extended_gap`).
+
+```{r}
+#| label: check-flow-gaps
+
+# Helper: find max consecutive missing weeks given present weeks and expected weeks
+max_consec_missing <- function(weeks_present, expected) {
+  missing <- expected[!expected %in% weeks_present]
+  if (length(missing) == 0L) return(0L)
+  # For consecutive detection, treat the season as a linear sequence
+  # Map to position in expected vector
+  pos <- which(expected %in% missing)
+  max(tabulate(cumsum(c(1L, diff(pos) != 1L))))
+}
+
+# Weeks present per stream/run_year (within RST window)
+weeks_present <- flow_data |>
+  filter(week %in% RST_WEEKS) |>
+  group_by(stream, site_group, run_year) |>
+  summarise(
+    weeks_present   = list(week),
+    n_present       = n(),
+    .groups         = "drop"
+  ) |>
+  mutate(
+    n_expected       = 31L,  # weeks 45-53 (9) + 1-22 (22)
+    n_missing        = n_expected - n_present,
+    pct_missing      = round(n_missing / n_expected * 100, 1),
+    max_consec       = map_int(weeks_present, ~max_consec_missing(.x, RST_WEEKS))
+  )
+
+gap_issues     <- weeks_present |> filter(pct_missing > 20, max_consec < 3)
+ext_gap_issues <- weeks_present |> filter(max_consec >= 3)
+
+new_gaps <- log_issues(
+  gap_issues |>
+    mutate(
+      site        = site_group,
+      data_type   = "flow",
+      issue_type  = "gap",
+      field       = "week",
+      n_records   = n_missing,
+      severity    = "moderate",
+      description = glue("{n_missing} of 31 RST window weeks ({pct_missing}%) missing flow data in run year {run_year} for {stream}")
+    )
+)
+
+new_ext_gaps <- log_issues(
+  ext_gap_issues |>
+    mutate(
+      site        = site_group,
+      data_type   = "flow",
+      issue_type  = "extended_gap",
+      field       = "week",
+      n_records   = max_consec,
+      severity    = "critical",
+      description = glue("{max_consec} consecutive RST window weeks missing flow data in run year {run_year} for {stream} ({n_missing} total missing weeks)")
+    )
+)
+```
+
+```{r}
+#| label: plot-flow-availability
+#| echo: false
+#| fig-height: 8
+
+# Show weekly flow availability by site_group, faceted by stream
+avail_plot <- flow_data |>
+  filter(week %in% RST_WEEKS) |>
+  count(stream, site_group, run_year, name = "n_weeks_present") |>
+  mutate(pct_present = round(n_weeks_present / 31 * 100))
+
+ggplot(avail_plot, aes(x = run_year, y = site_group, fill = pct_present)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "#fee08b", high = "steelblue",
+                      name = "% weeks\npresent", limits = c(0, 100)) +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Flow data coverage in RST season window (weeks 45–53 and 1–22)",
+       x = "Run year", y = NULL) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        strip.text = element_text(face = "bold"))
+```
+
+`r if (nrow(gap_issues) + nrow(ext_gap_issues) == 0) "No missing-week issues detected." else glue("{nrow(gap_issues)} gap(s) and {nrow(ext_gap_issues)} extended gap(s) flagged.")`
+
+---
+
+## Check 3: Flow — Zero or Negative Values
+
+Flag stream/run_years with any flow value ≤ 0 in the RST season window. Zero flow during RST season is almost certainly a sensor or data issue.
+
+```{r}
+#| label: check-zero-flow
+
+zero_flow <- flow_data |>
+  filter(week %in% RST_WEEKS, value <= 0) |>
+  group_by(stream, site_group, run_year) |>
+  summarise(
+    n_records = n(),
+    min_value = min(value),
+    .groups   = "drop"
+  )
+
+new_zero_flow <- log_issues(
+  zero_flow |>
+    mutate(
+      site        = site_group,
+      data_type   = "flow",
+      issue_type  = "implausible_value",
+      field       = "value",
+      severity    = "critical",
+      description = glue("{n_records} week(s) with flow <= 0 (min = {min_value} cfs) during RST season window in run year {run_year} for {stream}")
+    )
+)
+```
+
+`r if (nrow(zero_flow) == 0) "No zero or negative flow values detected." else glue("{nrow(zero_flow)} stream/run-year combination(s) flagged.")`
+
+---
+
+## Check 4: Temperature — Implausible Values
+
+Flag stream/run_years with any weekly mean temperature outside the plausible range (< −5°C or > 35°C).
+
+```{r}
+#| label: check-temp-implausible
+
+temp_impl <- temp_data |>
+  filter(value < -5 | value > 35) |>
+  group_by(stream, site_group, run_year) |>
+  summarise(
+    n_records = n(),
+    min_temp  = round(min(value), 1),
+    max_temp  = round(max(value), 1),
+    .groups   = "drop"
+  )
+
+new_temp_impl <- log_issues(
+  temp_impl |>
+    mutate(
+      site        = site_group,
+      data_type   = "flow",
+      issue_type  = "implausible_value",
+      field       = "value",
+      severity    = "critical",
+      description = glue("{n_records} weekly temperature record(s) outside [-5, 35]°C in run year {run_year} for {stream}. Range: [{min_temp}, {max_temp}]°C")
+    )
+)
+```
+
+```{r}
+#| label: plot-temp-distribution
+#| echo: false
+#| fig-height: 6
+
+temp_plot <- temp_data |>
+  mutate(implausible = value < -5 | value > 35)
+
+ggplot(temp_plot, aes(x = value, fill = implausible)) +
+  geom_histogram(bins = 60, alpha = 0.8) +
+  scale_fill_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+                    labels = c("Normal", "Flagged"), name = NULL) +
+  geom_vline(xintercept = c(-5, 35), linetype = "dashed", color = "#d73027") +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Weekly temperature distribution with implausible values flagged",
+       x = "Temperature (°C)", y = "Count") +
+  theme_minimal()
+```
+
+`r if (nrow(temp_impl) == 0) "No implausible temperature values detected." else glue("{nrow(temp_impl)} stream/run-year combination(s) flagged.")`
+
+---
+
+## Issues Logged This Run
+
+```{r}
+#| label: issues-summary
+#| echo: false
+
+all_new <- bind_rows(new_missing_streams, new_gaps, new_ext_gaps,
+                     new_zero_flow, new_temp_impl)
+
+if (nrow(all_new) == 0) {
+  cat("No new issues logged this run.")
+} else {
+  DT::datatable(
+    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, description),
+    caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
+
+### All Open Flow Issues
+
+```{r}
+#| label: open-issues
+#| echo: false
+
+full_log  <- readr::read_csv(here::here("data-raw", "qc", "qc_log.csv"), show_col_types = FALSE)
+open_flow <- full_log |> filter(data_type == "flow", status == "open")
+
+if (nrow(open_flow) == 0) {
+  cat("No open flow issues in the log.")
+} else {
+  DT::datatable(
+    open_flow |> select(log_id, date_identified, stream, site, run_year,
+                        issue_type, field, severity, description, reviewer_notes),
+    caption = glue("{nrow(open_flow)} open flow issue(s)"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
