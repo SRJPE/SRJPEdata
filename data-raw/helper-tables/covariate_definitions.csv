@@ -18,3 +18,6 @@ rr_median_flow,flow,FALSE,This is the same as rr_mean_flow except the max flow b
 monthly reservoir storage Keswick ,resevoir storage ,TRUE,"Using reservoir storage data, calculate the monthly max storage for Keswick. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)"
 monthly reservoir storage Shasta,resevoir storage ,TRUE,"Using reservoir storage data, calculate the monthly max storage for Shasta. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)"
 monthly peak flow,flow,TRUE,Calculate the peak flow for each watershed and month. This would be different based on JPE date
+mi_gdd_sacramento,temperature,TRUE,"Water temperature exposure during adult upstream migration in the mainstem Sacramento River (March–May), calculated by summing mean daily temperatures."
+mi_above_13_temp_day,temperature,TRUE,Week of the year (1:52) when water temperature exceeds 13 °C during the adult upstream migration in the mainstem Sacramento (March–May).
+mi_above_13_temp_week,temperature,TRUE,Day of the year (1:365) when water temperature exceeds 13 C during the adult upstream migration in the mainstem Sacramento (March–May).
