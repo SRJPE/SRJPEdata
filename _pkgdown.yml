@@ -65,9 +65,11 @@ reference:
   - btspasx_special_priors_data
   - weekly_hours_fished
 - subtitle: Environmental Data
-  desc: Environmental gage data used pulled from USGS/CDEC and used as covatiates
+  desc: Environmental gage data provided by stream teams or pulled from USGS/CDEC and used as covatiates
     to models
-- contents: environmental_data
+- contents: 
+  - flow_data
+  - temperature_data
 - title: Helper Functions
   desc: Functions used to generate model data
 - contents:
