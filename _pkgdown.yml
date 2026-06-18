@@ -105,12 +105,10 @@ navbar:
       href: articles/site_overview.html
     - text: Hours Fished Analysis
       href: articles/trap_effort.html
-    - text: Monitoring Years to Include
+    - text: Monitoring Years to Model
       href: articles/years_to_include_analysis.html
-    - text: Stock Recruit Model Covariate Prep
-      href: articles/sr_covariates.html
-    - text: Forecast and Scenario Model Covariate Prep
-      href: articles/forecast_covariates.html
+    - text: Covariates Overview
+      href: articles/covariate_documentation.html
     - text: Filling Temperature Data Gaps
       href: articles/temp_regression.html
   - text: News

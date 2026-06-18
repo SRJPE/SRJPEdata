@@ -20,7 +20,7 @@ A tibble with 651 rows and 8 columns
 }
 \source{
 Prepared using rotary screw trap catch data (see \code{?SRJPEdata::rst_catch} for more information on raw data sources),
-environmental_data (see \code{?SRJPEdata::environmental_data}), hours fished information
+flow_data (see \code{?SRJPEdata::flow_data}), hours fished information
 (see \verb{?SRJPEdata::weekly_hours_fished for more information}), and btspasx special priors (see \code{?SRJPEdata::btspasx_special_priors_data} for more information).
 }
 \usage{
