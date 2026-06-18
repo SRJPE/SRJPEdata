@@ -338,7 +338,7 @@
 #'   \item interpolated 
 #'   }
 #'   }
-#' @source USGS/CDEC/FWS. See `data-raw/pull_environmental_data.R` for more details.
+#' @source USGS/CDEC/FWS. See `data-raw/pull_data_scripts/pull_flow_data.R` for more details.
 'flow_data'
 
 
@@ -410,7 +410,7 @@
 #'   \item interpolated 
 #'   }
 #'   }
-#' @source USGS/CDEC/FWS. See `data-raw/pull_environmental_data.R` for more details.
+#' @source USGS/CDEC/FWS. See `data-raw/pull_data_scripts/pull_temperature_data.R` for more details.
 'temperature_data'
 
 #' @title Survival Model Data
