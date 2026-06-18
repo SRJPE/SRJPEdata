@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -44,16 +44,10 @@
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="../articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -90,13 +84,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">aggregate_detections_sacramento</span><span class="op">(</span></span>
 <span>  <span class="va">detections</span>,</span>
 <span>  <span class="va">receiver_metadata</span>,</span>
-<span>  replace_dict <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>replace_with <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Releasepoint"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WoodsonBridge"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ButteBridge"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sacramento"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Endpoint"</span><span class="op">)</span><span class="op">)</span>, replace_list <span class="op">=</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BattleCk_CNFH_Rel"</span>, <span class="st">"RBDD_Rel"</span>, <span class="st">"RBDD_Rel_Rec"</span>, <span class="st">"Altube Island"</span>,</span>
-<span>    <span class="st">"Abv_Altube1"</span>, <span class="st">"MillCk_RST_Rel"</span>, <span class="st">"MillCk2_Rel"</span>, <span class="st">"DeerCk_RST_Rel"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Abv_WoodsonBr"</span>,</span>
-<span>    <span class="st">"Blw_Woodson"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ButteBr"</span>, <span class="st">"BlwButteBr"</span>, <span class="st">"AbvButteBr"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TowerBridge"</span>,</span>
-<span>    <span class="st">"I80-50_Br"</span>, <span class="st">"ToeDrainBase"</span>, <span class="st">"Hwy84Ferry"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BeniciaE"</span>, <span class="st">"BeniciaW"</span>, <span class="st">"ChippsE"</span>,</span>
-<span>    <span class="st">"ChippsW"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  create_detection_history <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -108,12 +96,8 @@
 <dd><p>A dataframe containing detections information.</p></dd>
 
 
-<dt id="arg-receiever-metadata">receiver_metadata<a class="anchor" aria-label="anchor" href="#arg-receiever-metadata"></a></dt>
+<dt id="arg-receiver-metadata">receiver_metadata<a class="anchor" aria-label="anchor" href="#arg-receiver-metadata"></a></dt>
 <dd><p>A table containing metadata for general release sites. Created using <code>get_reciever_sites_metadata()</code>.</p></dd>
-
-
-<dt id="arg-replace-dict">replace_dict<a class="anchor" aria-label="anchor" href="#arg-replace-dict"></a></dt>
-<dd><p>A list specifying receiver locations to aggregate and their corresponding aggregated names.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -125,30 +109,6 @@
     <p>This function replaces specified receiver locations in the detections dataframe with aggregated sites according to the provided replace dictionary. It updates the River Kilometer (RKM), Latitude (Lat), Longitude (Lon), and Region for the aggregated sites. The function creates a new dataframe containing the aggregated receiver sites' metadata, reflecting the aggregation done.</p>
     </div>
 
-    <div id="ref-examples">
-    <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Define replace dictionary</span></span></span>
-<span class="r-in"><span><span class="va">replace_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>replace_with <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Releasepoint"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WoodsonBridge"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ButteBridge"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sacramento"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                         <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Endpoint"</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                    replace_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BattleCk_CNFH_Rel"</span>,<span class="st">"RBDD_Rel"</span>,<span class="st">"RBDD_Rel_Rec"</span>,</span></span>
-<span class="r-in"><span>                                          <span class="st">"Altube Island"</span>,<span class="st">"Abv_Altube1"</span>,</span></span>
-<span class="r-in"><span>                                          <span class="st">"MillCk_RST_Rel"</span>,<span class="st">"MillCk2_Rel"</span>,<span class="st">"DeerCk_RST_Rel"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Mill_Ck_Conf"</span>,<span class="st">"Abv_WoodsonBr"</span>,<span class="st">"Blw_Woodson"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ButteBr"</span>,<span class="st">"BlwButteBr"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TowerBridge"</span>,<span class="st">"I80-50_Br"</span>,</span></span>
-<span class="r-in"><span>                                          <span class="st">"ToeDrainBase"</span>,<span class="st">"Hwy84Ferry"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BeniciaE"</span>,<span class="st">"BeniciaW"</span>,</span></span>
-<span class="r-in"><span>                                          <span class="st">"ChippsE"</span>,<span class="st">"ChippsW"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Aggregate detections data for Sacramento River sites</span></span></span>
-<span class="r-in"><span><span class="va">aggregated_detections</span> <span class="op">&lt;-</span> <span class="fu">aggregate_detections_sacramento</span><span class="op">(</span><span class="va">detections_data</span>, <span class="va">replace_dict</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in receiver_metadata %&gt;% select(receiver_general_location, receiver_general_river_km,     receiver_general_latitude, receiver_general_longitude, receiver_region) %&gt;%     filter(receiver_general_location %in% c(replace_list, replace_with)) %&gt;%     distinct() %&gt;% select(-receiver_general_location) %&gt;% group_by(receiver_region) %&gt;%     summarise_all(mean):</span> could not find function "%&gt;%"</span>
-<span class="r-in"><span></span></span>
-</code></pre></div>
-    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

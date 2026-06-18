@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -44,16 +44,10 @@
       <a href="articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -140,48 +134,48 @@
 <div class="section level2 tabset">
 <h2 class="tabset" id="hours-fished">Hours Fished<a class="anchor" aria-label="anchor" href="#hours-fished"></a></h2>
 <p>We now process all locations together using a combination of method 1 and 3. All locations currently have both a start and stop date though this was not the case historically. There are cases when start date or stop date is NA. For these we fill in the start date assuming it is the sample date of the previous record. When the stop date is missing we assume it is the start date of the next record. Note that there are some records with 0 hours. These occur because trap visit data was entered when the trap was not in service and then a new trap visit entry was recorded once the trap started working again. There are some erroneous values. These will be addressed at the end of the script by setting limits.</p>
-<table class="table"><colgroup><col width="17%"><col width="17%"><col width="8%"><col width="8%"><col width="10%"><col width="26%"><col width="11%"></colgroup><thead><tr><th align="left">start_datetime</th>
+<table class="table"><colgroup><col width="14%"><col width="13%"><col width="9%"><col width="9%"><col width="11%"><col width="29%"><col width="12%"></colgroup><thead><tr><th align="left">start_datetime</th>
 <th align="left">stop_datetime</th>
 <th align="left">site</th>
 <th align="left">subsite</th>
 <th align="left">stream</th>
 <th align="left">hours_fished_methodology</th>
 <th align="left">hours_fished</th>
-</tr></thead><tbody><tr><td align="left">1997-01-18 09:00:00</td>
-<td align="left">1997-03-05 09:00:00</td>
+</tr></thead><tbody><tr><td align="left">NA</td>
+<td align="left">1997-01-18</td>
 <td align="left">adams dam</td>
 <td align="left">adams dam</td>
 <td align="left">butte creek</td>
 <td align="left">using start time and stop time</td>
-<td align="left">1104.00 hours</td>
-</tr><tr><td align="left">1997-03-05 09:00:00</td>
-<td align="left">1997-03-11 07:00:00</td>
+<td align="left">NA hours</td>
+</tr><tr><td align="left">1997-01-18</td>
+<td align="left">1997-03-05</td>
 <td align="left">adams dam</td>
 <td align="left">adams dam</td>
 <td align="left">butte creek</td>
 <td align="left">using start time and stop time</td>
-<td align="left">142.00 hours</td>
-</tr><tr><td align="left">1997-03-11 07:00:00</td>
-<td align="left">1997-03-12 09:15:00</td>
+<td align="left">1104 hours</td>
+</tr><tr><td align="left">1997-03-05</td>
+<td align="left">1997-03-11</td>
 <td align="left">adams dam</td>
 <td align="left">adams dam</td>
 <td align="left">butte creek</td>
 <td align="left">using start time and stop time</td>
-<td align="left">26.25 hours</td>
-</tr><tr><td align="left">1997-03-12 09:15:00</td>
-<td align="left">1997-03-15 09:00:00</td>
+<td align="left">144 hours</td>
+</tr><tr><td align="left">1997-03-11</td>
+<td align="left">1997-03-12</td>
 <td align="left">adams dam</td>
 <td align="left">adams dam</td>
 <td align="left">butte creek</td>
 <td align="left">using start time and stop time</td>
-<td align="left">71.75 hours</td>
-</tr><tr><td align="left">1997-03-15 09:00:00</td>
-<td align="left">1997-03-16 09:30:00</td>
+<td align="left">24 hours</td>
+</tr><tr><td align="left">1997-03-12</td>
+<td align="left">1997-03-15</td>
 <td align="left">adams dam</td>
 <td align="left">adams dam</td>
 <td align="left">butte creek</td>
 <td align="left">using start time and stop time</td>
-<td align="left">24.50 hours</td>
+<td align="left">72 hours</td>
 </tr></tbody></table><div class="section level3">
 <h3 id="qc">QC<a class="anchor" aria-label="anchor" href="#qc"></a></h3>
 <p>The dot plot below shows hours fished for each stream by date. Most dots appear to be hovering around the 24 hour mark but a few are greater than 1000 or less than -1000 and skew the plot.</p>
@@ -217,21 +211,21 @@
 <div class="section level2">
 <h2 id="summarized-by-week">Summarized by week<a class="anchor" aria-label="anchor" href="#summarized-by-week"></a></h2>
 <p>We grouped hours fished data by site, subsite, week, and year and summarized to come up with a weekly hours fished dataset. We capped hours fished to 168 for each stream, assuming that a single trap could not run for more hours than there are in a week. Before 2005 trap data is not available for Knights Landing, we assume 168 hours when trap data is missing.</p>
-<pre><code><span><span class="co">## # A tibble: 194 × 5</span></span>
-<span><span class="co">## # Groups:   year, stream, site [141]</span></span>
-<span><span class="co">##     year stream           site            subsite        n</span></span>
-<span><span class="co">##    &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;           &lt;chr&gt;      &lt;int&gt;</span></span>
-<span><span class="co">##  1  1992 deer creek       deer creek      deer creek     7</span></span>
-<span><span class="co">##  2  1994 deer creek       deer creek      deer creek    14</span></span>
-<span><span class="co">##  3  1995 deer creek       deer creek      deer creek    17</span></span>
-<span><span class="co">##  4  1995 mill creek       mill creek      mill creek     1</span></span>
-<span><span class="co">##  5  1995 sacramento river knights landing 8.3            3</span></span>
-<span><span class="co">##  6  1995 sacramento river knights landing 8.4            7</span></span>
-<span><span class="co">##  7  1996 deer creek       deer creek      deer creek    28</span></span>
-<span><span class="co">##  8  1996 mill creek       mill creek      mill creek    25</span></span>
-<span><span class="co">##  9  1996 sacramento river knights landing 8.3           40</span></span>
-<span><span class="co">## 10  1996 sacramento river knights landing 8.4           40</span></span>
-<span><span class="co">## # ℹ 184 more rows</span></span></code></pre>
+<pre><code><span><span class="co">## # A tibble: 26 × 5</span></span>
+<span><span class="co">## # Groups:   year, stream, site [17]</span></span>
+<span><span class="co">##     year stream           site            subsite                n</span></span>
+<span><span class="co">##    &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;           &lt;chr&gt;              &lt;int&gt;</span></span>
+<span><span class="co">##  1  2002 sacramento river knights landing knights landing       14</span></span>
+<span><span class="co">##  2  2003 sacramento river knights landing knights landing       45</span></span>
+<span><span class="co">##  3  2004 sacramento river knights landing knights landing       37</span></span>
+<span><span class="co">##  4  2005 sacramento river knights landing knights landing       39</span></span>
+<span><span class="co">##  5  2006 sacramento river knights landing knights landing       26</span></span>
+<span><span class="co">##  6  2015 butte creek      okie dam        okie dam 1            10</span></span>
+<span><span class="co">##  7  2016 butte creek      okie dam        okie dam 1            24</span></span>
+<span><span class="co">##  8  2017 butte creek      okie dam        okie dam 1             9</span></span>
+<span><span class="co">##  9  2017 butte creek      okie dam        okie dam fyke trap     9</span></span>
+<span><span class="co">## 10  2018 butte creek      okie dam        okie dam 1            25</span></span>
+<span><span class="co">## # ℹ 16 more rows</span></span></code></pre>
 <div class="section level3">
 <h3 id="qc-1">QC<a class="anchor" aria-label="anchor" href="#qc-1"></a></h3>
 <p>The following plots provide visuals to show weekly hours fished for a few select stream and calendar year. Note that for the combined plots this is for all years of data so there are multiple datapoints for a given week due to multiple years being represented and multiple subsites.</p>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -44,16 +44,10 @@
       <a href="articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -107,7 +101,7 @@
 </ul><p>We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.</p>
 <div class="section level4">
 <h4 id="years-to-exclude-table">Years to Exclude Table<a class="anchor" aria-label="anchor" href="#years-to-exclude-table"></a></h4>
-<table class="table"><colgroup><col width="6%"><col width="5%"><col width="4%"><col width="25%"><col width="57%"></colgroup><thead><tr><th align="left">Stream</th>
+<table class="table"><colgroup><col width="11%"><col width="8%"><col width="7%"><col width="44%"><col width="27%"></colgroup><thead><tr><th align="left">Stream</th>
 <th align="left">Site</th>
 <th align="right">Run Year</th>
 <th align="left">Exclusion Type</th>
@@ -132,37 +126,37 @@
 <td align="right">2007</td>
 <td align="left">really low sampling</td>
 <td align="left">only 12 week of data</td>
-</tr><tr><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">2003</td>
-<td align="left">really low sampling</td>
-<td align="left">Stream Team noted this as year that is incomparable and also efficiency data exists where there is no catch data</td>
-</tr><tr><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">2015</td>
-<td align="left">missing four consecutive weeks in critical window</td>
-<td align="left">NA</td>
-</tr><tr><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">1998</td>
-<td align="left">low sampling</td>
-<td align="left">NA</td>
-</tr><tr><td align="left">battle creek</td>
-<td align="left">ubc</td>
-<td align="right">2001</td>
-<td align="left">low sampling</td>
-<td align="left">NA</td>
-</tr><tr><td align="left">battle creek</td>
-<td align="left">lbc</td>
-<td align="right">2001</td>
-<td align="left">low sampling</td>
-<td align="left">NA</td>
 </tr><tr><td align="left">butte creek</td>
 <td align="left">adams dam</td>
 <td align="right">1997</td>
 <td align="left">automatic</td>
 <td align="left">less than 75% of weeks sampled</td>
-</tr></tbody></table><p><em>… with 71 more rows</em></p>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">adams dam</td>
+<td align="right">1998</td>
+<td align="left">automatic</td>
+<td align="left">less than 75% of weeks sampled</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2019</td>
+<td align="left">really low sampling</td>
+<td align="left">only 10 weeks of data</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">2005</td>
+<td align="left">really low sampling</td>
+<td align="left">only 6 weeks of data</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">1997</td>
+<td align="left">missing four consecutive weeks in critical window</td>
+<td align="left">NA</td>
+</tr><tr><td align="left">butte creek</td>
+<td align="left">okie dam</td>
+<td align="right">1998</td>
+<td align="left">missing four consecutive weeks in critical window</td>
+<td align="left">NA</td>
+</tr></tbody></table><p><em>… with 63 more rows</em></p>
 </div>
 </div>
 <div class="section level3">
@@ -172,37 +166,37 @@
 <table class="table"><thead><tr><th align="left">stream</th>
 <th align="left">site</th>
 <th align="right">run_year</th>
-</tr></thead><tbody><tr><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">2016</td>
-</tr><tr><td align="left">sacramento river</td>
-<td align="left">knights landing</td>
-<td align="right">2004</td>
-</tr><tr><td align="left">sacramento river</td>
-<td align="left">knights landing</td>
-<td align="right">2005</td>
-</tr><tr><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">2018</td>
-</tr><tr><td align="left">feather river</td>
-<td align="left">eye riffle</td>
+</tr></thead><tbody><tr><td align="left">clear creek</td>
+<td align="left">lcc</td>
 <td align="right">1999</td>
-</tr><tr><td align="left">feather river</td>
-<td align="left">eye riffle</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">1999</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">1999</td>
+</tr><tr><td align="left">clear creek</td>
+<td align="left">lcc</td>
+<td align="right">2018</td>
+</tr><tr><td align="left">clear creek</td>
+<td align="left">ucc</td>
+<td align="right">2018</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
 <td align="right">2000</td>
-</tr><tr><td align="left">feather river</td>
-<td align="left">eye riffle</td>
-<td align="right">2001</td>
-</tr><tr><td align="left">feather river</td>
-<td align="left">eye riffle</td>
-<td align="right">2002</td>
-</tr><tr><td align="left">feather river</td>
-<td align="left">eye riffle</td>
-<td align="right">2004</td>
-</tr><tr><td align="left">feather river</td>
-<td align="left">eye riffle</td>
+</tr><tr><td align="left">clear creek</td>
+<td align="left">ucc</td>
 <td align="right">2006</td>
-</tr></tbody></table><p><em>… with 217 more rows</em></p>
+</tr><tr><td align="left">clear creek</td>
+<td align="left">lcc</td>
+<td align="right">2006</td>
+</tr><tr><td align="left">clear creek</td>
+<td align="left">lcc</td>
+<td align="right">2000</td>
+</tr><tr><td align="left">clear creek</td>
+<td align="left">lcc</td>
+<td align="right">2001</td>
+</tr></tbody></table><p><em>… with 201 more rows</em></p>
 </div>
 </div>
 <div class="section level2">
@@ -280,7 +274,7 @@
 <td align="right">2017</td>
 <td align="left">redd</td>
 <td align="left">Missing reaches 2, 3, 5, and 6</td>
-</tr></tbody></table><p><em>… with 47 more rows</em></p>
+</tr></tbody></table><p><em>… with 49 more rows</em></p>
 </div>
 <div class="section level3">
 <h3 id="applying-to-modeling-datasets-1">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets-1"></a></h3>
@@ -363,7 +357,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-</tr></tbody></table><p><em>… with 269 more rows</em></p>
+</tr></tbody></table><p><em>… with 240 more rows</em></p>
 </div>
 </div>
 

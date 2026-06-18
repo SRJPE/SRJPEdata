@@ -108,7 +108,7 @@ navbar:
     - text: Monitoring Years to Model
       href: articles/years_to_include_analysis.html
     - text: Covariates Overview
-      href: articles/covariate_documentation.html
+      href: articles/covariates_documentation.html
     - text: Filling Temperature Data Gaps
       href: articles/temp_regression.html
   - text: News

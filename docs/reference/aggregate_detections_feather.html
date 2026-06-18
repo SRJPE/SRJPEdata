@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -44,16 +44,10 @@
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="../articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -90,10 +84,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">aggregate_detections_feather</span><span class="op">(</span></span>
 <span>  <span class="va">detections</span>,</span>
 <span>  <span class="va">receiver_metadata</span>,</span>
-<span>  replace_dict <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>replace_with <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Releasepoint"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sacramento"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Endpoint"</span><span class="op">)</span><span class="op">)</span>, replace_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FR_Gridley_Rel"</span>, <span class="st">"FR_Boyds_Rel"</span>,</span>
-<span>    <span class="st">"FR_Boyds_Rel_Rec"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TowerBridge"</span>, <span class="st">"I80-50_Br"</span>, <span class="st">"ToeDrainBase"</span>, <span class="st">"Hwy84Ferry"</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BeniciaE"</span>, <span class="st">"BeniciaW"</span>, <span class="st">"ChippsE"</span>, <span class="st">"ChippsW"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  create_detection_history <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -108,10 +99,6 @@
 <dt id="arg-receiver-metadata">receiver_metadata<a class="anchor" aria-label="anchor" href="#arg-receiver-metadata"></a></dt>
 <dd><p>A dataframe containing receiver metadata.</p></dd>
 
-
-<dt id="arg-replace-dict">replace_dict<a class="anchor" aria-label="anchor" href="#arg-replace-dict"></a></dt>
-<dd><p>A list specifying receiver locations to aggregate and their aggregated name.</p></dd>
-
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -125,20 +112,9 @@
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Define replacement dictionary</span></span></span>
-<span class="r-in"><span><span class="va">replacement_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>replace_with <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Releasepoint"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                             <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sacramento"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                             <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Endpoint"</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                         replace_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"FR_Gridley_Rel"</span>,<span class="st">"FR_Boyds_Rel"</span>,<span class="st">"FR_Boyds_Rel_Rec"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TowerBridge"</span>,<span class="st">"I80-50_Br"</span>, </span></span>
-<span class="r-in"><span>                                              <span class="st">"ToeDrainBase"</span>,<span class="st">"Hwy84Ferry"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                                            <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BeniciaE"</span>,<span class="st">"BeniciaW"</span>, </span></span>
-<span class="r-in"><span>                                              <span class="st">"ChippsE"</span>,<span class="st">"ChippsW"</span> </span></span>
-<span class="r-in"><span>                                            <span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Aggregate detections for Feather River region</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Aggregate detections for Feather River region</span></span></span>
 <span class="r-in"><span><span class="va">aggregated_data</span> <span class="op">&lt;-</span> <span class="fu">aggregate_detections_feather</span><span class="op">(</span><span class="va">detections_data</span>, <span class="va">receiver_metadata</span>, replace_dict <span class="op">=</span> <span class="va">replacement_dict</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'receiver_metadata' not found</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in aggregate_detections_feather(detections_data, receiver_metadata,     replace_dict = replacement_dict):</span> unused argument (replace_dict = replacement_dict)</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

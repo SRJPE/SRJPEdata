@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -44,16 +44,10 @@
       <a href="articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -110,20 +104,15 @@
 <th align="right">gdd_sac</th>
 <th align="right">gdd_total</th>
 </tr></thead><tbody><tr><td align="right">1999</td>
-<td align="left">butte creek</td>
-<td align="right">1.2857143</td>
-<td align="right">0.0000000</td>
-<td align="right">1.29</td>
-</tr><tr><td align="right">1999</td>
 <td align="left">deer creek</td>
 <td align="right">10.5952381</td>
 <td align="right">0.0000000</td>
 <td align="right">10.60</td>
 </tr><tr><td align="right">1999</td>
 <td align="left">feather river</td>
-<td align="right">0.9674561</td>
+<td align="right">0.8854668</td>
 <td align="right">0.0000000</td>
-<td align="right">0.97</td>
+<td align="right">0.89</td>
 </tr><tr><td align="right">1999</td>
 <td align="left">mill creek</td>
 <td align="right">2.6888228</td>
@@ -131,14 +120,9 @@
 <td align="right">2.69</td>
 </tr><tr><td align="right">1999</td>
 <td align="left">yuba river</td>
-<td align="right">18.3203082</td>
+<td align="right">38.8451090</td>
 <td align="right">0.0000000</td>
-<td align="right">18.32</td>
-</tr><tr><td align="right">2000</td>
-<td align="left">butte creek</td>
-<td align="right">8.2142857</td>
-<td align="right">0.2142857</td>
-<td align="right">8.43</td>
+<td align="right">38.85</td>
 </tr><tr><td align="right">2000</td>
 <td align="left">deer creek</td>
 <td align="right">26.1731380</td>
@@ -146,9 +130,9 @@
 <td align="right">26.39</td>
 </tr><tr><td align="right">2000</td>
 <td align="left">feather river</td>
-<td align="right">5.4679588</td>
+<td align="right">4.9837141</td>
 <td align="right">0.2142857</td>
-<td align="right">5.68</td>
+<td align="right">5.20</td>
 </tr><tr><td align="right">2000</td>
 <td align="left">mill creek</td>
 <td align="right">12.9672619</td>
@@ -156,9 +140,19 @@
 <td align="right">13.18</td>
 </tr><tr><td align="right">2000</td>
 <td align="left">yuba river</td>
-<td align="right">24.5936982</td>
+<td align="right">46.7065710</td>
 <td align="right">0.2142857</td>
-<td align="right">24.81</td>
+<td align="right">46.92</td>
+</tr><tr><td align="right">2001</td>
+<td align="left">clear creek</td>
+<td align="right">2.1879338</td>
+<td align="right">2.0714286</td>
+<td align="right">4.26</td>
+</tr><tr><td align="right">2001</td>
+<td align="left">deer creek</td>
+<td align="right">37.7183402</td>
+<td align="right">2.0714286</td>
+<td align="right">39.79</td>
 </tr></tbody></table><p>The following plot is of the growing degree days above the 20 degree threshold over time for all tributaries:</p>
 <div class="float">
 <img src="figure/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"><div class="figcaption">plot of chunk unnamed-chunk-3</div>
@@ -238,52 +232,52 @@
 </tr></thead><tbody><tr><td align="right">1995</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">2.4649663</td>
+<td align="right">2.4649268</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">1996</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.2898692</td>
+<td align="right">0.2895225</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">1997</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">-0.9427207</td>
+<td align="right">-0.9432415</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">1998</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">1.7783272</td>
+<td align="right">1.7781908</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">1999</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.4810521</td>
+<td align="right">0.4807324</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">2000</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.2496476</td>
+<td align="right">0.2492953</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">2001</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.8773390</td>
+<td align="right">-0.8778505</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">2002</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">-0.9726692</td>
+<td align="right">-0.9731942</td>
 <td align="right">NA</td>
 </tr><tr><td align="right">2003</td>
 <td align="left">battle creek</td>
 <td align="right">1</td>
-<td align="right">0.1590186</td>
+<td align="right">0.1586534</td>
 <td align="right">-0.6228421</td>
 </tr><tr><td align="right">2004</td>
 <td align="left">battle creek</td>
 <td align="right">0</td>
-<td align="right">0.0851050</td>
+<td align="right">0.0847294</td>
 <td align="right">-0.6228421</td>
 </tr></tbody></table><p>The following plot is of standardized covariates (covariates are colored by type) over time for all tributaries:</p>
 <div class="float">

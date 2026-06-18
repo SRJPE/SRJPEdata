@@ -31,8 +31,8 @@ colors_full <-  c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089", #Royal 
                   "#9986A5", "#EAD3BF", "#AA9486", "#B6854D", "#798E87" # Isle of dogs 2 altered slightly
 )
 
-cov_definitions <- read_csv("data-raw/helper-tables/covariate_definitions.csv")
-cov_selections <- read_csv("data-raw/helper-tables/covariate_selection_table.csv")
+cov_definitions <- read_csv(here::here("data-raw", "helper-tables", "covariate_definitions.csv"))
+cov_selections <- read_csv(here::here("data-raw", "helper-tables", "covariate_selection_table.csv"))
 ```
 
 There are multiple covariates used in SR JPE modeling that were developed through separate but related processes. This vignette provides a comprehensive summary of:
