@@ -1,0 +1,250 @@
+---
+title: "Genetics Data Annual QC"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    embed-resources: true
+params:
+  review_run_year: 2026
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(lubridate)
+library(here)
+library(glue)
+library(DT)
+
+if (file.exists(here::here("DESCRIPTION"))) {
+  devtools::load_all(here::here(), quiet = TRUE)
+} else {
+  library(SRJPEdata)
+}
+
+source(here::here("data-raw", "qc", "qc_helpers.R"))
+
+review_run_year <- params$review_run_year
+
+# Check whether genetics data is available in this build
+genetics_available <- exists("completed_genetic_samples")
+```
+
+## Status
+
+```{r}
+#| echo: false
+
+if (!genetics_available) {
+  cat("Genetics data (completed_genetic_samples) is not yet integrated into this build.\n")
+  cat("QC checks are stubbed out and will be activated once the dataset is available.\n")
+  cat("See data-raw/pull_data_scripts/pull_genetic_run_assignment_data.R for the pull script.")
+} else {
+  cat(glue("Genetics data available. {nrow(completed_genetic_samples)} records found.\n"))
+}
+```
+
+`r if (!genetics_available) knitr::knit_exit()`
+
+---
+
+## Overview
+
+Run year being reviewed: **`r review_run_year`**.
+
+Data source: `completed_genetic_samples` — columns include `sample_id`, `datetime_collected`, `fork_length_mm`, `sherlock_run_assignment`, `field_run_assignment`, `stream_name`.
+
+```{r}
+#| label: overview-table
+#| echo: false
+
+completed_genetic_samples |>
+  mutate(year = lubridate::year(datetime_collected)) |>
+  group_by(stream_name, year) |>
+  summarise(n_samples = n(), .groups = "drop") |>
+  arrange(stream_name, year) |>
+  knitr::kable(caption = "Genetics samples by stream and year")
+```
+
+---
+
+## Check 1: Sample Count — Low by Stream/Year
+
+Flag stream/years with fewer samples than expected. Expected counts to be defined based on monitoring program targets (placeholder threshold: < 30 samples).
+
+```{r}
+#| label: check-sample-count
+
+sample_counts <- completed_genetic_samples |>
+  mutate(
+    run_year = as_run_year(as.Date(datetime_collected))
+  ) |>
+  group_by(stream_name, run_year) |>
+  summarise(n_samples = n(), .groups = "drop")
+
+# TODO: replace placeholder threshold with program-specific targets
+low_samples <- sample_counts |>
+  filter(n_samples < 30)
+
+new_low_samples <- log_issues(
+  low_samples |>
+    rename(stream = stream_name) |>
+    mutate(
+      site        = NA_character_,
+      n_records   = n_samples,
+      data_type   = "genetics",
+      issue_type  = "low_sample_count",
+      field       = "sample_id",
+      severity    = "moderate",
+      description = glue("Only {n_samples} sample(s) in run year {run_year} for {stream} (threshold: 30). Verify against program targets.")
+    )
+)
+```
+
+`r if (nrow(low_samples) == 0) "No low sample counts detected." else glue("{nrow(low_samples)} stream/run-year combination(s) flagged.")`
+
+---
+
+## Check 2: Missing Key Fields
+
+Flag stream/years with high NA rates in `fork_length_mm`, `sherlock_run_assignment`, or `datetime_collected`.
+
+```{r}
+#| label: check-missing-fields
+
+missing_fields <- completed_genetic_samples |>
+  mutate(run_year = as_run_year(as.Date(datetime_collected))) |>
+  group_by(stream_name, run_year) |>
+  summarise(
+    n_records             = n(),
+    pct_na_fork_length    = round(mean(is.na(fork_length_mm)) * 100, 1),
+    pct_na_sherlock       = round(mean(is.na(sherlock_run_assignment)) * 100, 1),
+    pct_na_date           = round(mean(is.na(datetime_collected)) * 100, 1),
+    .groups               = "drop"
+  )
+
+fl_issues <- missing_fields |>
+  filter(pct_na_fork_length > 50) |>
+  mutate(
+    stream      = stream_name, site = NA_character_,
+    data_type   = "genetics", issue_type = "high_na_rate", field = "fork_length_mm",
+    severity    = "moderate",
+    description = glue("{pct_na_fork_length}% of {n_records} sample(s) missing fork_length_mm in run year {run_year} for {stream_name}")
+  )
+
+sherlock_issues <- missing_fields |>
+  filter(pct_na_sherlock > 50) |>
+  mutate(
+    stream      = stream_name, site = NA_character_,
+    data_type   = "genetics", issue_type = "high_na_rate", field = "sherlock_run_assignment",
+    severity    = "moderate",
+    description = glue("{pct_na_sherlock}% of {n_records} sample(s) missing sherlock_run_assignment in run year {run_year} for {stream_name}")
+  )
+
+new_missing_fields <- bind_rows(
+  log_issues(fl_issues),
+  log_issues(sherlock_issues)
+)
+```
+
+---
+
+## Check 3: Run Assignment Mismatch
+
+For records with both Sherlock and field assignment, compute the mismatch rate by stream/year. Flag stream/years where mismatch rate is notably higher than the site historical average.
+
+```{r}
+#| label: check-run-mismatch
+
+mismatch <- completed_genetic_samples |>
+  filter(!is.na(sherlock_run_assignment), !is.na(field_run_assignment)) |>
+  mutate(
+    run_year  = as_run_year(as.Date(datetime_collected)),
+    mismatch  = sherlock_run_assignment != field_run_assignment
+  ) |>
+  group_by(stream_name, run_year) |>
+  summarise(
+    n_compared       = n(),
+    n_mismatch       = sum(mismatch),
+    pct_mismatch     = round(mean(mismatch) * 100, 1),
+    .groups          = "drop"
+  )
+
+site_mismatch_stats <- mismatch |>
+  group_by(stream_name) |>
+  summarise(
+    n_years       = n(),
+    hist_mean_pct = mean(pct_mismatch),
+    hist_sd_pct   = sd(pct_mismatch),
+    .groups       = "drop"
+  ) |>
+  filter(n_years >= 3)
+
+mismatch_outliers <- mismatch |>
+  inner_join(site_mismatch_stats, by = "stream_name") |>
+  filter(pct_mismatch > hist_mean_pct + 2 * hist_sd_pct)
+
+new_mismatch <- log_issues(
+  mismatch_outliers |>
+    mutate(
+      stream      = stream_name,
+      site        = NA_character_,
+      n_records   = n_mismatch,
+      data_type   = "genetics",
+      issue_type  = "run_assignment_mismatch",
+      field       = "sherlock_run_assignment",
+      severity    = "minor",
+      description = glue("{pct_mismatch}% mismatch rate ({n_mismatch}/{n_compared} samples) in run year {run_year} for {stream_name}. Historical mean: {round(hist_mean_pct, 1)}%")
+    )
+)
+```
+
+---
+
+## Issues Logged This Run
+
+```{r}
+#| label: issues-summary
+#| echo: false
+
+all_new <- bind_rows(new_low_samples, new_missing_fields, new_mismatch)
+
+if (nrow(all_new) == 0) {
+  cat("No new issues logged this run.")
+} else {
+  DT::datatable(
+    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, description),
+    caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
+
+### All Open Genetics Issues
+
+```{r}
+#| label: open-issues
+#| echo: false
+
+full_log     <- readr::read_csv(here::here("data-raw", "qc", "qc_log.csv"), show_col_types = FALSE)
+open_genetics <- full_log |> filter(data_type == "genetics", status == "open")
+
+if (nrow(open_genetics) == 0) {
+  cat("No open genetics issues in the log.")
+} else {
+  DT::datatable(
+    open_genetics |> select(log_id, date_identified, stream, site, run_year,
+                            issue_type, field, severity, description, reviewer_notes),
+    caption = glue("{nrow(open_genetics)} open genetics issue(s)"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```

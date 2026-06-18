@@ -1,0 +1,350 @@
+---
+title: "RST Data Annual QC"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    embed-resources: true
+params:
+  review_run_year: 2026
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(lubridate)
+library(here)
+library(glue)
+library(DT)
+
+# Load package data (works from source or installed)
+if (file.exists(here::here("DESCRIPTION"))) {
+  devtools::load_all(here::here(), quiet = TRUE)
+} else {
+  library(SRJPEdata)
+}
+
+source(here::here("data-raw", "qc", "qc_helpers.R"))
+
+review_run_year <- params$review_run_year
+```
+
+## Overview
+
+Reviewing RST catch and trap data. Run year being reviewed: **`r review_run_year`**.
+
+Data sources: `rst_catch`, `rst_trap`, `weekly_juvenile_abundance_catch_data`, `years_to_exclude_rst_data`.
+
+```{r}
+#| label: overview-table
+#| echo: false
+
+rst_catch |>
+  mutate(run_year = as_run_year(date)) |>
+  group_by(stream, site) |>
+  summarise(
+    min_run_year = min(run_year, na.rm = TRUE),
+    max_run_year = max(run_year, na.rm = TRUE),
+    total_records = n(),
+    .groups = "drop"
+  ) |>
+  arrange(stream, site) |>
+  knitr::kable(caption = "RST catch records by stream and site")
+```
+
+---
+
+## Check 1: Fork Length — High NA Rate
+
+Flag stream/site/run_years where >95% of records have no fork length recorded and total records exceed 50. Indicates a season where measurements were not taken.
+
+```{r}
+#| label: check-fl-na
+
+fl_na_check <- rst_catch |>
+  filter(!is.na(date)) |>
+  mutate(run_year = as_run_year(date)) |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_records    = n(),
+    n_na_fl      = sum(is.na(fork_length)),
+    pct_na_fl    = round(mean(is.na(fork_length)) * 100, 1),
+    .groups      = "drop"
+  ) |>
+  filter(pct_na_fl > 95, n_records > 50)
+
+new_fl_na <- log_issues(
+  fl_na_check |>
+    mutate(
+      data_type   = "rst",
+      issue_type  = "high_na_rate",
+      field       = "fork_length",
+      severity    = "moderate",
+      description = glue("{n_na_fl} of {n_records} records ({pct_na_fl}%) have no fork length in run year {run_year} at {site} ({stream})")
+    )
+)
+```
+
+```{r}
+#| label: plot-fl-na
+#| echo: false
+#| fig-height: 6
+
+fl_na_all <- rst_catch |>
+  filter(!is.na(date)) |>
+  mutate(run_year = as_run_year(date)) |>
+  group_by(stream, site, run_year) |>
+  summarise(pct_na_fl = round(mean(is.na(fork_length)) * 100, 1), .groups = "drop")
+
+ggplot(fl_na_all, aes(x = run_year, y = site, fill = pct_na_fl)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "#d73027", name = "% NA") +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Fork length NA rate by site and run year",
+       x = "Run year", y = NULL) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+`r if (nrow(fl_na_check) == 0) "No issues detected." else glue("{nrow(fl_na_check)} site/run-year combination(s) flagged.")`
+
+---
+
+## Check 2: Fork Length — Implausible Values
+
+Flag records where `fork_length < 20mm` or `fork_length > 200mm`. These are biologically implausible for juvenile chinook at an RST.
+
+```{r}
+#| label: check-fl-implausible
+
+fl_impl_check <- rst_catch |>
+  filter(!is.na(fork_length), fork_length > 0) |>
+  mutate(run_year = as_run_year(date)) |>
+  mutate(implausible = fork_length < 20 | fork_length > 200) |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_records    = sum(implausible),
+    min_fl       = min(fork_length[implausible], na.rm = TRUE),
+    max_fl       = max(fork_length[implausible], na.rm = TRUE),
+    .groups      = "drop"
+  ) |>
+  filter(n_records > 0)
+
+new_fl_impl <- log_issues(
+  fl_impl_check |>
+    mutate(
+      data_type   = "rst",
+      issue_type  = "implausible_value",
+      field       = "fork_length",
+      severity    = "critical",
+      description = glue("{n_records} record(s) with fork_length <20mm or >200mm in run year {run_year} at {site} ({stream}). Range of flagged values: [{min_fl}, {max_fl}]mm")
+    )
+)
+```
+
+```{r}
+#| label: plot-fl-implausible
+#| echo: false
+#| fig-height: 5
+
+fl_plot_data <- rst_catch |>
+  filter(!is.na(fork_length), fork_length > 0) |>
+  mutate(
+    run_year    = as_run_year(date),
+    implausible = fork_length < 20 | fork_length > 200
+  )
+
+ggplot(fl_plot_data, aes(x = fork_length)) +
+  geom_histogram(aes(fill = implausible), bins = 80, alpha = 0.8) +
+  scale_fill_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+                    labels = c("Normal", "Flagged"), name = NULL) +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Fork length distribution with flagged values",
+       x = "Fork length (mm)", y = "Count") +
+  theme_minimal()
+```
+
+`r if (nrow(fl_impl_check) == 0) "No issues detected." else glue("{nrow(fl_impl_check)} site/run-year combination(s) flagged.")`
+
+---
+
+## Check 3: Catch — Extreme Annual Totals
+
+Flag run_years where total catch at a site exceeds 4× the site's historical median. Requires at least 5 years of history. Not necessarily an error — warrants review.
+
+```{r}
+#| label: check-catch-extreme
+
+annual_catch <- rst_catch |>
+  filter(!is.na(date), !is.na(count)) |>
+  mutate(run_year = as_run_year(date)) |>
+  group_by(stream, site, run_year) |>
+  summarise(total_catch = sum(count, na.rm = TRUE), .groups = "drop")
+
+site_stats <- annual_catch |>
+  group_by(stream, site) |>
+  summarise(
+    n_years      = n(),
+    median_catch = median(total_catch),
+    .groups      = "drop"
+  ) |>
+  filter(n_years >= 5, median_catch > 0)
+
+catch_extreme <- annual_catch |>
+  inner_join(site_stats, by = c("stream", "site")) |>
+  filter(total_catch > 4 * median_catch)
+
+new_catch_extreme <- log_issues(
+  catch_extreme |>
+    mutate(
+      n_records   = 1L,
+      data_type   = "rst",
+      issue_type  = "extreme_value",
+      field       = "count",
+      severity    = "minor",
+      description = glue("Total catch of {total_catch} in run year {run_year} at {site} ({stream}) is {round(total_catch / median_catch, 1)}x the site median ({median_catch})")
+    )
+)
+```
+
+```{r}
+#| label: plot-catch-timeseries
+#| echo: false
+#| fig-height: 8
+
+flagged_years <- catch_extreme |> select(stream, site, run_year)
+
+ggplot(annual_catch, aes(x = run_year, y = total_catch)) +
+  geom_line(color = "grey60") +
+  geom_point(aes(color = paste(stream, site, run_year) %in%
+               paste(flagged_years$stream, flagged_years$site, flagged_years$run_year)),
+             size = 2) +
+  scale_color_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+                     labels = c("Normal", "Flagged"), name = NULL) +
+  facet_wrap(~stream + site, scales = "free_y", ncol = 2) +
+  labs(title = "Annual total catch by site with flagged years",
+       x = "Run year", y = "Total catch") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+`r if (nrow(catch_extreme) == 0) "No issues detected." else glue("{nrow(catch_extreme)} site/run-year combination(s) flagged.")`
+
+---
+
+## Check 4: Season Coverage — Low Sampling Effort
+
+Flag all stream/site/run_years with fewer than 3 weeks sampled in the BTSPAS window (weeks 45–53 and 1–22), including those already in `years_to_exclude_rst_data`. The description notes exclusion status.
+
+```{r}
+#| label: check-season-coverage
+
+weeks_in_window <- weekly_juvenile_abundance_catch_data |>
+  filter(week %in% c(45:53, 1:22), !is.na(count)) |>
+  group_by(stream, site, run_year) |>
+  summarise(weeks_sampled = n_distinct(week), .groups = "drop")
+
+excluded_lookup <- years_to_exclude_rst_data |>
+  distinct(stream, site, run_year) |>
+  mutate(already_excluded = TRUE)
+
+low_effort <- weeks_in_window |>
+  filter(weeks_sampled < 3) |>
+  left_join(excluded_lookup, by = c("stream", "site", "run_year")) |>
+  mutate(already_excluded = replace_na(already_excluded, FALSE))
+
+new_low_effort <- log_issues(
+  low_effort |>
+    mutate(
+      n_records   = weeks_sampled,
+      data_type   = "rst",
+      issue_type  = "low_sampling_effort",
+      field       = "weeks_sampled",
+      severity    = "moderate",
+      description = glue("Only {weeks_sampled} week(s) sampled in BTSPAS window for run year {run_year} at {site} ({stream}). Already excluded from modeling: {already_excluded}")
+    )
+)
+```
+
+```{r}
+#| label: plot-season-coverage
+#| echo: false
+#| fig-height: 8
+
+coverage_plot_data <- weeks_in_window |>
+  left_join(excluded_lookup, by = c("stream", "site", "run_year")) |>
+  mutate(
+    already_excluded = replace_na(already_excluded, FALSE),
+    label = case_when(
+      weeks_sampled < 3 & already_excluded ~ "Low effort (excluded)",
+      weeks_sampled < 3 & !already_excluded ~ "Low effort (not excluded)",
+      TRUE ~ "Adequate"
+    )
+  )
+
+ggplot(coverage_plot_data, aes(x = run_year, y = site, fill = label)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(
+    values = c("Adequate" = "steelblue",
+               "Low effort (excluded)" = "#fdae61",
+               "Low effort (not excluded)" = "#d73027"),
+    name = NULL
+  ) +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Weeks sampled in BTSPAS window by site and run year",
+       x = "Run year", y = NULL) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom")
+```
+
+`r if (nrow(low_effort) == 0) "No issues detected." else glue("{nrow(low_effort)} site/run-year combination(s) flagged ({sum(low_effort$already_excluded)} already excluded from modeling).")`
+
+---
+
+## Issues Logged This Run
+
+```{r}
+#| label: issues-summary
+#| echo: false
+
+all_new <- bind_rows(new_fl_na, new_fl_impl, new_catch_extreme, new_low_effort)
+
+if (nrow(all_new) == 0) {
+  cat("No new issues logged this run.")
+} else {
+  DT::datatable(
+    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, description),
+    caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
+
+### All Open RST Issues
+
+```{r}
+#| label: open-issues
+#| echo: false
+
+full_log <- readr::read_csv(here::here("data-raw", "qc", "qc_log.csv"), show_col_types = FALSE)
+open_rst  <- full_log |> filter(data_type == "rst", status == "open")
+
+if (nrow(open_rst) == 0) {
+  cat("No open RST issues in the log.")
+} else {
+  DT::datatable(
+    open_rst |> select(log_id, date_identified, stream, site, run_year,
+                       issue_type, field, severity, description, reviewer_notes),
+    caption = glue("{nrow(open_rst)} open RST issue(s)"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
