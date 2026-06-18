@@ -18,7 +18,7 @@
 }
 }
 \source{
-USGS/CDEC/FWS. See \code{data-raw/pull_environmental_data.R} for more details.
+USGS/CDEC/FWS. See \code{data-raw/pull_data_scripts/pull_temperature_data.R} for more details.
 }
 \usage{
 temperature_data
