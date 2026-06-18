@@ -9,7 +9,7 @@
 A tibble with 651 rows and 8 columns
 \itemize{
 \item \code{year}: year
-\week \code{week} : week
+\item \code{week} : week
 \item \code{stream}: rst stream
 \item \code{site}: rst site
 \item \code{number_released}: Number of efficiency trial fish released

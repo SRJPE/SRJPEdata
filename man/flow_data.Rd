@@ -31,35 +31,35 @@ The temporal coverage of flow data ranges from 1930 to 2025.
 }
 \details{
 Gage Information
-\strong Deer creek
+\strong{Deer creek}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1986 - 2025
 \item USGS - 11383500
 \item CDEC - DCV
 }
 }
-\strong Sacramento River
+\strong{Sacramento River}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1994 - 2025
 \item USGS - 11383500
 \item USGS - 11377100
 }
 }
-\strong Battle Creek
+\strong{Battle Creek}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1995 - 2025
 \item USGS - 11376550
 \item USFWS - UBC
 }
 }
-\strong Butte Creek
+\strong{Butte Creek}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1930 - 2025
 \item USGS - 11376550
 \item USGS - BCK
 }
 }
-\strong Clear Creek
+\strong{Clear Creek}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1995 - 2025
 \item USFWS - UCC
@@ -67,14 +67,14 @@ Gage Information
 \item USFWS - LCC
 }
 }
-\strong Mill Creek
+\strong{Mill Creek}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1995 - 2025
 \item USGS - 11381500
 \item CDEC - MLM
 }
 }
-\strong Feather River
+\strong{Feather River}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1969 - 2025
 \item USGS - 11407000
@@ -85,7 +85,7 @@ Gage Information
 \item interpolated
 }
 }
-\strong Yuba River
+\strong{Yuba River}
 \itemize{
 \itemize{Flow gages - Temporal coverage: 1999 - 2025
 \item USGS - 11421000

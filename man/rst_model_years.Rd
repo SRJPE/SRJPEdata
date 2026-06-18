@@ -14,6 +14,7 @@
 \item \code{apply_to}: Differentiates between years that can be excluded broadly ("all runs") or those specific to spring run ("spring")
 \item \code{exclude}: Boolean value to describe if a year should be excluded or not
 }
+}
 \usage{
 rst_model_years
 }

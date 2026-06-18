@@ -33,38 +33,38 @@ The temporal coverage of temperature data ranges from 1994 to 2025.
 }
 \details{
 Gage Information
-\strong Deer creek
+\strong{Deer creek}
 \itemize{
 \itemize{Temperature gages - Temporal coverage: 1998 - 2025
 \item CDEC - DCV
 }
 }
-\strong Sacramento River
+\strong{Sacramento River}
 \itemize{
 \itemize{Temperature gages - Temporal coverage: 1994 - 2023
 \item USGS - 11383500
 }
 }
-\strong Battle Creek
+\strong{Battle Creek}
 \itemize{
 \itemize{Temperature gages  - Temporal coverage: 2003 - 2021
 \item USFWS - UBC
 }
 }
-\strong Clear Creek
+\strong{Clear Creek}
 \itemize{
 \itemize{Temperature gages - Temporal coverage: 2001 - 2021
 \item USFWS - UCC
 \item USFWS - LCC
 }
 }
-\strong Mill Creek
+\strong{Mill Creek}
 \itemize{
 \itemize{Temperature gages - Temporal coverage: 1998 - 2025
 \item CDEC - MLM
 }
 }
-\strong Feather River
+\strong{Feather River}
 \itemize{
 \itemize{Temperature gages - Temporal coverage: 1999 - 2025
 \item CDEC - GRL
@@ -72,7 +72,7 @@ Gage Information
 \item interpolated
 }
 }
-\strong Yuba River
+\strong{Yuba River}
 \itemize{
 \itemize{Temperature gages - Temporal coverage: 1998 - 2025
 \item CDEC - YR7

@@ -13,6 +13,7 @@
 \item \code{reason_for_exclusion}: Provides reason for exclusion
 \item \code{exclude}: Boolean value to describe if a year should be excluded or not
 }
+}
 \usage{
 adult_model_years
 }
