@@ -77,7 +77,7 @@ temp_data <- env |> filter(parameter == "temperature", statistic == "mean")
 
 ---
 
-## Check 1: Stream Coverage
+## Check 1 (error): Stream Coverage
 
 Verify all expected streams have flow data for the most recent run year in the dataset.
 
@@ -133,7 +133,7 @@ tibble(stream = EXPECTED_STREAMS) |>
 
 ---
 
-## Check 2: Flow — Missing Weeks in RST Season Window
+## Check 2 (warning): Flow — Missing Weeks in RST Season Window
 
 For each stream/run_year, count how many weeks in the BTSPAS window (weeks 45–53 and 1–22) are missing flow data. Flag run_years where >20% of the 31 possible window weeks are missing (`gap`) or where 3+ consecutive weeks are missing (`extended_gap`).
 
@@ -223,7 +223,7 @@ ggplot(avail_plot, aes(x = run_year, y = site_group, fill = pct_present)) +
 
 ---
 
-## Check 3: Flow — Zero or Negative Values
+## Check 3 (error): Flow — Zero or Negative Values
 
 Flag stream/run_years with any flow value ≤ 0 in the RST season window. Zero flow during RST season is almost certainly a sensor or data issue.
 
@@ -256,7 +256,7 @@ new_zero_flow <- log_issues(
 
 ---
 
-## Check 4: Temperature — Implausible Values
+## Check 4 (warning): Temperature — Implausible Values
 
 Flag stream/run_years with any weekly mean temperature outside the plausible range (< −5°C or > 35°C).
 

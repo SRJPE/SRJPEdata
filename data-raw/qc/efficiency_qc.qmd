@@ -72,7 +72,7 @@ eff <- weekly_efficiency |>
 
 ---
 
-## Check 1: Recaptures Exceeding Releases
+## Check 1 (error): Recaptures Exceeding Releases
 
 Flag trials where `number_recaptured > number_released`. These rows are already filtered out during the model data build, but logging them creates a traceable record for upstream correction.
 
@@ -123,7 +123,7 @@ ggplot(eff_plot, aes(x = number_released, y = number_recaptured, color = flagged
 
 ---
 
-## Check 2: Low Release Count
+## Check 2 (warning): Low Release Count
 
 Flag trials where fewer than 50 fish were released. Small releases produce high-variance efficiency estimates.
 
@@ -171,7 +171,7 @@ ggplot(eff, aes(x = number_released, fill = number_released < 50)) +
 
 ---
 
-## Check 3: Zero Recaptures
+## Check 3 (warning): Zero Recaptures
 
 Flag trials with zero recaptures. Can be real (very low efficiency) but may also indicate a data entry issue.
 
@@ -224,7 +224,7 @@ ggplot(zero_recap_by_year, aes(x = run_year, y = zero_recap_trials)) +
 
 ---
 
-## Check 4: Trial Coverage Per Run Year
+## Check 4 (warning): Trial Coverage Per Run Year
 
 Flag stream/site/run_years with fewer than 3 efficiency trials in the BTSPAS window (weeks 45–53 and 1–22). Indicates sparse coverage that may limit model reliability.
 
@@ -294,7 +294,7 @@ ggplot(coverage_plot, aes(x = run_year, y = site, fill = label)) +
 
 ---
 
-## Check 5: Efficiency Rate Outliers
+## Check 5 (error): Efficiency Rate Outliers
 
 For each site with at least 5 years of history, flag run_years where the mean simple efficiency (`number_recaptured / number_released`) is more than 3 SD above the site historical mean.
 
@@ -360,6 +360,14 @@ ggplot(eff_rates, aes(x = run_year, y = mean_eff)) +
 `r if (nrow(eff_outliers) == 0) "No efficiency rate outliers detected." else glue("{nrow(eff_outliers)} site/run-year combination(s) flagged.")`
 
 ---
+
+
+## Check 6 (error): No efficiency trials in the given year
+
+TODO add a check for this
+
+---
+
 
 ## Issues Logged This Run
 
