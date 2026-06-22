@@ -97,5 +97,8 @@ test_that("No NA values in identifying annual adult data variables", {
 })
 
 
+# Genetic data tests ----------------------------------------------------------
 
+# TODO add a test to make sure data object exists
+# check that run assignment is one of the 4, date time
 

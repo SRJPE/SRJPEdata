@@ -59,7 +59,7 @@ rst_catch |>
 
 ---
 
-## Check 1: Fork Length — High NA Rate
+## Check 1 (warning): Fork Length — High NA Rate
 
 Flag stream/site/run_years where >95% of records have no fork length recorded and total records exceed 50. Indicates a season where measurements were not taken.
 
@@ -115,7 +115,7 @@ ggplot(fl_na_all, aes(x = run_year, y = site, fill = pct_na_fl)) +
 
 ---
 
-## Check 2: Fork Length — Implausible Values
+## Check 2 (warning): Fork Length — Implausible Values
 
 Flag records where `fork_length < 20mm` or `fork_length > 200mm`. These are biologically implausible for juvenile chinook at an RST.
 
@@ -173,9 +173,14 @@ ggplot(fl_plot_data, aes(x = fork_length)) +
 
 ---
 
-## Check 3: Catch — Extreme Annual Totals
+## Check 3 (error): Catch — Extreme Annual Totals
 
 Flag run_years where total catch at a site exceeds 4× the site's historical median. Requires at least 5 years of history. Not necessarily an error — warrants review.
+
+TODO: 
+- integrate the simple abundance expansion logic
+- maybe add a separate check for weekly extreme values
+- add a check for when annual count is low
 
 ```{r}
 #| label: check-catch-extreme
@@ -237,9 +242,11 @@ ggplot(annual_catch, aes(x = run_year, y = total_catch)) +
 
 ---
 
-## Check 4: Season Coverage — Low Sampling Effort
+## Check 4 (error): Season Coverage — Low Sampling Effort
 
 Flag all stream/site/run_years with fewer than 3 weeks sampled in the BTSPAS window (weeks 45–53 and 1–22), including those already in `years_to_exclude_rst_data`. The description notes exclusion status.
+
+Note - These years are removed from the modeling dataset but the purpose of this check is to talk to the data collectors to ensure we are not missing data and the low sampling effort is accurate and the automatic fix to remove is correct.
 
 ```{r}
 #| label: check-season-coverage
@@ -304,6 +311,12 @@ ggplot(coverage_plot_data, aes(x = run_year, y = site, fill = label)) +
 ```
 
 `r if (nrow(low_effort) == 0) "No issues detected." else glue("{nrow(low_effort)} site/run-year combination(s) flagged ({sum(low_effort$already_excluded)} already excluded from modeling).")`
+
+---
+
+## Check 5 (error): Hours Fished - Extreme Value
+
+TODO add a check for this
 
 ---
 
