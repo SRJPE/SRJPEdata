@@ -10,7 +10,6 @@ library(SRJPEdata)
 # STOCK RECRUIT COVARIATES
 # ----------------------------------------------------------------------------
 # --- Source data ------------------------------------------------------------
-source("data-raw/pull_data_scripts/pull_flow_data.R")
 standard_temperature <-  temp
 standard_flow <- flow_daily         
 
