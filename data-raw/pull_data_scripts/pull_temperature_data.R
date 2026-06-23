@@ -414,7 +414,7 @@ required_objects <- c(
 # Check if all objects exist
 if (!all(sapply(required_objects, exists))) {
   stop(
-    "One or more of the flow or temp queries do not exist in the environment."
+    "One or more of the temp queries do not exist in the environment."
   )
 }
 
