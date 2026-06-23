@@ -20,13 +20,13 @@ A tibble with 10,890 rows and 14 columns
 \item \code{standardized_flow}: Flow standardized across years and sites
 \item \code{run_year}: Run year
 \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week
-\item \code{lgN_prior}: log normalized special prior abundance cap, for more info search \code{?SRJPEdata::btspasx_special_priors_data}
+\item \code{lgN_prior}: log normalized special prior abundance cap
 }
 }
 \source{
 Prepared using rotary screw trap catch data (see \code{?SRJPEdata::rst_catch} for more information on raw data sources),
 flow_data (see \code{?SRJPEdata::flow_data}), hours fished information
-(see \verb{?SRJPEdata::weekly_hours_fished for more information}), and btspasx special priors (see \code{?SRJPEdata::btspasx_special_priors_data} for more information).
+(see \verb{?SRJPEdata::weekly_hours_fished for more information}).
 }
 \usage{
 weekly_juvenile_abundance_catch_data

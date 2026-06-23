@@ -15,7 +15,7 @@
 #'   }
 #' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
 #'   flow_data (see `?SRJPEdata::flow_data`), hours fished information 
-#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`).
 'weekly_juvenile_abundance_model_data'
 
 #' @title Weekly BT-SPAS-X Catch Data
@@ -37,25 +37,13 @@
 #'   \item \code{standardized_flow}: Flow standardized across years and sites 
 #'   \item \code{run_year}: Run year 
 #'   \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week 
-#'   \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search `?SRJPEdata::btspasx_special_priors_data`
+#'   \item \code{lgN_prior}: log normalized special prior abundance cap
 #'   }
 #' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
 #'   flow_data (see `?SRJPEdata::flow_data`), hours fished information 
-#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`).
 'weekly_juvenile_abundance_catch_data'
 
-#' @title Special Priors for BT-SPAS-X Abundance Model 
-#' @name btspasx_special_priors_data
-#' @description A dataframe containing special priors to fine tune model 
-#' @format A dataframe with 71 rows and 4 columns 
-#' \itemize{
-#'   \item \code{site}: site
-#'   \item \code{run_year}: run year
-#'   \item \code{week}: week 
-#'   \item \code{special_prior}: log normalized special prior abundance cap
-#'   }
-#' @source Special priors were developed by the lead SR JPE modeler, Josh Korman.
-'btspasx_special_priors_data'
 
 #' @title RST Catch Data 
 #' @name rst_catch

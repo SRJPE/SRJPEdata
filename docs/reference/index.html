@@ -79,16 +79,24 @@
           <p class="section-desc"></p><p>Data used directly as model inputs</p>
         </th>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="adult-datasets">Adult Datasets <a href="#adult-datasets" class="anchor" aria-hidden="true"></a></h3>
+          <h3 id="stock-recruit-datasets">Stock Recruit Datasets <a href="#stock-recruit-datasets" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p><p>Data used as model inputs to stock recruit</p>
         </th>
       </tr></tbody><tbody><tr><td>
           <p><code><a href="upstream_passage_estimates.html">annual_adult</a></code> </p>
         </td>
         <td><p>Annual adult estimates</p></td>
+      </tr><tr><td>
+          <p><code><a href="years_to_exclude_adult.html">adult_model_years</a></code> </p>
+        </td>
+        <td><p>Adult Modeling Years</p></td>
+      </tr><tr><td>
+          <p><code><a href="stock_recruit_covariates.html">stock_recruit_covariates</a></code> </p>
+        </td>
+        <td><p>Stock recruit covariates</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="juvenile-datasets">Juvenile Datasets <a href="#juvenile-datasets" class="anchor" aria-hidden="true"></a></h3>
-          <p class="section-desc"></p><p>Data used as inputs to juvenile bt-spas-x abundance model</p>
+          <h3 id="bt-spas-x-datasets">BT-SPAS-X Datasets <a href="#bt-spas-x-datasets" class="anchor" aria-hidden="true"></a></h3>
+          <p class="section-desc"></p><p>Data used as inputs to juvenile BT-SPAS-X abundance model</p>
         </th>
       </tr></tbody><tbody><tr><td>
           <p><code><a href="weekly_juvenile_abundance_catch_data.html">weekly_juvenile_abundance_catch_data</a></code> </p>
@@ -114,12 +122,8 @@
           <p><code><a href="forecast_covariates.html">forecast_covariates</a></code> </p>
         </td>
         <td><p>Forecast covariates</p></td>
-      </tr><tr><td>
-          <p><code><a href="years_to_exclude_adult.html">adult_model_years</a></code> </p>
-        </td>
-        <td><p>Adult Modeling Years</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="survival-datasets">Survival Datasets <a href="#survival-datasets" class="anchor" aria-hidden="true"></a></h3>
+          <h3 id="survival-and-travel-time-datasets">Survival and Travel Time Datasets <a href="#survival-and-travel-time-datasets" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p><p>Data used as inputs to survival model</p>
         </th>
       </tr></tbody><tbody><tr><td>
@@ -135,7 +139,7 @@
         </td>
         <td><p>Travel Time Model Data - Sacramento</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="genetics-datasets">Genetics Datasets <a href="#genetics-datasets" class="anchor" aria-hidden="true"></a></h3>
+          <h3 id="plad-datasets">PLAD Datasets <a href="#plad-datasets" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p><p>Data used as inputs to PLAD model</p>
         </th>
       </tr></tbody><tbody><tr><td>
@@ -143,16 +147,12 @@
         </td>
         <td><p>Completed Genetic Samples</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h2 id="helper-data">Helper Data <a href="#helper-data" class="anchor" aria-hidden="true"></a></h2>
-          <p class="section-desc"></p><p>Data used as helper datasets to generate model data</p>
+          <h2 id="monitoring-data">Monitoring Data <a href="#monitoring-data" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Salmonid and environmental datasets used to generate model datasets.</p>
         </th>
-      </tr></tbody><tbody><tr><td>
-          <p><code><a href="years_to_exclude_adult.html">adult_model_years</a></code> </p>
-        </td>
-        <td><p>Adult Modeling Years</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="juvenile-datasets">Juvenile Datasets <a href="#juvenile-datasets" class="anchor" aria-hidden="true"></a></h3>
-          <p class="section-desc"></p><p>RST monitoring datasets</p>
+          <h3 id="rst-datasets">RST Datasets <a href="#rst-datasets" class="anchor" aria-hidden="true"></a></h3>
+          <p class="section-desc"></p><p>RST monitoring datasets compiled accross streams.</p>
         </th>
       </tr></tbody><tbody><tr><td>
           <p><code><a href="site_lookup.html">site_lookup</a></code> </p>
@@ -207,23 +207,7 @@
         </td>
         <td><p>Escapement estimates all runs</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="modeling-ruleset-datasets">Modeling Ruleset Datasets <a href="#modeling-ruleset-datasets" class="anchor" aria-hidden="true"></a></h3>
-          <p class="section-desc"></p><p>Helper datasets used to subset, categorize and describe model data, used to prepare weekly_juvenile_abundance_model_data</p>
-        </th>
-      </tr></tbody><tbody><tr><td>
-          <p><code><a href="daily_yearling_ruleset.html">daily_yearling_ruleset</a></code> </p>
-        </td>
-        <td><p>Daily Yearling Rulesets</p></td>
-      </tr><tr><td>
-          <p><code><a href="btspasx_special_priors_data.html">btspasx_special_priors_data</a></code> </p>
-        </td>
-        <td><p>Special Priors for BT-SPAS-X Abundance Model</p></td>
-      </tr><tr><td>
-          <p><code><a href="weekly_hours_fished.html">weekly_hours_fished</a></code> </p>
-        </td>
-        <td><p>Weekly Hours Fished</p></td>
-      </tr></tbody><tbody><tr><th colspan="2">
-          <h3 id="environmental-data">Environmental Data <a href="#environmental-data" class="anchor" aria-hidden="true"></a></h3>
+          <h3 id="environmental-datasets">Environmental Datasets <a href="#environmental-datasets" class="anchor" aria-hidden="true"></a></h3>
           <p class="section-desc"></p><p>Environmental gage data provided by stream teams or pulled from USGS/CDEC and used as covatiates to models</p>
         </th>
       </tr></tbody><tbody><tr><td>
@@ -234,6 +218,18 @@
           <p><code><a href="temperature_data.html">temperature_data</a></code> </p>
         </td>
         <td><p>Environmental Gage Data - Temperature</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h3 id="modeling-ruleset-datasets">Modeling Ruleset Datasets <a href="#modeling-ruleset-datasets" class="anchor" aria-hidden="true"></a></h3>
+          <p class="section-desc"></p><p>Helper datasets used to subset, categorize and describe model data, used to prepare weekly_juvenile_abundance_model_data</p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="daily_yearling_ruleset.html">daily_yearling_ruleset</a></code> </p>
+        </td>
+        <td><p>Daily Yearling Rulesets</p></td>
+      </tr><tr><td>
+          <p><code><a href="weekly_hours_fished.html">weekly_hours_fished</a></code> </p>
+        </td>
+        <td><p>Weekly Hours Fished</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="helper-functions">Helper Functions <a href="#helper-functions" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Functions used to generate model data</p>
