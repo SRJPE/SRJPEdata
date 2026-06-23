@@ -13,11 +13,20 @@ rr_mean_flow,flow,FALSE,"Mean flow during the rearing time period. This window i
 rr_max_flow,flow,FALSE,This is the same as rr_mean_flow except the max flow by stream and year is calculated.
 rr_min_flow,flow,FALSE,This is the same as rr_mean_flow except the max flow by stream and year is calculated.
 rr_median_flow,flow,FALSE,This is the same as rr_mean_flow except the max flow by stream and year is calculated.
-3-category water year type,water year summary ,TRUE,"Use water year type from CDEC for the Sacramento Valley and aggregate into 3 categories: C, D/BN/AN, W. This is a scenario based covariate meaning we do not need any data for the forecast. All 3 categories would be run for the forecast."
+2-category water year type,water year summary ,TRUE,Simplify water year type indicating Wet or Dry 
+3-category water year type,water year summary ,TRUE,"Use water year type from CDEC for the Sacramento Valley and aggregate into 2 categories: C/D/BN, AN/W. This is a scenario based covariate meaning we do not need any data for the forecast. Both categories would be run for the forecast."
 3-category flow exceedance year type,water year summary ,TRUE,"Use the flow exceedance methodology provided by the CDFW Instream Flow team (find mean annual flow by water year for each stream and rank the water years where the top 33% are wet, middle are average, bottom are dry) to categorize years for each stream into 3 categories: wet, average, dry"
 monthly reservoir storage Keswick ,resevoir storage ,TRUE,"Using reservoir storage data, calculate the monthly max storage for Keswick. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)"
 monthly reservoir storage Shasta,resevoir storage ,TRUE,"Using reservoir storage data, calculate the monthly max storage for Shasta. For each JPE date we would use data from the month prior (e.g for Jan 1 it would be average for Dec)"
 monthly peak flow,flow,TRUE,Calculate the peak flow for each watershed and month. This would be different based on JPE date
+weight,physical,FALSE,Weight of fish in grams. 
+fork_length,physical,FALSE,Fork length of fish in mm. 
+fish_condition,physical,FALSE,Fish health condition. 
 mi_gdd_sacramento,temperature,TRUE,"Water temperature exposure during adult upstream migration in the mainstem Sacramento River (March–May), calculated by summing mean daily temperatures."
 mi_above_13_temp_day,temperature,TRUE,Week of the year (1:52) when water temperature exceeds 13 °C during the adult upstream migration in the mainstem Sacramento (March–May).
 mi_above_13_temp_week,temperature,TRUE,Day of the year (1:365) when water temperature exceeds 13 C during the adult upstream migration in the mainstem Sacramento (March–May).
+efficiency_flow,flow,FALSE,Mean weekly flow during efficiency trials. 
+weekly_flow,flow,FALSE,Mean weekly flow. 
+peak_flow_prior_to_X (shifting dates),flow ,FALSE,Peak flow prior to a given date. Multiple dates tested to see which preformed best. 
+hatchery_origin,physical ,FALSE,Hatchery origin of chinook indicating if fish is of wild or hatchery origin. 
+null ,,FALSE,"Null model selected, no covariate. "

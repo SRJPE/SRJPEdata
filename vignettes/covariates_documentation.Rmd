@@ -87,7 +87,6 @@ temp_cov_detail |>
 Flow covariates were developed for the spawning/incubation period (Aug–Dec) and the juvenile rearing period (Nov–Jul for tributaries; Jan–Jul for the Sacramento River). Daily maximum flows are used to capture peak flow conditions. All data come from USGS and CDEC gages.
 
 ```{r flow-cov-table}
-# TODO add new covariates. 
 flow_cov_detail <- cov_definitions |> 
   filter(Type == "flow") 
 
@@ -100,7 +99,6 @@ flow_cov_detail |>
 
 
 ```{r cat-cov-table}
-# TODO add new covariates. 
 cat_cov_detail <- cov_definitions |> 
   filter(Type == "water year summary") 
 
@@ -114,11 +112,23 @@ cat_cov_detail |>
 Reservoir storage in Shasta and Keswick Reservoirs integrates upstream water management and provides an early-season indicator of downstream flow conditions. These data are particularly useful for forecasting because they are reported in real time.
 
 ```{r res-cov-table}
-# TODO add new covariates. 
 res_cov_detail <- cov_definitions |> 
   filter(Type == "resevoir storage") 
 
 res_cov_detail |>
+  kable(escape = FALSE) |>
+  kable_classic(full_width = TRUE, font_size = 12) 
+```
+
+### Physical Covariates
+
+Physical measurements of fish. 
+
+```{r physical-cov-table}
+physical_cov_detail <- cov_definitions |> 
+  filter(Type == "physical") 
+
+physical_cov_detail |>
   kable(escape = FALSE) |>
   kable_classic(full_width = TRUE, font_size = 12) 
 ```
@@ -169,5 +179,20 @@ Model performance with covariates is continuously evaluated to ensure covariates
 Covariates currently selected as of July 2026: 
 
 ```{r}
-# TODO filter selected table 
+selected_covariates <- tibble::tribble(
+  ~Model,          ~Covariate,                  ~Type,         ~Note,
+  "Stock-Recruit", "si_gdd_spawn",              "temperature", "Selected for Mill Creek",
+  "Stock-Recruit", "si_above_13_temp_week",     "temperature", "Selected for Deer Creek and Yuba River",
+  "Stock-Recruit", "si_weekly_max_temp_median", "temperature", "Selected for Clear Creek",
+  "Stock-Recruit", "si_mean_flow",              "flow",        "Selected for Battle Creek",
+  "Stock-Recruit", "si_min_flow",               "flow",        "Selected for Butte Creek",
+  "Survival",      "monthly peak flow",         "flow",        "-",
+  "Survival",      "fork_length",               "physical",    "-",
+  "PLAD",          "fork_length",               "physical",    "-",
+  "In Season",     "null",                      NA,            "-",
+  "BTSPASX",       "efficiency_flow",           "flow",        "-",
+  "BTSPASX",       "weekly_flow",               "flow",        "-"
+)
+
+knitr::kable(selected_covariates)
 ```
