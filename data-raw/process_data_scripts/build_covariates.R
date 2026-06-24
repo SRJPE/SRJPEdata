@@ -222,6 +222,7 @@ usethis::use_data(stock_recruit_covariates, overwrite = TRUE)
 # FORECAST COVARIATES
 # ----------------------------------------------------------------------------
 # --- Spawning & incubation flow ---------------------------------------------
+sr_covariates <- stock_recruit_covariates
 si_min_flow <- sr_covariates |>
   filter(lifestage == "spawning and incubation", covariate_structure == "min_flow") |>
   as_tibble() |>
@@ -303,7 +304,7 @@ peak_flow_monthly <- flow_daily |>
   group_by(stream, site_group, month, year, name) |>
   summarize(value = max(value, na.rm = TRUE)) |>
   bind_rows(
-    flow_data |>
+    flow_daily |>
       filter(statistic == "mean", stream != "sacramento river") |>
       mutate(month = month(date),
              year = year(date),
