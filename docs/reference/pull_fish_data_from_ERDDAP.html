@@ -38,7 +38,7 @@
       <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="../articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
@@ -97,7 +97,7 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Pull fish data from ERDDAP</span></span></span>
 <span class="r-in"><span><span class="va">fish_data</span> <span class="op">&lt;-</span> <span class="fu">pull_fish_data_from_ERDDAP</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in tabledap("FED_JSATS_taggedfish", url = "https://oceanview.pfeg.noaa.gov/erddap/"):</span> could not find function "tabledap"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in mutate(tabledap("FED_JSATS_taggedfish", url = "https://oceanview.pfeg.noaa.gov/erddap/"),     fish_release_date = as.POSIXct(fish_release_date, format = "%m/%d/%Y %H:%M:%S",         tz = "Etc/GMT+8"), fish_date_tagged = as.POSIXct(fish_date_tagged,         format = "%m/%d/%Y %H:%M:%S", tz = "Etc/GMT+8"), fish_id_prefix = substr(fish_id,         start = 1, stop = (nchar(fish_id) - 4))):</span> could not find function "mutate"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

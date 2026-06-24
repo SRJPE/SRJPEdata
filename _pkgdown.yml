@@ -100,7 +100,7 @@ navbar:
       href: articles/summary_of_data_for_modeling.html
     - text: Yearling Ruleset
       href: articles/yearling_ruleset.html
-    - text: Site Selection for Stock Recruit Modeling
+    - text: Overview of RST Sites
       href: articles/site_overview.html
     - text: Hours Fished Analysis
       href: articles/trap_effort.html

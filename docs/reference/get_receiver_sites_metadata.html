@@ -39,7 +39,7 @@ Detections data can be pulled directly from ERDAP using library(rerddap). See ?p
       <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="../articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
@@ -112,7 +112,7 @@ Detections data can be pulled directly from ERDAP using <code>library(rerddap).<
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get receiver sites metadata</span></span></span>
 <span class="r-in"><span><span class="va">receiver_metadata</span> <span class="op">&lt;-</span> <span class="fu">get_receiver_sites_metadata</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in bind_rows(.):</span> Argument 1 must be a data frame or a named atomic vector.</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in all_detections %&gt;% bind_rows() %&gt;% distinct(receiver_general_location,     receiver_general_river_km, receiver_general_latitude, receiver_general_longitude,     receiver_region) %&gt;% group_by(receiver_general_location) %&gt;%     summarise(receiver_general_river_km = mean(as.numeric(receiver_general_river_km),         na.rm = TRUE), receiver_general_latitude = mean(as.numeric(receiver_general_latitude),         na.rm = TRUE), receiver_general_longitude = mean(as.numeric(receiver_general_longitude),         na.rm = TRUE), receiver_region = first(receiver_region)) %&gt;%     arrange(desc(receiver_general_river_km)):</span> could not find function "%&gt;%"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -38,7 +38,7 @@
       <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="../articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
@@ -97,7 +97,7 @@
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Pull study IDs from ERDDAP</span></span></span>
 <span class="r-in"><span><span class="va">study_ids</span> <span class="op">&lt;-</span> <span class="fu">pull_study_ids_from_ERDDAP</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in tabledap("FED_JSATS_detects", fields = "study_id", url = "https://oceanview.pfeg.noaa.gov/erddap/"):</span> could not find function "tabledap"</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in pull(tabledap("FED_JSATS_detects", fields = "study_id", url = "https://oceanview.pfeg.noaa.gov/erddap/"),     study_id):</span> could not find function "pull"</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
