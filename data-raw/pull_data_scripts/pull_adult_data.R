@@ -106,9 +106,12 @@ data <- read_csv(file = raw)
 # process into format as previously defined by database
 yuba_spring_passage_estimates <- data |> 
   mutate(run = ifelse(run %in% c("early spring", "late spring"), "spring", run)) |> 
+  filter(run == "spring") |> 
   group_by(year = biological_year, run) |> 
   dplyr::summarize(passage_estimate = sum(count, na.rm = T)) |> 
-  mutate(stream = "yuba river")
+  mutate(stream = "yuba river",
+         data_type = "upstream_estimate") |> 
+  rename(count = "passage_estimate")
 
 # Combine and save
 annual_adult_raw <- bind_rows(battle_redd,
