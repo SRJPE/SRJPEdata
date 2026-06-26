@@ -13,6 +13,7 @@
 \item \code{covariate_structure}: Describes the structure of the covariate.
 \item \code{value}: Numeric value
 }
+}
 \usage{
 stock_recruit_covariates
 }

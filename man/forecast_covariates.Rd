@@ -15,6 +15,7 @@
 \item \code{text_value}: Text value for categorical variables.
 \item \code{site_group}: Site group that the value applies to. Only used for the "monthly_max_flow" parameter. For some streams there are multiple gages and this variable is used to differentiate.
 }
+}
 \usage{
 forecast_covariates
 }

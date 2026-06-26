@@ -102,11 +102,9 @@ weekly_effort_by_site <- weekly_hours_fished |>
   ungroup()
 
 # Environmental -----------------------------------------------------------
-env_with_sites <- environmental_data |>
+env_with_sites <- flow_data |>
   left_join(site_lookup, relationship = "many-to-many") |> # Confirmed that many to many makes sense, added relationship to silence warning
   glimpse()
-
-weekly_flow <- env_with_sites |> filter(parameter == "flow")
 
 # Efficiency Formatting ---------------------------------------------------------
 # pulled in release_summary
@@ -179,7 +177,7 @@ average_hours_fished_efficiency <- weekly_efficiency |>
 flow_reformatted_raw <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
   left_join(
     env_with_sites |>
-      filter(parameter == "flow", statistic == "mean") |>
+      filter(statistic == "mean") |>
       group_by(stream, site, week, year, gage_agency, gage_number) |>
       summarise(flow_cfs = mean(value, na.rm = T))
   )

@@ -37,13 +37,13 @@ The spring run juvenile production estimate (SR JPE) contains a suite of submode
 
 The SR JPE considers data from 7 tributaries and the mainstem Sacramento river, including:
 
--   Battle Creek
--   Butte Creek
--   Clear Creek
--   Deer Creek
--   Feather River
--   Mill Creek
--   Yuba River
+- Battle Creek
+- Butte Creek
+- Clear Creek
+- Deer Creek
+- Feather River
+- Mill Creek
+- Yuba River
 
 Each of these tributaries has a unique monitoring setup and number of rotary screw traps (RSTs) that we can use in the SR JPE model. Data for the SR JPE is organized by stream, site, and subsite. `stream` represents the creek or river where the trapping sites are located. `site` represents a unique trapping location whereas `subsite` represents the RST positioning within the `site`. `site group` is used as a helper to group sites that may be more similar than others. For instance, on the Feather River there are multiple sites that have been used over time. It is assumed that sites within the Low Flow Channel are more similar to each other than the sites in the High Flow Channel and vice versa. Some streams only have one site and some sites only have one RST. The important difference is that catch from different subsites within the same site and same year can be added together, whereas catch from different sites cannot be added together as this would be double counting.
 
@@ -103,8 +103,8 @@ The SR JPE modeling team selected UCC as the primary site to use in the SR JPE b
 
 Lower Clear Creek efficiency or catch data may be used in fitting the juvenile abundance estimate model (BTSPAS-X) and for supplementary analysis. There is a separation weir on Clear Creek that ensures that only spring run Chinook are caught in the UCC trap. This may prove helpful for potential supplementary analysis focused run identification including:
 
--   Use for understanding of run & potential survival between traps
--   Comparison UCC (all spring) to LCC PLAD results
+- Use for understanding of run & potential survival between traps
+- Comparison UCC (all spring) to LCC PLAD results
 
 ## Deer Creek
 

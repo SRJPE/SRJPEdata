@@ -1,17 +1,15 @@
-pandoc: 3.6.3
+pandoc: 3.8.3
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
-  forecast_covariates: forecast_covariates.html
-  prep_environmental_covariates: prep_environmental_covariates.html
+  covariates_documentation: covariates_documentation.html
   site_overview: site_overview.html
-  sr_covariates: sr_covariates.html
   summary_of_data_for_modeling: summary_of_data_for_modeling.html
   temp_regression: temp_regression.html
   trap_effort: trap_effort.html
   yearling_ruleset: yearling_ruleset.html
   years_to_include_analysis: years_to_include_analysis.html
-last_built: 2026-03-11T15:33Z
+last_built: 2026-06-23T23:56Z
 urls:
   reference: https://srjpe.github.io/SRJPEdata/reference
   article: https://srjpe.github.io/SRJPEdata/articles

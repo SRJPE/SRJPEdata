@@ -5,7 +5,7 @@
 #' @format A tibble with 651 rows and 8 columns 
 #' \itemize{
 #'   \item \code{year}: year 
-#'   \week \code{week} : week 
+#'   \item \code{week} : week 
 #'   \item \code{stream}: rst stream 
 #'   \item \code{site}: rst site 
 #'   \item \code{number_released}: Number of efficiency trial fish released
@@ -14,8 +14,8 @@
 #'   \item \code{run_year}: Run year 
 #'   }
 #' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
-#'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
-#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
+#'   flow_data (see `?SRJPEdata::flow_data`), hours fished information 
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`).
 'weekly_juvenile_abundance_model_data'
 
 #' @title Weekly BT-SPAS-X Catch Data
@@ -25,7 +25,7 @@
 #' @format A tibble with 10,890 rows and 14 columns 
 #' \itemize{
 #'   \item \code{year}: year 
-#'   \week \code{week} : week 
+#'   \item \code{week} : week 
 #'   \item \code{stream}: rst stream 
 #'   \item \code{site}: rst site 
 #'   \item \code{count}: weekly count of number of 
@@ -37,25 +37,13 @@
 #'   \item \code{standardized_flow}: Flow standardized across years and sites 
 #'   \item \code{run_year}: Run year 
 #'   \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week 
-#'   \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search `?SRJPEdata::btspasx_special_priors_data`
+#'   \item \code{lgN_prior}: log normalized special prior abundance cap
 #'   }
 #' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
-#'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
-#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
+#'   flow_data (see `?SRJPEdata::flow_data`), hours fished information 
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`).
 'weekly_juvenile_abundance_catch_data'
 
-#' @title Special Priors for BT-SPAS-X Abundance Model 
-#' @name btspasx_special_priors_data
-#' @description A dataframe containing special priors to fine tune model 
-#' @format A dataframe with 71 rows and 4 columns 
-#' \itemize{
-#'   \item \code{site}: site
-#'   \item \code{run_year}: run year
-#'   \item \code{week}: week 
-#'   \item \code{special_prior}: log normalized special prior abundance cap
-#'   }
-#' @source Special priors were developed by the lead SR JPE modeler, Josh Korman.
-'btspasx_special_priors_data'
 
 #' @title RST Catch Data 
 #' @name rst_catch
@@ -256,88 +244,70 @@
 #'   }
 'weekly_hours_fished'
 
-#' @title Environmental Gage Data
-#' @name environmental_data
-#' @description Environmental gage data for each tributary in the SR JPE. 
-#' Data includes flow and temperature measurements from gages located on tributaries and the Sacramento River mainstem. 
-#' Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type. 
-#' Interpolation was performed to fill in data gaps where temperature data were missing or the time series was incomplete. 
-#' For the Feather River and Yuba River, temperature values were interpolated using regression models based on nearby gages and historical data, allowing for consistent estimation across incomplete records.
-#' The temporal coverage of flow data ranges from 1930 to 2025, and temperature data ranges from 1994 to 2025.
+#' @title Environmental Gage Data - Flow
+#' @name flow_data
+#' @description Flow gage data for each tributary in the SR JPE.
+#' Data includes flow measurements from gages located on tributaries and the Sacramento River mainstem.
+#' Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type.
+#' The temporal coverage of flow data ranges from 1930 to 2025.
 #' @format
 #' \itemize{
 #'   \item \code{year}: Year associated with environmental measure 
 #'   \item \code{week}: Week associated with environmental measure 
-#'   \item \code{statistic}: Summary static used to summarize flow and temperature measures into a single daily reccord (min, mean, max)
-#'   \item \code{value}: Flow or temperature measurements 
+#'   \item \code{statistic}: Summary static used to summarize flow measures into a single daily reccord (min, mean, max)
+#'   \item \code{value}: Flow measurements 
 #'   \item \code{stream}: Stream environmental data is collected on  
-#'   \item \code{gage_agency}: Agency providing flow or temperature data, most data pulled from CDEC or USGS
-#'   \item \code{gage_number}: Unique identifier of gage used to query flow and temperature data
-#'   \item \code{parameter}: Parameter measured, includes "flow" and "temperature"
+#'   \item \code{gage_agency}: Agency providing flow data, most data pulled from CDEC or USGS
+#'   \item \code{gage_number}: Unique identifier of gage used to query flow data
+#'   \item \code{parameter}: Parameter measured, "flow"
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   }
-#'   #' @details
+#' @details
 #'  Gage Information
-#'   \strong Deer creek
+#'   \strong{Deer creek}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1986 - 2025
 #'   \item USGS - 11383500
 #'   \item CDEC - DCV
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
-#'   \item CDEC - DCV
 #'   }
-#'   }
-#'   \strong Sacramento River 
+#'   \strong{Sacramento River} 
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1994 - 2025
 #'   \item USGS - 11383500
 #'   \item USGS - 11377100
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1994 - 2023
-#'   \item USGS - 11383500
 #'   }
-#'   }
-#'   \strong Battle Creek 
+#'   \strong{Battle Creek} 
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1995 - 2025
 #'   \item USGS - 11376550
 #'   \item USFWS - UBC
 #'   }
-#'   \itemize{Temperature gages  - Temporal coverage: 2003 - 2021
-#'   \item USFWS - UBC
 #'   }
-#'   }
-#'   \strong Butte Creek 
+#'   \strong{Butte Creek} 
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1930 - 2025
 #'   \item USGS - 11376550
 #'   \item USGS - BCK
 #'   }
 #'   }
-#'   \strong Clear Creek 
+#'   \strong{Clear Creek} 
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1995 - 2025
 #'   \item USFWS - UCC
 #'   \item USGS - 11372000
 #'   \item USFWS - LCC
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 2001 - 2021
-#'   \item USFWS - UCC
-#'   \item USFWS - LCC
 #'   }
-#'   }
-#'   \strong Mill Creek  
+#'   \strong{Mill Creek}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1995 - 2025
 #'   \item USGS - 11381500
 #'   \item CDEC - MLM
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
-#'   \item CDEC - MLM
 #'   }
-#'   }
-#'   \strong Feather River 
+#'   \strong{Feather River}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1969 - 2025
 #'   \item USGS - 11407000
@@ -347,26 +317,89 @@
 #'   \item CDEC - FRA
 #'   \item interpolated 
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1999 - 2025
-#'   \item CDEC - GRL
-#'   \item CDEC - FRA 
-#'   \item interpolated 
 #'   }
-#'   }
-#'   \strong Yuba River 
+#'   \strong{Yuba River}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1999 - 2025
 #'   \item USGS - 11421000
 #'   \item CDEC - YR7
 #'   \item interpolated 
 #'   }
+#'   }
+#' @source USGS/CDEC/FWS. See `data-raw/pull_data_scripts/pull_flow_data.R` for more details.
+'flow_data'
+
+
+#' @title Environmental Gage Data - Temperature
+#' @name temperature_data
+#' @description Temperature gage data for each tributary in the SR JPE. 
+#' Data includes temperature measurements from gages located on tributaries and the Sacramento River mainstem. 
+#' Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type. 
+#' Interpolation was performed to fill in data gaps where temperature data were missing or the time series was incomplete. 
+#' For the Feather River and Yuba River, temperature values were interpolated using regression models based on nearby gages and historical data, allowing for consistent estimation across incomplete records.
+#' The temporal coverage of temperature data ranges from 1994 to 2025.
+#' @format
+#' \itemize{
+#'   \item \code{year}: Year associated with environmental measure 
+#'   \item \code{week}: Week associated with environmental measure 
+#'   \item \code{statistic}: Summary static used to summarize temperature measures into a single daily reccord (min, mean, max)
+#'   \item \code{value}: Temperature measurements 
+#'   \item \code{stream}: Stream environmental data is collected on  
+#'   \item \code{gage_agency}: Agency providing temperature data, most data pulled from CDEC or USGS
+#'   \item \code{gage_number}: Unique identifier of gage used to query temperature data
+#'   \item \code{parameter}: Parameter measured, "temperature"
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+#'   }
+#' @details
+#'  Gage Information
+#'   \strong{Deer creek}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
+#'   \item CDEC - DCV
+#'   }
+#'   }
+#'   \strong{Sacramento River}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1994 - 2023
+#'   \item USGS - 11383500
+#'   }
+#'   }
+#'   \strong{Battle Creek}
+#'   \itemize{
+#'   \itemize{Temperature gages  - Temporal coverage: 2003 - 2021
+#'   \item USFWS - UBC
+#'   }
+#'   }
+#'   \strong{Clear Creek}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 2001 - 2021
+#'   \item USFWS - UCC
+#'   \item USFWS - LCC
+#'   }
+#'   }
+#'   \strong{Mill Creek} 
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
+#'   \item CDEC - MLM
+#'   }
+#'   }
+#'   \strong{Feather River} 
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1999 - 2025
+#'   \item CDEC - GRL
+#'   \item CDEC - FRA 
+#'   \item interpolated 
+#'   }
+#'   }
+#'   \strong{Yuba River} 
+#'   \itemize{
 #'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
 #'   \item CDEC - YR7
 #'   \item interpolated 
 #'   }
 #'   }
-#' @source USGS/CDEC/FWS. See `data-raw/pull_environmental_data.R` for more details.
-'environmental_data'
+#' @source USGS/CDEC/FWS. See `data-raw/pull_data_scripts/pull_temperature_data.R` for more details.
+'temperature_data'
 
 #' @title Survival Model Data
 #' @name survival_model_inputs
@@ -429,6 +462,7 @@
 #'   \item \code{site}: Site RST is located on   
 #'   \item \code{subsite}: Specific trap site   
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+#'   }
 'site_lookup'
 
 #' @title Feather Hatchery Release
@@ -458,6 +492,7 @@
 #'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+#'   }
 'feather_hatchery_release'
 
 #' @title Hatchery Release
@@ -489,6 +524,7 @@
 #'   \item \code{stream}: Stream of release location (relevant to SR JPE streams, some may be NA) used for joining the covariates
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+#'   }
 'hatchery_release'
 
 #' @title Escapement estimates all runs
@@ -502,6 +538,7 @@
 #'   \item \code{run}: Run of Chinook salmon. Currently only fall are included. See `annual_adult` for the best spring run estimates
 #'   \item \code{species}: Chinook salmon
 #'   \item \code{data_type}: Escapement estimates from GrandTab.
+#'   }
 'escapement_estimates_all_runs'
 
 #' @title RST Recaptures 
@@ -520,6 +557,7 @@
 #'   \item \code{run_year}: Run year of recapture (where week >= 45 are year + 1)
 #'   \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
 #'   \item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
+#'   }
 'rst_cwt_recaptures'
 
 #' @title Forecast covariates 
@@ -535,6 +573,7 @@
 #'   \item \code{month}: Month. Not all variables are available at the monthly level.
 #'   \item \code{text_value}: Text value for categorical variables.
 #'   \item \code{site_group}: Site group that the value applies to. Only used for the "monthly_max_flow" parameter. For some streams there are multiple gages and this variable is used to differentiate.
+#'   }
 'forecast_covariates'
 
 #' @title Stock recruit covariates 
@@ -548,6 +587,7 @@
 #'   \item \code{covariate_type}: Describes the type of covariate (temperature or flow)
 #'   \item \code{covariate_structure}: Describes the structure of the covariate. 
 #'   \item \code{value}: Numeric value
+#'   }
 'stock_recruit_covariates'
 
 #' @title Adult Modeling Years
@@ -560,6 +600,7 @@
 #'   \item \code{data_type}: Type of adult data
 #'   \item \code{reason_for_exclusion}: Provides reason for exclusion
 #'   \item \code{exclude}: Boolean value to describe if a year should be excluded or not
+#'   }
 'adult_model_years'
 
 #' @title RST Modeling Years
@@ -574,6 +615,7 @@
 #'   \item \code{exclusion_type}: Provides the exclusion ruleset applied
 #'   \item \code{apply_to}: Differentiates between years that can be excluded broadly ("all runs") or those specific to spring run ("spring")
 #'   \item \code{exclude}: Boolean value to describe if a year should be excluded or not
+#'   }
 'rst_model_years'
 
 #' Completed Genetic Samples

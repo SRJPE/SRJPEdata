@@ -38,7 +38,22 @@ daily_yearling_ruleset.rda:
   check_attributes: true
 
 # Species reference list
-environmental_data.rda:
+flow_data.rda:
+  id_columns:
+    - stream
+    - week
+    - year
+    - gage_number
+    - gage_agency
+    - site_group
+    - parameter
+    - statistic
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  
+temperature_data.rda:
   id_columns:
     - stream
     - week

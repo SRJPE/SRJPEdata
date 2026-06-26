@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -56,22 +56,16 @@
       <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="../articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="../articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -309,16 +303,16 @@ limits.</p>
 <p>The dot plot below shows hours fished for each stream by date. Most
 dots appear to be hovering around the 24 hour mark but a few are greater
 than 1000 or less than -1000 and skew the plot.</p>
-<p><img src="trap_effort_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" width="768"></p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="768"></p>
 <p>The histogram below shows data filtered to remove the outliers though
 there are still some inconsistencies with hours fished below or equal to
 0. As mentioned above there are reasons why hours fished may be 0.</p>
-<p><img src="trap_effort_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" width="768"></p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="768"></p>
 <p>The dot plot below shows hours fished for each stream by date. Here
 we see several distinct bands of dots in 24 hour increments, indicating
 that the trap is most often checked every day but that there are some
 instances where it is checked every other or every few days.</p>
-<p><img src="trap_effort_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" width="768"></p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="768"></p>
 </div>
 </div>
 <div class="section level2">
@@ -336,7 +330,7 @@ data and applied rulesets to ensure erroneous data are not included.</p>
 <span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>      <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Week"</span>, y <span class="op">=</span> <span class="st">"Hours Fished"</span>, </span>
 <span>       title <span class="op">=</span> <span class="st">"Hours Fished All Methods"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="trap_effort_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" width="768"></p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="768"></p>
 <div class="section level3">
 <h3 id="summarized-by-week">Summarized by week<a class="anchor" aria-label="anchor" href="#summarized-by-week"></a>
 </h3>
@@ -346,8 +340,8 @@ hours fished to 168 for each stream, assuming that a single trap could
 not run for more hours than there are in a week. Before 2005 trap data
 is not available for Knights Landing, we assume 168 hours when trap data
 is missing.</p>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 194 × 5</span></span></span>
-<span><span class="co">## <span style="color: #949494;"># Groups:   year, stream, site [141]</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 193 × 5</span></span></span>
+<span><span class="co">## <span style="color: #949494;"># Groups:   year, stream, site [140]</span></span></span>
 <span><span class="co">##     year stream           site            subsite        n</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">1</span>992 deer creek       deer creek      deer creek     6</span></span>
@@ -360,7 +354,7 @@ is missing.</p>
 <span><span class="co">## <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">1</span>996 mill creek       mill creek      mill creek    24</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>996 sacramento river knights landing 8.3           40</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">1</span>996 sacramento river knights landing 8.4           40</span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 184 more rows</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #949494;"># ℹ 183 more rows</span></span></span></code></pre>
 <div class="section level4">
 <h4 id="qc-1">QC<a class="anchor" aria-label="anchor" href="#qc-1"></a>
 </h4>
@@ -369,9 +363,9 @@ few select stream and calendar year. Note that for the combined plots
 this is for all years of data so there are multiple datapoints for a
 given week due to multiple years being represented and multiple
 subsites.</p>
-<p><img src="trap_effort_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-2.png" class="r-plt" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-3.png" class="r-plt" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-4.png" class="r-plt" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-5.png" class="r-plt" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-6.png" class="r-plt" width="768"></p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-2.png" class="r-plt" alt="" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-3.png" class="r-plt" alt="" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-4.png" class="r-plt" alt="" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-5.png" class="r-plt" alt="" width="768"><img src="trap_effort_files/figure-html/unnamed-chunk-9-6.png" class="r-plt" alt="" width="768"></p>
 <p>The following plot shows all years</p>
-<p><img src="trap_effort_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" width="768"></p>
+<p><img src="trap_effort_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="768"></p>
 </div>
 </div>
 </div>

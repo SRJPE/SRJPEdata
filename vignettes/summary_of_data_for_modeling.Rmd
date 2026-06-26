@@ -135,8 +135,8 @@ included_color <- "#9A8822"
 excluded_color <- "gray"
 
 # Load and join exclusion data
-rst_years_to_exclude <- SRJPEdata::years_to_exclude_rst_data |>  
-  mutate(exclude = TRUE)
+rst_years_to_exclude <- SRJPEdata::rst_model_years |>  
+  filter(exclude == TRUE)
 
 rst_plot_data_with_exclusion <- rst_plot_data |> 
   left_join(rst_years_to_exclude |> 
@@ -217,8 +217,8 @@ The summary table below describes which years remain after filtering out incompl
 
 ```{r, echo = FALSE, message=FALSE}
 
-rst_years_to_exclude <- SRJPEdata::years_to_exclude_rst_data |> 
-  mutate(exclude = TRUE)
+rst_years_to_exclude <- SRJPEdata::rst_model_years |> 
+  filter(exclude == TRUE)
 
 rst_plot_data_with_exclusion <- rst_plot_data |> 
   left_join(rst_years_to_exclude |> 
@@ -279,8 +279,8 @@ In order to utilize data for the stock recruit models, we need both juvenile dat
 ```{r, echo = FALSE}
 # TODO add a label with the number of years excluded
 # TODO review with erin because looks like a lot of Feather River years are removed.
-rst_years_to_exclude <- SRJPEdata::years_to_exclude_rst_data |> 
-  mutate(exclude = TRUE)
+rst_years_to_exclude <- SRJPEdata::rst_model_years |> 
+  filter(exclude == TRUE)
 
 rst_plot_data <- rst_plot_data |> 
   left_join(rst_years_to_exclude |> 
