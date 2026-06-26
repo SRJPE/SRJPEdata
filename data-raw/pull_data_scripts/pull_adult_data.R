@@ -1,15 +1,15 @@
-# Pull adult data from EDI (or other repositories)
-# Adult data were originally stored in the SR JPE database
-# however, for the short-term (until we understand what and how we want to use those data
-# it is easier to update the data on EDI and pull directly) 
-
 library(tidyverse)
 library(EDIutils)
+
+# COMPILE ADULT DATASETS =======================================================
+# MOST DATA IS PULLED DIRECTLY FROM CSVs VALIDATED BY STREAM TEAMS
+# SOME DATA FROM EDI, PLANT TO MIGRATE ALL DATA PULLS FROM EDI ONCE EDI DATA IS 
+# AS DESIRED BY STREAM TEAMS
 
 # Set the scope for script to use API to download data from EDI
 scope = "edi"
 
-# Battle/Clear
+# Battle/Clear -----------------------------------------------------------------
 # Upstream passage and redd data
 # These data will be published on EDI but currently are not
 # In the interim we will pull from the standard format datasets which originally were saved on GCP - "standard-format-data/standard_daily_redd.csv"
@@ -23,7 +23,7 @@ clear_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv"
 
 battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
 
-# Butte
+# Butte ------------------------------------------------------------------------
 # Carcass estimates
 # Only agreed to publishing carcass estimates which are available on GrandTab
 # The timing of availability on GrandTab is unknown so reach out to Grant/Anna
@@ -35,7 +35,7 @@ butte_carcass <- read_csv("data-raw/helper-tables/butte_carcass_historical.csv")
   rename(count = carcass_estimate) |> 
   mutate(data_type = "carcass_estimate")
 
-# Deer/Mill
+# Deer/Mill  -------------------------------------------------------------------
 # Upstream passage data, redd (mill), holding (deer)
 # These data are on EDI and should be updated following the EDI workflow
 # https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1672.1
@@ -63,63 +63,8 @@ data_from_ryan <- data_from_ryan_raw |>
   filter(!(data_type == "redd" & stream == "mill creek")) |> 
   bind_rows(mill_redd)
 
-# identifier = "1672"
-# revision = list_data_package_revisions(scope, identifier, filter = "newest")
-# package_id <- paste(scope, identifier, revision, sep = ".")
 
-# List data entities of the data package
-# res <- read_data_entity_names(package_id)
-# 
-# # Download the daily corrected passage
-# name <- "deer_mill_upstream_passage_estimates.csv"
-# entity_id <- res$entityId[res$entityName == name]
-# raw <- read_data_entity(package_id, entity_id)
-# upstream_passage_estimates_data <- read_csv(file = raw)
-# # Note that there are some discrepancies between EDI and what Ryan is using
-# # TODO we need to fix data on EDI
-# # Until data are fixed on EDI make updates here
-# deer_mill_upstream_passage_estimates <- upstream_passage_estimates_data |> 
-#   group_by(year, stream, run) |> 
-#   summarize(count = sum(passage_estimate, na.rm = T),
-#             upper_bound_estimate = sum(ucl, na.rm = T),
-#             lower_bound_estimate = sum(lcl, na.rm = T),
-#             confidence_level = 90)
-#   mutate(data_type = "upstream_estimate") |>
-#   select(year, stream, count, data_type, upper_bound_estimate, lower_bound_estimate, confidence_level) |>
-#   glimpse()
-# 
-# # redd data (Mill) ---
-# name <- "deer_mill_redd.csv"
-# entity_id <- res$entityId[res$entityName == name]
-# raw <- read_data_entity(package_id, entity_id)
-# redd_data <- read_csv(file = raw)
-# 
-# deer_mill_redd <- redd_data |> 
-#   mutate(reach_number = NA,
-#          latitude = NA,
-#          longitude = NA,
-#          velocity = NA,
-#          redd_id = NA,
-#          age = NA,
-#          run = NA, # TODO are they all spring run?
-#          date = as.Date(date)) |> 
-#   select(date, stream, reach, latitude, longitude, run, velocity, redd_id, age, redd_count) |> 
-#   group_by(year(date), stream) |> 
-#   summarize(count = sum(redd_count, na.rm = T))
-# 
-# # holding (deer)
-# name <- "deer_mill_holding.csv"
-# entity_id <- res$entityId[res$entityName == name]
-# raw <- read_data_entity(package_id, entity_id)
-# holding_data <- read_csv(file = raw)
-# 
-# deer_mill_holding <- holding_data |> 
-#   mutate(latitude = NA,
-#          longitude = NA) |> 
-#   select(date, stream, reach, count, adipose_clipped, run, latitude, longitude) |> 
-#   glimpse()
-
-# Feather
+# Feather  ---------------------------------------------------------------------
 # Data provided by Casey Campos
 # To get spring run in river spawning number we would take "broodstock tagged" minus "broodstock returning to the hatchery" minus"over summer mortality"
 # The more I thought about it I realized that those redd survey data are not going to be the best to use because the effort has been inconsistent. We now have the drone-based redd surveys that will have a similar effort every year and could be used in conjunction with the weir counts, but turning the images into redd counts is a bottleneck.
@@ -139,8 +84,7 @@ feather_spring_spawner <- feather_adult_raw |>
          data_type = "broodstock_tag",
          year = as.numeric(year))
 
-
-# Yuba
+# Yuba  ------------------------------------------------------------------------
 # Upstream passage data
 # These data are on EDI and should be updated following the EDI workflow
 # https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1707.1 
@@ -160,22 +104,14 @@ raw <- read_data_entity(package_id, entity_id)
 data <- read_csv(file = raw)
 
 # process into format as previously defined by database
-yuba_passage_estimates <- data |> 
+yuba_spring_passage_estimates <- data |> 
   mutate(run = ifelse(run %in% c("early spring", "late spring"), "spring", run)) |> 
+  filter(run == "spring") |> 
   group_by(year = biological_year, run) |> 
   dplyr::summarize(passage_estimate = sum(count, na.rm = T)) |> 
-  mutate(stream = "yuba river")
-
-# As of May 11 2026 we are in process of publishing additional Yuba River adult data on EDI
-# to not slow down the release of SRJPEdata 1.0.0 we pull these data from the helper files
-# this will be reverted to pulling from EDI after the next update is published
-yuba_spring_passage_estimates <- yuba_passage_estimates |> 
-  filter(run == "spring",
-         !year %in% c(2016, 2017, 2019, 2025)) |> 
-  rename(count = passage_estimate) |> 
-  ungroup() |> 
-  mutate(data_type = "upstream_estimate") |> 
-  select(year, stream, count, data_type)
+  mutate(stream = "yuba river",
+         data_type = "upstream_estimate") |> 
+  rename(count = "passage_estimate")
 
 # Combine and save
 annual_adult_raw <- bind_rows(battle_redd,
@@ -188,12 +124,13 @@ annual_adult_raw <- bind_rows(battle_redd,
 
 # Apply years to exclude
 
-adult_years_exclude <- read_csv("data-raw/helper-tables/years_to_exclude_adult_datasets.csv") |> 
+adult_years_exclude <- adult_model_years |> 
+  filter(exclude == TRUE)
   select(-reason_for_exclusion) |> 
-  mutate(exclude = T,
-         data_type = case_when(data_type == "carcass" ~ "carcass_estimate",
+  mutate(data_type = case_when(data_type == "carcass" ~ "carcass_estimate",
                                data_type == "upstream passage" ~ "upstream_estimate",
                                T ~ data_type))
+  
 annual_adult <- annual_adult_raw |> 
   left_join(adult_years_exclude) |> 
   filter(is.na(exclude)) |> 
