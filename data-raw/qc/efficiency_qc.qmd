@@ -95,6 +95,7 @@ new_recap_exceed <- log_issues(
       issue_type  = "recaptures_exceed_releases",
       field       = "number_recaptured",
       severity    = "critical",
+      alert_level = "error",
       description = glue("{n_records} trial(s) in run year {run_year} at {site} ({stream}) have more recaptures than releases. Max recapture/release ratio: {max_ratio}. These rows are filtered at build time.")
     )
 )
@@ -146,6 +147,7 @@ new_low_release <- log_issues(
       issue_type  = "low_release_count",
       field       = "number_released",
       severity    = "minor",
+      alert_level = "warning",
       description = glue("{n_records} trial(s) with <50 fish released in run year {run_year} at {site} ({stream}). Minimum release count: {min_release}")
     )
 )
@@ -193,6 +195,7 @@ new_zero_recap <- log_issues(
       issue_type  = "zero_recaptures",
       field       = "number_recaptured",
       severity    = "minor",
+      alert_level = "warning",
       description = glue("{n_records} trial(s) with 0 recaptures in run year {run_year} at {site} ({stream})")
     )
 )
@@ -253,6 +256,7 @@ new_low_coverage <- log_issues(
       issue_type  = "low_trial_coverage",
       field       = "n_trials",
       severity    = "moderate",
+      alert_level = "warning",
       description = glue("Only {n_trials} efficiency trial(s) in BTSPAS window for run year {run_year} at {site} ({stream}). Already excluded from modeling: {already_excluded}")
     )
 )
@@ -317,8 +321,9 @@ site_eff_stats <- eff_rates |>
   ) |>
   filter(n_years >= 5)
 
-eff_outliers <- eff_rates |>
-  inner_join(site_eff_stats, by = c("stream", "site")) |>
+eff_rates_eval <- eff_rates |> inner_join(site_eff_stats, by = c("stream", "site"))
+
+eff_outliers <- eff_rates_eval |>
   filter(mean_eff > hist_mean + 3 * hist_sd)
 
 new_eff_outliers <- log_issues(
@@ -329,6 +334,7 @@ new_eff_outliers <- log_issues(
       issue_type  = "extreme_value",
       field       = "number_recaptured",
       severity    = "minor",
+      alert_level = "error",
       description = glue("Mean efficiency of {round(mean_eff, 3)} in run year {run_year} at {site} ({stream}) is >3 SD above site historical mean ({round(hist_mean, 3)}, SD = {round(hist_sd, 3)})")
     )
 )
@@ -364,7 +370,45 @@ ggplot(eff_rates, aes(x = run_year, y = mean_eff)) +
 
 ## Check 6 (error): No efficiency trials in the given year
 
-TODO add a check for this
+This check is scoped to `review_run_year` and flag if a stream/site that was actively trapping fish this year run zero efficiency trials. Historical non efficiency data years are already handeled in the `rst_model_years` script so is not flagged here. A complete absence of trial data for a site trapping in the current year is a strong signal that data collection or submission was missed and needs immediate follow-up, so this is logged as a distinct `issue_type` and treated as an error even though Check 4 would also independently flag the same site as `low_trial_coverage` (moderate/warning) once it has 3+ historical years.
+
+```{r}
+#| label: check-no-trials-this-year
+
+
+active_sites_this_year <- rst_catch |>
+  filter(!is.na(date), !is.na(count)) |>
+  mutate(run_year = as_run_year(date)) |>
+  filter(run_year == review_run_year) |>
+  distinct(stream, site)
+
+trials_this_year <- eff |>
+  filter(run_year == review_run_year) |>
+  distinct(stream, site) |>
+  mutate(has_trials = TRUE)
+
+no_trials_eval <- active_sites_this_year |>
+  left_join(trials_this_year, by = c("stream", "site")) |>
+  mutate(has_trials = replace_na(has_trials, FALSE))
+
+no_trials <- no_trials_eval |> filter(!has_trials)
+
+new_no_trials <- log_issues(
+  no_trials |>
+    mutate(
+      run_year    = review_run_year,
+      n_records   = 0L,
+      data_type   = "efficiency",
+      issue_type  = "no_efficiency_trials",
+      field       = "number_released",
+      severity    = "critical",
+      alert_level = "error",
+      description = glue("{site} ({stream}) had RST catch activity in run year {review_run_year} but zero efficiency trials logged anywhere in weekly_efficiency for that year")
+    )
+)
+```
+
+`r if (nrow(no_trials) == 0) "All actively-trapping sites had at least one efficiency trial this year." else glue("{nrow(no_trials)} site(s) with catch but zero efficiency trials in run year {review_run_year}.")`
 
 ---
 
@@ -377,14 +421,14 @@ TODO add a check for this
 
 all_new <- bind_rows(
   new_recap_exceed, new_low_release, new_zero_recap,
-  new_low_coverage, new_eff_outliers
+  new_low_coverage, new_eff_outliers, new_no_trials
 )
 
 if (nrow(all_new) == 0) {
   cat("No new issues logged this run.")
 } else {
   DT::datatable(
-    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, description),
+    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, alert_level, description),
     caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
@@ -406,7 +450,7 @@ if (nrow(open_eff) == 0) {
 } else {
   DT::datatable(
     open_eff |> select(log_id, date_identified, stream, site, run_year,
-                       issue_type, field, severity, description, reviewer_notes),
+                       issue_type, field, severity, alert_level, description, reviewer_notes),
     caption = glue("{nrow(open_eff)} open efficiency issue(s)"),
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
