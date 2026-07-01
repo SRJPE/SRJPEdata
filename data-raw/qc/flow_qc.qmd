@@ -109,6 +109,7 @@ new_missing_streams <- log_issues(
       issue_type  = "gap",
       field       = "stream_coverage",
       severity    = "critical",
+      alert_level = "error",
       description = glue("Stream '{stream}' has no flow data in run year {current_run_year_data}")
     )
 )
@@ -178,6 +179,7 @@ new_gaps <- log_issues(
       field       = "week",
       n_records   = n_missing,
       severity    = "moderate",
+      alert_level = "warning",
       description = glue("{n_missing} of 31 RST window weeks ({pct_missing}%) missing flow data in run year {run_year} for {stream}")
     )
 )
@@ -191,6 +193,7 @@ new_ext_gaps <- log_issues(
       field       = "week",
       n_records   = max_consec,
       severity    = "critical",
+      alert_level = "warning",
       description = glue("{max_consec} consecutive RST window weeks missing flow data in run year {run_year} for {stream} ({n_missing} total missing weeks)")
     )
 )
@@ -230,14 +233,17 @@ Flag stream/run_years with any flow value ≤ 0 in the RST season window. Zero f
 ```{r}
 #| label: check-zero-flow
 
-zero_flow <- flow_data |>
-  filter(week %in% RST_WEEKS, value <= 0) |>
+flow_window_all <- flow_data |>
+  filter(week %in% RST_WEEKS) |>
   group_by(stream, site_group, run_year) |>
   summarise(
-    n_records = n(),
-    min_value = min(value),
-    .groups   = "drop"
+    n_evaluated = n(),
+    n_failed    = sum(value <= 0),
+    min_value   = min(value),
+    .groups     = "drop"
   )
+
+zero_flow <- flow_window_all |> filter(n_failed > 0)
 
 new_zero_flow <- log_issues(
   zero_flow |>
@@ -247,7 +253,9 @@ new_zero_flow <- log_issues(
       issue_type  = "implausible_value",
       field       = "value",
       severity    = "critical",
-      description = glue("{n_records} week(s) with flow <= 0 (min = {min_value} cfs) during RST season window in run year {run_year} for {stream}")
+      alert_level = "error",
+      n_records   = n_failed,
+      description = glue("{n_failed} week(s) with flow <= 0 (min = {min_value} cfs) during RST season window in run year {run_year} for {stream}")
     )
 )
 ```
@@ -263,15 +271,17 @@ Flag stream/run_years with any weekly mean temperature outside the plausible ran
 ```{r}
 #| label: check-temp-implausible
 
-temp_impl <- temp_data |>
-  filter(value < -5 | value > 35) |>
+temp_impl_all <- temp_data |>
   group_by(stream, site_group, run_year) |>
   summarise(
-    n_records = n(),
-    min_temp  = round(min(value), 1),
-    max_temp  = round(max(value), 1),
-    .groups   = "drop"
+    n_evaluated = n(),
+    n_failed    = sum(value < -5 | value > 35),
+    min_temp    = round(min(value), 1),
+    max_temp    = round(max(value), 1),
+    .groups     = "drop"
   )
+
+temp_impl <- temp_impl_all |> filter(n_failed > 0)
 
 new_temp_impl <- log_issues(
   temp_impl |>
@@ -279,11 +289,17 @@ new_temp_impl <- log_issues(
       site        = site_group,
       data_type   = "flow",
       issue_type  = "implausible_value",
-      field       = "value",
+      # NOTE: field is "temperature" (not "value") so this doesn't collide in
+      # the qc_log dedup key with the zero/negative flow check above, which
+      # also uses issue_type = "implausible_value" for the same data_type.
+      field       = "temperature",
       severity    = "critical",
-      description = glue("{n_records} weekly temperature record(s) outside [-5, 35]°C in run year {run_year} for {stream}. Range: [{min_temp}, {max_temp}]°C")
+      alert_level = "warning",
+      n_records   = n_failed,
+      description = glue("{n_failed} weekly temperature record(s) outside [-5, 35]°C in run year {run_year} for {stream}. Range: [{min_temp}, {max_temp}]°C")
     )
 )
+
 ```
 
 ```{r}
@@ -302,6 +318,7 @@ ggplot(temp_plot, aes(x = value, fill = implausible)) +
   facet_wrap(~stream, scales = "free_y", ncol = 2) +
   labs(title = "Weekly temperature distribution with implausible values flagged",
        x = "Temperature (°C)", y = "Count") +
+  xlim(0, 150) +
   theme_minimal()
 ```
 
@@ -322,7 +339,7 @@ if (nrow(all_new) == 0) {
   cat("No new issues logged this run.")
 } else {
   DT::datatable(
-    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, description),
+    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, alert_level, description),
     caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
@@ -344,7 +361,7 @@ if (nrow(open_flow) == 0) {
 } else {
   DT::datatable(
     open_flow |> select(log_id, date_identified, stream, site, run_year,
-                        issue_type, field, severity, description, reviewer_notes),
+                        issue_type, field, severity, alert_level, description, reviewer_notes),
     caption = glue("{nrow(open_flow)} open flow issue(s)"),
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
