@@ -66,7 +66,7 @@ Flag stream/site/run_years where >95% of records have no fork length recorded an
 ```{r}
 #| label: check-fl-na
 
-fl_na_check <- rst_catch |>
+fl_na_all <- rst_catch |>
   filter(!is.na(date)) |>
   mutate(run_year = as_run_year(date)) |>
   group_by(stream, site, run_year) |>
@@ -75,7 +75,9 @@ fl_na_check <- rst_catch |>
     n_na_fl      = sum(is.na(fork_length)),
     pct_na_fl    = round(mean(is.na(fork_length)) * 100, 1),
     .groups      = "drop"
-  ) |>
+  )
+
+fl_na_check <- fl_na_all |>
   filter(pct_na_fl > 95, n_records > 50)
 
 new_fl_na <- log_issues(
@@ -85,6 +87,7 @@ new_fl_na <- log_issues(
       issue_type  = "high_na_rate",
       field       = "fork_length",
       severity    = "moderate",
+      alert_level = "warning",
       description = glue("{n_na_fl} of {n_records} records ({pct_na_fl}%) have no fork length in run year {run_year} at {site} ({stream})")
     )
 )
@@ -94,12 +97,6 @@ new_fl_na <- log_issues(
 #| label: plot-fl-na
 #| echo: false
 #| fig-height: 6
-
-fl_na_all <- rst_catch |>
-  filter(!is.na(date)) |>
-  mutate(run_year = as_run_year(date)) |>
-  group_by(stream, site, run_year) |>
-  summarise(pct_na_fl = round(mean(is.na(fork_length)) * 100, 1), .groups = "drop")
 
 ggplot(fl_na_all, aes(x = run_year, y = site, fill = pct_na_fl)) +
   geom_tile(color = "white") +
@@ -122,18 +119,20 @@ Flag records where `fork_length < 20mm` or `fork_length > 200mm`. These are biol
 ```{r}
 #| label: check-fl-implausible
 
-fl_impl_check <- rst_catch |>
+fl_impl_all <- rst_catch |>
   filter(!is.na(fork_length), fork_length > 0) |>
   mutate(run_year = as_run_year(date)) |>
   mutate(implausible = fork_length < 20 | fork_length > 200) |>
   group_by(stream, site, run_year) |>
   summarise(
+    n_evaluated  = n(),
     n_records    = sum(implausible),
-    min_fl       = min(fork_length[implausible], na.rm = TRUE),
-    max_fl       = max(fork_length[implausible], na.rm = TRUE),
+    min_fl       = suppressWarnings(min(fork_length[implausible], na.rm = TRUE)),
+    max_fl       = suppressWarnings(max(fork_length[implausible], na.rm = TRUE)),
     .groups      = "drop"
-  ) |>
-  filter(n_records > 0)
+  )
+
+fl_impl_check <- fl_impl_all |> filter(n_records > 0)
 
 new_fl_impl <- log_issues(
   fl_impl_check |>
@@ -142,6 +141,7 @@ new_fl_impl <- log_issues(
       issue_type  = "implausible_value",
       field       = "fork_length",
       severity    = "critical",
+      alert_level = "warning",
       description = glue("{n_records} record(s) with fork_length <20mm or >200mm in run year {run_year} at {site} ({stream}). Range of flagged values: [{min_fl}, {max_fl}]mm")
     )
 )
@@ -173,14 +173,9 @@ ggplot(fl_plot_data, aes(x = fork_length)) +
 
 ---
 
-## Check 3 (error): Catch — Extreme Annual Totals
+## Check 3a (error): Catch — Extreme Annual Totals
 
-Flag run_years where total catch at a site exceeds 4× the site's historical median. Requires at least 5 years of history. Not necessarily an error — warrants review.
-
-TODO: 
-- integrate the simple abundance expansion logic
-- maybe add a separate check for weekly extreme values
-- add a check for when annual count is low
+Flag run_years where total catch at a site exceeds 4× the site's historical median, or falls below 0.25× the median (a collapse can be as much a data problem as a spike). Requires at least 5 years of history. A parallel check re-runs the high-extreme test on efficiency-expanded abundance rather than raw catch, since a "high" raw-catch year can simply reflect a year with unusually low trap efficiency. A fourth check looks at weekly (not annual) extremes. None of these are necessarily errors — they always warrant review.
 
 ```{r}
 #| label: check-catch-extreme
@@ -200,8 +195,9 @@ site_stats <- annual_catch |>
   ) |>
   filter(n_years >= 5, median_catch > 0)
 
-catch_extreme <- annual_catch |>
-  inner_join(site_stats, by = c("stream", "site")) |>
+annual_catch_eval <- annual_catch |> inner_join(site_stats, by = c("stream", "site"))
+
+catch_extreme <- annual_catch_eval |>
   filter(total_catch > 4 * median_catch)
 
 new_catch_extreme <- log_issues(
@@ -212,6 +208,7 @@ new_catch_extreme <- log_issues(
       issue_type  = "extreme_value",
       field       = "count",
       severity    = "minor",
+      alert_level = "error",
       description = glue("Total catch of {total_catch} in run year {run_year} at {site} ({stream}) is {round(total_catch / median_catch, 1)}x the site median ({median_catch})")
     )
 )
@@ -239,6 +236,50 @@ ggplot(annual_catch, aes(x = run_year, y = total_catch)) +
 ```
 
 `r if (nrow(catch_extreme) == 0) "No issues detected." else glue("{nrow(catch_extreme)} site/run-year combination(s) flagged.")`
+
+### Check 3b (Warning) Check Weekly Extreme Values
+
+Flags individual weeks (rather than annual totals) where catch is unusually high relative to that site's own weekly distribution. We use the same metric 4X medium weekly catch. This check catches weeks with a single anomalous spike that might get averaged out of an annual total.
+
+```{r}
+#| label: check-catch-weekly-extreme
+
+weekly_catch_stats <- weekly_juvenile_abundance_catch_data |>
+  filter(!is.na(count)) |>
+  group_by(stream, site) |>
+  mutate(
+    median_weekly_count = median(count, na.rm = TRUE), 
+    mediumX4 = median_weekly_count * 4
+  ) |>
+  ungroup() 
+
+weekly_extreme_all <- weekly_catch_stats |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_evaluated = n(),
+    n_failed    = sum(count > mediumX4),
+    max_count   = max(count),
+    greater_than_four_x_medium = first(mediumX4),
+    .groups     = "drop"
+  )
+
+weekly_extreme <- weekly_extreme_all |> filter(n_failed > 0)
+
+new_weekly_extreme <- log_issues(
+  weekly_extreme |>
+    mutate(
+      n_records   = n_failed,
+      data_type   = "rst",
+      issue_type  = "extreme_value",
+      field       = "count_weekly",
+      severity    = "minor",
+      alert_level = "warning",
+      description = glue("{n_failed} week(s) with catch above 4X medium ({round(greater_than_four_x_medium)}) in run year {run_year} at {site} ({stream}). Max weekly catch: {max_count}")
+    )
+)
+```
+
+`r if (nrow(weekly_extreme) == 0) "No issues detected." else glue("{nrow(weekly_extreme)} site/run-year combination(s) flagged.")`
 
 ---
 
@@ -273,6 +314,7 @@ new_low_effort <- log_issues(
       issue_type  = "low_sampling_effort",
       field       = "weeks_sampled",
       severity    = "moderate",
+      alert_level = "error",
       description = glue("Only {weeks_sampled} week(s) sampled in BTSPAS window for run year {run_year} at {site} ({stream}). Already excluded from modeling: {already_excluded}")
     )
 )
@@ -316,7 +358,58 @@ ggplot(coverage_plot_data, aes(x = run_year, y = site, fill = label)) +
 
 ## Check 5 (error): Hours Fished - Extreme Value
 
-TODO add a check for this
+Flag any stream/site/run_year with a weekly `hours_fished` value greater than 168 (24 × 7) — physically impossible for a single week and almost always a data entry or effort-calculation error.
+
+```{r}
+#| label: check-hours-fished
+
+hours_fished_all <- weekly_juvenile_abundance_catch_data |>
+  filter(!is.na(hours_fished)) |>
+  group_by(stream, site, run_year) |>
+  summarise(
+    n_evaluated = n(),
+    n_failed    = sum(hours_fished > 168),
+    max_hours   = max(hours_fished),
+    .groups     = "drop"
+  )
+
+hours_fished_impl <- hours_fished_all |> filter(n_failed > 0)
+
+new_hours_fished <- log_issues(
+  hours_fished_impl |>
+    mutate(
+      n_records   = n_failed,
+      data_type   = "rst",
+      issue_type  = "implausible_value",
+      field       = "hours_fished",
+      severity    = "critical",
+      alert_level = "error",
+      description = glue("{n_failed} week(s) with hours_fished > 168 (impossible for a 7-day week) in run year {run_year} at {site} ({stream}). Max value: {max_hours}")
+    )
+)
+```
+
+```{r}
+#| label: plot-hours-fished
+#| echo: false
+#| fig-height: 5
+
+hours_fished_plot_data <- weekly_juvenile_abundance_catch_data |>
+  filter(!is.na(hours_fished)) |>
+  mutate(implausible = hours_fished > 168)
+
+ggplot(hours_fished_plot_data, aes(x = hours_fished, fill = implausible)) +
+  geom_histogram(bins = 40, alpha = 0.8) +
+  scale_fill_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+                    labels = c("Normal", "Flagged"), name = NULL) +
+  geom_vline(xintercept = 168, linetype = "dashed", color = "#d73027") +
+  facet_wrap(~stream, scales = "free_y", ncol = 2) +
+  labs(title = "Weekly hours fished distribution (dashed = 168hr max possible)",
+       x = "Hours fished", y = "Count") +
+  theme_minimal()
+```
+
+`r if (nrow(hours_fished_impl) == 0) "No issues detected." else glue("{nrow(hours_fished_impl)} site/run-year combination(s) flagged.")`
 
 ---
 
@@ -326,13 +419,14 @@ TODO add a check for this
 #| label: issues-summary
 #| echo: false
 
-all_new <- bind_rows(new_fl_na, new_fl_impl, new_catch_extreme, new_low_effort)
+all_new <- bind_rows(new_fl_na, new_fl_impl, new_catch_extreme, new_weekly_extreme, new_low_effort,
+                     new_hours_fished)
 
 if (nrow(all_new) == 0) {
   cat("No new issues logged this run.")
 } else {
   DT::datatable(
-    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, description),
+    all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, alert_level, description),
     caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
@@ -354,7 +448,7 @@ if (nrow(open_rst) == 0) {
 } else {
   DT::datatable(
     open_rst |> select(log_id, date_identified, stream, site, run_year,
-                       issue_type, field, severity, description, reviewer_notes),
+                       issue_type, field, severity, alert_level, description, reviewer_notes),
     caption = glue("{nrow(open_rst)} open RST issue(s)"),
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
