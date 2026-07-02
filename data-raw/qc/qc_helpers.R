@@ -67,8 +67,6 @@ CHECK_METADATA <- tibble::tribble(
   "rst",        "high_na_rate",                "fork_length",              "warning",    "moderate",
   "rst",        "implausible_value",           "fork_length",              "warning",    "critical",
   "rst",        "extreme_value",               "count",                    "error",      "minor",
-  "rst",        "extreme_value",               "count_low",                "error",      "minor",
-  "rst",        "extreme_value",               "count_expanded",           "error",      "minor",
   "rst",        "extreme_value",               "count_weekly",             "error",      "minor",
   "rst",        "low_sampling_effort",         "weeks_sampled",            "error",      "moderate",
   "rst",        "implausible_value",           "hours_fished",             "error",      "critical",

@@ -14,6 +14,7 @@ data-raw/qc/
   flow_qc.qmd               # flow & temperature QC report
   efficiency_qc.qmd         # efficiency trial QC report
   genetics_qc.qmd           # genetics QC report (stub until integrated)
+  qc_summary.qmd            # this-year-vs-historical-average summary report
   run_annual_qc.R           # orchestration script — run this annually
   reports/                  # rendered HTML reports, tracked in git
   fixes/
@@ -41,7 +42,8 @@ Tracked in git. Issues are **auto-appended** by the QC reports. Reviewers **manu
 | `field` | auto | which variable has the issue |
 | `description` | auto | human-readable sentence describing the specific issue |
 | `n_records` | auto | number of affected records |
-| `severity` | auto | `critical`, `moderate`, `minor` (default by issue_type, reviewer can override) |
+| `severity` | auto | `critical`, `moderate`, `minor` (default by issue_type, reviewer can override) — reflects the impact of the issue if real |
+| `alert_level` | auto | `warning` or `error` — taken directly from the `(warning)`/`(error)` tag in the check's section title. Distinct from `severity`: an `error` check is one where a flagged row is very likely a genuine data problem (e.g. an impossible value, a complete data gap); a `warning` check flags things that are frequently benign and need a human judgment call (e.g. a zero-recapture trial, a high-NA-rate season) |
 | `status` | **manual** | `open` → `reviewed_no_issue` / `fixed_in_patch` / `fixed_in_source` |
 | `reviewer_notes` | **manual** | explanation of resolution or why it is not an issue |
 | `date_resolved` | **manual** | date status changed from `open` |
@@ -66,6 +68,9 @@ Tracked in git. Issues are **auto-appended** by the QC reports. Reviewers **manu
 | `zero_recaptures` | minor | efficiency trial with 0 recaptures |
 | `run_assignment_mismatch` | minor | high rate of Sherlock vs. field disagreement |
 | `missing_trap_record` | minor | catch dates with no corresponding trap visit |
+| `no_efficiency_trials` | critical | a stream/site with catch activity in `review_run_year` logged zero efficiency trials anywhere that year (distinct from `low_trial_coverage`, which is a multi-year, BTSPAS-window-only, <3-trials check) |
+
+Each issue_type also has a default `alert_level` (`ALERT_LEVEL_DEFAULTS` in `qc_helpers.R`), matching the `(warning)`/`(error)` tag on the check that produces it — see the per-report sections below.
 
 ---
 
@@ -76,7 +81,8 @@ Sourced at the top of every QC report. Contains:
 - **`as_run_year(date)`** — converts a date to run year using the week >= 45 convention
 - **`make_log_id(...)`** — pastes key fields into a readable stable ID
 - **`log_issues(new_issues, log_path)`** — reads existing log, removes duplicates on key fields, appends only truly new issues, writes CSV
-- **`qc_log_summary(log_path)`** — prints a count table of issues by data_type x status x severity (used at end of `run_annual_qc.R`)
+- **`qc_log_summary(log_path)`** — prints a count table of issues by data_type x alert_level x status x severity (used at end of `run_annual_qc.R`)
+- **`CHECK_METADATA`** — a lookup table of `(data_type, issue_type, field) -> (alert_level, severity)` for every check, used by `qc_summary.qmd` to label checks it recomputes directly from source data, without duplicating each category report's hardcoded alert_level/severity assignment a third time
 
 ---
 
@@ -95,10 +101,11 @@ Works from `SRJPEdata::rst_catch`, `SRJPEdata::rst_trap`, and `SRJPEdata::weekly
 - These are biologically implausible for juvenile chinook at an RST
 - Visualization: dot plot of flagged values in context of full fork length distribution
 
-**Check 3 — Catch: extreme annual totals**
-- For each stream/site, compute total annual catch per run_year
-- Flag run_years where total catch >4x the site median across all run_years (minimum 5 years of history required)
-- Not necessarily an error — could be a real high-catch year — but always warrants review
+**Check 3 — Catch: extreme annual totals (and variants)**
+- Check 3b: annual extreme (error)- For each stream/site, compute total annual catch per run_year
+- Flag run_years where total catch >4x the site median across all run_years (minimum 5 years of history required), `field = "count"`
+- Check 3b: weekly-grain version (warning) — flags individual weeks where `count > 4X weekly medium count` of that site's weekly distribution, `field = "count_weekly"`
+- None of these are necessarily errors — could be a real high- or low-catch year — but always warrant review
 - Visualization: time series of annual catch per site with flagged years highlighted
 
 **Check 4 — Season coverage: low sampling effort**
@@ -106,6 +113,11 @@ Works from `SRJPEdata::rst_catch`, `SRJPEdata::rst_trap`, and `SRJPEdata::weekly
 - Flag all stream/site/run_years with <3 sampled weeks, including those already in `years_to_exclude_rst_data`, to provide a complete picture of data gaps
 - Indicate in the description whether each flagged run_year is already excluded from modeling
 - Visualization: tile plot of sampling coverage by site x run_year, with excluded years marked
+
+**Check 5 — Hours fished: extreme value**
+- Use `weekly_juvenile_abundance_catch_data$hours_fished` (joined in from `weekly_hours_fished`)
+- Flag any stream/site/run_year with a weekly value >168 hours (24×7) — physically impossible for a week
+- Visualization: histogram of hours_fished with the 168hr limit marked
 
 ---
 
@@ -168,22 +180,25 @@ Works from `SRJPEdata::weekly_efficiency` (raw trial data) and `SRJPEdata::weekl
 - Unusually high efficiency could indicate data entry error or atypical conditions
 - Visualization: time series of mean annual simple efficiency per site with flagged years highlighted
 
+**Check 6 — No efficiency trials in the given year**
+- Scoped to `review_run_year` only (not all historical run_years, unlike Check 4)
+- Cross-reference `rst_catch` (sites with catch activity this year) against raw `weekly_efficiency` (not window-filtered) for the same run_year
+- Flag any stream/site with catch but zero trials logged anywhere that year — `issue_type = "no_efficiency_trials"`, distinct from `low_trial_coverage` so the two checks don't collide in the log
+- A complete absence of trial data for an actively-trapping site is a stronger signal than "sparse coverage" and needs prompt follow-up with data collectors
+
 ---
 
-## Genetics QC Report (`genetics_qc.qmd`)
+## QC Summary Report (`qc_summary.qmd`)
 
-Stub until `completed_genetic_samples` is fully integrated. Structure in place for the following checks:
+Answers "is this year's data quality better or worse than usual?" — something `qc_log.csv` alone can't answer, since it only stores rows that *failed* a check, with no record of how many records were *evaluated*. Rather than maintaining a second persisted file to track that denominator, this report recomputes each category report's check logic directly from the same source data tables (`rst_catch`, `environmental_data`, `weekly_efficiency`, `weekly_juvenile_abundance_*`, `completed_genetic_samples`) every time it's rendered, pooled by `run_year` across all streams/sites. This duplicates some aggregation logic already in the four category reports, but keeps `qc_log.csv` itself simple — issues only, no separate bookkeeping file to keep in sync — and means the report is self-contained (it doesn't need the other four reports to have run first) and always reflects the full historical span of data, not just years QC has previously been run for.
 
-**Check 1 — Sample count by stream/year**
-- Flag stream/years with fewer samples than expected
-- Expected counts to be defined based on monitoring program targets
+Alert level and severity for each recomputed check are looked up from `CHECK_METADATA` in `qc_helpers.R` (a single `(data_type, issue_type, field) -> (alert_level, severity)` table), rather than duplicating each category report's hardcoded assignment a third time.
 
-**Check 2 — Missing key fields**
-- Flag stream/years with high NA rates in `fork_length_mm`, `sherlock_run_assignment`, `datetime_collected`
-
-**Check 3 — Run assignment mismatch rate**
-- For records with both Sherlock and field assignment, compute mismatch rate by stream/year
-- Flag stream/years where mismatch rate is notably higher than historical average
+Contents:
+- **Headline table** — per check, this year's pooled `% failed` vs. the historical average of that same rate across prior run_years, with a `notably_worse` flag (this year > historical mean + 2 SD)
+- **Dumbbell plot** — this year (colored by alert_level) vs. historical average (grey), per data_type
+- **Open issue counts** — `data_type x alert_level x severity`, this year vs. historical average issues logged per year (this part does read `qc_log.csv`, since it's specifically about *logged, reviewer-facing* issues rather than raw failure rates)
+- Table of all currently notably-worse checks, for quick triage
 
 ---
 
@@ -219,8 +234,9 @@ When an issue is corrected in the source database, the patch block is removed an
 4. quarto::quarto_render("flow_qc.qmd")       → reports/flow_qc_YYYY-MM-DD.html
 5. quarto::quarto_render("efficiency_qc.qmd") → reports/efficiency_qc_YYYY-MM-DD.html
 6. quarto::quarto_render("genetics_qc.qmd")   → reports/genetics_qc_YYYY-MM-DD.html
-7. qc_log_summary()  — print count of open/resolved issues to console
-8. message directing reviewer to qc_log.csv
+7. quarto::quarto_render("qc_summary.qmd")    → reports/qc_summary_YYYY-MM-DD.html (recomputes its own metrics from source data)
+8. qc_log_summary()  — print count of open/resolved issues to console
+9. message directing reviewer to qc_log.csv
 ```
 
 Rendered HTML reports go to `data-raw/qc/reports/` and are tracked in git so they can be reviewed without re-running the QC scripts.

@@ -1,0 +1,412 @@
+---
+title: "QC Summary: This Year vs. Historical Average"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    embed-resources: true
+params:
+  review_run_year: 2026
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(lubridate)
+library(here)
+library(glue)
+library(DT)
+
+if (file.exists(here::here("DESCRIPTION"))) {
+  devtools::load_all(here::here(), quiet = TRUE)
+} else {
+  library(SRJPEdata)
+}
+
+source(here::here("data-raw", "qc", "qc_helpers.R"))
+
+review_run_year <- params$review_run_year
+
+RST_WEEKS <- c(45:53, 1:22)
+```
+
+## Overview
+
+This report compares **run year `r review_run_year`** against the historical average across all other run years present in the underlying data. 
+
+```{r}
+#| label: rst-metrics
+#| echo: false
+
+rst_fl_metrics <- rst_catch |>
+  filter(!is.na(date)) |>
+  mutate(run_year = as_run_year(date)) |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(is.na(fork_length)), .groups = "drop") |>
+  mutate(data_type = "rst", issue_type = "high_na_rate", field = "fork_length")
+
+rst_fl_impl_metrics <- rst_catch |>
+  filter(!is.na(fork_length), fork_length > 0) |>
+  mutate(run_year = as_run_year(date)) |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(fork_length < 20 | fork_length > 200), .groups = "drop") |>
+  mutate(data_type = "rst", issue_type = "implausible_value", field = "fork_length")
+
+annual_catch <- rst_catch |>
+  filter(!is.na(date), !is.na(count)) |>
+  mutate(run_year = as_run_year(date)) |>
+  group_by(stream, site, run_year) |>
+  summarise(total_catch = sum(count, na.rm = TRUE), .groups = "drop")
+
+catch_site_stats <- annual_catch |>
+  group_by(stream, site) |>
+  summarise(n_years = n(), median_catch = median(total_catch), .groups = "drop") |>
+  filter(n_years >= 5, median_catch > 0)
+
+annual_catch_eval <- annual_catch |> inner_join(catch_site_stats, by = c("stream", "site"))
+
+rst_catch_high_metrics <- annual_catch_eval |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(total_catch > 4 * median_catch), .groups = "drop") |>
+  mutate(data_type = "rst", issue_type = "extreme_value", field = "count")
+
+efficiency_summary <- weekly_juvenile_abundance_efficiency_data |>
+  filter(!is.na(number_recaptured), !is.na(number_released), number_released > 0) |>
+  mutate(simple_eff = number_recaptured / number_released) |>
+  group_by(stream, site) |>
+  summarise(mean_simple_eff = mean(simple_eff, na.rm = TRUE), .groups = "drop") |>
+  filter(mean_simple_eff > 0)
+
+annual_expanded <- rst_catch |>
+  filter(!is.na(date), !is.na(count)) |>
+  mutate(run_year = as_run_year(date)) |>
+  inner_join(efficiency_summary, by = c("stream", "site")) |>
+  mutate(expanded_count = count / mean_simple_eff) |>
+  group_by(stream, site, run_year) |>
+  summarise(total_expanded = sum(expanded_count, na.rm = TRUE), .groups = "drop")
+
+expanded_site_stats <- annual_expanded |>
+  group_by(stream, site) |>
+  summarise(n_years = n(), median_expanded = median(total_expanded), .groups = "drop") |>
+  filter(n_years >= 5, median_expanded > 0)
+
+
+weekly_catch_stats <- weekly_juvenile_abundance_catch_data |>
+  filter(!is.na(count)) |>
+  group_by(stream, site) |>
+  mutate(
+    mean_weekly_count = mean(count, na.rm = TRUE),
+    sd_weekly_count   = sd(count, na.rm = TRUE),
+    upper_limit       = mean_weekly_count + 2 * sd_weekly_count
+  ) |>
+  ungroup() |>
+  filter(sd_weekly_count > 0)
+
+rst_catch_weekly_metrics <- weekly_catch_stats |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(count > upper_limit), .groups = "drop") |>
+  mutate(data_type = "rst", issue_type = "extreme_value", field = "count_weekly")
+
+rst_sampling_metrics <- weekly_juvenile_abundance_catch_data |>
+  filter(week %in% RST_WEEKS, !is.na(count)) |>
+  group_by(stream, site, run_year) |>
+  summarise(weeks_sampled = n_distinct(week), .groups = "drop") |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n() * 31L, n_failed = sum(pmax(31L - weeks_sampled, 0L)), .groups = "drop") |>
+  mutate(data_type = "rst", issue_type = "low_sampling_effort", field = "weeks_sampled")
+
+rst_hours_metrics <- weekly_juvenile_abundance_catch_data |>
+  filter(!is.na(hours_fished)) |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(hours_fished > 168), .groups = "drop") |>
+  mutate(data_type = "rst", issue_type = "implausible_value", field = "hours_fished")
+```
+
+```{r}
+#| label: flow-metrics
+#| echo: false
+
+EXPECTED_STREAMS <- c(
+  "battle creek", "butte creek", "clear creek", "deer creek",
+  "feather river", "mill creek", "sacramento river", "yuba river"
+)
+
+env <- environmental_data |> mutate(run_year = if_else(week >= 45L, year + 1L, year))
+flow_data <- env |> filter(parameter == "flow", statistic == "mean")
+temp_data <- env |> filter(parameter == "temperature", statistic == "mean")
+
+flow_stream_coverage_metrics <- flow_data |>
+  distinct(stream, run_year) |>
+  group_by(run_year) |>
+  summarise(n_present = n_distinct(stream), .groups = "drop") |>
+  mutate(n_evaluated = length(EXPECTED_STREAMS), n_failed = pmax(n_evaluated - n_present, 0L)) |>
+  select(run_year, n_evaluated, n_failed) |>
+  mutate(data_type = "flow", issue_type = "gap", field = "stream_coverage")
+
+flow_gap_metrics <- flow_data |>
+  filter(week %in% RST_WEEKS) |>
+  group_by(stream, site_group, run_year) |>
+  summarise(n_present = n(), .groups = "drop") |>
+  mutate(n_missing = pmax(31L - n_present, 0L)) |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n() * 31L, n_failed = sum(n_missing), .groups = "drop") |>
+  mutate(data_type = "flow", issue_type = "gap", field = "week")
+
+flow_zero_metrics <- flow_data |>
+  filter(week %in% RST_WEEKS) |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(value <= 0), .groups = "drop") |>
+  mutate(data_type = "flow", issue_type = "implausible_value", field = "value")
+
+flow_temp_metrics <- temp_data |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(value < -5 | value > 35), .groups = "drop") |>
+  mutate(data_type = "flow", issue_type = "implausible_value", field = "temperature")
+```
+
+```{r}
+#| label: efficiency-metrics
+#| echo: false
+
+eff <- weekly_efficiency |>
+  mutate(run_year = if_else(week_released >= 45, year_released + 1L, year_released))
+
+eff_recap_metrics <- eff |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(number_recaptured > number_released), .groups = "drop") |>
+  mutate(data_type = "efficiency", issue_type = "recaptures_exceed_releases", field = "number_recaptured")
+
+eff_low_release_metrics <- eff |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(number_released < 50), .groups = "drop") |>
+  mutate(data_type = "efficiency", issue_type = "low_release_count", field = "number_released")
+
+eff_zero_recap_metrics <- eff |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(number_recaptured == 0), .groups = "drop") |>
+  mutate(data_type = "efficiency", issue_type = "zero_recaptures", field = "number_recaptured")
+
+eff_trial_coverage_metrics <- weekly_juvenile_abundance_efficiency_data |>
+  filter(week %in% RST_WEEKS) |>
+  group_by(stream, site, run_year) |>
+  summarise(n_trials = n(), .groups = "drop") |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n() * 3L, n_failed = sum(pmax(3L - n_trials, 0L)), .groups = "drop") |>
+  mutate(data_type = "efficiency", issue_type = "low_trial_coverage", field = "n_trials")
+
+eff_rates <- eff |>
+  filter(number_released > 0, number_recaptured <= number_released) |>
+  mutate(simple_eff = number_recaptured / number_released) |>
+  group_by(stream, site, run_year) |>
+  summarise(mean_eff = mean(simple_eff, na.rm = TRUE), .groups = "drop")
+
+eff_site_stats <- eff_rates |>
+  group_by(stream, site) |>
+  summarise(n_years = n(), hist_mean = mean(mean_eff, na.rm = TRUE), hist_sd = sd(mean_eff, na.rm = TRUE), .groups = "drop") |>
+  filter(n_years >= 5)
+
+eff_outlier_metrics <- eff_rates |>
+  inner_join(eff_site_stats, by = c("stream", "site")) |>
+  group_by(run_year) |>
+  summarise(n_evaluated = n(), n_failed = sum(mean_eff > hist_mean + 3 * hist_sd), .groups = "drop") |>
+  mutate(data_type = "efficiency", issue_type = "extreme_value", field = "number_recaptured")
+
+all_historical_run_years <- sort(unique(c(annual_catch$run_year, flow_data$run_year, eff$run_year)))
+
+eff_no_trials_metrics <- map_dfr(all_historical_run_years, function(ry) {
+  active <- rst_catch |>
+    filter(!is.na(date), !is.na(count)) |>
+    mutate(run_year = as_run_year(date)) |>
+    filter(run_year == ry) |>
+    distinct(stream, site)
+  if (nrow(active) == 0) return(tibble())
+  had_trials <- eff |> filter(run_year == ry) |> distinct(stream, site) |> mutate(has_trials = TRUE)
+  active |>
+    left_join(had_trials, by = c("stream", "site")) |>
+    mutate(has_trials = replace_na(has_trials, FALSE)) |>
+    summarise(n_evaluated = n(), n_failed = sum(!has_trials)) |>
+    mutate(run_year = ry)
+}) |>
+  mutate(data_type = "efficiency", issue_type = "no_efficiency_trials", field = "number_released")
+```
+
+```{r}
+#| label: combine-metrics
+#| echo: false
+
+metrics <- bind_rows(
+  rst_fl_metrics, rst_fl_impl_metrics, rst_catch_high_metrics, rst_catch_weekly_metrics, rst_sampling_metrics, rst_hours_metrics,
+  flow_stream_coverage_metrics, flow_gap_metrics, flow_zero_metrics, flow_temp_metrics,
+  eff_recap_metrics, eff_low_release_metrics, eff_zero_recap_metrics, eff_trial_coverage_metrics,
+  eff_outlier_metrics, eff_no_trials_metrics
+) |>
+  mutate(pct_failed = if_else(n_evaluated > 0, round(n_failed / n_evaluated * 100, 2), NA_real_)) |>
+  left_join(CHECK_METADATA, by = c("data_type", "issue_type", "field"))
+
+n_history_years <- metrics |> filter(run_year != review_run_year) |> distinct(run_year) |> nrow()
+```
+
+`r if (n_history_years == 0) "No prior run_years are available for comparison yet." else glue("Comparing against {n_history_years} prior run year(s).")`
+
+---
+
+## Headline: This Year vs. Historical Average, by Check
+
+For each check, "this year" is the pooled `n_failed / n_evaluated` for `review_run_year`; "historical average" is the mean of that same pooled rate computed separately for each prior run_year, with `notably_worse` flagged when this year exceeds the historical mean by more than 2 historical SDs.
+
+```{r}
+#| label: headline-table
+
+this_year <- metrics |>
+  filter(run_year == review_run_year) |>
+  select(data_type, issue_type, field, alert_level, severity, this_year_pct = pct_failed)
+
+historical <- metrics |>
+  filter(run_year != review_run_year) |>
+  group_by(data_type, issue_type, field) |>
+  summarise(
+    n_hist_years = n(),
+    hist_avg_pct = round(mean(pct_failed, na.rm = TRUE), 2),
+    hist_sd_pct  = round(sd(pct_failed, na.rm = TRUE), 2),
+    .groups      = "drop"
+  )
+
+headline <- this_year |>
+  full_join(historical, by = c("data_type", "issue_type", "field")) |>
+  mutate(
+    delta_pct     = round(this_year_pct - hist_avg_pct, 2),
+    notably_worse = !is.na(hist_avg_pct) & !is.na(hist_sd_pct) & hist_sd_pct > 0 &
+                    !is.na(this_year_pct) & this_year_pct > hist_avg_pct + 2 * hist_sd_pct,
+    check_label   = as.character(glue("{data_type} / {issue_type} / {field}"))
+  ) |>
+  arrange(desc(notably_worse), desc(delta_pct))
+
+DT::datatable(
+  headline |>
+    select(check_label, alert_level, severity, this_year_pct, hist_avg_pct,
+           n_hist_years, delta_pct, notably_worse),
+  caption = glue("Check-level failure rates: run year {review_run_year} vs. historical average"),
+  options = list(pageLength = 25, scrollX = TRUE),
+  rownames = FALSE
+) |>
+  DT::formatStyle("notably_worse",
+                  target = "row",
+                  backgroundColor = DT::styleEqual(TRUE, "#fde0dc"))
+```
+
+---
+
+## Visualization: This Year vs. Historical Average
+
+One panel per `data_type`. Grey dot = historical average pooled failure rate; colored dot = this year (amber = warning-level check, red = error-level check). Bars show ±1 historical SD.
+
+```{r}
+#| label: plot-dumbbell
+#| echo: false
+#| fig-height: 10
+
+plot_data <- headline |>
+  filter(!is.na(this_year_pct) | !is.na(hist_avg_pct)) |>
+  mutate(sort_key = pmax(this_year_pct, hist_avg_pct, na.rm = TRUE)) |>
+  arrange(sort_key) |>
+  mutate(check_label = factor(check_label, levels = unique(check_label)))
+
+ggplot(plot_data) +
+  geom_segment(aes(x = pmin(hist_avg_pct, this_year_pct, na.rm = TRUE),
+                    xend = pmax(hist_avg_pct, this_year_pct, na.rm = TRUE),
+                    y = check_label, yend = check_label),
+               color = "grey70") +
+  geom_errorbar(aes(xmin = hist_avg_pct - hist_sd_pct, xmax = hist_avg_pct + hist_sd_pct, y = check_label),
+                orientation = "y", width = 0.15, color = "grey60", na.rm = TRUE) +
+  geom_point(aes(x = hist_avg_pct, y = check_label), color = "grey40", size = 2, na.rm = TRUE) +
+  geom_point(aes(x = this_year_pct, y = check_label, color = alert_level), size = 3, na.rm = TRUE) +
+  scale_color_manual(values = c("warning" = "#fdae61", "error" = "#d73027"), name = "This year (by alert level)") +
+  facet_wrap(~data_type, scales = "free_y", ncol = 1) +
+  labs(title = glue("Check failure rate: run year {review_run_year} (colored) vs. historical average (grey)"),
+       x = "% of records failed", y = NULL) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+---
+
+## Open Issue Counts: This Year vs. Historical Average
+
+```{r}
+#| label: open-issue-counts
+#| echo: false
+
+full_log <- readr::read_csv(QC_LOG_PATH, show_col_types = FALSE) |>
+  mutate(run_year = as.integer(run_year))
+
+issues_per_year <- full_log |>
+  count(data_type, alert_level, severity, run_year, name = "n_issues")
+
+this_year_issues <- issues_per_year |>
+  filter(run_year == review_run_year) |>
+  select(data_type, alert_level, severity, this_year_n_issues = n_issues)
+
+hist_issues <- issues_per_year |>
+  filter(run_year != review_run_year) |>
+  group_by(data_type, alert_level, severity) |>
+  summarise(hist_avg_n_issues = round(mean(n_issues), 1), n_hist_years = n(), .groups = "drop")
+
+issue_count_summary <- this_year_issues |>
+  full_join(hist_issues, by = c("data_type", "alert_level", "severity")) |>
+  arrange(data_type, alert_level, severity)
+
+DT::datatable(
+  issue_count_summary,
+  caption = glue("New issues logged per run: run year {review_run_year} vs. historical average"),
+  options = list(pageLength = 25, scrollX = TRUE),
+  rownames = FALSE
+)
+```
+
+### Checks Flagged as Notably Worse Than Historical Average
+
+```{r}
+#| label: notably-worse-table
+#| echo: false
+
+worse <- headline |> filter(notably_worse)
+
+if (nrow(worse) == 0) {
+  cat("No checks are notably worse than their historical average this run.")
+} else {
+  DT::datatable(
+    worse |> select(check_label, alert_level, severity, this_year_pct, hist_avg_pct, hist_sd_pct, delta_pct),
+    caption = glue("{nrow(worse)} check(s) notably worse than historical average (>2 SD)"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
+
+---
+
+## All Open Issues, by Alert Level and Severity
+
+```{r}
+#| label: open-issues-table
+#| echo: false
+
+open_issues <- full_log |> filter(status == "open")
+
+if (nrow(open_issues) == 0) {
+  cat("No open issues in the log.")
+} else {
+  DT::datatable(
+    open_issues |> count(data_type, alert_level, severity, name = "n_open") |>
+      arrange(data_type, alert_level, severity),
+    caption = glue("{nrow(open_issues)} total open issue(s) across all data types"),
+    options = list(pageLength = 25, scrollX = TRUE),
+    rownames = FALSE
+  )
+}
+```
