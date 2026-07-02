@@ -40,7 +40,11 @@ render_report <- function(qmd_name, label) {
 render_report("rst_qc.qmd",        "RST")
 render_report("flow_qc.qmd",       "Flow & Temperature")
 render_report("efficiency_qc.qmd", "Efficiency Trials")
-render_report("genetics_qc.qmd",   "Genetics")
+
+
+# Summary report recomputes its own metrics from source data (not dependent
+# on the four reports above), but is rendered last since it's a wrap-up view.
+render_report("qc_summary.qmd",    "Summary")
 
 # Print log summary -----------------------------------------------------------
 source(file.path(qc_dir, "qc_helpers.R"))

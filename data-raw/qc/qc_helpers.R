@@ -102,6 +102,22 @@ make_log_id <- function(data_type, stream, site, run_year, issue_type, field) {
   )
 }
 
+# Read qc_log.csv, dropping any fully-blank rows.
+# Spreadsheet apps (Excel, Numbers, Google Sheets) often leave blank rows
+# behind when a range of rows is cleared/deleted and the file is re-saved as
+# CSV, rather than truly removing the lines. Every reader of the log routes
+# through this function so those blank rows get dropped as soon as they're
+# encountered, instead of being read back in and rewritten by log_issues()
+# on every subsequent run (which would make them accumulate indefinitely).
+read_qc_log <- function(log_path = QC_LOG_PATH) {
+  if (!file.exists(log_path) || file.info(log_path)$size < 50) {
+    return(tibble::tibble())
+  }
+  log <- readr::read_csv(log_path, show_col_types = FALSE,
+                         col_types = readr::cols(.default = "c"))
+  log[rowSums(!is.na(log)) > 0, ]
+}
+
 # Append new issues to qc_log.csv.
 # Issues already present (matched on KEY_COLS) are skipped regardless of status,
 # preserving any reviewer notes or status updates across re-runs.
@@ -129,13 +145,7 @@ log_issues <- function(new_issues, log_path = QC_LOG_PATH) {
   }
   new_issues <- new_issues[, LOG_COLS]
 
-  # Read existing log (all character for type safety)
-  if (file.exists(log_path) && file.info(log_path)$size > 50) {
-    existing <- readr::read_csv(log_path, show_col_types = FALSE,
-                                col_types = readr::cols(.default = "c"))
-  } else {
-    existing <- tibble::tibble()
-  }
+  existing <- read_qc_log(log_path)
 
   # Deduplicate on KEY_COLS
   make_key <- function(df) apply(df[, KEY_COLS, drop = FALSE], 1, paste, collapse = "|")
