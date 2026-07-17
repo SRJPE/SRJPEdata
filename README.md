@@ -24,6 +24,18 @@ data(package = 'SRJPEdata')
 ?SRJPEdata
 ```
 
+## Update Instructions
+
+A GitHub Action (to run on a biweekly trigger) is currently in development. In the interim, data are updated by:
+
+- Check out a branch off of dev called data-update-month-year-number (e.g. data-update-jan-2027-1)
+- Run update_data.R
+- Run data-qc-visual-inspection.qmd for visual data checks
+- Update NEWS.md to include the appropriate version and add a description of the data added. New year of data is considered a major release.
+- Create PR to merge branch into dev branch which will trigger automated validation checks. Resolve any issues and merge to dev.
+- Submit a PR to merge branch to main which will also trigger automated validation checks.
+- Merge to main and tag as the appropriate data release (this should correspond to the package version)
+
 ## Data Sources 
 
 #### Spring Run Monitoring Datasets 
