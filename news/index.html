@@ -82,6 +82,14 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="1.0.1" id="srjpedata-101">SRJPEdata 1.0.1<a class="anchor" aria-label="anchor" href="#srjpedata-101"></a></h2>
+<p>Updates included in this patch:</p>
+<p>The patch updates the criteria for “years to exclude” to remove years with less than 3 weeks with catch data which results in the following changes.</p>
+<ul><li>Updates <code>years_to_include_rst_data</code>: adds Feather River (Herringer Riffle) 2026 and removes Mill Creek 2025<br></li>
+<li>Updates <code>years_to_exclude_rst_data</code>: adds Mill Creek 2025 (21 weeks sampled, 1 week with catch data) and updates Mill Creek 2026 number of weeks sampled (16 → 17); removes Feather River (Herringer Riffle) 2026 as this year meets the criteria</li>
+<li>Updates <code>years_to_include_adult</code>: corrects Yuba River 2023 upstream passage count (0 → 348) and adds Yuba River 2024 upstream passage count (668)</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0.0" id="srjpedata-100">SRJPEdata 1.0.0<a class="anchor" aria-label="anchor" href="#srjpedata-100"></a></h2>
 <p>This release contains: - RST (including mark recapture trials) data through the 2025/2026 monitoring season (2025/2026 is still considered preliminary). - Adult estimates through 2025 (aligns with 2025/2026 juvenile data), except for Yuba River which has data through 2024 - Updated flow and water temperature data through May 2026</p>
 <p>This dataset will be used to develop a manuscript for the BTSPAS-X model.</p>
@@ -109,7 +117,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

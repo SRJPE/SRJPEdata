@@ -125,6 +125,20 @@
 <span><span class="op">?</span><span class="va">SRJPEdata</span></span></code></pre>
 </div>
 <div class="section level2">
+<h2 id="update-instructions">Update Instructions<a class="anchor" aria-label="anchor" href="#update-instructions"></a>
+</h2>
+<p>A GitHub Action (to run on a biweekly trigger) is currently in development. In the interim, data are updated by:</p>
+<ul>
+<li>Check out a branch off of dev called data-update-month-year-number (e.g. data-update-jan-2027-1)</li>
+<li>Run update_data.R</li>
+<li>Run data-qc-visual-inspection.qmd for visual data checks</li>
+<li>Update NEWS.md to include the appropriate version and add a description of the data added. New year of data is considered a major release.</li>
+<li>Create PR to merge branch into dev branch which will trigger automated validation checks. Resolve any issues and merge to dev.</li>
+<li>Submit a PR to merge branch to main which will also trigger automated validation checks.</li>
+<li>Merge to main and tag as the appropriate data release (this should correspond to the package version)</li>
+</ul>
+</div>
+<div class="section level2">
 <h2 id="data-sources">Data Sources<a class="anchor" aria-label="anchor" href="#data-sources"></a>
 </h2>
 <div class="section level4">
@@ -197,7 +211,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer>
