@@ -120,11 +120,6 @@ rst_sampling_metrics <- weekly_juvenile_abundance_catch_data |>
   summarise(n_evaluated = n() * 31L, n_failed = sum(pmax(31L - weeks_sampled, 0L)), .groups = "drop") |>
   mutate(data_type = "rst", issue_type = "low_sampling_effort", field = "weeks_sampled")
 
-rst_hours_metrics <- weekly_juvenile_abundance_catch_data |>
-  filter(!is.na(hours_fished)) |>
-  group_by(run_year) |>
-  summarise(n_evaluated = n(), n_failed = sum(hours_fished > 168), .groups = "drop") |>
-  mutate(data_type = "rst", issue_type = "implausible_value", field = "hours_fished")
 ```
 
 ```{r}
@@ -135,7 +130,7 @@ EXPECTED_STREAMS <- c(
   "battle creek", "butte creek", "clear creek", "deer creek",
   "feather river", "mill creek", "sacramento river", "yuba river"
 )
-
+environmental_data <- bind_rows(flow_data, temperature_data)
 env <- environmental_data |> mutate(run_year = if_else(week >= 45L, year + 1L, year))
 flow_data <- env |> filter(parameter == "flow", statistic == "mean")
 temp_data <- env |> filter(parameter == "temperature", statistic == "mean")
@@ -240,7 +235,7 @@ eff_no_trials_metrics <- map_dfr(all_historical_run_years, function(ry) {
 #| echo: false
 
 metrics <- bind_rows(
-  rst_fl_metrics, rst_fl_impl_metrics, rst_catch_high_metrics, rst_catch_weekly_metrics, rst_sampling_metrics, rst_hours_metrics,
+  rst_fl_metrics, rst_fl_impl_metrics, rst_catch_high_metrics, rst_catch_weekly_metrics, rst_sampling_metrics,
   flow_stream_coverage_metrics, flow_gap_metrics, flow_zero_metrics, flow_temp_metrics,
   eff_recap_metrics, eff_low_release_metrics, eff_zero_recap_metrics, eff_trial_coverage_metrics,
   eff_outlier_metrics, eff_no_trials_metrics
@@ -339,7 +334,7 @@ ggplot(plot_data) +
 #| label: open-issue-counts
 #| echo: false
 
-full_log <- readr::read_csv(QC_LOG_PATH, show_col_types = FALSE) |>
+full_log <- read_full_qc_log() |>
   mutate(run_year = as.integer(run_year))
 
 issues_per_year <- full_log |>

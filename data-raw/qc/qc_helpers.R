@@ -9,7 +9,15 @@ library(glue)
 library(stringr)
 library(here)
 
-QC_LOG_PATH <- here::here("data-raw", "qc", "qc_log.csv")
+QC_ERROR_LOG_PATH   <- here::here("data-raw", "qc", "qc_log_errors.csv")
+QC_WARNING_LOG_PATH <- here::here("data-raw", "qc", "qc_log_warnings.csv")
+
+# Maps an alert_level value to the log file it belongs in. Anything other
+# than "error" is treated as a warning, so unrecognized/legacy alert_level
+# values still land somewhere rather than being silently dropped.
+qc_log_path_for_alert_level <- function(alert_level) {
+  dplyr::if_else(alert_level == "error", QC_ERROR_LOG_PATH, QC_WARNING_LOG_PATH)
+}
 
 LOG_COLS <- c(
   "log_id", "date_identified", "data_type", "stream", "site", "run_year",
@@ -102,14 +110,15 @@ make_log_id <- function(data_type, stream, site, run_year, issue_type, field) {
   )
 }
 
-# Read qc_log.csv, dropping any fully-blank rows.
+# Read a single QC log file (qc_log_errors.csv or qc_log_warnings.csv),
+# dropping any fully-blank rows.
 # Spreadsheet apps (Excel, Numbers, Google Sheets) often leave blank rows
 # behind when a range of rows is cleared/deleted and the file is re-saved as
 # CSV, rather than truly removing the lines. Every reader of the log routes
 # through this function so those blank rows get dropped as soon as they're
 # encountered, instead of being read back in and rewritten by log_issues()
 # on every subsequent run (which would make them accumulate indefinitely).
-read_qc_log <- function(log_path = QC_LOG_PATH) {
+read_qc_log <- function(log_path) {
   if (!file.exists(log_path) || file.info(log_path)$size < 50) {
     return(tibble::tibble())
   }
@@ -118,11 +127,50 @@ read_qc_log <- function(log_path = QC_LOG_PATH) {
   log[rowSums(!is.na(log)) > 0, ]
 }
 
-# Append new issues to qc_log.csv.
-# Issues already present (matched on KEY_COLS) are skipped regardless of status,
-# preserving any reviewer notes or status updates across re-runs.
-# Returns the newly added rows invisibly.
-log_issues <- function(new_issues, log_path = QC_LOG_PATH) {
+# Read and combine both the error and warning logs into one data frame.
+# Use this wherever a report needs a full view across alert levels (e.g. the
+# "all open issues" tables and the year-over-year summary), rather than
+# reading qc_log_errors.csv / qc_log_warnings.csv directly.
+read_full_qc_log <- function() {
+  dplyr::bind_rows(
+    read_qc_log(QC_ERROR_LOG_PATH),
+    read_qc_log(QC_WARNING_LOG_PATH)
+  )
+}
+
+# Append truly-new rows (already restricted to a single log file's worth of
+# issues) to log_path, deduplicating on KEY_COLS against what's already there.
+# Issues already present are skipped regardless of status, preserving any
+# reviewer notes or status updates across re-runs. Returns the newly added
+# rows invisibly.
+append_to_qc_log <- function(new_issues, log_path) {
+  existing <- read_qc_log(log_path)
+
+  # Deduplicate on KEY_COLS
+  make_key <- function(df) apply(df[, KEY_COLS, drop = FALSE], 1, paste, collapse = "|")
+  new_issues_chr <- new_issues |> dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+
+  if (nrow(existing) > 0) {
+    truly_new <- new_issues_chr[!make_key(new_issues_chr) %in% make_key(existing), ]
+  } else {
+    truly_new <- new_issues_chr
+  }
+
+  n_new  <- nrow(truly_new)
+  n_skip <- nrow(new_issues) - n_new
+
+  if (n_new > 0) {
+    combined <- dplyr::bind_rows(existing, truly_new)
+    readr::write_csv(combined, log_path, na = "")
+  }
+
+  list(truly_new = truly_new, n_new = n_new, n_skip = n_skip)
+}
+
+# Log new issues, routing each row to qc_log_errors.csv or qc_log_warnings.csv
+# based on its alert_level. Returns the newly added rows (across both files)
+# invisibly.
+log_issues <- function(new_issues) {
   if (nrow(new_issues) == 0) {
     message("  No issues detected for this check.")
     return(invisible(tibble::tibble()))
@@ -145,39 +193,34 @@ log_issues <- function(new_issues, log_path = QC_LOG_PATH) {
   }
   new_issues <- new_issues[, LOG_COLS]
 
-  existing <- read_qc_log(log_path)
+  # Route each row to its log file by alert_level, and append separately so
+  # errors and warnings dedup against (and land in) their own file.
+  new_issues$log_path <- qc_log_path_for_alert_level(new_issues$alert_level)
 
-  # Deduplicate on KEY_COLS
-  make_key <- function(df) apply(df[, KEY_COLS, drop = FALSE], 1, paste, collapse = "|")
-  new_issues_chr <- new_issues |> dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+  results <- lapply(split(new_issues, new_issues$log_path), function(issues_for_log) {
+    log_path <- issues_for_log$log_path[[1]]
+    append_to_qc_log(issues_for_log[, LOG_COLS], log_path)
+  })
 
-  if (nrow(existing) > 0) {
-    truly_new <- new_issues_chr[!make_key(new_issues_chr) %in% make_key(existing), ]
-  } else {
-    truly_new <- new_issues_chr
-  }
-
-  n_new  <- nrow(truly_new)
-  n_skip <- nrow(new_issues) - n_new
+  n_new  <- sum(vapply(results, `[[`, integer(1), "n_new"))
+  n_skip <- sum(vapply(results, `[[`, integer(1), "n_skip"))
 
   if (n_new > 0) {
-    combined <- dplyr::bind_rows(existing, truly_new)
-    readr::write_csv(combined, log_path, na = "")
     message(glue::glue("  + {n_new} new issue(s) logged. {n_skip} already in log."))
   } else {
     message(glue::glue("  All {nrow(new_issues)} issue(s) already in log."))
   }
 
-  invisible(truly_new)
+  invisible(dplyr::bind_rows(lapply(results, `[[`, "truly_new")))
 }
 
-# Print a summary of the QC log to the console
-qc_log_summary <- function(log_path = QC_LOG_PATH) {
-  if (!file.exists(log_path) || file.info(log_path)$size < 50) {
+# Print a summary of the QC log (combined across errors and warnings) to the console
+qc_log_summary <- function() {
+  log <- read_full_qc_log()
+  if (nrow(log) == 0) {
     message("QC log is empty.")
     return(invisible(NULL))
   }
-  log <- readr::read_csv(log_path, show_col_types = FALSE)
   cat(glue::glue("\n=== QC Log Summary ({nrow(log)} total issues) ===\n\n"))
   log |>
     dplyr::count(data_type, alert_level, status, severity) |>

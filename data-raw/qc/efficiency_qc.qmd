@@ -430,7 +430,7 @@ if (nrow(all_new) == 0) {
 } else {
   DT::datatable(
     all_new |> select(log_id, stream, site, run_year, issue_type, field, severity, alert_level, description),
-    caption = glue("{nrow(all_new)} new issue(s) added to qc_log.csv"),
+    caption = glue("{nrow(all_new)} new issue(s) added to the QC log"),
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
   )
@@ -443,7 +443,7 @@ if (nrow(all_new) == 0) {
 #| label: open-issues
 #| echo: false
 
-full_log   <- readr::read_csv(here::here("data-raw", "qc", "qc_log.csv"), show_col_types = FALSE)
+full_log   <- read_full_qc_log()
 open_eff   <- full_log |> filter(data_type == "efficiency", status == "open")
 
 if (nrow(open_eff) == 0) {
