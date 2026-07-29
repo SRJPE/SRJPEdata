@@ -37,7 +37,7 @@ review_run_year <- params$review_run_year
 
 Reviewing efficiency trial data. Run year being reviewed: **`r review_run_year`**.
 
-Data sources: `weekly_efficiency` (raw trial data), `weekly_juvenile_abundance_efficiency_data` (model-ready), `years_to_exclude_rst_data`.
+Data sources: `weekly_efficiency` (raw trial data), `weekly_juvenile_abundance_efficiency_data` (model-ready), `rst_model_years`.
 
 ```{r}
 #| label: overview-table
@@ -239,7 +239,8 @@ trial_coverage <- weekly_juvenile_abundance_efficiency_data |>
   group_by(stream, site, run_year) |>
   summarise(n_trials = n(), .groups = "drop")
 
-excluded_lookup <- years_to_exclude_rst_data |>
+excluded_lookup <- rst_model_years |>
+  filter(exclude == TRUE) |> 
   distinct(stream, site, run_year) |>
   mutate(already_excluded = TRUE)
 

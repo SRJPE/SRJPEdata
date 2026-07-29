@@ -45,11 +45,12 @@ RST_WEEKS <- c(45:53, 1:22)
 
 Reviewing flow and temperature data. Run year being reviewed: **`r review_run_year`**.
 
-Data source: `environmental_data` — weekly data with columns `year`, `week`, `stream`, `site_group`, `parameter`, `statistic`, `value`.
+Data source: `flow_data` & `temperature_data` — weekly data with columns `year`, `week`, `stream`, `site_group`, `parameter`, `statistic`, `value`.
 
 ```{r}
 #| label: overview-table
 #| echo: false
+environmental_data <- bind_rows(flow_data, temperature_data)
 
 environmental_data |>
   group_by(stream, parameter, statistic) |>

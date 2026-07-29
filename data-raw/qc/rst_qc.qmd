@@ -297,14 +297,16 @@ weeks_in_window <- weekly_juvenile_abundance_catch_data |>
   group_by(stream, site, run_year) |>
   summarise(weeks_sampled = n_distinct(week), .groups = "drop")
 
-excluded_lookup <- years_to_exclude_rst_data |>
+excluded_lookup <- rst_model_years |>
+  filter(exclude == TRUE) |> 
   distinct(stream, site, run_year) |>
   mutate(already_excluded = TRUE)
 
 low_effort <- weeks_in_window |>
   filter(weeks_sampled < 3) |>
   left_join(excluded_lookup, by = c("stream", "site", "run_year")) |>
-  mutate(already_excluded = replace_na(already_excluded, FALSE))
+  mutate(already_excluded = replace_na(already_excluded, FALSE)) |> 
+  filter(already_excluded == FALSE)
 
 new_low_effort <- log_issues(
   low_effort |>
@@ -361,8 +363,7 @@ ggplot(coverage_plot_data, aes(x = run_year, y = site, fill = label)) +
 #| label: issues-summary
 #| echo: false
 
-all_new <- bind_rows(new_fl_na, new_fl_impl, new_catch_extreme, new_weekly_extreme, new_low_effort,
-                     new_hours_fished)
+all_new <- bind_rows(new_fl_na, new_fl_impl, new_catch_extreme, new_weekly_extreme, new_low_effort)
 
 if (nrow(all_new) == 0) {
   cat("No new issues logged this run.")
