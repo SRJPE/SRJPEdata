@@ -251,8 +251,6 @@ metrics <- bind_rows(
 n_history_years <- metrics |> filter(run_year != review_run_year) |> distinct(run_year) |> nrow()
 ```
 
-`r if (n_history_years == 0) "No prior run_years are available for comparison yet." else glue("Comparing against {n_history_years} prior run year(s).")`
-
 ---
 
 ## Headline: This Year vs. Historical Average, by Check

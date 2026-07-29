@@ -354,64 +354,6 @@ ggplot(coverage_plot_data, aes(x = run_year, y = site, fill = label)) +
 
 `r if (nrow(low_effort) == 0) "No issues detected." else glue("{nrow(low_effort)} site/run-year combination(s) flagged ({sum(low_effort$already_excluded)} already excluded from modeling).")`
 
----
-
-## Check 5 (error): Hours Fished - Extreme Value
-
-Flag any stream/site/run_year with a weekly `hours_fished` value greater than 168 (24 × 7) — physically impossible for a single week and almost always a data entry or effort-calculation error.
-
-```{r}
-#| label: check-hours-fished
-
-hours_fished_all <- weekly_juvenile_abundance_catch_data |>
-  filter(!is.na(hours_fished)) |>
-  group_by(stream, site, run_year) |>
-  summarise(
-    n_evaluated = n(),
-    n_failed    = sum(hours_fished > 168),
-    max_hours   = max(hours_fished),
-    .groups     = "drop"
-  )
-
-hours_fished_impl <- hours_fished_all |> filter(n_failed > 0)
-
-new_hours_fished <- log_issues(
-  hours_fished_impl |>
-    mutate(
-      n_records   = n_failed,
-      data_type   = "rst",
-      issue_type  = "implausible_value",
-      field       = "hours_fished",
-      severity    = "critical",
-      alert_level = "error",
-      description = glue("{n_failed} week(s) with hours_fished > 168 (impossible for a 7-day week) in run year {run_year} at {site} ({stream}). Max value: {max_hours}")
-    )
-)
-```
-
-```{r}
-#| label: plot-hours-fished
-#| echo: false
-#| fig-height: 5
-
-hours_fished_plot_data <- weekly_juvenile_abundance_catch_data |>
-  filter(!is.na(hours_fished)) |>
-  mutate(implausible = hours_fished > 168)
-
-ggplot(hours_fished_plot_data, aes(x = hours_fished, fill = implausible)) +
-  geom_histogram(bins = 40, alpha = 0.8) +
-  scale_fill_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
-                    labels = c("Normal", "Flagged"), name = NULL) +
-  geom_vline(xintercept = 168, linetype = "dashed", color = "#d73027") +
-  facet_wrap(~stream, scales = "free_y", ncol = 2) +
-  labs(title = "Weekly hours fished distribution (dashed = 168hr max possible)",
-       x = "Hours fished", y = "Count") +
-  theme_minimal()
-```
-
-`r if (nrow(hours_fished_impl) == 0) "No issues detected." else glue("{nrow(hours_fished_impl)} site/run-year combination(s) flagged.")`
-
----
 
 ## Issues Logged This Run
 
