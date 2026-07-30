@@ -80,7 +80,16 @@ upperclear_temp_raw2 <- readxl::read_excel(
   sheet = 1
 )
 
-upperclear_creek_daily_temp <- dplyr::bind_rows(upperclear_temp_raw, upperclear_temp_raw2) |>
+upperclear_temp_raw3 <- readxl::read_excel(
+  here::here("data-raw", "temperature-data", "clear_2022.xlsx"),
+  sheet = 1,
+  skip = 2,
+  col_types = c("date", "numeric", "skip", "skip", "date", "numeric"), 
+  col_names = c("lcc_date", "lcc_temp", "blank", "blank2", "ucc_date", "ucc_temp")) |> # SKIP FIRST ROW STATING LCC and UCC 
+  select(DT = "ucc_date", TEMP_C = "ucc_temp") |> 
+  filter(!is.na(DT))
+
+upperclear_creek_daily_temp <- dplyr::bind_rows(upperclear_temp_raw, upperclear_temp_raw2, upperclear_temp_raw3) |>
   dplyr::rename(date = DT, temp_degC = TEMP_C) |>
   dplyr::mutate(date = as_date(date, tz = "UTC")) |>
   dplyr::group_by(date) |>
