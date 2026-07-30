@@ -1,5 +1,143 @@
 ---
-title: "stream_team_review"
-output: html_document
+title: "SRJPE Data Review: `r params$stream`"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+params:
+  stream: "deer creek"        # TODO: provide when looping through Streams in R SCRIPT
+  flow_gage: "TODO"           # TODO: create lookup table for these 
+  temp_gage: "TODO" 
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 9,
+  fig.height = 5
+)
+
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(SRJPEdata)
+# library(SRJPEmodel)
+
+stream <- params$stream
+```
+
+This report summarizes data for **`r stream`** to support stream team review ahead of
+model runs. 
+
+Included within the zipped folder are full datatables for:
+  - adult data (table of annual estimates being used in stock recruit modeling)
+  - adult_model_years (summary of any years being excluded in the adult dataset)
+  - flow and temperature datasets (flow and temperature data pulled from gages)
+  - rst_model_years (summary of any years being excluded in juvenile abundance modeling)
+  - weekly_catch (catch data summarized by week, refer to the diagram for information about data processing)
+  - weekly_eff (efficiency data summarized by week)
+
+Please confirm that the years-excluded tables below are still correct, that we are using the best source for environmental data, and flag anything that looks off in the catch, efficiency, or environmental sections. Visualizations below will highlight points that are outliers to help you QC.  
+
+---
+## Data Summary 
+
+- we have x years of RST data 
+- we have x years of adult data, the adult data source that is being used in the Stock Recruit for this stream is X. 
+
+## Years Excluded
+
+### Adult Data
+
+We are excluding the following adult data years from analysis. 
+
+```{r adult-years-excluded}
+adult_years_excluded_tbl <- adult_model_years %>%
+  filter(exclude, stream == params$stream) %>%
+  arrange(year) %>% 
+  select(year, data_type, reason_for_exclusion)
+
+if (nrow(adult_years_excluded_tbl) == 0) {
+  cat("No adult years excluded in this range for", stream)
+} else {
+  adult_years_excluded_tbl %>%
+    kable(col.names = c("Year", "Data Type", "Reason for exclusion"),
+          caption = paste("Adult years excluded –", stream)) %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+}
+```
+
+### RST (Juvenile Outmigrant) Data
+
+```{r rst-years-excluded}
+rst_years_excluded_tbl <- rst_model_years %>%
+  filter(stream == params$stream) %>% 
+  arrange(run_year) %>% 
+  select(run_year, exclusion_type)
+
+if (nrow(rst_years_excluded_tbl) == 0) {
+  cat("No RST years excluded in this range for", stream)
+} else {
+  rst_years_excluded_tbl %>%
+    kable(col.names = c("Year", "Reason for exclusion"),
+          caption = paste("RST years excluded –", stream)) %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+}
+```
+
+---
+
+## Catch
+
+```{r catch-data}
+
+```
+
+### Cumulative Catch
+
+```{r cumulative-catch-plot}
+ggplot(catch_data, aes(x = date, y = cumulative_catch, color = factor(water_year))) +
+  geom_line(linewidth = 0.8) +
+  labs(
+    title = paste("Cumulative catch –", stream),
+    x = "Date", y = "Cumulative catch", color = "Water Year"
+  ) +
+  theme_minimal()
+```
+
+### Absolute (Daily) Catch
+
+```{r absolute-catch-plot}
+
+```
+
+---
+
+## Trap Efficiency
+
+
+---
+
+## Environmental Data
+
+> **Gage reminder:** This stream team uses gage **`r params$flow_gage`** for flow data and **`r params$temp_gage`** for temperature data. Please let us know if there are better data sources to utilize for environmental data. 
+
+### Flow
+
+```{r flow-plot}
+
+```
+
+### Temperature
+
+```{r temperature-plot}
+
+```
+
+---
+
 
