@@ -1,5 +1,5 @@
 ---
-title: "SRJPE Data Review: `r params$stream`"
+title: "SRJPE Data Review: `r params$selected_stream`"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
   html_document:
@@ -7,7 +7,7 @@ output:
     toc_float: true
     theme: flatly
 params:
-  stream: "deer creek"        # TODO: provide when looping through Streams in R SCRIPT
+  selected_stream: "deer creek"        # TODO: provide when looping through Streams in R SCRIPT
   flow_gage: "TODO"           # TODO: create lookup table for these 
   temp_gage: "TODO" 
 ---
@@ -25,12 +25,24 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 library(SRJPEdata)
-# library(SRJPEmodel)
+library(lubridate)
+library(plotly)
 
-stream <- params$stream
+selected_stream <- params$selected_stream
+
+colors_small <- c(
+  "#9A8822",
+  "#F5CDB4",
+  "#F8AFA8",
+  "#FDDDA0",
+  "#74A089", # Royal 2
+  "#899DA4",
+  "#C93312",
+  "#DC863B" # royal 1 (- 3)
+)
 ```
 
-This report summarizes data for **`r stream`** to support stream team review ahead of
+This report summarizes data for **`r selected_stream`** to support stream team review ahead of
 model runs. 
 
 Included within the zipped folder are full datatables for:
@@ -57,16 +69,16 @@ We are excluding the following adult data years from analysis.
 
 ```{r adult-years-excluded}
 adult_years_excluded_tbl <- adult_model_years %>%
-  filter(exclude, stream == params$stream) %>%
+  filter(exclude, stream == params$selected_stream) %>%
   arrange(year) %>% 
   select(year, data_type, reason_for_exclusion)
 
 if (nrow(adult_years_excluded_tbl) == 0) {
-  cat("No adult years excluded in this range for", stream)
+  cat("No adult years excluded in this range for", selected_stream)
 } else {
   adult_years_excluded_tbl %>%
     kable(col.names = c("Year", "Data Type", "Reason for exclusion"),
-          caption = paste("Adult years excluded –", stream)) %>%
+          caption = paste("Adult years excluded –", selected_stream)) %>%
     kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 }
 ```
@@ -75,16 +87,16 @@ if (nrow(adult_years_excluded_tbl) == 0) {
 
 ```{r rst-years-excluded}
 rst_years_excluded_tbl <- rst_model_years %>%
-  filter(stream == params$stream) %>% 
+  filter(stream == params$selected_stream) %>% 
   arrange(run_year) %>% 
   select(run_year, exclusion_type)
 
 if (nrow(rst_years_excluded_tbl) == 0) {
-  cat("No RST years excluded in this range for", stream)
+  cat("No RST years excluded in this range for", selected_stream)
 } else {
   rst_years_excluded_tbl %>%
     kable(col.names = c("Year", "Reason for exclusion"),
-          caption = paste("RST years excluded –", stream)) %>%
+          caption = paste("RST years excluded –", selected_stream)) %>%
     kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
 }
 ```
@@ -94,28 +106,98 @@ if (nrow(rst_years_excluded_tbl) == 0) {
 ## Catch
 
 ```{r catch-data}
+catch_data <- SRJPEdata::weekly_juvenile_abundance_catch_data 
+
+## Prep data --------------------------------------------------------------
+cuml_catch <- catch_data |>
+  filter(stream == params$selected_stream) |> 
+  mutate(
+    date = lubridate::ymd(paste0(year, "-01-01")) + lubridate::weeks(week - 1),
+    water_year = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
+    fake_date = as_date(paste(
+      ifelse(month(date) %in% 10:12, 1999, 2000),
+      month(date),
+      day(date)
+    ))
+  ) |>
+  arrange(date) |>
+  group_by(water_year) |>
+  mutate(
+    count = ifelse(is.na(count), 0, count),
+    total_count = sum(count, na.rm = TRUE),
+    cumulative_catch = cumsum(count),
+    prop_cuml_catch = cumulative_catch / total_count * 100
+  ) |>
+  ungroup() |> 
+  mutate(water_year = factor(water_year))
+
+year_palette <- colorRampPalette(colors_small)(nlevels(cuml_catch$water_year))
 
 ```
 
-### Cumulative Catch
+### Percent Cumulative Catch
 
 ```{r cumulative-catch-plot}
-ggplot(catch_data, aes(x = date, y = cumulative_catch, color = factor(water_year))) +
-  geom_line(linewidth = 0.8) +
+cuml_catch_plot_proportional <- ggplot(
+  cuml_catch,
+  aes(x = fake_date, y = prop_cuml_catch, color = water_year, group = interaction(site, water_year),
+           text = paste0("Year: ", water_year, "<br>Catch: ", count)  # <- custom tooltip aesthetic
+)) +
+  geom_line() +
+  scale_color_manual(values = year_palette, name = "Water Year") +
+  scale_x_date(date_labels = "%b") +
   labs(
-    title = paste("Cumulative catch –", stream),
-    x = "Date", y = "Cumulative catch", color = "Water Year"
+    title = paste0("Cumulative Catch in RST - ", stringr::str_to_title(selected_stream)),
+    x = "Months",
+    y = "Percent Cumulative Catch"
   ) +
-  theme_minimal()
+  theme_minimal() + 
+  facet_wrap(~site)
+
+
+cuml_catch_plot_proportional|> ggplotly(tooltip = "text")
 ```
 
-### Absolute (Daily) Catch
+### Absolute Cumulative Catch
 
 ```{r absolute-catch-plot}
+cuml_catch_plot_absolute <- ggplot(
+  cuml_catch,
+  aes(x = fake_date, y = cumulative_catch, color = water_year, group = interaction(site, water_year),
+      text = paste0("Year: ", water_year, "<br>Catch: ", count)  # <- custom tooltip aesthetic
+      )) +
+  geom_line() +
+  scale_color_manual(values = year_palette, name = "Water Year") +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Cumulative Catch in RST - ", stringr::str_to_title(selected_stream)),
+    x = "Months",
+    y = "Cumulative Catch"
+  ) +
+  theme_minimal()
 
+cuml_catch_plot_absolute |> ggplotly(tooltip = "text")
 ```
 
----
+### Catch Timeserries
+```{r}
+weekly_catch_plot <- ggplot(
+  cuml_catch,
+  aes(x = fake_date, y = count, color = water_year, group = interaction(site, water_year),
+     text = paste0("Year: ", water_year, "<br>Catch: ", count)  # <- custom tooltip aesthetic
+      )) +
+  geom_line() +
+  scale_color_manual(values = year_palette, name = "Water Year") +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Weekly Catch in RST - ", stringr::str_to_title(selected_stream)),
+    x = "Months",
+    y = "Catch"
+  ) +
+  theme_minimal()
+
+weekly_catch_plot |> ggplotly(tooltip = "text")
+```
 
 ## Trap Efficiency
 

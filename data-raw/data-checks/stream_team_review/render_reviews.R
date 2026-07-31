@@ -6,7 +6,7 @@ library(tibble)
 
 # TODO: DOUBLE CHECK THESE - ESPECIALLY Adult used in SR 
 stream_config <- tribble(
-  ~stream,          ~flow_gage,                                                    ~temp_gage,                                       ~adult_used_in_SR,
+  ~selected_stream,          ~flow_gage,                                                    ~temp_gage,                                       ~adult_used_in_SR,
   "battle creek",   "USGS-11376550",                                               "USFWS - UBC",                                    "redd",
   "butte creek",    "USGS-11390000",                                               "USGS-11390000",                                  "carcass",
   "clear creek",    "USGS-11372000",                                               "USFWS - UCC",                                    "redd",
@@ -28,7 +28,7 @@ pwalk(stream_config, function(stream, flow_gage, temp_gage, adult_used_in_SR) {
     output_file = paste0(gsub(" ", "_", stream), "_review.html"),
     output_dir = output_dir,
     params = list(
-      stream = stream,
+      selected_stream = selected_stream,
       flow_gage = flow_gage,
       temp_gage = temp_gage, 
       adult_used_in_SR
