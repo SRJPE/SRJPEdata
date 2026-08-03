@@ -17,6 +17,7 @@ stream_config <- tribble(
   # SAC: flow gages are USGS-11390500 (Sac @ Wilkins Slough, used for both "tisdale" and "knights landing" site groups) 
   # and USGS-11377100 (Red Bluff Diversion Dam, RBDD). Temp gage is USGS-11390500 (same, used for tisdale/knights landing),
   # with knights landing temp gap-filled using RST-reported temperature. 
+  # IF STREAM SAC - ADD site column 
 )
 
 output_dir <- "data-raw/data-checks/stream_team_review/stream_team_reports"

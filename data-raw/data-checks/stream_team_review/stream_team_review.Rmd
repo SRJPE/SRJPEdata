@@ -53,10 +53,10 @@ Included within the zipped folder are full datatables for:
   - weekly_catch (catch data summarized by week, refer to the diagram for information about data processing)
   - weekly_eff (efficiency data summarized by week)
 
-Please confirm that the years-excluded tables below are still correct, that we are using the best source for environmental data, and flag anything that looks off in the catch, efficiency, or environmental sections. Visualizations below will highlight points that are outliers to help you QC.  
+Please confirm that the years-excluded tables below are still correct, that we are using the best source for environmental data, and flag anything that looks off in the catch, efficiency, or environmental sections. Visualizations below will highlight points that are outliers to help you QC.
 
----
-## Data Summary 
+***
+## Data Summary
 
 - we have x years of RST data 
 - we have x years of adult data, the adult data source that is being used in the Stock Recruit for this stream is X. 
@@ -101,7 +101,7 @@ if (nrow(rst_years_excluded_tbl) == 0) {
 }
 ```
 
----
+***
 
 ## Catch
 
@@ -202,24 +202,102 @@ weekly_catch_plot |> ggplotly(tooltip = "text")
 ## Trap Efficiency
 
 
----
+***
 
 ## Environmental Data
 
 > **Gage reminder:** This stream team uses gage **`r params$flow_gage`** for flow data and **`r params$temp_gage`** for temperature data. Please let us know if there are better data sources to utilize for environmental data. 
 
+```{r environmental-data}
+environmental_data <- bind_rows(SRJPEdata::flow_data, SRJPEdata::temperature_data) |>
+  filter(stream == params$selected_stream, statistic == "mean") |>
+  mutate(
+    date = lubridate::ymd(paste0(year, "-01-01")) + lubridate::weeks(week - 1),
+    water_year = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
+    fake_date = as_date(paste(
+      ifelse(month(date) %in% 10:12, 1999, 2000),
+      month(date),
+      day(date)
+    ))
+  ) |>
+  arrange(date)
+```
+
 ### Flow
 
-```{r flow-plot}
+Flags negative flow (physically impossible) as well as statistical outliers per
+site (values beyond the median +/- 5 times the interquartile range).
 
+```{r flow-plot}
+flow_data_plot <- environmental_data |>
+  filter(parameter == "flow") |>
+  group_by(site_group) |>
+  mutate(
+    med = median(value, na.rm = TRUE),
+    iqr = IQR(value, na.rm = TRUE),
+    implausible = value < 0 | value < med - 5 * iqr | value > med + 5 * iqr
+  ) |>
+  ungroup()
+
+multi_site <- n_distinct(flow_data_plot$site_group) > 1
+
+flow_plot <- ggplot(
+  flow_data_plot,
+  aes(x = fake_date, y = value, group = interaction(site_group, water_year))
+) +
+  geom_line(color = "grey60", linewidth = 0.3) +
+  geom_point(aes(color = implausible), size = 0.8) +
+  scale_color_manual(
+    values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+    labels = c("Normal", "Flagged"), name = NULL, na.translate = FALSE
+  ) +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Weekly Flow - ", stringr::str_to_title(selected_stream), " (implausible values flagged)"),
+    x = "Months",
+    y = "Flow (cfs)"
+  ) +
+  theme_minimal()
+
+if (multi_site) flow_plot <- flow_plot + facet_wrap(~site_group, scales = "free_y")
+
+flow_plot
 ```
 
 ### Temperature
+Flags values below -5C or above 35C as biologically implausible.
 
 ```{r temperature-plot}
+temp_data_plot <- environmental_data |>
+  filter(parameter == "temperature") |>
+  mutate(implausible = value < -5 | value > 35)
 
+multi_site <- n_distinct(temp_data_plot$site_group) > 1
+
+temperature_plot <- ggplot(
+  temp_data_plot,
+  aes(x = fake_date, y = value, group = interaction(site_group, water_year))
+) +
+  geom_line(color = "grey60", linewidth = 0.3) +
+  geom_point(aes(color = implausible), size = 0.8) +
+  geom_hline(yintercept = c(-5, 35), linetype = "dashed", color = "#d73027") +
+  scale_color_manual(
+    values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+    labels = c("Normal", "Flagged"), name = NULL, na.translate = FALSE
+  ) +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Weekly Temperature - ", stringr::str_to_title(selected_stream), " (implausible values flagged)"),
+    x = "Months",
+    y = "Temperature (°C)"
+  ) +
+  theme_minimal()
+
+if (multi_site) temperature_plot <- temperature_plot + facet_wrap(~site_group, scales = "free_y")
+
+temperature_plot
 ```
 
----
+***
 
 
