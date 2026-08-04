@@ -13,7 +13,7 @@ padded_catch <- catch |>
   padr::pad(interval = "day", group = c("stream", "site", "subsite", "site_group")) |>
   mutate(
     trap_status = case_when(
-      is.na(count) ~ "trap not fishing (assumed)",
+      is.na(count) ~ "trap not fishing",
       count > 0 ~ "trap fishing - fish caught",
       count == 0 ~ "trap fishing - zero catch"
     )
@@ -23,9 +23,9 @@ padded_catch <- catch |>
 padded_catch |> count(trap_status)
 
 
-selected_stream <- "butte creek"
-selected_site <- "okie dam" 
-selected_subsite <- "okie dam 1"
+selected_stream <- "yuba river"
+selected_site <- "hallwood" 
+selected_subsite <- "hal"
 
 plot_data <- padded_catch |>
   filter(stream == selected_stream, site == selected_site, subsite == selected_subsite) |>
@@ -34,19 +34,21 @@ plot_data <- padded_catch |>
 ggplot(plot_data, aes(x = day, y = year, color = trap_status)) +
   geom_point(size = 1) +
   scale_color_manual(values = c(
-    "trap not fishing (assumed)" = "#DC863B",
+    "trap not fishing" = "#DC863B",
     "trap fishing - fish caught" = "#A5C2A3",
     "trap fishing - zero catch" = "#3F5151"
   )) +
   scale_y_reverse(breaks = scales::pretty_breaks()) +
   labs(
-    title = paste0("Trap status by day: ", selected_stream, " - ", selected_site),
+    title = paste0("Trap status by day: ", selected_stream, " - ", selected_site, " - ", selected_subsite),
     x = "Day of year", y = "Year", color = "Trap status"
   ) +
   theme_minimal()
 
 
+trapping_reccord <- padded_catch
 
+write_csv(trapping_reccord, "data-raw/analysis/trapping_reccord.csv")
 
 
 
