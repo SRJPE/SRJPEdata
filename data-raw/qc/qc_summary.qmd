@@ -21,6 +21,8 @@ library(lubridate)
 library(here)
 library(glue)
 library(DT)
+library(plotly)
+library(kableExtra)
 
 if (file.exists(here::here("DESCRIPTION"))) {
   devtools::load_all(here::here(), quiet = TRUE)
@@ -33,6 +35,23 @@ source(here::here("data-raw", "qc", "qc_helpers.R"))
 review_run_year <- params$review_run_year
 
 RST_WEEKS <- c(45:53, 1:22)
+
+# Earliest run_year shown in the trend plot and heatmaps below. Flow data goes
+# back to 1961, but the pre-1990 span is sparse enough (few streams, few
+# checks with any evaluable data) that including it mostly just compresses
+# the years reviewers actually care about. The headline table and dumbbell
+# plot above are unaffected and still use the full history.
+MIN_TREND_YEAR <- 1990
+
+# Rolls up per-(stream, run_year) check results into the pooled per-run_year
+# metrics used by the headline table, dumbbell plot, and trend plot. Kept as
+# a helper since every check below is computed at the stream grain first (for
+# the per-stream heatmap tabs) and then pooled the same way.
+pool_across_streams <- function(by_stream) {
+  by_stream |>
+    dplyr::group_by(run_year, data_type, issue_type, field) |>
+    dplyr::summarise(n_evaluated = sum(n_evaluated), n_failed = sum(n_failed), .groups = "drop")
+}
 ```
 
 ## Overview
@@ -43,17 +62,17 @@ This report compares **run year `r review_run_year`** against the historical ave
 #| label: rst-metrics
 #| echo: false
 
-rst_fl_metrics <- rst_catch |>
+rst_fl_metrics_by_stream <- rst_catch |>
   filter(!is.na(date)) |>
   mutate(run_year = as_run_year(date)) |>
-  group_by(run_year) |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(is.na(fork_length)), .groups = "drop") |>
   mutate(data_type = "rst", issue_type = "high_na_rate", field = "fork_length")
 
-rst_fl_impl_metrics <- rst_catch |>
+rst_fl_impl_metrics_by_stream <- rst_catch |>
   filter(!is.na(fork_length), fork_length > 0) |>
   mutate(run_year = as_run_year(date)) |>
-  group_by(run_year) |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(fork_length < 20 | fork_length > 200), .groups = "drop") |>
   mutate(data_type = "rst", issue_type = "implausible_value", field = "fork_length")
 
@@ -70,8 +89,8 @@ catch_site_stats <- annual_catch |>
 
 annual_catch_eval <- annual_catch |> inner_join(catch_site_stats, by = c("stream", "site"))
 
-rst_catch_high_metrics <- annual_catch_eval |>
-  group_by(run_year) |>
+rst_catch_high_metrics_by_stream <- annual_catch_eval |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(total_catch > 4 * median_catch), .groups = "drop") |>
   mutate(data_type = "rst", issue_type = "extreme_value", field = "count")
 
@@ -107,16 +126,16 @@ weekly_catch_stats <- weekly_juvenile_abundance_catch_data |>
   ungroup() |>
   filter(sd_weekly_count > 0)
 
-rst_catch_weekly_metrics <- weekly_catch_stats |>
-  group_by(run_year) |>
+rst_catch_weekly_metrics_by_stream <- weekly_catch_stats |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(count > upper_limit), .groups = "drop") |>
   mutate(data_type = "rst", issue_type = "extreme_value", field = "count_weekly")
 
-rst_sampling_metrics <- weekly_juvenile_abundance_catch_data |>
+rst_sampling_metrics_by_stream <- weekly_juvenile_abundance_catch_data |>
   filter(week %in% RST_WEEKS, !is.na(count)) |>
   group_by(stream, site, run_year) |>
   summarise(weeks_sampled = n_distinct(week), .groups = "drop") |>
-  group_by(run_year) |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n() * 31L, n_failed = sum(pmax(31L - weeks_sampled, 0L)), .groups = "drop") |>
   mutate(data_type = "rst", issue_type = "low_sampling_effort", field = "weeks_sampled")
 
@@ -135,31 +154,38 @@ env <- environmental_data |> mutate(run_year = if_else(week >= 45L, year + 1L, y
 flow_data <- env |> filter(parameter == "flow", statistic == "mean")
 temp_data <- env |> filter(parameter == "temperature", statistic == "mean")
 
-flow_stream_coverage_metrics <- flow_data |>
-  distinct(stream, run_year) |>
-  group_by(run_year) |>
-  summarise(n_present = n_distinct(stream), .groups = "drop") |>
-  mutate(n_evaluated = length(EXPECTED_STREAMS), n_failed = pmax(n_evaluated - n_present, 0L)) |>
-  select(run_year, n_evaluated, n_failed) |>
-  mutate(data_type = "flow", issue_type = "gap", field = "stream_coverage")
+# Special-cased rather than a simple group_by(stream, ...) add-on, since this
+# check is inherently about whether each stream shows up at all in a given
+# run_year - there's no site-level detail to roll up from. Every expected
+# stream x run_year combination is scored, so a stream missing entirely from
+# flow_data that year is a genuine (not implicit) failure at the stream grain.
+flow_stream_coverage_by_stream <- tidyr::expand_grid(
+    stream = EXPECTED_STREAMS,
+    run_year = sort(unique(flow_data$run_year))
+  ) |>
+  left_join(flow_data |> distinct(stream, run_year) |> mutate(present = TRUE),
+            by = c("stream", "run_year")) |>
+  mutate(n_evaluated = 1L, n_failed = if_else(is.na(present), 1L, 0L),
+         data_type = "flow", issue_type = "gap", field = "stream_coverage") |>
+  select(stream, run_year, n_evaluated, n_failed, data_type, issue_type, field)
 
-flow_gap_metrics <- flow_data |>
+flow_gap_metrics_by_stream <- flow_data |>
   filter(week %in% RST_WEEKS) |>
   group_by(stream, site_group, run_year) |>
   summarise(n_present = n(), .groups = "drop") |>
   mutate(n_missing = pmax(31L - n_present, 0L)) |>
-  group_by(run_year) |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n() * 31L, n_failed = sum(n_missing), .groups = "drop") |>
   mutate(data_type = "flow", issue_type = "gap", field = "week")
 
-flow_zero_metrics <- flow_data |>
+flow_zero_metrics_by_stream <- flow_data |>
   filter(week %in% RST_WEEKS) |>
-  group_by(run_year) |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(value <= 0), .groups = "drop") |>
   mutate(data_type = "flow", issue_type = "implausible_value", field = "value")
 
-flow_temp_metrics <- temp_data |>
-  group_by(run_year) |>
+flow_temp_metrics_by_stream <- temp_data |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(value < -5 | value > 35), .groups = "drop") |>
   mutate(data_type = "flow", issue_type = "implausible_value", field = "temperature")
 ```
@@ -171,26 +197,26 @@ flow_temp_metrics <- temp_data |>
 eff <- weekly_efficiency |>
   mutate(run_year = if_else(week_released >= 45, year_released + 1L, year_released))
 
-eff_recap_metrics <- eff |>
-  group_by(run_year) |>
+eff_recap_metrics_by_stream <- eff |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(number_recaptured > number_released), .groups = "drop") |>
   mutate(data_type = "efficiency", issue_type = "recaptures_exceed_releases", field = "number_recaptured")
 
-eff_low_release_metrics <- eff |>
-  group_by(run_year) |>
+eff_low_release_metrics_by_stream <- eff |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(number_released < 50), .groups = "drop") |>
   mutate(data_type = "efficiency", issue_type = "low_release_count", field = "number_released")
 
-eff_zero_recap_metrics <- eff |>
-  group_by(run_year) |>
+eff_zero_recap_metrics_by_stream <- eff |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(number_recaptured == 0), .groups = "drop") |>
   mutate(data_type = "efficiency", issue_type = "zero_recaptures", field = "number_recaptured")
 
-eff_trial_coverage_metrics <- weekly_juvenile_abundance_efficiency_data |>
+eff_trial_coverage_metrics_by_stream <- weekly_juvenile_abundance_efficiency_data |>
   filter(week %in% RST_WEEKS) |>
   group_by(stream, site, run_year) |>
   summarise(n_trials = n(), .groups = "drop") |>
-  group_by(run_year) |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n() * 3L, n_failed = sum(pmax(3L - n_trials, 0L)), .groups = "drop") |>
   mutate(data_type = "efficiency", issue_type = "low_trial_coverage", field = "n_trials")
 
@@ -205,15 +231,15 @@ eff_site_stats <- eff_rates |>
   summarise(n_years = n(), hist_mean = mean(mean_eff, na.rm = TRUE), hist_sd = sd(mean_eff, na.rm = TRUE), .groups = "drop") |>
   filter(n_years >= 5)
 
-eff_outlier_metrics <- eff_rates |>
+eff_outlier_metrics_by_stream <- eff_rates |>
   inner_join(eff_site_stats, by = c("stream", "site")) |>
-  group_by(run_year) |>
+  group_by(stream, run_year) |>
   summarise(n_evaluated = n(), n_failed = sum(mean_eff > hist_mean + 3 * hist_sd), .groups = "drop") |>
   mutate(data_type = "efficiency", issue_type = "extreme_value", field = "number_recaptured")
 
 all_historical_run_years <- sort(unique(c(annual_catch$run_year, flow_data$run_year, eff$run_year)))
 
-eff_no_trials_metrics <- map_dfr(all_historical_run_years, function(ry) {
+eff_no_trials_metrics_by_stream <- map_dfr(all_historical_run_years, function(ry) {
   active <- rst_catch |>
     filter(!is.na(date), !is.na(count)) |>
     mutate(run_year = as_run_year(date)) |>
@@ -224,7 +250,8 @@ eff_no_trials_metrics <- map_dfr(all_historical_run_years, function(ry) {
   active |>
     left_join(had_trials, by = c("stream", "site")) |>
     mutate(has_trials = replace_na(has_trials, FALSE)) |>
-    summarise(n_evaluated = n(), n_failed = sum(!has_trials)) |>
+    group_by(stream) |>
+    summarise(n_evaluated = n(), n_failed = sum(!has_trials), .groups = "drop") |>
     mutate(run_year = ry)
 }) |>
   mutate(data_type = "efficiency", issue_type = "no_efficiency_trials", field = "number_released")
@@ -234,12 +261,23 @@ eff_no_trials_metrics <- map_dfr(all_historical_run_years, function(ry) {
 #| label: combine-metrics
 #| echo: false
 
-metrics <- bind_rows(
-  rst_fl_metrics, rst_fl_impl_metrics, rst_catch_high_metrics, rst_catch_weekly_metrics, rst_sampling_metrics,
-  flow_stream_coverage_metrics, flow_gap_metrics, flow_zero_metrics, flow_temp_metrics,
-  eff_recap_metrics, eff_low_release_metrics, eff_zero_recap_metrics, eff_trial_coverage_metrics,
-  eff_outlier_metrics, eff_no_trials_metrics
-) |>
+# Every check above is computed at the (stream, run_year) grain first. metrics
+# (pooled across streams, as before) and metrics_by_stream (used by the
+# per-stream heatmap tabs) are both derived from that same by-stream data, so
+# the two views can never drift apart from each other.
+metrics_by_stream_raw <- bind_rows(
+  rst_fl_metrics_by_stream, rst_fl_impl_metrics_by_stream, rst_catch_high_metrics_by_stream,
+  rst_catch_weekly_metrics_by_stream, rst_sampling_metrics_by_stream,
+  flow_stream_coverage_by_stream, flow_gap_metrics_by_stream, flow_zero_metrics_by_stream, flow_temp_metrics_by_stream,
+  eff_recap_metrics_by_stream, eff_low_release_metrics_by_stream, eff_zero_recap_metrics_by_stream,
+  eff_trial_coverage_metrics_by_stream, eff_outlier_metrics_by_stream, eff_no_trials_metrics_by_stream
+)
+
+metrics_by_stream <- metrics_by_stream_raw |>
+  mutate(pct_failed = if_else(n_evaluated > 0, round(n_failed / n_evaluated * 100, 2), NA_real_)) |>
+  left_join(CHECK_METADATA, by = c("data_type", "issue_type", "field"))
+
+metrics <- pool_across_streams(metrics_by_stream_raw) |>
   mutate(pct_failed = if_else(n_evaluated > 0, round(n_failed / n_evaluated * 100, 2), NA_real_)) |>
   left_join(CHECK_METADATA, by = c("data_type", "issue_type", "field"))
 
@@ -328,6 +366,122 @@ ggplot(plot_data) +
 
 ---
 
+## Visualization: Trend Across All Run Years
+
+One panel per `data_type`, one colored line per check, from `r MIN_TREND_YEAR` onward. This shows whether `review_run_year` continues a multi-year trend or is an isolated blip — something the headline table and the this-year-vs-historical-average dumbbell plot above can't convey, since both collapse all prior years into a single average. The ringed point marks `review_run_year` on each line. Hover any point for the exact numbers and a description of what the check measures.
+
+```{r}
+#| label: plot-trend
+#| echo: false
+#| fig-height: 16
+#| fig-width: 10
+
+trend_data <- metrics |>
+  filter(!is.na(pct_failed), run_year >= MIN_TREND_YEAR) |>
+  mutate(
+    check_short = as.character(glue("{issue_type} / {field}")),
+    tooltip = as.character(glue(
+      "{data_type} / {issue_type} / {field}<br>",
+      "Run year: {run_year}<br>",
+      "% failed: {pct_failed}% ({n_failed} / {n_evaluated})<br>",
+      "Alert level: {alert_level} | Severity: {severity}<br>",
+      "{description}"
+    ))
+  )
+
+p_trend <- ggplot(trend_data, aes(x = run_year, y = pct_failed, color = check_short, group = check_short)) +
+  geom_line(alpha = 0.7) +
+  geom_point(aes(text = tooltip), size = 1.8, alpha = 0.8) +
+  geom_point(data = filter(trend_data, run_year == review_run_year),
+             aes(text = tooltip),
+             shape = 21, size = 4, stroke = 1.2, color = "black", fill = NA) +
+  geom_vline(xintercept = review_run_year, linetype = "dashed", color = "grey50") +
+  facet_wrap(~data_type, scales = "free_y", ncol = 1) +
+  labs(title = glue("% failed by run year, per check (ringed point = run year {review_run_year})"),
+       x = "Run year", y = "% of records failed", color = "Check") +
+  theme_minimal() +
+  theme(legend.text = element_text(size = 8))
+
+plotly::ggplotly(p_trend, tooltip = "text", height = 1100, width = 800) |>
+  plotly::layout(legend = list(orientation = "h", x = 0, y = -0.1, font = list(size = 9)))
+```
+
+---
+
+## Visualization: Failure Rate Heatmap (All Checks x Run Years)
+
+Every check (row) against every run year (column) from `r MIN_TREND_YEAR` onward, colored by % failed. Grey tiles mean the check had no evaluable data that year (e.g. a stream not yet monitored), rather than 0% failed. The outlined column is `review_run_year` — scan across a row to see if this year is a continuation of an existing pattern for that check, or scan down the outlined column to see which checks stand out this year relative to their own row.
+
+The **Overall** tab pools every stream together, matching the tables and plots above. Each stream tab recomputes the same checks from just that stream's records, so you can tell whether something flagged in the pooled view is basin-wide or concentrated at one site.
+
+::: {.panel-tabset}
+
+### Overall
+
+```{r}
+#| label: plot-heatmap-overall
+#| echo: false
+#| fig-height: 10
+#| fig-width: 14
+
+heatmap_data <- metrics |>
+  filter(run_year >= MIN_TREND_YEAR) |>
+  mutate(check_label = as.character(glue("{data_type} / {issue_type} / {field}"))) |>
+  select(check_label, data_type, run_year, pct_failed) |>
+  complete(check_label, run_year) |>
+  arrange(data_type) |>
+  mutate(check_label = factor(check_label, levels = rev(unique(check_label))))
+
+ggplot(heatmap_data, aes(x = factor(run_year), y = check_label, fill = pct_failed)) +
+  geom_tile(color = "white", linewidth = 0.3) +
+  geom_tile(data = filter(heatmap_data, run_year == review_run_year),
+            fill = NA, color = "black", linewidth = 0.9) +
+  scale_fill_gradient(low = "#fee8c8", high = "#b30000", na.value = "grey90", name = "% failed", limits = c(0, 100)) +
+  labs(title = glue("% failed by check across all run years (outlined column = run year {review_run_year})"),
+       x = "Run year", y = NULL) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.text.y = element_text(size = 8))
+```
+
+```{r}
+#| label: plot-heatmap-by-stream
+#| echo: false
+#| results: asis
+#| fig-height: 8
+#| fig-width: 14
+
+for (s in sort(unique(metrics_by_stream$stream))) {
+  cat(glue("\n\n### {str_to_title(s)}\n\n"))
+
+  stream_heatmap_data <- metrics_by_stream |>
+    filter(stream == s, run_year >= MIN_TREND_YEAR) |>
+    mutate(check_label = as.character(glue("{data_type} / {issue_type} / {field}"))) |>
+    select(check_label, data_type, run_year, pct_failed) |>
+    complete(check_label, run_year) |>
+    arrange(data_type) |>
+    mutate(check_label = factor(check_label, levels = rev(unique(check_label))))
+
+  p_stream <- ggplot(stream_heatmap_data, aes(x = factor(run_year), y = check_label, fill = pct_failed)) +
+    geom_tile(color = "white", linewidth = 0.3) +
+    geom_tile(data = filter(stream_heatmap_data, run_year == review_run_year),
+              fill = NA, color = "black", linewidth = 0.9) +
+    scale_fill_gradient(low = "#fee8c8", high = "#b30000", na.value = "grey90", name = "% failed", limits = c(0, 100)) +
+    labs(title = glue("{str_to_title(s)}: % failed by check across all run years"),
+         x = "Run year", y = NULL) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.text.y = element_text(size = 8))
+
+  print(p_stream)
+  cat("\n\n")
+}
+```
+
+:::
+
+---
+
 ## Open Issue Counts: This Year vs. Historical Average
 
 ```{r}
@@ -401,5 +555,35 @@ if (nrow(open_issues) == 0) {
     options = list(pageLength = 25, scrollX = TRUE),
     rownames = FALSE
   )
+}
+```
+
+---
+
+## Error Log: Run Year `r review_run_year`
+
+The individual error-level (`alert_level = "error"`) entries from `qc_log.csv` for `review_run_year`, for reference alongside the checks above — everything else in this report is a computed rate, this is the actual reviewer-facing log rows behind it. Rows still in `open` status are highlighted.
+
+```{r}
+#| label: error-log-table
+#| echo: false
+
+year_errors <- full_log |>
+  filter(alert_level == "error", run_year == review_run_year) |>
+  select(data_type, stream, site, issue_type, field, description, n_records, severity, status, reviewer_notes) |>
+  arrange(data_type, stream, site, issue_type)
+
+if (nrow(year_errors) == 0) {
+  cat(glue("No error-level issues logged for run year {review_run_year}."))
+} else {
+  year_errors |>
+    kableExtra::kbl(
+      caption = glue("Error-level issues logged for run year {review_run_year} ({nrow(year_errors)} total)"),
+      col.names = c("Data Type", "Stream", "Site", "Issue Type", "Field", "Description",
+                    "# Records", "Severity", "Status", "Reviewer Notes"),
+      row.names = FALSE
+    ) |>
+    kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = TRUE) |>
+    kableExtra::row_spec(which(year_errors$status == "open"), background = "#fde0dc")
 }
 ```
