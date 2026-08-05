@@ -8,6 +8,12 @@ Data are loaded into `jpe-db` (Azure PostgreSQL) and updated regularly. Because 
 
 ---
 
+## Adult Data
+
+Adult data are compiled in `pull_adult_data.R`. Because most adult data are not stored in `jpe-db`, updating them requires reaching out to stream team contacts each year. See [adult_data_request_update_guidance.md](adult_data_request_update_guidance.md) for a full description of what each stream needs to provide, which helper-table CSVs to update, and who to contact.
+
+---
+
 ## Scripts
 
 ### `pull_misfit_rst_data.R`
