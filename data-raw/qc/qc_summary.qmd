@@ -9,12 +9,13 @@ format:
     embed-resources: true
 params:
   review_run_year: 2026
+execute:
+  warning: false
+  message: false
 ---
 
 ```{r}
 #| label: setup
-#| message: false
-#| warning: false
 
 library(tidyverse)
 library(lubridate)
@@ -39,14 +40,14 @@ RST_WEEKS <- c(45:53, 1:22)
 # Earliest run_year shown in the trend plot and heatmaps below. Flow data goes
 # back to 1961, but the pre-1990 span is sparse enough (few streams, few
 # checks with any evaluable data) that including it mostly just compresses
-# the years reviewers actually care about. The headline table and dumbbell
-# plot above are unaffected and still use the full history.
+# the years reviewers actually care about. The headline table is unaffected
+# and still uses the full history.
 MIN_TREND_YEAR <- 1990
 
 # Rolls up per-(stream, run_year) check results into the pooled per-run_year
-# metrics used by the headline table, dumbbell plot, and trend plot. Kept as
-# a helper since every check below is computed at the stream grain first (for
-# the per-stream heatmap tabs) and then pooled the same way.
+# metrics used by the headline table and trend plot. Kept as a helper since
+# every check below is computed at the stream grain first (for the
+# per-stream heatmap tabs) and then pooled the same way.
 pool_across_streams <- function(by_stream) {
   by_stream |>
     dplyr::group_by(run_year, data_type, issue_type, field) |>
@@ -286,7 +287,161 @@ n_history_years <- metrics |> filter(run_year != review_run_year) |> distinct(ru
 
 ---
 
-## Headline: This Year vs. Historical Average, by Check
+## Failure Rate Heatmap (All Checks x Run Years)
+
+Every check (row) against every run year (column) from `r MIN_TREND_YEAR` onward, colored by % failed, split into an **Error** panel and a **Warning** panel by `alert_level`. The outlined column is `review_run_year`\. This plot provides a quick overview of how checks preform over time. Hover any tile for the exact numbers and a description of what the check measures.
+
+The **Overall** tab pools every stream together, matching the tables and plots below. Each stream tab recomputes the same checks from just that stream's records, so you can tell whether something flagged in the pooled view is basin-wide or concentrated at one site.
+
+```{r}
+#| label: heatmap-helpers
+#| echo: false
+
+# Sequential ramps following this report's error = red / warning = amber
+# color convention, each stretched into its own light->dark single-hue scale
+# rather than used as a flat swatch - a heatmap needs a gradient, not a
+# single color, to also show magnitude within each alert_level.
+ERROR_RAMP   <- c(low = "#fff5f0", high = "#a50026")
+WARNING_RAMP <- c(low = "#fffde7", high = "#f9a825")
+
+# One alert_level's panel of a failure-rate heatmap: checks (rows) x run
+# years (columns), colored on its own ramp, converted to plotly so each tile
+# carries a hover tooltip (same info as the trend plot's tooltip below).
+# Returns NULL if this alert_level has no rows in `data` (e.g. a single
+# stream with only warning-level checks in its history), so
+# stack_alert_level_panels() can skip it cleanly.
+alert_level_heatmap_panel <- function(data, level, ramp) {
+  d <- data |> filter(alert_level == level)
+  if (nrow(d) == 0) return(NULL)
+
+  d <- d |>
+    mutate(
+      check_label = factor(check_label, levels = rev(unique(check_label))),
+      tooltip = if_else(
+        is.na(pct_failed),
+        as.character(glue(
+          "{data_type} / {issue_type} / {field}<br>",
+          "Run year: {run_year}<br>",
+          "No evaluable data this year<br>",
+          "{description}"
+        )),
+        as.character(glue(
+          "{data_type} / {issue_type} / {field}<br>",
+          "Run year: {run_year}<br>",
+          "% failed: {pct_failed}% ({n_failed} / {n_evaluated})<br>",
+          "Alert level: {alert_level} | Severity: {severity}<br>",
+          "{description}"
+        ))
+      )
+    )
+
+  p <- ggplot(d, aes(x = factor(run_year), y = check_label, fill = pct_failed)) +
+    geom_tile(aes(text = tooltip), color = "white", linewidth = 0.3) +
+    geom_tile(data = filter(d, run_year == review_run_year), aes(text = tooltip),
+              fill = NA, color = "black", linewidth = 0.9) +
+    scale_fill_gradient(low = ramp[["low"]], high = ramp[["high"]],
+                        na.value = "grey90", limits = c(0, 100)) +
+    labs(title = str_to_title(level), x = "Run year", y = NULL) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.text.y = element_text(size = 8),
+          legend.position = "none")
+
+  plotly::ggplotly(p, tooltip = "text")
+}
+
+# Stacks the error and warning panels, each on its own color scale (so a
+# single facet_wrap() with one shared scale won't do here) and each already
+# converted to plotly - combined with plotly::subplot() so the hover
+# tooltip carries through (a static-only combiner like patchwork can't take
+# plotly widgets as input). Panel heights stay proportional to how many
+# checks each has: a 3-check panel and a 10-check panel would otherwise
+# render at the same height and every tile in the smaller panel would look
+# artificially tall.
+stack_alert_level_panels <- function(data, title, height = 900, width = 1200) {
+  n_error   <- data |> filter(alert_level == "error")   |> distinct(check_label) |> nrow()
+  n_warning <- data |> filter(alert_level == "warning") |> distinct(check_label) |> nrow()
+
+  p_error   <- alert_level_heatmap_panel(data, "error", ERROR_RAMP)
+  p_warning <- alert_level_heatmap_panel(data, "warning", WARNING_RAMP)
+
+  combined <- if (is.null(p_error)) {
+    p_warning
+  } else if (is.null(p_warning)) {
+    p_error
+  } else {
+    plotly::subplot(p_error, p_warning, nrows = 2, shareX = TRUE,
+                    titleX = TRUE, titleY = TRUE, margin = 0.04,
+                    heights = c(n_error, n_warning) / (n_error + n_warning))
+  }
+
+  combined <- combined |> plotly::layout(title = title)
+  # height/width must be set as top-level widget attributes, not via
+  # layout() (that form is deprecated and silently no-ops), and subplot()
+  # itself doesn't take sizing args - so they're assigned directly here.
+  combined$width  <- width
+  combined$height <- height
+  combined
+}
+
+# check_label's alert_level/data_type/severity/description never vary within
+# a check, so nesting() keeps them paired to check_label while still
+# crossing every check against the full set of run_years - a plain
+# complete(check_label, run_year) would null out alert_level (and the rest)
+# on the synthetic gap rows it creates, silently dropping them from both
+# panels above instead of showing as grey.
+build_heatmap_data <- function(data) {
+  data |>
+    filter(run_year >= MIN_TREND_YEAR) |>
+    mutate(check_label = as.character(glue("{data_type} / {issue_type} / {field}"))) |>
+    select(check_label, data_type, issue_type, field, alert_level, severity, description,
+           run_year, n_evaluated, n_failed, pct_failed) |>
+    complete(nesting(check_label, data_type, issue_type, field, alert_level, severity, description), run_year) |>
+    arrange(data_type)
+}
+```
+
+::: {.panel-tabset}
+
+### Overall
+
+```{r}
+#| label: plot-heatmap-overall
+#| echo: false
+
+heatmap_data <- build_heatmap_data(metrics)
+
+stack_alert_level_panels(heatmap_data,
+  title = glue("% failed by check across all run years (outlined column = run year {review_run_year})"))
+```
+
+```{r}
+#| label: plot-heatmap-by-stream
+#| echo: false
+#| results: asis
+
+for (s in sort(unique(metrics_by_stream$stream))) {
+  cat(glue("\n\n### {str_to_title(s)}\n\n"))
+
+  stream_heatmap_data <- build_heatmap_data(metrics_by_stream |> filter(stream == s))
+
+  p_stream <- stack_alert_level_panels(stream_heatmap_data,
+    title = glue("{str_to_title(s)}: % failed by check across all run years"),
+    height = 700)
+
+  # plain print() doesn't reliably emit an htmlwidget from inside a for loop
+  # under results: asis - wrapping in tagList() is the standard fix.
+  print(htmltools::tagList(p_stream))
+
+  cat("\n\n")
+}
+```
+
+:::
+
+---
+
+## Table Showing this Year vs. Historical Average
 
 For each check, "this year" is the pooled `n_failed / n_evaluated` for `review_run_year`; "historical average" is the mean of that same pooled rate computed separately for each prior run_year, with `notably_worse` flagged when this year exceeds the historical mean by more than 2 historical SDs.
 
@@ -332,43 +487,9 @@ DT::datatable(
 
 ---
 
-## Visualization: This Year vs. Historical Average
+## Trend Across All Run Years
 
-One panel per `data_type`. Grey dot = historical average pooled failure rate; colored dot = this year (amber = warning-level check, red = error-level check). Bars show ±1 historical SD.
-
-```{r}
-#| label: plot-dumbbell
-#| echo: false
-#| fig-height: 10
-
-plot_data <- headline |>
-  filter(!is.na(this_year_pct) | !is.na(hist_avg_pct)) |>
-  mutate(sort_key = pmax(this_year_pct, hist_avg_pct, na.rm = TRUE)) |>
-  arrange(sort_key) |>
-  mutate(check_label = factor(check_label, levels = unique(check_label)))
-
-ggplot(plot_data) +
-  geom_segment(aes(x = pmin(hist_avg_pct, this_year_pct, na.rm = TRUE),
-                    xend = pmax(hist_avg_pct, this_year_pct, na.rm = TRUE),
-                    y = check_label, yend = check_label),
-               color = "grey70") +
-  geom_errorbar(aes(xmin = hist_avg_pct - hist_sd_pct, xmax = hist_avg_pct + hist_sd_pct, y = check_label),
-                orientation = "y", width = 0.15, color = "grey60", na.rm = TRUE) +
-  geom_point(aes(x = hist_avg_pct, y = check_label), color = "grey40", size = 2, na.rm = TRUE) +
-  geom_point(aes(x = this_year_pct, y = check_label, color = alert_level), size = 3, na.rm = TRUE) +
-  scale_color_manual(values = c("warning" = "#fdae61", "error" = "#d73027"), name = "This year (by alert level)") +
-  facet_wrap(~data_type, scales = "free_y", ncol = 1) +
-  labs(title = glue("Check failure rate: run year {review_run_year} (colored) vs. historical average (grey)"),
-       x = "% of records failed", y = NULL) +
-  theme_minimal() +
-  theme(legend.position = "bottom")
-```
-
----
-
-## Visualization: Trend Across All Run Years
-
-One panel per `data_type`, one colored line per check, from `r MIN_TREND_YEAR` onward. This shows whether `review_run_year` continues a multi-year trend or is an isolated blip — something the headline table and the this-year-vs-historical-average dumbbell plot above can't convey, since both collapse all prior years into a single average. The ringed point marks `review_run_year` on each line. Hover any point for the exact numbers and a description of what the check measures.
+One panel per `data_type`, one colored line per check, from `r MIN_TREND_YEAR` onward. This shows whether `review_run_year` continues a multi-year trend or is an isolated blip — something the headline table above and the heatmap below can't convey as directly, since the table collapses all prior years into a single average and the heatmap needs a glance-then-scan rather than a continuous line to read a trend. The ringed point marks `review_run_year` on each line. Hover any point for the exact numbers and a description of what the check measures.
 
 ```{r}
 #| label: plot-trend
@@ -398,91 +519,20 @@ p_trend <- ggplot(trend_data, aes(x = run_year, y = pct_failed, color = check_sh
   geom_vline(xintercept = review_run_year, linetype = "dashed", color = "grey50") +
   facet_wrap(~data_type, scales = "free_y", ncol = 1) +
   labs(title = glue("% failed by run year, per check (ringed point = run year {review_run_year})"),
-       x = "Run year", y = "% of records failed", color = "Check") +
-  theme_minimal() +
-  theme(legend.text = element_text(size = 8))
+       x = "Run year", y = "% of records failed") +
+  theme_minimal()
 
+# theme(legend.position = "none") on the ggplot above is not enough here -
+# ggplotly() ignores it for a discrete color scale and marks every line
+# trace showlegend = TRUE regardless, so it has to be forced off on the
+# plotly side directly.
 plotly::ggplotly(p_trend, tooltip = "text", height = 1100, width = 800) |>
-  plotly::layout(legend = list(orientation = "h", x = 0, y = -0.1, font = list(size = 9)))
+  plotly::layout(showlegend = FALSE)
 ```
 
 ---
 
-## Visualization: Failure Rate Heatmap (All Checks x Run Years)
-
-Every check (row) against every run year (column) from `r MIN_TREND_YEAR` onward, colored by % failed. Grey tiles mean the check had no evaluable data that year (e.g. a stream not yet monitored), rather than 0% failed. The outlined column is `review_run_year` — scan across a row to see if this year is a continuation of an existing pattern for that check, or scan down the outlined column to see which checks stand out this year relative to their own row.
-
-The **Overall** tab pools every stream together, matching the tables and plots above. Each stream tab recomputes the same checks from just that stream's records, so you can tell whether something flagged in the pooled view is basin-wide or concentrated at one site.
-
-::: {.panel-tabset}
-
-### Overall
-
-```{r}
-#| label: plot-heatmap-overall
-#| echo: false
-#| fig-height: 10
-#| fig-width: 14
-
-heatmap_data <- metrics |>
-  filter(run_year >= MIN_TREND_YEAR) |>
-  mutate(check_label = as.character(glue("{data_type} / {issue_type} / {field}"))) |>
-  select(check_label, data_type, run_year, pct_failed) |>
-  complete(check_label, run_year) |>
-  arrange(data_type) |>
-  mutate(check_label = factor(check_label, levels = rev(unique(check_label))))
-
-ggplot(heatmap_data, aes(x = factor(run_year), y = check_label, fill = pct_failed)) +
-  geom_tile(color = "white", linewidth = 0.3) +
-  geom_tile(data = filter(heatmap_data, run_year == review_run_year),
-            fill = NA, color = "black", linewidth = 0.9) +
-  scale_fill_gradient(low = "#fee8c8", high = "#b30000", na.value = "grey90", name = "% failed", limits = c(0, 100)) +
-  labs(title = glue("% failed by check across all run years (outlined column = run year {review_run_year})"),
-       x = "Run year", y = NULL) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        axis.text.y = element_text(size = 8))
-```
-
-```{r}
-#| label: plot-heatmap-by-stream
-#| echo: false
-#| results: asis
-#| fig-height: 8
-#| fig-width: 14
-
-for (s in sort(unique(metrics_by_stream$stream))) {
-  cat(glue("\n\n### {str_to_title(s)}\n\n"))
-
-  stream_heatmap_data <- metrics_by_stream |>
-    filter(stream == s, run_year >= MIN_TREND_YEAR) |>
-    mutate(check_label = as.character(glue("{data_type} / {issue_type} / {field}"))) |>
-    select(check_label, data_type, run_year, pct_failed) |>
-    complete(check_label, run_year) |>
-    arrange(data_type) |>
-    mutate(check_label = factor(check_label, levels = rev(unique(check_label))))
-
-  p_stream <- ggplot(stream_heatmap_data, aes(x = factor(run_year), y = check_label, fill = pct_failed)) +
-    geom_tile(color = "white", linewidth = 0.3) +
-    geom_tile(data = filter(stream_heatmap_data, run_year == review_run_year),
-              fill = NA, color = "black", linewidth = 0.9) +
-    scale_fill_gradient(low = "#fee8c8", high = "#b30000", na.value = "grey90", name = "% failed", limits = c(0, 100)) +
-    labs(title = glue("{str_to_title(s)}: % failed by check across all run years"),
-         x = "Run year", y = NULL) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
-          axis.text.y = element_text(size = 8))
-
-  print(p_stream)
-  cat("\n\n")
-}
-```
-
-:::
-
----
-
-## Open Issue Counts: This Year vs. Historical Average
+## Open Issue Counts - This Year vs. Historical Average
 
 ```{r}
 #| label: open-issue-counts
@@ -537,7 +587,7 @@ if (nrow(worse) == 0) {
 
 ---
 
-## All Open Issues, by Alert Level and Severity
+## All Open Issues
 
 ```{r}
 #| label: open-issues-table
@@ -560,9 +610,9 @@ if (nrow(open_issues) == 0) {
 
 ---
 
-## Error Log: Run Year `r review_run_year`
+## Error Log - Run Year `r review_run_year`
 
-The individual error-level (`alert_level = "error"`) entries from `qc_log.csv` for `review_run_year`, for reference alongside the checks above — everything else in this report is a computed rate, this is the actual reviewer-facing log rows behind it. Rows still in `open` status are highlighted.
+The individual error-level entries from `qc_errors.csv` for `review_run_year`, for reference alongside the checks above — everything else in this report is a computed rate, this is the actual log rows behind it. Rows still in `open` status are highlighted.
 
 ```{r}
 #| label: error-log-table
