@@ -48,7 +48,7 @@ years_to_exclude_rst_data_all <- exclusion_catch |>
   rowwise() |>
   mutate(
     exclusion_type = paste(
-      c("no efficiency data", "low catch", "60% of weeks sampled")[
+      c("no efficiency data for site across all years", "low catch", "60% of weeks sampled")[
         c(!if_efficiency_data, if_low_catch, exclude_60)], collapse = "; "),
     apply_to = "all runs") |>
   ungroup() |>
