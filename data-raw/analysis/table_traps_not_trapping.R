@@ -9,8 +9,8 @@ catch <- SRJPEdata::rst_catch
 padded_catch <- catch |>
   mutate(date = as_date(date)) |> # drop the stray 12:00:00 timestamps so padr treats same-day records as one
   group_by(stream, site, subsite, site_group, date) |>
-  summarise(count = sum(count, na.rm = TRUE), .groups = "drop") |>
-  padr::pad(interval = "day", group = c("stream", "site", "subsite", "site_group")) |>
+  summarise(count = sum(count, na.rm = TRUE), .groups = "drop") |> 
+  padr::pad(interval = "day", group = c("stream", "site", "subsite", "site_group")) |> 
   mutate(
     trap_status = case_when(
       is.na(count) ~ "trap not fishing",
@@ -46,9 +46,9 @@ ggplot(plot_data, aes(x = day, y = year, color = trap_status)) +
   theme_minimal()
 
 
-trapping_reccord <- padded_catch
+trapping_record <- padded_catch
 
-write_csv(trapping_reccord, "data-raw/analysis/trapping_reccord.csv")
+write_csv(trapping_record, "data-raw/analysis/trapping_record.csv")
 
 
 
