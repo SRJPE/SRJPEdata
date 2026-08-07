@@ -44,6 +44,12 @@ colors_small <- c(
   "#C93312",
   "#DC863B" # royal 1 (- 3)
 )
+
+as_run_year <- function(date) {
+  dplyr::if_else(lubridate::week(date) >= 45,
+                 lubridate::year(date) + 1L,
+                 lubridate::year(date))
+}
 ```
 
 This report summarizes data for **`r selected_stream`**`r if (has_site) paste0(" at **", selected_site, "**")` to support stream team review ahead of

@@ -1,12 +1,12 @@
 stream,site,run_year,number_weeks,exclusion_type,apply_to,exclude
-battle creek,lbc,1999,30,no efficiency data,all runs,TRUE
-battle creek,lbc,2000,31,no efficiency data,all runs,TRUE
-battle creek,lbc,2001,15,no efficiency data; 60% of weeks sampled,all runs,TRUE
-battle creek,lbc,2002,30,no efficiency data,all runs,TRUE
-battle creek,lbc,2003,30,no efficiency data,all runs,TRUE
-battle creek,lbc,2004,31,no efficiency data,all runs,TRUE
-battle creek,lbc,2005,27,no efficiency data,all runs,TRUE
-battle creek,lbc,2006,13,no efficiency data; 60% of weeks sampled,all runs,TRUE
-battle creek,lbc,2016,1,no efficiency data; 60% of weeks sampled,all runs,TRUE
+battle creek,lbc,1999,30,no efficiency data for site across all years,all runs,TRUE
+battle creek,lbc,2000,31,no efficiency data for site across all years,all runs,TRUE
+battle creek,lbc,2001,15,no efficiency data for site across all years; 60% of weeks sampled,all runs,TRUE
+battle creek,lbc,2002,30,no efficiency data for site across all years,all runs,TRUE
+battle creek,lbc,2003,30,no efficiency data for site across all years,all runs,TRUE
+battle creek,lbc,2004,31,no efficiency data for site across all years,all runs,TRUE
+battle creek,lbc,2005,27,no efficiency data for site across all years,all runs,TRUE
+battle creek,lbc,2006,13,no efficiency data for site across all years; 60% of weeks sampled,all runs,TRUE
+battle creek,lbc,2016,1,no efficiency data for site across all years; 60% of weeks sampled,all runs,TRUE
 battle creek,ubc,2001,15,60% of weeks sampled,all runs,TRUE
 battle creek,ubc,2007,12,60% of weeks sampled,all runs,TRUE

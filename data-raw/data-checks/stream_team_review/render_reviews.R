@@ -14,14 +14,28 @@ library(SRJPEdata)
 # time (see sac_site_config below), so it is intentionally absent from this table.
 stream_config <- tribble(
   ~selected_stream,          ~flow_gage,                                                    ~temp_gage,                                       ~adult_used_in_SR,
-  "battle creek",   "USGS-11376550",                                               "USFWS - UBC",                                    "redd",
+  "battle creek",   "USGS-11376550",                                               "USFWS - UBC",                                    "redd OR upstream passage",
   "butte creek",    "USGS-11390000",                                               "USGS-11390000",                                  "carcass",
-  "clear creek",    "USGS-11372000",                                               "USFWS - UCC",                                    "redd",
+  "clear creek",    "USGS-11372000",                                               "USFWS - UCC",                                    "redd OR upstream passage",
   "deer creek",     "USGS-11383500",                                               "CDEC - DCV",                                     "holding",
-  "feather river",  "USGS-11406930 (ORF) + USGS-11407000 (TFB) + USGS-11406920 (TAO) for HFC; ORF+TFB for LFC; CDEC-FSB for lower Feather", "CDEC-GRL (HFC, interpolated) / CDEC-FRA (LFC, interpolated)", "broodstock_tag",
+  "feather river",  "USGS-11406930 (ORF) + USGS-11407000 (TFB) + USGS-11406920 (TAO) for HFC; ORF+TFB for LFC", "CDEC-GRL (HFC, interpolated) / CDEC-FRA (LFC, interpolated)", "broodstock_tag",
   "mill creek",     "USGS-11381500",                                               "CDEC - MLM",                                     "redd",
   "yuba river",     "USGS-11421000",                                               "CDEC - YR7 (interpolated)",                      "passage"
 )
+
+# TODO just filter years to exclude adult to datatype we are using. 
+# TODO similarly, specify RST site we are using (ex. UBC) and filter exclude table to only show UBC.For plots throughout, only show sites we are using.  
+# FEATHER - REMOVE LIVE OAK AND SUNSET PUMPS 
+# BATTLE 
+# BUTTE - DONT USE ADAMS DAM 
+# TODO get rid of line for 100 % efficency 
+# TODO remove points from flow plot and just have colored lines 
+# TODO filter flow and temperature data objectcs to 1990 
+# TODO check on temperature data plot to see what is happening in january 1st disconnect
+# TODO color efficiency plot by site
+# TODO remove lower feather river flows
+# TODO in catch plots use dashed line or gray to show which ones are excluded 
+# TODO add note if interpolated temps
 
 # Sacramento River is reviewed per-site rather than per-stream: RST, catch, and
 # efficiency data are only collected at these sites, and there is no stream-wide

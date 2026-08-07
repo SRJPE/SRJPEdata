@@ -7065,5 +7065,8 @@ week,year,stream,gage_number,gage_agency,site_group,parameter,statistic,value
 30,2026,butte creek,11390000,USGS,butte creek,temperature,mean,20.385714285714283
 30,2026,butte creek,11390000,USGS,butte creek,temperature,min,17.5
 31,2026,butte creek,11390000,USGS,butte creek,temperature,max,23.3
-31,2026,butte creek,11390000,USGS,butte creek,temperature,mean,20.439999999999998
+31,2026,butte creek,11390000,USGS,butte creek,temperature,mean,20.607142857142858
 31,2026,butte creek,11390000,USGS,butte creek,temperature,min,17.7
+32,2026,butte creek,11390000,USGS,butte creek,temperature,max,23.2
+32,2026,butte creek,11390000,USGS,butte creek,temperature,mean,20.9
+32,2026,butte creek,11390000,USGS,butte creek,temperature,min,18.6
