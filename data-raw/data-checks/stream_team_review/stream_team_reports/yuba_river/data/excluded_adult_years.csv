@@ -1,0 +1,29 @@
+stream,year,data_type,reason_for_exclusion,exclude
+yuba river,2009,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2010,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2011,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2012,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2013,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2014,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2015,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2016,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2017,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2018,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2019,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2020,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2021,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2022,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+yuba river,2011,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2012,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2013,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2014,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2015,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2016,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2017,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2018,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2019,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2020,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2021,redd,"Not representative survey type, no reaches provided, does not sample full system",TRUE
+yuba river,2016,upstream passage,No run differentiation,TRUE
+yuba river,2017,upstream passage,No run differentiation,TRUE
+yuba river,2019,upstream passage,No run differentiation,TRUE
