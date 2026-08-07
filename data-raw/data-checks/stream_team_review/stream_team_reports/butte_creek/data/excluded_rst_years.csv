@@ -1,0 +1,8 @@
+stream,site,run_year,number_weeks,exclusion_type,apply_to,exclude
+butte creek,adams dam,1997,9,no efficiency data; 60% of weeks sampled,all runs,TRUE
+butte creek,adams dam,1998,11,no efficiency data; 60% of weeks sampled,all runs,TRUE
+butte creek,okie dam,1997,6,60% of weeks sampled,all runs,TRUE
+butte creek,okie dam,2005,6,60% of weeks sampled,all runs,TRUE
+butte creek,okie dam,2015,9,60% of weeks sampled,all runs,TRUE
+butte creek,okie dam,2019,8,60% of weeks sampled,all runs,TRUE
+butte creek,okie dam,2026,17,60% of weeks sampled,all runs,TRUE

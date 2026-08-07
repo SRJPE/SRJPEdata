@@ -1,0 +1,378 @@
+---
+title: "SRJPE Data Review: `r params$selected_stream` `r if (!is.na(params$selected_site)) paste0('- ', params$selected_site)`"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+params:
+  selected_stream: "deer creek"        # TODO: provide when looping through Streams in R SCRIPT
+  selected_site: NA           # only used for sacramento river, which is reviewed per-site
+  flow_gage: "TODO"           # TODO: create lookup table for these
+  temp_gage: "TODO"
+  adult_used_in_SR: "TODO"    # TODO: not yet used in report body - reserved for future use
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 9,
+  fig.height = 5
+)
+
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(SRJPEdata)
+library(lubridate)
+library(plotly)
+
+selected_stream <- params$selected_stream
+selected_site <- params$selected_site
+has_site <- !is.na(selected_site)
+
+colors_small <- c(
+  "#9A8822",
+  "#F5CDB4",
+  "#F8AFA8",
+  "#FDDDA0",
+  "#74A089", # Royal 2
+  "#899DA4",
+  "#C93312",
+  "#DC863B" # royal 1 (- 3)
+)
+```
+
+This report summarizes data for **`r selected_stream`**`r if (has_site) paste0(" at **", selected_site, "**")` to support stream team review ahead of
+model runs.
+
+Included within the zipped data folder are full datatables for:
+`r if (!has_site) "\n  * adult data (table of annual estimates being used in stock recruit modeling)\n  * adult_model_years (summary of any years being excluded in the adult dataset)"`
+
+  * flow and temperature datasets (flow and temperature data pulled from gages)
+  * rst_model_years (summary of any years being excluded in juvenile abundance modeling)
+  * weekly_catch (catch data summarized by week, refer to the diagram for information about data processing)
+  * weekly_eff (efficiency data summarized by week)
+
+Please confirm that the years-excluded tables below are still correct, that we are using the best source for environmental data, and flag anything that looks off in the catch, efficiency, or environmental sections. Visualizations below will highlight points that are outliers to help you QC.
+
+***
+## Data Summary
+
+```{r data-summary, results='asis'}
+rst_years <- weekly_juvenile_abundance_catch_data |>
+  filter(stream == selected_stream) |>
+  filter(!has_site | site == selected_site) |>
+  distinct(year) |>
+  nrow()
+
+cat("- we have **", rst_years, "** years of RST data\n", sep = "")
+
+if (!has_site) {
+  adult_years <- stock_recruit_model_inputs |>
+    filter(stream == selected_stream) |>
+    distinct(year) |>
+    nrow()
+
+  cat("- we have **", adult_years, "** years of adult data, the adult data source that is being used in the Stock Recruit for this stream is **",
+      params$adult_used_in_SR, "**\n", sep = "")
+}
+```
+
+## Years Excluded
+
+```{r adult-section-header, results='asis'}
+if (!has_site) {
+  cat("### Adult Data\n\nWe are excluding the following adult data years from analysis.\n")
+}
+```
+
+```{r adult-years-excluded, eval=!has_site}
+adult_years_excluded_tbl <- adult_model_years %>%
+  filter(exclude, stream == selected_stream) %>%
+  arrange(year) %>%
+  select(year, data_type, reason_for_exclusion)
+
+if (nrow(adult_years_excluded_tbl) == 0) {
+  cat("No adult years excluded in this range for", selected_stream)
+} else {
+  adult_years_excluded_tbl %>%
+    kable(col.names = c("Year", "Data Type", "Reason for exclusion"),
+          caption = paste("Adult years excluded –", selected_stream)) %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+}
+```
+
+### RST (Juvenile Outmigrant) Data
+
+We are excluding the following rst data years from analysis. 
+
+```{r rst-years-excluded}
+rst_years_excluded_tbl <- rst_model_years %>%
+  filter(stream == selected_stream, exclude) %>%
+  filter(!has_site | site == selected_site) %>%
+  arrange(run_year) %>%
+  select(run_year, site, exclusion_type)
+
+if (nrow(rst_years_excluded_tbl) == 0) {
+  cat("No RST years excluded in this range for", selected_stream)
+} else {
+  rst_years_excluded_tbl %>%
+    kable(col.names = c("Year", "Site", "Reason for exclusion"),
+          caption = paste("RST years excluded –", selected_stream)) %>%
+    kable_styling(full_width = FALSE, bootstrap_options = c("striped", "hover"))
+}
+```
+
+***
+
+## Catch
+
+The following plots show percent cumulative catch, cumulative catch, and absolute catch timeserries for **`r selected_stream`**, The goal of these plots is to quickly review catch across years to see if there are any years that look inaccurate or any weeks that have unrealistic catch values. 
+
+```{r catch-data}
+catch_data <- SRJPEdata::weekly_juvenile_abundance_catch_data 
+
+## Prep data --------------------------------------------------------------
+cuml_catch <- catch_data |>
+  filter(stream == selected_stream) |>
+  filter(!has_site | site == selected_site) |>
+  mutate(
+    date = lubridate::ymd(paste0(year, "-01-01")) + lubridate::weeks(week - 1),
+    water_year = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
+    fake_date = as_date(paste(
+      ifelse(month(date) %in% 10:12, 1999, 2000),
+      month(date),
+      day(date)
+    ))
+  ) |>
+  arrange(date) |>
+  group_by(water_year) |>
+  mutate(
+    count = ifelse(is.na(count), 0, count),
+    total_count = sum(count, na.rm = TRUE),
+    cumulative_catch = cumsum(count),
+    prop_cuml_catch = cumulative_catch / total_count * 100
+  ) |>
+  ungroup() |> 
+  mutate(water_year = factor(water_year))
+
+year_palette <- colorRampPalette(colors_small)(nlevels(cuml_catch$water_year))
+
+```
+
+### Percent Cumulative Catch
+
+```{r cumulative-catch-plot}
+cuml_catch_plot_proportional <- ggplot(
+  cuml_catch,
+  aes(x = fake_date, y = prop_cuml_catch, color = water_year, group = interaction(site, water_year),
+           text = paste0("Year: ", water_year)  # <- custom tooltip aesthetic
+)) +
+  geom_line() +
+  scale_color_manual(values = year_palette, name = "Water Year") +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Cumulative Catch in RST - ", stringr::str_to_title(selected_stream)),
+    x = "Months",
+    y = "Percent Cumulative Catch"
+  ) +
+  theme_minimal() + 
+  facet_wrap(~site)
+
+
+cuml_catch_plot_proportional|> ggplotly(tooltip = "text")
+```
+
+### Absolute Cumulative Catch
+
+```{r absolute-catch-plot}
+cuml_catch_plot_absolute <- ggplot(
+  cuml_catch,
+  aes(x = fake_date, y = cumulative_catch, color = water_year, group = interaction(site, water_year),
+      text = paste0("Year: ", water_year)  # <- custom tooltip aesthetic
+      )) +
+  geom_line() +
+  scale_color_manual(values = year_palette, name = "Water Year") +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Cumulative Catch in RST - ", stringr::str_to_title(selected_stream)),
+    x = "Months",
+    y = "Cumulative Catch"
+  ) +
+  theme_minimal() + 
+  facet_wrap(~site)
+
+cuml_catch_plot_absolute |> ggplotly(tooltip = "text")
+```
+
+### Catch Timeserries
+
+```{r}
+weekly_catch_plot <- ggplot(
+  cuml_catch,
+  aes(x = fake_date, y = count, color = water_year, group = interaction(site, water_year),
+     text = paste0("Year: ", water_year, "<br>Catch: ", count)  # <- custom tooltip aesthetic
+      )) +
+  geom_line() +
+  scale_color_manual(values = year_palette, name = "Water Year") +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Weekly Catch in RST - ", stringr::str_to_title(selected_stream)),
+    x = "Months",
+    y = "Catch"
+  ) +
+  theme_minimal() + 
+  facet_wrap(~site)
+
+weekly_catch_plot |> ggplotly(tooltip = "text")
+```
+
+## Trap Efficiency
+```{r efficiency}
+weekly_efficiency |>
+  filter(stream == selected_stream) |>
+  filter(!has_site | site == selected_site) |>
+  mutate(run_year = as_run_year(
+    as.Date(paste0(year_released, "-01-01") ) + lubridate::weeks(week_released - 1)
+  )) |>
+  group_by(stream, site) |>
+  summarise(
+    min_run_year   = min(run_year, na.rm = TRUE),
+    max_run_year   = max(run_year, na.rm = TRUE),
+    total_trials   = n(),
+    total_released = sum(number_released, na.rm = TRUE),
+    total_recaptured = sum(number_recaptured, na.rm = TRUE),
+    .groups        = "drop"
+  ) |>
+  arrange(stream, site) |>
+  knitr::kable(caption = paste0("Efficiency trial summary for ", params$selected_stream))
+```
+
+
+```{r efficiency_plot}
+eff_plot <- weekly_efficiency |>
+  filter(stream == selected_stream) |>
+  filter(!has_site | site == selected_site) |>
+  mutate(run_year = as_run_year(
+    as.Date(paste0(year_released, "-01-01") ) + lubridate::weeks(week_released - 1)
+  )) |> 
+  mutate(flagged = number_recaptured > number_released)
+
+ggplot(eff_plot, aes(x = number_released, y = number_recaptured, color = flagged)) +
+  geom_point(alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey40") +
+  scale_color_manual(values = c("FALSE" = "steelblue", "TRUE" = "#d73027"),
+                     labels = c("Normal", "Flagged"), name = NULL) +
+  facet_wrap(~stream, scales = "free", ncol = 2) +
+  coord_cartesian(xlim = c(0, NA), ylim = c(0, NA)) +
+  labs(title = "Releases vs. recaptures per trial (dashed = 1:1 line)",
+       x = "Number released", y = "Number recaptured") +
+  theme_minimal()
+```
+
+***
+
+## Environmental Data
+
+> **Gage reminder:** We are using gage **`r params$flow_gage`** for flow data and **`r params$temp_gage`** for temperature data. Please let us know if there are better data sources to utilize for environmental data. 
+
+```{r environmental-data}
+environmental_data <- bind_rows(SRJPEdata::flow_data, SRJPEdata::temperature_data) |>
+  filter(stream == selected_stream, statistic == "mean") |>
+  filter(!has_site | site_group == selected_site) |>
+  mutate(
+    date = lubridate::ymd(paste0(year, "-01-01")) + lubridate::weeks(week - 1),
+    water_year = ifelse(month(date) %in% 10:12, year(date) + 1, year(date)),
+    fake_date = as_date(paste(
+      ifelse(month(date) %in% 10:12, 1999, 2000),
+      month(date),
+      day(date)
+    ))
+  ) |>
+  arrange(date)
+```
+
+### Flow
+
+The plot below shows weekly flow over time on **`r selected_stream`**. Each line is colored by the year. Hover over a line to see additional information. 
+
+Flags negative flow (physically impossible) as well as statistical outliers per
+site (values beyond the median +/- 5 times the interquartile range).
+
+```{r flow-plot}
+# TODO - what is going on with flow data, why are they all 1 
+
+flow_data_plot <- environmental_data |>
+  filter(parameter == "flow") |> 
+  group_by(site_group) |>
+  mutate(
+    med = median(value, na.rm = TRUE),
+    iqr = IQR(value, na.rm = TRUE),
+    implausible = value < 0 | value < med - 5 * iqr | value > med + 5 * iqr,
+    year = as.character(year)
+  ) |>
+  ungroup()
+
+multi_site <- n_distinct(flow_data_plot$site_group) > 1
+
+flow_plot <- ggplot(
+  flow_data_plot,
+  aes(x = fake_date, y = value, group = interaction(site_group, water_year))
+) +
+  geom_line(color = "grey60", linewidth = 0.3) +
+  geom_point(aes(color = year), size = 0.8) +
+  # scale_color_manual(year_palette, name = "Water Year") +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Weekly Flow - ", stringr::str_to_title(params$selected_stream), " (implausible values flagged)"),
+    x = "Months",
+    y = "Flow (cfs)"
+  ) +
+  theme_minimal()
+
+if (multi_site) flow_plot <- flow_plot + facet_wrap(~site_group, scales = "free_y")
+
+flow_plot |> ggplotly()
+```
+
+### Temperature
+
+The plot below shows weekly temperature over time on **`r selected_stream`**. Each line is colored by the year. Hover over a line to see additional information. 
+
+
+Flags values below -5C or above 35C as biologically implausible.
+
+```{r temperature-plot}
+temp_data_plot <- environmental_data |>
+  filter(parameter == "temperature") |>
+  mutate(implausible = value < -5 | value > 35,
+         year = as.character(year))
+
+multi_site <- n_distinct(temp_data_plot$site_group) > 1
+
+temperature_plot <- ggplot(
+  temp_data_plot,
+  aes(x = fake_date, y = value, group = interaction(site_group, water_year))) +
+  geom_line(aes(color = year), linewidth = 0.3) +
+  geom_hline(yintercept = c(-5, 35), linetype = "dashed", color = "#d73027") +
+  scale_x_date(date_labels = "%b") +
+  labs(
+    title = paste0("Weekly Temperature - ", stringr::str_to_title(params$selected_stream), " (implausible values flagged)"),
+    x = "Months",
+    y = "Temperature (°C)",
+    color = "Year"
+  ) +
+  theme_minimal()
+
+if (multi_site) temperature_plot <- temperature_plot + facet_wrap(~site_group, scales = "free_y")
+
+temperature_plot |> ggplotly()
+```
+
+***
+
+

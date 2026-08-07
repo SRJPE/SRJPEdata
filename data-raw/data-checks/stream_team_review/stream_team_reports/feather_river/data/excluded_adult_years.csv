@@ -1,0 +1,7 @@
+stream,year,data_type,reason_for_exclusion,exclude
+feather river,2000,carcass,"Not representative survey type, no reaches provided, does not sample full system, only 2 years of mark recap",TRUE
+feather river,2009,redd,Missing > 50% of reaches,TRUE
+feather river,2013,redd,Missing > 50% of reaches,TRUE
+feather river,2014,redd,Missing > 50% of reaches,TRUE
+feather river,2015,redd,Missing > 50% of reaches,TRUE
+feather river,2016,redd,Missing > 50% of reaches,TRUE

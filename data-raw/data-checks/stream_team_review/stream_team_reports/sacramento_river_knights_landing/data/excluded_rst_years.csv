@@ -1,0 +1,4 @@
+stream,site,run_year,number_weeks,exclusion_type,apply_to,exclude
+sacramento river,knights landing,2004,10,60% of weeks sampled,all runs,TRUE
+sacramento river,knights landing,2005,16,60% of weeks sampled,all runs,TRUE
+sacramento river,knights landing,2013,6,60% of weeks sampled,all runs,TRUE

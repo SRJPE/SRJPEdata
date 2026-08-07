@@ -1,0 +1,14 @@
+stream,year,data_type,reason_for_exclusion,exclude
+battle creek,2017,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,2008,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,2019,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,1996,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,1997,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,1998,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,1999,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,2000,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,2001,carcass,Missing 50% or more of reach coverage,TRUE
+battle creek,2017,redd,"Missing reaches 2, 3, 5, and 6",TRUE
+battle creek,2018,redd,"Missing reaches 3, 5, and 6",TRUE
+battle creek,2017,holding,"Missing reach 2, 3, 5",TRUE
+battle creek,2018,holding,"Missing reach 3, 5, 6",TRUE

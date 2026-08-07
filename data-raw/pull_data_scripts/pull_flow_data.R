@@ -144,7 +144,7 @@ feather_tfb_cdec <- CDECRetrieve::cdec_query(
   station = "TFB",
   dur_code = "D",
   sensor_num = "41",
-  start_date = "2023-10-01"
+  start_date = "2024-10-01"
 )
 
 feather_tfb_usgs_cdec <- feather_tfb_usgs |>
@@ -398,6 +398,18 @@ flow_daily <- data.table::rbindlist(
   fill = TRUE
 ) |> 
   dplyr::filter(lubridate::year(date) > 1990) 
+
+# Check to make sure there are no duplicates because the reshaping with result in values of 0 and 1 if duplicates exist which is a major issue.
+find_duplicates <- flow_daily |> 
+  group_by(date, stream, site_group, parameter, statistic) |> 
+  tally() |> 
+  filter(n > 1)
+
+if (nrow(find_duplicates) > 0) {
+  stop(
+    "Duplicates exist in the flow_daily table. Resolve these duplicates before proceeding."
+  )
+}
 
 data.table::setDT(flow_daily)
 
