@@ -13952,9 +13952,9 @@ week,year,stream,gage_number,gage_agency,site_group,parameter,statistic,value
 31,2026,feather river,11407000/TFB + 11406930/ORF,USGS/CDEC,upper feather lfc,flow,max,NA
 31,2026,feather river,11407000/TFB + 11406930/ORF,USGS/CDEC,upper feather lfc,flow,mean,NA
 31,2026,feather river,11407000/TFB + 11406930/ORF,USGS/CDEC,upper feather lfc,flow,min,NA
-32,2026,feather river,FSB,CDEC,lower feather river,flow,max,9702
-32,2026,feather river,FSB,CDEC,lower feather river,flow,mean,9591.310049019608
-32,2026,feather river,FSB,CDEC,lower feather river,flow,min,9525
+32,2026,feather river,FSB,CDEC,lower feather river,flow,max,9720
+32,2026,feather river,FSB,CDEC,lower feather river,flow,mean,9607.830555555556
+32,2026,feather river,FSB,CDEC,lower feather river,flow,min,9507
 32,2026,feather river,11407000/TFB + 11406930/ORF + 11406920/TAO,USGS/CDEC,upper feather hfc,flow,max,NA
 32,2026,feather river,11407000/TFB + 11406930/ORF + 11406920/TAO,USGS/CDEC,upper feather hfc,flow,mean,NA
 32,2026,feather river,11407000/TFB + 11406930/ORF + 11406920/TAO,USGS/CDEC,upper feather hfc,flow,min,NA

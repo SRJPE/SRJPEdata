@@ -2720,8 +2720,8 @@ year,week,stream,site,count,mean_fork_length,hours_fished,flow_cfs,run_year
 2026,30,clear creek,ucc,NA,NA,NA,125,2026
 2026,31,clear creek,lcc,NA,NA,NA,125.14285714285714,2026
 2026,31,clear creek,ucc,NA,NA,NA,125.14285714285714,2026
-2026,32,clear creek,lcc,NA,NA,NA,125,2026
-2026,32,clear creek,ucc,NA,NA,NA,125,2026
+2026,32,clear creek,lcc,NA,NA,NA,124.25,2026
+2026,32,clear creek,ucc,NA,NA,NA,124.25,2026
 2026,33,clear creek,lcc,NA,NA,NA,125.46428571428571,2026
 2026,33,clear creek,ucc,NA,NA,NA,128.8608695652174,2026
 2026,34,clear creek,lcc,NA,NA,NA,121.55204081632654,2026

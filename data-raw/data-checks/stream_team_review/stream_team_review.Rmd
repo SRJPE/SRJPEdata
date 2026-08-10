@@ -302,10 +302,8 @@ eff_plot <- weekly_efficiency |>
   )) |>
   mutate(flagged = number_recaptured > number_released)
 
-ggplot(eff_plot, aes(x = number_released, y = number_recaptured, color = site, shape = flagged)) +
+ggplot(eff_plot, aes(x = number_released, y = number_recaptured, color = site)) +
   geom_point(alpha = 0.7) +
-  scale_shape_manual(values = c("FALSE" = 16, "TRUE" = 17),
-                      labels = c("Normal", "Flagged"), name = NULL) +
   facet_wrap(~stream, scales = "free", ncol = 2) +
   coord_cartesian(xlim = c(0, NA), ylim = c(0, NA)) +
   labs(title = "Releases vs. recaptures per trial, colored by site",
@@ -367,7 +365,7 @@ flow_plot <- ggplot(
   geom_line(linewidth = 0.3) +
   scale_x_date(date_labels = "%b") +
   labs(
-    title = paste0("Weekly Flow - ", stringr::str_to_title(params$selected_stream), " (implausible values flagged)"),
+    title = paste0("Weekly Flow - ", stringr::str_to_title(params$selected_stream)),
     x = "Months",
     y = "Flow (cfs)",
     color = "Year"
@@ -410,7 +408,7 @@ temperature_plot <- ggplot(
   geom_hline(yintercept = c(-5, 35), linetype = "dashed", color = "#d73027") +
   scale_x_date(date_labels = "%b") +
   labs(
-    title = paste0("Weekly Temperature - ", stringr::str_to_title(params$selected_stream), " (implausible values flagged)"),
+    title = paste0("Weekly Temperature - ", stringr::str_to_title(params$selected_stream)),
     x = "Months",
     y = "Temperature (°C)",
     color = "Year"
