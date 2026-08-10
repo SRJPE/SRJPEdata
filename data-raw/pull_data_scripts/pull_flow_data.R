@@ -443,7 +443,7 @@ updated_flow_data <- reshaped_flow[,
 print(head(updated_flow_data))
 
 flow_data <- updated_flow_data |>
-  dplyr::filter(!is.na(week)) |>
+  dplyr::filter(!is.na(week), year >= 1990) |>
   dplyr::mutate(
     max = ifelse(max == "-Inf", NA, max),
     min = ifelse(min == "Inf", NA, min)
