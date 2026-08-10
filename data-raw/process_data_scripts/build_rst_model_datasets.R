@@ -150,7 +150,7 @@ weekly_efficiency <-
     median_fork_length_released = median(median_fork_length_released, na.rm = T)
   ) |>
   mutate(
-# again, need to find the origin across releases within a week
+    # again, need to find the origin across releases within a week
     origin_released = case_when(
       mixed > 0 ~ "mixed",
       hatchery == 0 & natural == 0 & mixed == 0 ~ NA,
@@ -160,18 +160,36 @@ weekly_efficiency <-
       T ~ "mixed"
     )
   ) |>
-  select(stream, site, site_group, week_released, year_released, origin_released, number_released, number_recaptured, median_fork_length_released)
+  select(
+    stream,
+    site,
+    site_group,
+    week_released,
+    year_released,
+    origin_released,
+    number_released,
+    number_recaptured,
+    median_fork_length_released
+  )
 
 # calculate average hours fished for weeks when efficiency trials were conducted by site across all weeks and years
 average_hours_fished_efficiency <- weekly_efficiency |>
-      group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
-      summarize(
-        number_released = sum(number_released),
-        number_recaptured = sum(number_recaptured)
-      ) |> 
-      left_join(weekly_effort_by_site, by = c("stream", "site", "week_released" = "week", "year_released" = "year")) |> 
-  group_by(site) |> 
-  summarize(average_hours_fished_during_efficiency_trials = mean(hours_fished, na.rm = T))
+  group_by(week_released, year_released, stream, site) |> # we added in origin and fork length for post hoc figures but for the model data need to remove
+  summarize(
+    number_released = sum(number_released),
+    number_recaptured = sum(number_recaptured)
+  ) |>
+  left_join(
+    weekly_effort_by_site,
+    by = c("stream", "site", "week_released" = "week", "year_released" = "year")
+  ) |>
+  group_by(site) |>
+  summarize(
+    average_hours_fished_during_efficiency_trials = mean(
+      hours_fished,
+      na.rm = T
+    )
+  )
 
 # reformat flow data and summarize weekly
 flow_reformatted_raw <- rst_all_weeks |> # we want flows for all weeks, even if missing samples
@@ -191,7 +209,8 @@ flow_reformatted <- flow_reformatted_raw |>
   mutate(
     flow_cfs = ifelse(is.na(flow_cfs), mean_flow_for_data_gaps, flow_cfs)
   ) |>
-  select(-mean_flow_for_data_gaps)
+  select(-mean_flow_for_data_gaps) |>
+  mutate(log_flow_cfs = log(flow_cfs))
 
 # Combine all 3 tables together
 weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
@@ -219,7 +238,8 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
     number_released,
     number_recaptured,
     hours_fished,
-    flow_cfs
+    flow_cfs,
+    log_flow_cfs
   ) |>
   group_by(site) |>
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> # this is used to fill in gaps where hours fished data is missing
@@ -230,9 +250,10 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
       (hours_fished == 0 | is.na(hours_fished)) & count >= 0,
       average_stream_hours_fished,
       hours_fished
-    )) |> 
-  select(-average_stream_hours_fished) |> 
-  left_join(average_hours_fished_efficiency, by = c("site"))  # add the average_hours_fished_during_efficiency_trials
+    )
+  ) |>
+  select(-average_stream_hours_fished) |>
+  left_join(average_hours_fished_efficiency, by = c("site")) # add the average_hours_fished_during_efficiency_trials
 
 # calculate mean and sd used to standardize flows. should be mean and
 # sd of efficiency flows except for lbc
@@ -240,10 +261,12 @@ weekly_model_data_wo_efficiency_flows <- weekly_standard_catch |>
 # for lbc and adams dam, use mean and sd of catch flow because we have no efficiency flows
 standardizing_lbc_ad <- weekly_model_data_wo_efficiency_flows |>
   filter(site %in% c("lbc", "adams dam")) |>
-  group_by(site) |> 
+  group_by(site) |>
   summarise(
     mean_eff_flow = mean(flow_cfs, na.rm = T),
-    sd_eff_flow = sd(flow_cfs, na.rm = T)
+    sd_eff_flow = sd(flow_cfs, na.rm = T),
+    mean_log_eff_flow = mean(log_flow_cfs, na.rm = T),
+    sd_log_eff_flow = sd(log_flow_cfs, na.rm = T),
   ) |>
   ungroup()
 
@@ -257,7 +280,9 @@ standardizing_lookup <- weekly_model_data_wo_efficiency_flows |>
   group_by(site) |>
   summarise(
     mean_eff_flow = mean(flow_cfs, na.rm = T),
-    sd_eff_flow = sd(flow_cfs, na.rm = T)
+    sd_eff_flow = sd(flow_cfs, na.rm = T),
+    mean_log_eff_flow = mean(log_flow_cfs, na.rm = T),
+    sd_log_eff_flow = sd(log_flow_cfs, na.rm = T)
   ) |>
   ungroup() |>
   bind_rows(standardizing_lbc_ad)
@@ -274,9 +299,18 @@ mainstem_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows 
   group_by(site) |>
   mutate(
     standardized_efficiency_flow = (flow_cfs - mean_eff_flow) /
-      sd_eff_flow
+      sd_eff_flow,
+    standardized_log_efficiency_flow = (log_flow_cfs - mean_log_eff_flow) /
+      sd_log_eff_flow
   ) |>
-  select(year, week, stream, site, standardized_efficiency_flow)
+  select(
+    year,
+    week,
+    stream,
+    site,
+    standardized_efficiency_flow,
+    standardized_log_efficiency_flow
+  )
 
 tributary_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows |>
   filter(
@@ -289,45 +323,57 @@ tributary_standardized_efficiency_flows <- weekly_model_data_wo_efficiency_flows
   group_by(site) |>
   mutate(
     standardized_efficiency_flow = (flow_cfs - mean_eff_flow) /
-      sd_eff_flow
+      sd_eff_flow,
+    standardized_log_efficiency_flow = (log_flow_cfs - mean_log_eff_flow) /
+      sd_log_eff_flow
   ) |>
-  select(year, week, stream, site, standardized_efficiency_flow)
+  select(
+    year,
+    week,
+    stream,
+    site,
+    standardized_efficiency_flow,
+    standardized_log_efficiency_flow
+  )
 
 efficiency_standard_flows <- bind_rows(
   mainstem_standardized_efficiency_flows,
   tributary_standardized_efficiency_flows
-) 
+)
 
 weekly_model_data_with_eff_flows <- weekly_model_data_wo_efficiency_flows |>
   left_join(standardizing_lookup, by = "site") |>
   # standardize catch flow using mean and sd of mark recap flow
   mutate(
     standardized_flow = (flow_cfs - mean_eff_flow) /
-      sd_eff_flow
+      sd_eff_flow,
+    log_standardized_flow = (log_flow_cfs - mean_log_eff_flow) /
+      sd_log_eff_flow
   ) |>
   left_join(
     efficiency_standard_flows,
     by = c("year", "week", "stream", "site")
   ) |>
-  select(-c(mean_eff_flow, sd_eff_flow))
+  select(-c(mean_eff_flow, sd_eff_flow, mean_log_eff_flow, sd_log_eff_flow))
 
 # Fill in missing weeks that were sampled or not sampled ---------------------------------------------------------
 weekly_juvenile_abundance_model_data_raw <- weekly_model_data_with_eff_flows |>
-  full_join(weeks_sampled) |> 
+  full_join(weeks_sampled) |>
   group_by(site) |>
   mutate(average_stream_hours_fished = mean(hours_fished, na.rm = TRUE)) |> # this is used to fill in gaps where hours fished data is missing
-  ungroup() |> 
+  ungroup() |>
   mutate(
     count = case_when(
       is.na(count) & if_sampled == T ~ 0,
       is.na(count) & if_sampled == F ~ NA,
-      T ~ count),
+      T ~ count
+    ),
     hours_fished = case_when(
       is.na(hours_fished) & if_sampled == T ~ average_stream_hours_fished,
       if_sampled == F ~ NA,
       T ~ hours_fished
     )
-  ) |>  
+  ) |>
   select(-c(if_sampled, average_stream_hours_fished))
 
 
@@ -353,7 +399,12 @@ weekly_juvenile_abundance_model_data <- weekly_juvenile_abundance_model_data_raw
 # Catch
 weekly_juvenile_abundance_catch_data <- weekly_juvenile_abundance_model_data |>
   select(
-    -c(number_released, number_recaptured, standardized_efficiency_flow)
+    -c(
+      number_released,
+      number_recaptured,
+      standardized_efficiency_flow,
+      standardized_log_efficiency_flow
+    )
   ) |>
   # ensure weeks are organized by water year for indexing in BTSPASX
   group_by(site) |>
@@ -371,7 +422,9 @@ weekly_juvenile_abundance_efficiency_data_raw <- weekly_juvenile_abundance_model
     number_released,
     number_recaptured,
     standardized_efficiency_flow,
+    standardized_log_efficiency_flow,
     flow_cfs,
+    log_flow_cfs,
     hours_fished,
     average_hours_fished_during_efficiency_trials
   ) |>
