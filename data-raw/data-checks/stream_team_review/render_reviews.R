@@ -23,19 +23,23 @@ stream_config <- tribble(
   "yuba river",     "USGS-11421000",                                               "CDEC - YR7 (interpolated)",                      "passage"
 )
 
-# TODO just filter years to exclude adult to datatype we are using. 
-# TODO similarly, specify RST site we are using (ex. UBC) and filter exclude table to only show UBC.For plots throughout, only show sites we are using.  
-# FEATHER - REMOVE LIVE OAK AND SUNSET PUMPS 
-# BATTLE 
-# BUTTE - DONT USE ADAMS DAM 
-# TODO get rid of line for 100 % efficency 
-# TODO remove points from flow plot and just have colored lines 
-# TODO filter flow and temperature data objectcs to 1990 
-# TODO check on temperature data plot to see what is happening in january 1st disconnect
-# TODO color efficiency plot by site
-# TODO remove lower feather river flows
-# TODO in catch plots use dashed line or gray to show which ones are excluded 
-# TODO add note if interpolated temps
+# Sites collected but not used in BTSPAS-X / stock-recruit modeling for these
+# streams - excluded from rst/catch/eff tables below and from stream_team_review.Rmd.
+# Keep this in sync with `excluded_sites` in stream_team_review.Rmd.
+# FEATHER - REMOVE LIVE OAK AND SUNSET PUMPS
+# BATTLE - REMOVE lower battle (lbc)
+# BUTTE - DONT USE ADAMS DAM
+excluded_sites <- tribble(
+  ~stream,          ~site,
+  "battle creek",   "lbc",
+  "butte creek",    "adams dam",
+  "feather river",  "live oak",
+  "feather river",  "sunset pumps"
+)
+
+is_modeled_site <- function(stream, site) {
+  !paste(stream, site) %in% paste(excluded_sites$stream, excluded_sites$site)
+}
 
 # Sacramento River is reviewed per-site rather than per-stream: RST, catch, and
 # efficiency data are only collected at these sites, and there is no stream-wide
@@ -57,51 +61,57 @@ build_stream_tables <- function(selected_stream, selected_site = NA) {
         filter(stream == selected_stream),
 
       excluded_rst_years = rst_model_years |>
-        filter(stream == selected_stream, exclude),
+        filter(stream == selected_stream, exclude) |>
+        filter(is_modeled_site(stream, site)),
 
       excluded_adult_years = adult_model_years |>
         filter(stream == selected_stream, exclude),
 
       weekly_catch = weekly_juvenile_abundance_catch_data |>
         filter(stream == selected_stream) |>
+        filter(is_modeled_site(stream, site)) |>
         select(-average_hours_fished_during_efficiency_trials,
                -standardized_flow),
 
       weekly_eff = weekly_juvenile_abundance_efficiency_data |>
         filter(stream == selected_stream) |>
+        filter(is_modeled_site(stream, site)) |>
         select(-average_hours_fished_during_efficiency_trials,
                -standardized_efficiency_flow,
                -flow_cfs,
                -hours_fished),
 
       flow_data = flow_data |>
-        filter(stream == selected_stream),
+        filter(stream == selected_stream, year >= 1990),
 
       temperature_data = temperature_data |>
-        filter(stream == selected_stream)
+        filter(stream == selected_stream, year >= 1990)
     )
   } else {
     list(
       excluded_rst_years = rst_model_years |>
-        filter(stream == selected_stream, site == selected_site, exclude),
+        filter(stream == selected_stream, site == selected_site, exclude) |>
+        filter(is_modeled_site(stream, site)),
 
       weekly_catch = weekly_juvenile_abundance_catch_data |>
         filter(stream == selected_stream, site == selected_site) |>
+        filter(is_modeled_site(stream, site)) |>
         select(-average_hours_fished_during_efficiency_trials,
                -standardized_flow),
 
       weekly_eff = weekly_juvenile_abundance_efficiency_data |>
         filter(stream == selected_stream, site == selected_site) |>
+        filter(is_modeled_site(stream, site)) |>
         select(-average_hours_fished_during_efficiency_trials,
                -standardized_efficiency_flow,
                -flow_cfs,
                -hours_fished),
 
       flow_data = flow_data |>
-        filter(stream == selected_stream, site_group == selected_site),
+        filter(stream == selected_stream, site_group == selected_site, year >= 1990),
 
       temperature_data = temperature_data |>
-        filter(stream == selected_stream, site_group == selected_site)
+        filter(stream == selected_stream, site_group == selected_site, year >= 1990)
     )
   }
 }
