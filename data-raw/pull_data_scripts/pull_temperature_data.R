@@ -540,6 +540,7 @@ temperature_data <- longer_updated_temp_data |>
     )
   ) |>
   dplyr::filter(rm != "remove" | is.na(rm), year >= 1990) |>
+  dplyr::filter(value <= 35) |> 
   dplyr::select(-rm) |>
   # add on knights landing temperature where gaps have been filled in
   dplyr::bind_rows(kl_temp)

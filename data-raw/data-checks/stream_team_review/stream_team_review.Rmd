@@ -341,6 +341,10 @@ The plot below shows weekly flow over time on **`r selected_stream`**. Each line
 Flags negative flow (physically impossible) as well as statistical outliers per
 site (values beyond the median +/- 5 times the interquartile range).
 
+Note: the jagged jump seen every year right at Jan 1 is a data-binning artifact (the “week 53” bin covers only 1-2 days instead of 7), not a real flow swing.
+
+
+
 ```{r flow-plot}
 flow_data_plot <- environmental_data |>
   filter(parameter == "flow") |>
