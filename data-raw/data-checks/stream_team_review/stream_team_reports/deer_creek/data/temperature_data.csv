@@ -2756,7 +2756,6 @@ week,year,stream,gage_number,gage_agency,site_group,parameter,statistic,value
 4,2016,deer creek,DCV,CDEC,deer creek,temperature,max,9.611111111111109
 4,2016,deer creek,DCV,CDEC,deer creek,temperature,mean,8.274370255348517
 4,2016,deer creek,DCV,CDEC,deer creek,temperature,min,6.888888888888888
-5,2016,deer creek,DCV,CDEC,deer creek,temperature,max,38.888888888888886
 5,2016,deer creek,DCV,CDEC,deer creek,temperature,mean,13.286157119852772
 5,2016,deer creek,DCV,CDEC,deer creek,temperature,min,0.944444444444446
 6,2016,deer creek,DCV,CDEC,deer creek,temperature,max,9.555555555555557
@@ -2990,7 +2989,6 @@ week,year,stream,gage_number,gage_agency,site_group,parameter,statistic,value
 29,2017,deer creek,DCV,CDEC,deer creek,temperature,max,24.055555555555557
 29,2017,deer creek,DCV,CDEC,deer creek,temperature,mean,21.930618212197157
 29,2017,deer creek,DCV,CDEC,deer creek,temperature,min,19.66666666666667
-30,2017,deer creek,DCV,CDEC,deer creek,temperature,max,35.77777777777778
 30,2017,deer creek,DCV,CDEC,deer creek,temperature,mean,22.93647567489577
 30,2017,deer creek,DCV,CDEC,deer creek,temperature,min,21.27777777777778
 31,2017,deer creek,DCV,CDEC,deer creek,temperature,max,25.166666666666668
@@ -4416,5 +4414,5 @@ week,year,stream,gage_number,gage_agency,site_group,parameter,statistic,value
 31,2026,deer creek,DCV,CDEC,deer creek,temperature,mean,23.706679894179896
 31,2026,deer creek,DCV,CDEC,deer creek,temperature,min,21.77777777777778
 32,2026,deer creek,DCV,CDEC,deer creek,temperature,max,26.055555555555557
-32,2026,deer creek,DCV,CDEC,deer creek,temperature,mean,24.049074074074074
-32,2026,deer creek,DCV,CDEC,deer creek,temperature,min,22.333333333333332
+32,2026,deer creek,DCV,CDEC,deer creek,temperature,mean,23.85681216931217
+32,2026,deer creek,DCV,CDEC,deer creek,temperature,min,21.77777777777778

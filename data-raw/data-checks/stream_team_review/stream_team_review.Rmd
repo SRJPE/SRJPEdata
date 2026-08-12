@@ -182,12 +182,14 @@ cuml_catch <- catch_data |>
   arrange(date) |>
   group_by(water_year) |>
   mutate(
+    is_sampled = !is.na(count),
     count = ifelse(is.na(count), 0, count),
     total_count = sum(count, na.rm = TRUE),
     cumulative_catch = cumsum(count),
     prop_cuml_catch = cumulative_catch / total_count * 100
   ) |>
   ungroup() |>
+  filter(is_sampled) |> # weeks the trap wasn't fished shouldn't appear as zero catch
   left_join(excluded_rst_site_years, by = c("site", "water_year" = "run_year")) |>
   mutate(excluded = ifelse(is.na(excluded), FALSE, excluded)) |>
   mutate(water_year = factor(water_year))
@@ -403,11 +405,28 @@ temp_data_plot <- environmental_data |>
   mutate(implausible = value < -5 | value > 35,
          year = as.character(year))
 
-multi_site <- n_distinct(temp_data_plot$site_group) > 1
+# Some site_groups (e.g. clear creek) have two gages reporting for most of the
+# same weeks - split those into separate facets by gage so the line doesn't
+# zigzag between them. Site_groups where a gage was simply swapped out for
+# another over time (e.g. feather river, yuba river) are left as one facet.
+gage_overlap <- temp_data_plot |>
+  filter(!is.na(gage_number)) |>
+  distinct(site_group, year, week, gage_number) |>
+  count(site_group, year, week) |>
+  group_by(site_group) |>
+  summarise(overlap_frac = mean(n > 1), .groups = "drop")
+
+temp_data_plot <- temp_data_plot |>
+  left_join(gage_overlap, by = "site_group") |>
+  mutate(site_label = if_else(!is.na(overlap_frac) & overlap_frac > 0.2,
+                               paste0(site_group, " (", gage_number, ")"),
+                               site_group))
+
+multi_site <- n_distinct(temp_data_plot$site_label) > 1
 
 temperature_plot <- ggplot(
   temp_data_plot,
-  aes(x = fake_date, y = value, group = interaction(site_group, water_year))) +
+  aes(x = fake_date, y = value, group = interaction(site_label, water_year))) +
   geom_line(aes(color = year), linewidth = 0.3) +
   geom_hline(yintercept = c(-5, 35), linetype = "dashed", color = "#d73027") +
   scale_x_date(date_labels = "%b") +
@@ -419,7 +438,7 @@ temperature_plot <- ggplot(
   ) +
   theme_minimal()
 
-if (multi_site) temperature_plot <- temperature_plot + facet_wrap(~site_group, scales = "free_y")
+if (multi_site) temperature_plot <- temperature_plot + facet_wrap(~site_label, scales = "free_y")
 
 temperature_plot |> ggplotly()
 ```
