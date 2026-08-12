@@ -159,7 +159,7 @@ battle_2026_releases <- battle_creek_2026_efficiency |>
          number_released, run, median_fork_length_released, 
          life_stage, origin, included_in_analysis) |> glimpse()
 
-recaptures <- battle_creek_2026_efficiency |> 
+battle_2026_recaptures <- battle_creek_2026_efficiency |> 
   pivot_longer(cols = c(`Number caught day 1`, 
                         `Number caught day 2`, 
                         `Number caught day 3`, 
@@ -181,9 +181,115 @@ recaptures <- battle_creek_2026_efficiency |>
   filter(count > 0) |> 
   glimpse()
 
+# CLEAR ----
+# UCC
+ucc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark-Recap 2025-2026.xlsx", 
+                                                  sheet = 3, 
+                                                  skip = 1) |> 
+  select(release_id = Trial, date_released = `Release date...3`, number_released = `Number released...7`, `Number caught day 1`, 
+         `Number caught day 2`, `Number caught day 3`, `Number caught day 4`,
+         `Total recaptured...23`, run = `Race...25`) |> 
+  mutate(stream = "clear creek", 
+         site = "ucc", 
+         subsite = "ucc", 
+         site_group = "clear creek", 
+         origin = "natural",
+         median_fork_length_released = NA,
+         life_stage = NA, 
+         included_in_analysis = TRUE, 
+         run = case_when(run == "SCS" ~ "spring", 
+                         run %in% c("LF Smolt", "LFCS") ~ "late fall", 
+                         run == "FCS" ~ "fall")) |> 
+  glimpse()
+
+ucc_clear_2026_releases <- ucc_clear_creek_2026_efficiency |> 
+  select(release_id, release_id, stream, site, subsite, site_group, 
+         number_released, run, median_fork_length_released, 
+         life_stage, origin, included_in_analysis) |> glimpse()
+
+ucc_clear_2026_recaptures <- ucc_clear_creek_2026_efficiency |> 
+  pivot_longer(cols = c(`Number caught day 1`, 
+                        `Number caught day 2`, 
+                        `Number caught day 3`, 
+                        `Number caught day 4`)) |> 
+  mutate(date = case_when(name == "Number caught day 1" ~ as.Date(date_released) + 1, 
+                          name == "Number caught day 2" ~ as.Date(date_released) + 2,
+                          name == "Number caught day 3" ~ as.Date(date_released) + 3,
+                          name == "Number caught day 4" ~ as.Date(date_released) + 4),
+         date = as_date(date), 
+         fork_length = NA_real_) |> 
+  select(date, 
+         count = value, 
+         release_id, 
+         stream, 
+         site, 
+         subsite, 
+         site_group, 
+         run) |> 
+  filter(count > 0) |> 
+  glimpse()
+
+# LCC
+lcc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark-Recap 2025-2026.xlsx", 
+                                                     sheet = 4, 
+                                                     skip = 1) |> 
+  select(release_id = Trial, date_released = `Release date...3`, number_released = `Number released...7`, `Number caught day 1`, 
+         `Number caught day 2`, `Number caught day 3`, `Number caught day 4`,
+         `Total recaptured...23`, run = `Race...25`) |> 
+  mutate(stream = "clear creek", 
+         site = "lcc", 
+         subsite = "lcc", 
+         site_group = "clear creek", 
+         origin = "natural",
+         median_fork_length_released = NA,
+         life_stage = NA, 
+         included_in_analysis = TRUE, 
+         run = case_when(run == "SCS" ~ "spring", 
+                         run %in% c("LF Smolt", "LFCS") ~ "late fall", 
+                         run == "FCS" ~ "fall")) |> 
+  glimpse()
+
+lcc_clear_2026_releases <- lcc_clear_creek_2026_efficiency |> 
+  select(release_id, release_id, stream, site, subsite, site_group, 
+         number_released, run, median_fork_length_released, 
+         life_stage, origin, included_in_analysis) |> glimpse()
+
+lcc_clear_2026_recaptures <- lcc_clear_creek_2026_efficiency |> 
+  pivot_longer(cols = c(`Number caught day 1`, 
+                        `Number caught day 2`, 
+                        `Number caught day 3`, 
+                        `Number caught day 4`)) |> 
+  mutate(date = case_when(name == "Number caught day 1" ~ as.Date(date_released) + 1, 
+                          name == "Number caught day 2" ~ as.Date(date_released) + 2,
+                          name == "Number caught day 3" ~ as.Date(date_released) + 3,
+                          name == "Number caught day 4" ~ as.Date(date_released) + 4),
+         date = as_date(date), 
+         fork_length = NA_real_) |> 
+  select(date, 
+         count = value, 
+         release_id, 
+         stream, 
+         site, 
+         subsite, 
+         site_group, 
+         run) |> 
+  filter(count > 0) |> 
+  glimpse()
+
+# battle clear 2026
+
+battle_clear_2026_release <- bind_rows(battle_2026_releases, 
+                                       ucc_clear_2026_releases,
+                                       lcc_clear_2026_releases)
+battle_clear_2026_recaptures <- bind_rows(battle_2026_recaptures, 
+                                          ucc_clear_2026_recaptures,
+                                          lcc_clear_2026_recaptures)
+
 # Deer & Mill -------------------------------------------------------------
 # Historical data from Deer and Mill are pulled directly from EDI because they do not have unique identifiers. Version is static.
 catch_edi <- pull_edi("1504", 1, 3)
+
+
 recapture_edi <- pull_edi("1504", 2, 3)
 release_edi <- pull_edi("1504", 3, 3)
 trap_edi <- pull_edi("1504", 4, 3)
@@ -309,9 +415,11 @@ edi_catch <- bind_rows(butte_catch_edi,
   mutate(actual_count = as.logical(actual_count))
 edi_recapture <- bind_rows(battle_clear_recapture_edi,
                            deer_mill_recapture_edi,
-                           knl_recapture_standard)
+                           knl_recapture_standard, 
+                           battle_clear_2026_recaptures)
 edi_release <- bind_rows(knl_release_standard,
-                         deer_mill_release_edi)
+                         deer_mill_release_edi, 
+                         battle_clear_2026_release)
 edi_trap <- bind_rows(butte_trap_edi |> 
                         mutate(include = ifelse(include == "Yes", T, F)),
                       deer_mill_trap_edi,
