@@ -131,6 +131,55 @@ battle_clear_recapture_edi <- recapture_edi |>
   mutate(count = case_when(date == "2018-02-15" & count == 1180 ~ 11,
                             T ~ count))
 
+# 2026 battle and clear recapture data is not yet on EDI -----------------------
+# Pull from XLSX files - currently in TEMP_data folder  
+# 
+# TODO - see what the last release_id is to see if we can go off of that  
+battle_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/BC Mark-Recap 2025-2026.xlsx", 
+                                  sheet = 3, 
+                                  skip = 1) |>
+  select(release_id = Trial, date_released = `Release date...3`, number_released = `Number released...7`, `Number caught day 1`, 
+         `Number caught day 2`, `Number caught day 3`, `Number caught day 4`,
+         `Total recaptured...23`, run = `Race...25`) |> 
+  mutate(stream = "battle creek", 
+         site = "ubc", 
+         subsite = "ubc", 
+         site_group = "battle creek", 
+         origin = "hatchery",
+         median_fork_length_released = NA,
+         life_stage = NA, 
+         included_in_analysis = TRUE, 
+         run = case_when(run == "SCS" ~ "spring", 
+                         run %in% c("LF Smolt", "LFCS") ~ "late fall", 
+                         run == "FCS" ~ "fall")) |> 
+  glimpse()
+
+battle_2026_releases <- battle_creek_2026_efficiency |> 
+  select(release_id, release_id, stream, site, subsite, site_group, 
+         number_released, run, median_fork_length_released, 
+         life_stage, origin, included_in_analysis) |> glimpse()
+
+recaptures <- battle_creek_2026_efficiency |> 
+  pivot_longer(cols = c(`Number caught day 1`, 
+                        `Number caught day 2`, 
+                        `Number caught day 3`, 
+                        `Number caught day 4`)) |> 
+  mutate(date = case_when(name == "Number caught day 1" ~ as.Date(date_released) + 1, 
+                          name == "Number caught day 2" ~ as.Date(date_released) + 2,
+                          name == "Number caught day 3" ~ as.Date(date_released) + 3,
+                          name == "Number caught day 4" ~ as.Date(date_released) + 4),
+         date = as_date(date), 
+         fork_length = NA_real_) |> 
+  select(date, 
+         count = value, 
+         release_id, 
+         stream, 
+         site, 
+         subsite, 
+         site_group, 
+         run) |> 
+  filter(count > 0) |> 
+  glimpse()
 
 # Deer & Mill -------------------------------------------------------------
 # Historical data from Deer and Mill are pulled directly from EDI because they do not have unique identifiers. Version is static.
