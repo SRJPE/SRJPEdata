@@ -6,6 +6,9 @@
 
 library(tidyverse)
 library(EDIutils)
+library(DBI)
+library(lubridate)
+
 
 pull_edi <- function(id, index, version = NULL, max_attempts = 3) {
   scope <- "edi"
@@ -133,11 +136,44 @@ battle_clear_recapture_edi <- recapture_edi |>
 
 # 2026 battle and clear recapture data is not yet on EDI -----------------------
 # Pull from XLSX files - currently in TEMP_data folder  
-# 
-# TODO - see what the last release_id is to see if we can go off of that  
+
+# Check Release ID by pulling from DB
+con <- DBI::dbConnect(drv = RPostgres::Postgres(),
+                      host = "jpe-db.postgres.database.azure.com",
+                      dbname = "jpedb-prod",
+                      user = Sys.getenv("jpe_db_user_id"),
+                      password = Sys.getenv("jpe_db_password"),
+                      port = 5432)
+DBI::dbListTables(con)
+
+db_release <- DBI::dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
+                                                tl.subsite, tl.site_group, rs.number_released, r.definition as run, 
+                                                rs.median_fork_length_released,
+                                                ls.definition as life_stage, o.definition as origin, rs.include_in_analysis
+                                                FROM release rs 
+                                                left join trap_location tl on rs.trap_location_id = tl.id 
+                                                left join run r on rs.run_id = r.id
+                                                left join lifestage ls on rs.lifestage_id = ls.id
+                                                left join origin o on rs.origin_id = o.id") 
+clear_max_id <-db_release |> 
+  dplyr::filter(stream %in% c("clear creek")) |> 
+  separate(release_id, into = c("stream_code", "id_num"), sep = 3) |> 
+  pull(id_num) |> 
+  as.numeric() |> 
+  max()
+
+battle_max_id <-db_release |> 
+  dplyr::filter(stream %in% c("battle creek")) |> 
+  separate(release_id, into = c("stream_code", "id_num"), sep = 3) |> 
+  pull(id_num) |> 
+  as.numeric() |> 
+  max()
+
+# Battle efficency 
 battle_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/BC Mark-Recap 2025-2026.xlsx", 
                                   sheet = 3, 
-                                  skip = 1) |>
+                                  skip = 1,
+                                  n_max = 44) |>
   select(release_id = Trial, date_released = `Release date...3`, number_released = `Number released...7`, `Number caught day 1`, 
          `Number caught day 2`, `Number caught day 3`, `Number caught day 4`,
          `Total recaptured...23`, run = `Race...25`) |> 
@@ -151,7 +187,10 @@ battle_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/BC Mark-Re
          included_in_analysis = TRUE, 
          run = case_when(run == "SCS" ~ "spring", 
                          run %in% c("LF Smolt", "LFCS") ~ "late fall", 
-                         run == "FCS" ~ "fall")) |> 
+                         run == "FCS" ~ "fall"),
+         release_id = paste0("BAT", as.numeric(release_id) + battle_max_id)) |> 
+  filter(!is.na(number_released)) |> 
+  filter(number_released > 0) |> 
   glimpse()
 
 battle_2026_releases <- battle_creek_2026_efficiency |> 
@@ -185,7 +224,8 @@ battle_2026_recaptures <- battle_creek_2026_efficiency |>
 # UCC
 ucc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark-Recap 2025-2026.xlsx", 
                                                   sheet = 3, 
-                                                  skip = 1) |> 
+                                                  skip = 1, 
+                                                  n_max = 20) |> 
   select(release_id = Trial, date_released = `Release date...3`, number_released = `Number released...7`, `Number caught day 1`, 
          `Number caught day 2`, `Number caught day 3`, `Number caught day 4`,
          `Total recaptured...23`, run = `Race...25`) |> 
@@ -199,7 +239,10 @@ ucc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
          included_in_analysis = TRUE, 
          run = case_when(run == "SCS" ~ "spring", 
                          run %in% c("LF Smolt", "LFCS") ~ "late fall", 
-                         run == "FCS" ~ "fall")) |> 
+                         run == "FCS" ~ "fall"),
+         release_id = paste0("CLR", as.numeric(release_id) + clear_max_id)) |> 
+  filter(!is.na(number_released)) |>
+  filter(number_released > 0) |> 
   glimpse()
 
 ucc_clear_2026_releases <- ucc_clear_creek_2026_efficiency |> 
@@ -232,7 +275,8 @@ ucc_clear_2026_recaptures <- ucc_clear_creek_2026_efficiency |>
 # LCC
 lcc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark-Recap 2025-2026.xlsx", 
                                                      sheet = 4, 
-                                                     skip = 1) |> 
+                                                     skip = 1,
+                                                     n_max = 20) |> 
   select(release_id = Trial, date_released = `Release date...3`, number_released = `Number released...7`, `Number caught day 1`, 
          `Number caught day 2`, `Number caught day 3`, `Number caught day 4`,
          `Total recaptured...23`, run = `Race...25`) |> 
@@ -246,7 +290,10 @@ lcc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
          included_in_analysis = TRUE, 
          run = case_when(run == "SCS" ~ "spring", 
                          run %in% c("LF Smolt", "LFCS") ~ "late fall", 
-                         run == "FCS" ~ "fall")) |> 
+                         run == "FCS" ~ "fall"),
+         release_id = paste0("CLR", as.numeric(release_id) + clear_max_id + nrow(ucc_clear_2026_releases))) |> 
+  filter(!is.na(number_released)) |> 
+  filter(number_released > 0) |> 
   glimpse()
 
 lcc_clear_2026_releases <- lcc_clear_creek_2026_efficiency |> 
