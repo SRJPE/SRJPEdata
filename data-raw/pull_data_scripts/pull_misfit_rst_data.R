@@ -194,7 +194,7 @@ battle_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/BC Mark-Re
   glimpse()
 
 battle_2026_releases <- battle_creek_2026_efficiency |> 
-  select(release_id, release_id, stream, site, subsite, site_group, 
+  select(release_id, date_released, stream, site, subsite, site_group, 
          number_released, run, median_fork_length_released, 
          life_stage, origin, included_in_analysis) |> glimpse()
 
@@ -246,7 +246,7 @@ ucc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
   glimpse()
 
 ucc_clear_2026_releases <- ucc_clear_creek_2026_efficiency |> 
-  select(release_id, release_id, stream, site, subsite, site_group, 
+  select(release_id, date_released, stream, site, subsite, site_group, 
          number_released, run, median_fork_length_released, 
          life_stage, origin, included_in_analysis) |> glimpse()
 
@@ -297,7 +297,7 @@ lcc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
   glimpse()
 
 lcc_clear_2026_releases <- lcc_clear_creek_2026_efficiency |> 
-  select(release_id, release_id, stream, site, subsite, site_group, 
+  select(release_id, date_released, stream, site, subsite, site_group, 
          number_released, run, median_fork_length_released, 
          life_stage, origin, included_in_analysis) |> glimpse()
 
