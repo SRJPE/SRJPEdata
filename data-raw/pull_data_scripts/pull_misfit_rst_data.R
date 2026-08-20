@@ -184,7 +184,7 @@ battle_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/BC Mark-Re
          origin = "hatchery",
          median_fork_length_released = NA,
          life_stage = NA, 
-         included_in_analysis = TRUE, 
+         include_in_analysis = TRUE, 
          run = case_when(run == "SCS" ~ "spring", 
                          run %in% c("LF Smolt", "LFCS") ~ "late fall", 
                          run == "FCS" ~ "fall"),
@@ -196,7 +196,7 @@ battle_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/BC Mark-Re
 battle_2026_releases <- battle_creek_2026_efficiency |> 
   select(release_id, date_released, stream, site, subsite, site_group, 
          number_released, run, median_fork_length_released, 
-         life_stage, origin, included_in_analysis) |> glimpse()
+         life_stage, origin, include_in_analysis) |> glimpse()
 
 battle_2026_recaptures <- battle_creek_2026_efficiency |> 
   pivot_longer(cols = c(`Number caught day 1`, 
@@ -236,7 +236,7 @@ ucc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
          origin = "natural",
          median_fork_length_released = NA,
          life_stage = NA, 
-         included_in_analysis = TRUE, 
+         include_in_analysis = TRUE, 
          run = case_when(run == "SCS" ~ "spring", 
                          run %in% c("LF Smolt", "LFCS") ~ "late fall", 
                          run == "FCS" ~ "fall"),
@@ -248,7 +248,7 @@ ucc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
 ucc_clear_2026_releases <- ucc_clear_creek_2026_efficiency |> 
   select(release_id, date_released, stream, site, subsite, site_group, 
          number_released, run, median_fork_length_released, 
-         life_stage, origin, included_in_analysis) |> glimpse()
+         life_stage, origin, include_in_analysis) |> glimpse()
 
 ucc_clear_2026_recaptures <- ucc_clear_creek_2026_efficiency |> 
   pivot_longer(cols = c(`Number caught day 1`, 
@@ -287,7 +287,7 @@ lcc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
          origin = "natural",
          median_fork_length_released = NA,
          life_stage = NA, 
-         included_in_analysis = TRUE, 
+         include_in_analysis = TRUE, 
          run = case_when(run == "SCS" ~ "spring", 
                          run %in% c("LF Smolt", "LFCS") ~ "late fall", 
                          run == "FCS" ~ "fall"),
@@ -299,7 +299,7 @@ lcc_clear_creek_2026_efficiency <- readxl::read_xlsx("data-raw/TEMP_data/CC Mark
 lcc_clear_2026_releases <- lcc_clear_creek_2026_efficiency |> 
   select(release_id, date_released, stream, site, subsite, site_group, 
          number_released, run, median_fork_length_released, 
-         life_stage, origin, included_in_analysis) |> glimpse()
+         life_stage, origin, include_in_analysis) |> glimpse()
 
 lcc_clear_2026_recaptures <- lcc_clear_creek_2026_efficiency |> 
   pivot_longer(cols = c(`Number caught day 1`, 
