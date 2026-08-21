@@ -42,3 +42,20 @@ Genetics monitoring data is also included in this data package to prepare data i
 
 Explore model datasets on the SRJPEdashboard shiny app. (Add link)
 
+## Updating data
+
+Data objects are rebuilt on a schedule tied to the RST monitoring season (Nov - June):
+
+- *Biweekly, during the RST season* - RST catch/trap/efficiency, flow, temperature, and genetics data are refreshed with the most current available records.
+
+- *Annually, once the RST season ends and adult data has been finalized* - the full dataset is rebuilt to also incorporate the year's adult datasets.
+
+Version numbers direclty align with this update schedule, a major release accompanies the annual update (both juvenile and adult data change), while minor releases correspond to the within-season biweekly updates. 
+
+Every update follows the same three steps:
+
+- Run `data-raw/update_data.R`. This script pulls raw monitoring data from jpe-db, EDI, and CDEC/USGS gages, rebuilds the covariate, RST, adult, genetics, and survival data objects, and regenerates package documentation and the pkgdown site.
+- Run `data-raw/qc/run_annual_qc.R`. This script renders the RST, flow/temperature, efficiency, and summary reports. Flagged issues are logged to qc_log_errors.csv and qc_log_warnings.csv for review; see `data-raw/qc/qc_workflow.md` for the full QC workflow.
+- Run `data-raw/data-checks/stream_team_review/render_reviews.R`. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized.
+
+NOTE: Annually, the `data-raw/pull_data_scripts/README.md` should be revisited to check whether we can update any "misfit" data sources to pull from pipelines that are still being refined. 
