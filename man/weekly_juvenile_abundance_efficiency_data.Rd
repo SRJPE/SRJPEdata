@@ -3,19 +3,23 @@
 \docType{data}
 \name{weekly_juvenile_abundance_efficiency_data}
 \alias{weekly_juvenile_abundance_efficiency_data}
-\alias{weekly_juvenile_abundance_model_data}
 \title{Weekly BT-SPAS-X Model Efficency Data}
 \format{
 A tibble with 651 rows and 8 columns
 \itemize{
 \item \code{year}: year
+\item \code{run_year}: Run year
 \item \code{week} : week
 \item \code{stream}: rst stream
 \item \code{site}: rst site
 \item \code{number_released}: Number of efficiency trial fish released
 \item \code{number_recaptured}: Number of efficiency trial fish recaptured
 \item \code{standardized_efficiency_flow}: Flow standardized across years and sites
-\item \code{run_year}: Run year
+\item \code{standardized_log_efficiency_flow}: Log-transformed flow standardized across years within sites
+\item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
+\item \code{log_flow_cfs}: Weekly mean gage flow, log-transformed
+\item \code{hours_fished}: Weekly hours fished for a site
+\item \code{average_hours_fished_during_efficiency_trials}: Average hours a trap was fished during efficiency trials
 }
 }
 \source{
@@ -24,7 +28,7 @@ flow_data (see \code{?SRJPEdata::flow_data}), hours fished information
 (see \verb{?SRJPEdata::weekly_hours_fished for more information}).
 }
 \usage{
-weekly_juvenile_abundance_model_data
+weekly_juvenile_abundance_efficiency_data
 }
 \description{
 Weekly Rotary Screw Trap (RST) efficiency data and weekly standardized flow,
