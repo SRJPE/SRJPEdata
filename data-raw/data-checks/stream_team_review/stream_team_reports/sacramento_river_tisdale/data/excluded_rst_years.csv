@@ -1,2 +1,4 @@
 stream,site,run_year,number_weeks,exclusion_type,apply_to,exclude
+sacramento river,tisdale,2010,0,60% of weeks sampled,all runs,TRUE
+sacramento river,tisdale,2012,0,60% of weeks sampled,all runs,TRUE
 sacramento river,tisdale,2013,20,spring run specific - 11 consecutive weeks not sampled Dec 16 to Feb 19,spring,TRUE

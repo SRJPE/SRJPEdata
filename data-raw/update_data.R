@@ -70,4 +70,12 @@ devtools::test()
 devtools::document()
 pkgdown::build_site()
 
-message("Update complete!")
+# DATA QUALITY REPORTS 
+# Build stream team reports and QC 
+source("data-raw/data-checks/stream_team_review/render_reviews.R")
+source("data-raw/qc/run_annual_qc.R")
+
+
+message("Update complete! Check the stream team reports and QC folders to see helpful summary reports")
+
+

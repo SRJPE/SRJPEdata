@@ -2703,10 +2703,7 @@ week,year,stream,gage_number,gage_agency,site_group,parameter,statistic,value
 33,2007,sacramento river,11390500,USGS,tisdale,temperature,mean,19.175
 33,2007,sacramento river,11390500,USGS,tisdale,temperature,min,18
 34,2007,sacramento river,11390500,USGS,tisdale,temperature,max,21.3
-34,2007,sacramento river,11390500,USGS,tisdale,temperature,mean,NA
 34,2007,sacramento river,11390500,USGS,tisdale,temperature,min,20.3
-36,2007,sacramento river,11390500,USGS,tisdale,temperature,max,NA
-36,2007,sacramento river,11390500,USGS,tisdale,temperature,mean,NA
 36,2007,sacramento river,11390500,USGS,tisdale,temperature,min,19.3
 40,2007,sacramento river,11390500,USGS,tisdale,temperature,max,16.8
 40,2007,sacramento river,11390500,USGS,tisdale,temperature,mean,15.86

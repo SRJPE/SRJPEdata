@@ -1,5 +1,7 @@
 stream,site,run_year,number_weeks,exclusion_type,apply_to,exclude
+deer creek,deer creek,1992,0,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,1993,4,60% of weeks sampled,all runs,TRUE
+deer creek,deer creek,1994,0,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,1995,16,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,1997,3,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,1998,6,60% of weeks sampled,all runs,TRUE
@@ -7,4 +9,5 @@ deer creek,deer creek,1999,14,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,2006,16,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,2008,9,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,2009,18,60% of weeks sampled,all runs,TRUE
+deer creek,deer creek,2022,0,60% of weeks sampled,all runs,TRUE
 deer creek,deer creek,2025,15,60% of weeks sampled,all runs,TRUE

@@ -23,12 +23,11 @@ low_catch_years <- weekly_juvenile_abundance_catch_data |>
 
 # Assign stream/site/year as exclude or not based on criteria
 exclusion_catch <- weekly_juvenile_abundance_catch_data |>
-  filter(!is.na(count)) |> # remove when trap is not fishing
   filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
-  select(stream, site, week, run_year) |>
-  distinct() |>
-  group_by(stream, site, run_year) |>
-  summarise(number_weeks = n()) |>
+  select(stream, site, week, run_year, count) |> 
+  # distinct(stream, site, week, run_year) |>
+  group_by(stream, site, run_year) |> 
+  summarise(number_weeks =sum(!is.na(count))) |> 
   # other exclusion rules are included in case this changes in the future
   mutate(
     exclude_20 = ifelse(number_weeks < 6, TRUE, FALSE),
