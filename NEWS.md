@@ -12,8 +12,8 @@ Data Updates
 Logic Updates
 
 - Decouples flow and and water temperature data pulls, processing remains the same, now two tables, `flow_data` and `temperature_data` instead of the one `environmental_data`
-- Updates years to include vignette to focus on documentation, moves code logic to produce `rst_mode_years`and `adult_model_years` tables into a standalone helper data script. These tables now take the place of `years_to_include_rst_data`, `years_to_exclude_rst_data`, `years_to_include_adult_data`, and `years_to_exclude_adult_data` 
-- Produce a series of QC reports 
+- Updates years to include vignette to focus on documentation, moves code logic to produce `rst_model_years`and `adult_model_years` tables into a standalone helper data script. These tables now take the place of `years_to_include_rst_data`, `years_to_exclude_rst_data`, `years_to_include_adult_data`, and `years_to_exclude_adult_data` 
+- Produces a series of QC reports 
 - Removes passage to spawner datasets, adds to new p2s model repo 
 
 Documentation Updates

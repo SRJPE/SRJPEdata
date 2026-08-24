@@ -10,15 +10,15 @@ Data are loaded into `jpe-db` (Azure PostgreSQL) and updated regularly. Because 
 
 ## Action Items - Misfit Data Sources to Revisit
 
-Revisit data pulled in `pull_misfit_rst_data.R` - as we update data to upload hardcoded scripts to EDI or the SRJPE database, we can remove the temporary code in this script that pulls and processes misfit data. 
+Revisit data pulled in `pull_misfit_rst_data.R` - as we update temporary hardcoded scripts to pull from EDI or the SRJPE database, we can remove the temporary code in this script that pulls and processes misfit data. 
 
-- [ ] **Butte Creek pre-2015 catch/trap is pulled from static file** 
-- [ ] **Yuba pre-2022 (edi.1529) is pinned to version 13** Newer versions are published in zip format that the current `pull_edi()` helper can't parse. Investigate adding zip-file support so Yuba can move off the pinned version and pick up any upstream corrections.
+- [ ] **Butte Creek pre-2015 catch/trap is pulled from static file** These data do not have unique IDs and are not stored in the database. *This misfit data is not expected to change.*
+- [ ] **Yuba pre-2022 (edi.1529) is pinned to version 13** Newer versions are published in zip format that the current `pull_edi()` helper can't parse. Investigate adding zip-file support so Yuba can move off the pinned version and pick up any upstream corrections. *Low priority*
 - [ ] **Deer/Mill historical data (edi.1504) is pinned to version 3** ("Version is static" per the script comment) rather than pulling the latest. Confirm whether a newer version has been published and, if so, whether it's safe to unpin.
 - [ ] **Battle/Clear recapture has a hard-coded data fix** (a recapture count of 1180 on 2018-02-15 is overridden to 11) because the source error on EDI hasn't been corrected upstream - flagged to USFWS contact Natasha as of 7/24/2025 and still unresolved as of the last check. Follow up and remove the override once EDI is corrected.
 - [ ] **Battle/Clear 2026 efficiency** 2026 efficiency data is not yet on EDI so we currently pull from 2 xlsx sheets. Check EDI and update script once 2026 data is on EDI. 
 - [ ] **Deer/Mill recapture has a hard-coded fix** for recapture dates mistakenly entered with year 2032 instead of 2023. Follow up and remove the override once corrected at the source.
-- [ ] **Knights Landing pre-2004 data pulled from standard format csv** (`data-raw/helper-tables/google_bucket/knl_*_standard.csv`) pulled from the standard-format files in JPE-datasets/Google Cloud Bucket, on the assumption that this historical data "will not change." Confirm that's still true, and check whether CDFW has since published it to EDI, last checked August 2026.
+- [ ] **Knights Landing pre-2004 data pulled from standard format csv** (`data-raw/helper-tables/google_bucket/knl_*_standard.csv`) pulled from the standard-format files in JPE-datasets/Google Cloud Bucket, on the assumption that this historical data "will not change." Confirm that's still true, and check whether CDFW has since published it to EDI, last checked August 2026. Starting in 2026 CDFW no longer operates this trap and Fish Bio has taken over. *This misfit data is not expected to change.*
 
 ---
 

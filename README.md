@@ -56,6 +56,6 @@ Every update follows the same three steps:
 
 - Run `data-raw/update_data.R`. This script pulls raw monitoring data from jpe-db, EDI, and CDEC/USGS gages, rebuilds the covariate, RST, adult, genetics, and survival data objects, and regenerates package documentation and the pkgdown site.
 - Run `data-raw/qc/run_annual_qc.R`. This script renders the RST, flow/temperature, efficiency, and summary reports. Flagged issues are logged to qc_log_errors.csv and qc_log_warnings.csv for review; see `data-raw/qc/qc_workflow.md` for the full QC workflow.
-- Run `data-raw/data-checks/stream_team_review/render_reviews.R`. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized.
+- Run `data-raw/data-checks/stream_team_review/render_reviews.R`. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized. These files are emailed to stream teams around July-September.
 
 NOTE: Annually, the `data-raw/pull_data_scripts/README.md` should be revisited to check whether we can update any "misfit" data sources to pull from pipelines that are still being refined. 
