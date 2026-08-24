@@ -142,6 +142,23 @@
 </h2>
 <p>Explore model datasets on the SRJPEdashboard shiny app. (Add link)</p>
 </div>
+<div class="section level2">
+<h2 id="updating-data">Updating data<a class="anchor" aria-label="anchor" href="#updating-data"></a>
+</h2>
+<p>Data objects are rebuilt on a schedule tied to the RST monitoring season (Nov - June):</p>
+<ul>
+<li><p><em>Biweekly, during the RST season</em> - RST catch/trap/efficiency, flow, temperature, and genetics data are refreshed with the most current available records.</p></li>
+<li><p><em>Annually, once the RST season ends and adult data has been finalized</em> - the full dataset is rebuilt to also incorporate the year’s adult datasets.</p></li>
+</ul>
+<p>Version numbers direclty align with this update schedule, a major release accompanies the annual update (both juvenile and adult data change), while minor releases correspond to the within-season biweekly updates.</p>
+<p>Every update follows the same three steps:</p>
+<ul>
+<li>Run <code>data-raw/update_data.R</code>. This script pulls raw monitoring data from jpe-db, EDI, and CDEC/USGS gages, rebuilds the covariate, RST, adult, genetics, and survival data objects, and regenerates package documentation and the pkgdown site.</li>
+<li>Run <code>data-raw/qc/run_annual_qc.R</code>. This script renders the RST, flow/temperature, efficiency, and summary reports. Flagged issues are logged to qc_log_errors.csv and qc_log_warnings.csv for review; see <code>data-raw/qc/qc_workflow.md</code> for the full QC workflow.</li>
+<li>Run <code>data-raw/data-checks/stream_team_review/render_reviews.R</code>. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized.</li>
+</ul>
+<p>NOTE: Annually, the <code>data-raw/pull_data_scripts/README.md</code> should be revisited to check whether we can update any “misfit” data sources to pull from pipelines that are still being refined.</p>
+</div>
 </div>
   </div>
 
