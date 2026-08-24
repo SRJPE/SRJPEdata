@@ -15,9 +15,11 @@ A tibble with 10,890 rows and 14 columns
 \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish
 \item \code{hours_fished}: Hours fished on a stream
 \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
+\item \code{log_flow_cfs}: Weekly mean gage flow, log-transformed
 \item \code{life_stage}: Life stage of juvenile fish
 \item \code{average_stream_hours_fished}: Average hours fished on a given stream, used to standardize
-\item \code{standardized_flow}: Flow standardized across years and sites
+\item \code{standardized_flow}: Flow standardized across years within sites
+\item \code{log_standardized_flow}: Log-transformed flow standardized across years within sites
 \item \code{run_year}: Run year
 \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week
 \item \code{lgN_prior}: log normalized special prior abundance cap
