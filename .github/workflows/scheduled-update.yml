@@ -1,0 +1,155 @@
+name: "Automatic Data Update (schedule / manual dispatch)"
+
+# Entry point for the AUTOMATIC path:
+#   schedule (biweekly) or workflow_dispatch (annual - still manually
+#   triggered for now, or ad-hoc manual runs)
+#     -> prepare            (create a bot branch off main)
+#     -> update-data         (regenerate data objects, commit to bot branch)
+#     -> open-pr              (open a PR main <- bot branch, so there's
+#                              always a reviewable diff + a real place for
+#                              check-data's status check to block merge)
+#     -> check-data            (QC; blocks merge + emails on failure)
+#     -> auto-merge              (only if QC passed AND auto_merge=true)
+#
+# Why a bot PR instead of pushing straight to main (as the original sketch
+# implied)? So "blocks merge" is literally true for automatic runs too -
+# a QC failure leaves main untouched and the PR open for a human to look at,
+# instead of bad data already being live on main with only an after-the-fact
+# email. release-and-news.yml still fires normally once this PR merges
+# (auto or by a human), reading the `Update-Type:` trailer this workflow
+# stamps on its own commit.
+#
+# TODO(SRJPE): the cron below is a PLACEHOLDER (1st and 15th of month,
+# 13:00 UTC / 6am PDT). Replace with the actual EDI RST-data publication
+# schedule once confirmed from the versioning doc / EDI maintainers.
+# Cron has no native "every 2 weeks" - if EDI's cadence isn't day-of-month
+# aligned, switch this to a weekly cron plus an ISO-week-parity check step.
+#
+# TODO(SRJPE): the annual adult/temperature update is "still manual" per
+# the spec, so there is NO schedule trigger for it below - only the
+# workflow_dispatch path with update_type=annual. Flip on a cron here once
+# that process is ready to automate (targeting ~December, before JPE
+# execution, per the versioning doc).
+
+on:
+  schedule:
+    - cron: "0 13 1,15 * *" # TODO(SRJPE): confirm against real EDI biweekly schedule
+    # - cron: "0 13 1 12 *"  # TODO(SRJPE): example placeholder for a future automated annual run - left disabled
+  workflow_dispatch:
+    inputs:
+      update_type:
+        description: "Update type for this manual run"
+        type: choice
+        options: [annual, biweekly, manual]
+        default: manual
+      datasets:
+        description: "Optional comma-separated dataset override (adult,temperature,juvenile,flow)"
+        type: string
+        default: ""
+      auto_merge:
+        description: "Automatically merge the generated PR if QC passes"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      update_type: ${{ steps.resolve.outputs.update_type }}
+      bot_branch: ${{ steps.resolve.outputs.bot_branch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Resolve update_type + create bot branch
+        id: resolve
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            update_type="${{ inputs.update_type }}"
+          else
+            # Only one schedule trigger is currently enabled (biweekly).
+            # If a second cron (annual) is enabled above, branch on
+            # `github.event.schedule` (the exact cron string) here instead.
+            update_type="biweekly"
+          fi
+
+          bot_branch="automated-data-update/${update_type}-$(date -u +%Y%m%d)-${{ github.run_number }}"
+          git checkout -b "${bot_branch}"
+          git push origin "${bot_branch}"
+
+          echo "update_type=${update_type}" >> "$GITHUB_OUTPUT"
+          echo "bot_branch=${bot_branch}" >> "$GITHUB_OUTPUT"
+
+  update-data:
+    needs: prepare
+    uses: ./.github/workflows/update-data.yml
+    with:
+      update_type: ${{ needs.prepare.outputs.update_type }}
+      datasets: ${{ inputs.datasets || '' }}
+      ref: ${{ needs.prepare.outputs.bot_branch }}
+      commit_changes: true
+    secrets: inherit
+
+  open-pr:
+    needs: [prepare, update-data]
+    if: ${{ needs.update-data.outputs.data_changed == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.create.outputs.pr_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open PR into main
+        id: create
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          url=$(gh pr create \
+            --base main \
+            --head "${{ needs.prepare.outputs.bot_branch }}" \
+            --title "chore(data): automated ${{ needs.prepare.outputs.update_type }} update (${{ needs.update-data.outputs.datasets_run }})" \
+            --body "Automated data refresh. Update-Type: ${{ needs.prepare.outputs.update_type }}. Datasets: ${{ needs.update-data.outputs.datasets_run }}. This PR will auto-merge if Quality Control Checks pass.")
+          pr_number=$(basename "${url}")
+          echo "pr_number=${pr_number}" >> "$GITHUB_OUTPUT"
+
+  check-data:
+    needs: [prepare, update-data, open-pr]
+    if: ${{ needs.update-data.outputs.data_changed == 'true' }}
+    uses: ./.github/workflows/check-data.yml
+    with:
+      update_type: ${{ needs.prepare.outputs.update_type }}
+      ref: ${{ needs.prepare.outputs.bot_branch }}
+      pr_number: ${{ needs.open-pr.outputs.pr_number }}
+    secrets: inherit
+
+  auto-merge:
+    needs: [prepare, open-pr, check-data]
+    if: ${{ needs.check-data.outputs.qc_passed == 'true' && inputs.auto_merge != false }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Merge PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr merge "${{ needs.open-pr.outputs.pr_number }}" --merge --admin
+
+  no-changes:
+    needs: [prepare, update-data]
+    if: ${{ needs.update-data.outputs.data_changed != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Nothing to do
+        run: |
+          echo "No new data from source for update_type=${{ needs.prepare.outputs.update_type }} - skipping PR/QC/release."
+          # Note: the bot branch created in `prepare` is left in place with no
+          # commits ahead of main; TODO(SRJPE) add a cleanup step here (or a
+          # separate scheduled job) to delete stale empty bot branches.

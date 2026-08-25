@@ -1,0 +1,171 @@
+name: "Release Tags & News Update"
+
+# Fires once code/data actually lands on main - i.e. after a PR from either
+# check-commit.yml (human path) or scheduled-update.yml (bot path) merges.
+# Reads the `Update-Type:` trailer that both paths stamp onto their commits
+# to decide the semver bump, then tags, updates NEWS.md, cuts a GitHub
+# Release (the "Create Article on Releases" step), and redeploys the
+# pkgdown site so the News tab picks it up.
+#
+# Guards against re-triggering itself: this workflow's own version-bump
+# commit includes "[skip release]", and the job is skipped for any push
+# whose head commit contains that marker.
+#
+# IMPORTANT - only the tip (last) commit on main is read for update_type and
+# for the manual bump-severity decision (see determine_version_bump.sh) -
+# earlier commits on a merged branch are not inspected. That only works if
+# the commit that lands on main actually carries the Update-Type trailer:
+#   - Squash merge: fine, as long as the squash commit body retains it
+#     (GitHub's default squash message includes each source commit's full
+#     message when the repo isn't set to "PR title and description only").
+#   - Rebase merge: fine - the original commit (and its trailer) lands on
+#     main unchanged.
+#   - "Create a merge commit": BREAKS this - the merge commit's own message
+#     is just "Merge pull request #N ...", with no trailer.
+# TODO(SRJPE): in the repo's Settings > General > Pull Requests, disable
+# "Allow merge commits" and leave only Squash and/or Rebase enabled so this
+# holds every time, not just when people remember to squash.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {} # manual re-run / backfill, e.g. if this workflow itself failed
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: ${{ !contains(github.event.head_commit.message, '[skip release]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Resolve update_type from the last commit on main
+        id: update-type
+        run: |
+          set -euo pipefail
+          # Only the tip commit's message is read - see the merge-strategy
+          # note below for why that requires Squash or Rebase merge.
+          body="$(git log -1 --format=%B HEAD)"
+          if echo "${body}" | grep -qiE '^update-type:[[:space:]]*annual[[:space:]]*$'; then
+            update_type="annual"
+          elif echo "${body}" | grep -qiE '^update-type:[[:space:]]*biweekly[[:space:]]*$'; then
+            update_type="biweekly"
+          else
+            update_type="manual"
+          fi
+          echo "Resolved update_type=${update_type} from the last commit on main:"
+          git log -1 --format='  %H %s' HEAD
+          echo "update_type=${update_type}" >> "$GITHUB_OUTPUT"
+
+      - name: Determine version bump
+        id: bump
+        run: |
+          chmod +x .github/scripts/determine_version_bump.sh
+          .github/scripts/determine_version_bump.sh "${{ steps.update-type.outputs.update_type }}"
+
+      - name: Generate NEWS.md entry from commits since last release
+        id: news
+        run: |
+          python3 - <<'PY'
+          import subprocess, re, datetime, os
+
+          prev = os.environ["PREV_VERSION"]
+          new = os.environ["NEW_VERSION"]
+          rng = f"v{prev}..HEAD" if prev != "0.0.0" else "HEAD"
+
+          try:
+              log = subprocess.check_output(
+                  ["git", "log", "--format=%s", rng], text=True
+              ).splitlines()
+          except subprocess.CalledProcessError:
+              log = []
+
+          groups = {"feat": [], "fix": [], "chore/other": []}
+          type_re = re.compile(r"^(feat|fix)(\([^)]+\))?!?:\s*(.+)")
+          for subject in log:
+              m = type_re.match(subject)
+              if m:
+                  groups[m.group(1)].append(m.group(3))
+              elif not subject.startswith("Merge "):
+                  groups["chore/other"].append(subject)
+
+          date = datetime.date.today().isoformat()
+          lines = [f"# SRJPEdata {new} ({date})", ""]
+          label_map = {"feat": "Features", "fix": "Fixes", "chore/other": "Other changes"}
+          for key in ("feat", "fix", "chore/other"):
+              if groups[key]:
+                  lines.append(f"### {label_map[key]}")
+                  lines.extend(f"* {item}" for item in groups[key])
+                  lines.append("")
+
+          entry = "\n".join(lines).strip() + "\n"
+          with open("news_entry.md", "w") as f:
+              f.write(entry)
+
+          existing = ""
+          if os.path.exists("NEWS.md"):
+              with open("NEWS.md") as f:
+                  existing = f.read()
+          with open("NEWS.md", "w") as f:
+              f.write(entry + "\n" + existing)
+
+          print("---- news_entry.md ----")
+          print(entry)
+          PY
+        env:
+          PREV_VERSION: ${{ steps.bump.outputs.previous_version }}
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+
+      - name: Bump DESCRIPTION Version field
+        run: |
+          set -euo pipefail
+          if [ -f DESCRIPTION ]; then
+            sed -i -E "s/^Version:.*/Version: ${{ steps.bump.outputs.new_version }}/" DESCRIPTION
+          else
+            echo "::warning::No DESCRIPTION file found - skipping R package Version bump (TODO confirm this repo is still an R package at this path)."
+          fi
+
+      - name: Commit version bump + NEWS.md
+        run: |
+          set -euo pipefail
+          git config user.name "srjpe-data-bot"
+          git config user.email "srjpe-data-bot@users.noreply.github.com"
+          git add DESCRIPTION NEWS.md
+          git commit -m "chore(release): v${{ steps.bump.outputs.new_version }} [skip release]"
+          git push origin HEAD:main
+
+      - name: Tag release
+        run: |
+          set -euo pipefail
+          git tag -a "v${{ steps.bump.outputs.new_version }}" -m "v${{ steps.bump.outputs.new_version }}"
+          git push origin "v${{ steps.bump.outputs.new_version }}"
+
+      - name: Create Article on Releases (GitHub Release)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.new_version }}
+          name: "SRJPEdata v${{ steps.bump.outputs.new_version }}"
+          body_path: news_entry.md
+          generate_release_notes: false
+
+      - name: Set up R (for pkgdown)
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install pkgdown + package deps
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::pkgdown
+          needs: website
+
+      - name: Deploy pkgdown site (News tab)
+        run: |
+          git config user.name "srjpe-data-bot"
+          git config user.email "srjpe-data-bot@users.noreply.github.com"
+          Rscript -e 'pkgdown::deploy_to_branch(new_process = FALSE)'

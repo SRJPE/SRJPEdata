@@ -1,0 +1,63 @@
+name: "PR Data Update (check-commit -> update-data -> check-data)"
+
+# Entry point for the MANUAL / human-authored path:
+#   Any PR opened/updated against main
+#     -> lint-commit-messages  (fail fast on bad Conventional Commits syntax)
+#     -> update-data            (regenerate data objects, push back to PR branch)
+#     -> check-data              (QC; blocks merge + emails on failure)
+#
+# Release tagging + NEWS/article generation deliberately does NOT happen
+# here - that's handled by release-and-news.yml once this PR is actually
+# merged to main, so a version is only cut for code that's landed.
+#
+# Requires branch protection on `main` with "check-data / check-data" (and
+# optionally "lint-commit-messages") set as required status checks so this
+# genuinely blocks the merge button rather than just informing.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  lint-commit-messages:
+    runs-on: ubuntu-latest
+    outputs:
+      update_type: ${{ steps.lint.outputs.update_type }}
+    steps:
+      # Pin the checkout to the PR's actual head commit. On pull_request
+      # events actions/checkout defaults to the synthetic merge ref
+      # (refs/pull/N/merge), whose own message is not the branch's last
+      # commit - we need the real tip commit here, not the merge ref.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Lint last commit message + resolve update-type
+        id: lint
+        run: |
+          chmod +x .github/scripts/lint_commit_messages.sh
+          .github/scripts/lint_commit_messages.sh "${{ github.event.pull_request.head.sha }}"
+
+  update-data:
+    needs: lint-commit-messages
+    uses: ./.github/workflows/update-data.yml
+    with:
+      update_type: ${{ needs.lint-commit-messages.outputs.update_type }}
+      ref: ${{ github.head_ref }}
+      commit_changes: true
+    secrets: inherit
+
+  check-data:
+    needs: update-data
+    uses: ./.github/workflows/check-data.yml
+    with:
+      update_type: ${{ needs.lint-commit-messages.outputs.update_type }}
+      ref: ${{ github.head_ref }}
+      pr_number: ${{ github.event.pull_request.number }}
+    secrets: inherit
