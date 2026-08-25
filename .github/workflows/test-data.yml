@@ -14,53 +14,72 @@ on:
 jobs:
   quality-checks:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.head_ref }}
-      
+
       - name: Fetch main branch
         run: |
           git fetch origin main:main
           echo "Current branch: $(git branch --show-current)"
-      
+
+      - name: Resolve update-type from the last commit
+        id: update-type
+        run: |
+          body="$(git log -1 --format=%B HEAD)"
+          if echo "$body" | grep -qiE '^update-type:[[:space:]]*annual[[:space:]]*$'; then
+            update_type="annual"
+          elif echo "$body" | grep -qiE '^update-type:[[:space:]]*biweekly[[:space:]]*$'; then
+            update_type="biweekly"
+          else
+            update_type="manual"
+          fi
+          echo "Resolved update_type=${update_type}"
+          echo "update_type=${update_type}" >> "$GITHUB_OUTPUT"
+
       - name: Setup R
         uses: r-lib/actions/setup-r@v2
         with:
           r-version: '4.3.0'
           use-public-rspm: true
 
-      - name: Cache R packages
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-r-4.3.0-${{ hashFiles('DESCRIPTION') }}
-          restore-keys: |
-            ${{ runner.os }}-r-4.3.0-
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
-      
+
       - name: Install R packages
         run: |
           install.packages(c('padr','tidyverse', 'testthat', 'yaml', 'devtools', 'dplyr', 'remotes', 'roxygen2'))
         shell: Rscript {0}
-      
+
+      - name: Install package Suggests (quarto, glue - not yet in DESCRIPTION)
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::quarto
+            any::glue
+
       # ==========================================
       # CREDENTIAL SCANNING
       # ==========================================
-      
+
       - name: Check for credentials and sensitive files
         id: credential-check
         run: |
           echo "=== Checking for credentials and sensitive files ==="
           FOUND_ISSUES=0
-          
+
           FORBIDDEN_FILES=(
             ".Renviron"
             ".env"
@@ -69,7 +88,7 @@ jobs:
             "credentials.R"
             "config.yml"
           )
-          
+
           FORBIDDEN_PATTERNS=(
             "password\\s*=\\s*['\"][^'\"]{3,}['\"]"
             "api[_-]?key\\s*=\\s*['\"][^'\"]{10,}['\"]"
@@ -78,7 +97,7 @@ jobs:
             "aws_access_key_id"
             "aws_secret_access_key"
           )
-          
+
           echo "Checking for forbidden files..."
           for file in "${FORBIDDEN_FILES[@]}"; do
             if git ls-files | grep -q "^${file}$"; then
@@ -86,7 +105,7 @@ jobs:
               FOUND_ISSUES=$((FOUND_ISSUES + 1))
             fi
           done
-          
+
           echo ""
           echo "Checking for credential patterns in code..."
           for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
@@ -97,36 +116,36 @@ jobs:
               FOUND_ISSUES=$((FOUND_ISSUES + 1))
             fi
           done
-          
+
           echo ""
           if [ $FOUND_ISSUES -eq 0 ]; then
             echo "✅ No credentials or sensitive files found"
           else
             echo "❌ Found $FOUND_ISSUES potential issues"
           fi
-          
+
           echo "credential_issues=$FOUND_ISSUES" >> $GITHUB_OUTPUT
-      
+
       # ==========================================
       # R PACKAGE STRUCTURE CHECK
       # ==========================================
-      
+
       - name: Check R package structure
         id: structure-check
         run: |
           echo "=== Checking R package structure ==="
           STRUCTURE_ISSUES=0
-          
+
           REQUIRED_FILES=(
             "DESCRIPTION"
             "NAMESPACE"
           )
-          
+
           REQUIRED_DIRS=(
             "R"
             "man"
           )
-          
+
           echo "Checking required files..."
           for file in "${REQUIRED_FILES[@]}"; do
             if [ ! -f "$file" ]; then
@@ -136,7 +155,7 @@ jobs:
               echo "✓ Found: $file"
             fi
           done
-          
+
           echo ""
           echo "Checking required directories..."
           for dir in "${REQUIRED_DIRS[@]}"; do
@@ -147,7 +166,7 @@ jobs:
               echo "✓ Found: $dir/"
             fi
           done
-          
+
           echo ""
           echo "Checking DESCRIPTION file format..."
           if [ -f "DESCRIPTION" ]; then
@@ -160,44 +179,44 @@ jobs:
               STRUCTURE_ISSUES=$((STRUCTURE_ISSUES + 1))
             fi
           fi
-          
+
           echo ""
           if [ $STRUCTURE_ISSUES -eq 0 ]; then
             echo "✅ Package structure looks good"
           else
             echo "❌ Found $STRUCTURE_ISSUES structure issues"
           fi
-          
+
           echo "structure_issues=$STRUCTURE_ISSUES" >> $GITHUB_OUTPUT
-      
+
       # ==========================================
       # TESTTHAT TESTS
       # ==========================================
-      
+
       - name: Run testthat tests
         id: testthat
         continue-on-error: true
         run: |
           echo "=== Running testthat tests ==="
-          
+
           if [ ! -d "tests/testthat" ]; then
             echo "⚠️  No tests/testthat directory found"
             echo "test_status=skipped" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           TEST_FILES=$(find tests/testthat -name "test*.R" | wc -l)
           echo "Found $TEST_FILES test file(s)"
-          
+
           if [ $TEST_FILES -eq 0 ]; then
             echo "⚠️  No test files found in tests/testthat/"
             echo "test_status=skipped" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
+
           Rscript -e "
           library(testthat)
-          
+
           tryCatch({
             if (requireNamespace('devtools', quietly = TRUE)) {
               devtools::load_all('.', quiet = TRUE)
@@ -211,10 +230,10 @@ jobs:
           }, error = function(e) {
             cat('⚠️  Warning: Could not load package:', e\$message, '\n')
           })
-          
+
           cat('\nRunning tests...\n')
           results <- test_dir('tests/testthat', reporter = 'summary')
-          
+
           if (any(results\$failed > 0)) {
             cat('\n❌ Some tests failed\n')
             quit(status = 1)
@@ -226,20 +245,20 @@ jobs:
             quit(status = 0)
           }
           "
-          
+
           TEST_EXIT_CODE=$?
           if [ $TEST_EXIT_CODE -eq 0 ]; then
             echo "test_status=passed" >> $GITHUB_OUTPUT
           else
             echo "test_status=failed" >> $GITHUB_OUTPUT
           fi
-          
+
           exit $TEST_EXIT_CODE
-      
+
       # ==========================================
       # DATA COMPARISON
       # ==========================================
-      
+
       - name: Get changed RDA files
         id: changed-files
         uses: tj-actions/changed-files@v46
@@ -261,7 +280,7 @@ jobs:
         run: |
           Rscript inst/scripts/compare_data_files.R "${{ steps.changed-files.outputs.all_changed_files }}"
           echo "comparison_exit_code=$?" >> $GITHUB_OUTPUT
-        
+
       - name: Upload comparison report
         if: always()
         uses: actions/upload-artifact@v4
@@ -269,7 +288,7 @@ jobs:
           name: data-comparison-report
           path: comparison_report.txt
           retention-days: 30
-      
+
       - name: Check for approval override
         if: steps.comparison.outputs.comparison_exit_code != '0'
         id: check-approval
@@ -278,49 +297,136 @@ jobs:
           script: |
             const labels = context.payload.pull_request.labels.map(l => l.name);
             const approved = labels.includes('data-changes-approved');
-            
+
             console.log('PR labels:', labels);
             console.log('Has approval:', approved);
-            
+
             core.setOutput('approved', approved);
             return approved;
-      
+
+      # ==========================================
+      # ANNUAL QC + STREAM TEAM REVIEW
+      # ==========================================
+      # Runs data-raw/qc/run_annual_qc.R (renders the RST/flow-temp/
+      # efficiency/summary QC reports and appends any newly-detected issues
+      # to data-raw/qc/qc_log_errors.csv / qc_log_warnings.csv) and
+      # data-raw/data-checks/stream_team_review/render_reviews.R (renders
+      # the per-stream reports emailed to stream teams). These used to run
+      # unconditionally at the tail of update_data.R; that call is now
+      # commented out there so they run exactly once, here, against the
+      # data update-data.yml just committed.
+      #
+      # Skipped for biweekly runs: run_annual_qc.R's own header says "run
+      # this once per year after the RST season ends," and the stream team
+      # reports are described in the README as emailed once a year
+      # (July-September) - rendering nine Rmd/qmd reports on every
+      # biweekly sync would run against that intent. If that's wrong and you
+      # actually want these on every run, drop the `if:` condition below.
+      #
+      # The QC log is a running, human-annotated backlog, not a clean
+      # pass/fail signal - qc_log_errors.csv already has open issues in it
+      # today. So this gate only fails on NEW open error-level issues this
+      # run adds, not the pre-existing backlog (which is still surfaced,
+      # just non-blocking, in the PR comment below).
+
+      - name: Run annual QC + stream team review
+        id: annual-qc
+        if: steps.update-type.outputs.update_type != 'biweekly'
+        continue-on-error: true
+        run: |
+          Rscript - <<'RSCRIPT'
+          devtools::load_all(quiet = TRUE)
+
+          read_open_ids <- function(path) {
+            if (!file.exists(path) || file.info(path)$size < 50) return(character(0))
+            df <- readr::read_csv(path, show_col_types = FALSE,
+                                   col_types = readr::cols(.default = "c"))
+            df <- df[rowSums(!is.na(df)) > 0, ]
+            if (nrow(df) == 0) return(character(0))
+            df$log_id[df$status == "open"]
+          }
+
+          errors_path   <- "data-raw/qc/qc_log_errors.csv"
+          warnings_path <- "data-raw/qc/qc_log_warnings.csv"
+
+          open_errors_before <- read_open_ids(errors_path)
+
+          source("data-raw/data-checks/stream_team_review/render_reviews.R")
+          source("data-raw/qc/run_annual_qc.R")
+
+          open_errors_after <- read_open_ids(errors_path)
+          open_warnings     <- read_open_ids(warnings_path)
+          new_open_errors   <- setdiff(open_errors_after, open_errors_before)
+
+          gh_out <- Sys.getenv("GITHUB_OUTPUT")
+          cat(sprintf("new_open_errors=%d\n",     length(new_open_errors)),  file = gh_out, append = TRUE)
+          cat(sprintf("total_open_errors=%d\n",   length(open_errors_after)), file = gh_out, append = TRUE)
+          cat(sprintf("total_open_warnings=%d\n", length(open_warnings)),     file = gh_out, append = TRUE)
+
+          if (length(new_open_errors) > 0) {
+            cat("\nNew open error-level QC issues from this run:\n")
+            print(new_open_errors)
+          }
+          RSCRIPT
+
+      - name: Commit rendered QC + stream team review outputs
+        if: ${{ always() && steps.update-type.outputs.update_type != 'biweekly' }}
+        run: |
+          set -euo pipefail
+          git add data-raw/qc/reports data-raw/qc/qc_log_errors.csv data-raw/qc/qc_log_warnings.csv \
+                  data-raw/data-checks/stream_team_review/stream_team_reports 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git config user.name "srjpe-data-bot"
+            git config user.email "srjpe-data-bot@users.noreply.github.com"
+            git commit -m "chore(qc): render annual QC + stream team review reports" \
+                        -m "Update-Type: ${{ steps.update-type.outputs.update_type }}"
+            git push origin "HEAD:${{ github.head_ref }}"
+          else
+            echo "No QC/report changes to commit."
+          fi
+
       # ==========================================
       # REPORTING
       # ==========================================
-      
+
       - name: Comment PR with results
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
-            
+
             const credentialIssues = parseInt('${{ steps.credential-check.outputs.credential_issues }}') || 0;
             const structureIssues = parseInt('${{ steps.structure-check.outputs.structure_issues }}') || 0;
             const testStatus = '${{ steps.testthat.outputs.test_status }}' || 'unknown';
             const comparisonExitCode = '${{ steps.comparison.outputs.comparison_exit_code }}';
             const dataApproved = '${{ steps.check-approval.outputs.approved }}' === 'true';
-            
+            const updateType = '${{ steps.update-type.outputs.update_type }}' || 'manual';
+            const annualQcOutcome = '${{ steps.annual-qc.outcome }}';
+            const newOpenErrors = parseInt('${{ steps.annual-qc.outputs.new_open_errors }}') || 0;
+            const totalOpenErrors = parseInt('${{ steps.annual-qc.outputs.total_open_errors }}') || 0;
+            const totalOpenWarnings = parseInt('${{ steps.annual-qc.outputs.total_open_warnings }}') || 0;
+
             let comparisonReport = 'No comparison report generated.';
             if (fs.existsSync('comparison_report.txt')) {
               comparisonReport = fs.readFileSync('comparison_report.txt', 'utf8');
             }
-            
+
             let statusSummary = '## 🔍 Quality Check Summary\n\n';
-            
+            statusSummary += `_update-type: \`${updateType}\`_\n\n`;
+
             if (credentialIssues > 0) {
               statusSummary += '❌ **Credential Scan:** Found ' + credentialIssues + ' potential issue(s)\n';
             } else {
               statusSummary += '✅ **Credential Scan:** No credentials detected\n';
             }
-            
+
             if (structureIssues > 0) {
               statusSummary += '❌ **Package Structure:** Found ' + structureIssues + ' issue(s)\n';
             } else {
               statusSummary += '✅ **Package Structure:** Valid R package structure\n';
             }
-            
+
             if (testStatus === 'passed') {
               statusSummary += '✅ **Tests:** All tests passed\n';
             } else if (testStatus === 'failed') {
@@ -330,7 +436,7 @@ jobs:
             } else {
               statusSummary += '❓ **Tests:** Status unknown\n';
             }
-            
+
             if (comparisonExitCode === '0') {
               statusSummary += '✅ **Data Comparison:** No existing values changed\n';
             } else if (dataApproved) {
@@ -338,11 +444,24 @@ jobs:
             } else {
               statusSummary += '❌ **Data Comparison:** Existing values changed (requires approval)\n';
             }
-            
+
+            if (updateType === 'biweekly') {
+              statusSummary += '⏭️ **Annual QC & Stream Review:** skipped (biweekly update)\n';
+            } else if (annualQcOutcome === 'success' || annualQcOutcome === 'failure') {
+              if (newOpenErrors > 0) {
+                statusSummary += `❌ **Annual QC & Stream Review:** ${newOpenErrors} new open error(s)\n`;
+              } else {
+                statusSummary += '✅ **Annual QC & Stream Review:** no new open errors\n';
+              }
+              statusSummary += `   _(backlog: ${totalOpenErrors} open error(s), ${totalOpenWarnings} open warning(s) total — not blocking)_\n`;
+            } else {
+              statusSummary += '❓ **Annual QC & Stream Review:** did not run\n';
+            }
+
             statusSummary += '\n---\n\n';
-            
+
             let detailedReport = '';
-            
+
             const allDataFiles = '${{ steps.all-data-files.outputs.all_files }}'.trim().split(/\s+/).filter(Boolean);
             const changedDataFiles = '${{ steps.changed-files.outputs.all_changed_files }}'.trim().split(/\s+/).filter(Boolean);
             const unchangedDataFiles = allDataFiles.filter(f => !changedDataFiles.includes(f));
@@ -369,74 +488,90 @@ jobs:
             if (dataSection) {
               detailedReport += dataSection + '\n\n---\n\n';
             }
-            
+
             if (credentialIssues > 0) {
               detailedReport += `### 🔐 Credential Scan Issues
-            
+
             Review the "Check for credentials" step to see what was detected.
-            
+
             **How to fix:**
             - Remove sensitive files from the commit
             - Use environment variables: \`Sys.getenv("API_KEY")\`
             - Add sensitive files to \`.gitignore\`
-            
+
             ---
-            
+
             `;
             }
-            
+
             if (structureIssues > 0) {
               detailedReport += `### 📦 Package Structure Issues
-            
+
             Review the "Check R package structure" step in the workflow logs.
-            
+
             **How to fix:**
             - Ensure standard R package structure
             - Run \`devtools::check()\` locally
-            
+
             ---
-            
+
             `;
             }
-            
+
             if (testStatus === 'failed') {
               detailedReport += `### 🧪 Test Failures
-            
+
             Review the "Run testthat tests" step in the workflow logs.
-            
+
             **How to fix:**
             - Run tests locally: \`devtools::test()\`
             - Fix failing tests
-            
+
             ---
-            
+
             `;
             }
-            
+
+            if (updateType !== 'biweekly' && newOpenErrors > 0) {
+              detailedReport += `### 🧬 New QC Issues (\`data-raw/qc/qc_log_errors.csv\`)
+
+            This run's annual QC pass found **${newOpenErrors} new** error-level issue(s) not previously in the log (on top of ${totalOpenErrors - newOpenErrors} pre-existing open error(s), which are not blocking this PR).
+
+            **How to resolve:**
+            - Open \`data-raw/qc/qc_log_errors.csv\` in this PR's branch and find the rows with \`status = open\` added by this run (see the workflow log for the \`Run annual QC\` step for their \`log_id\`s)
+            - For each: set \`status\` to \`reviewed_no_issue\`, \`fixed_in_patch\` (and add a fix block to \`data-raw/qc/fixes/\`), or \`fixed_in_source\`, with \`reviewer_notes\` explaining the call
+            - Commit the updated log to this branch and push - this check re-runs and only re-fails on issues still marked \`open\`
+
+            ---
+
+            `;
+            }
+
             const infoFooter = `
             <details>
             <summary>ℹ️ About these checks</summary>
-            
+
             - **Credential Scan:** Prevents accidental commit of secrets
             - **Package Structure:** Ensures R package standards
             - **Tests:** Verifies code functionality
             - **Data Comparison:** Checks that existing values in .rda files are not changed unexpectedly; new rows are informational only
-            
+            - **Annual QC & Stream Review:** Renders \`data-raw/qc/run_annual_qc.R\` and \`data-raw/data-checks/stream_team_review/render_reviews.R\` against this PR's data; only fails on *newly* flagged error-level issues (skipped entirely for biweekly updates)
+
             </details>`;
-            
+
             const fullComment = statusSummary + detailedReport + infoFooter;
-            
+
             const comments = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            
-            const botComment = comments.data.find(comment => 
-              comment.user.type === 'Bot' && 
+
+            const botComment = comments.data.find(comment =>
+              comment.user.type === 'Bot' &&
               comment.body.includes('Quality Check Summary')
             );
-            
+
             if (botComment) {
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
@@ -452,53 +587,63 @@ jobs:
                 body: fullComment
               });
             }
-      
+
       - name: Final status check
         if: always()
         run: |
           echo "=== Final Status Check ==="
-          
+
           CREDENTIAL_ISSUES="${{ steps.credential-check.outputs.credential_issues }}"
           STRUCTURE_ISSUES="${{ steps.structure-check.outputs.structure_issues }}"
           TEST_STATUS="${{ steps.testthat.outputs.test_status }}"
           COMPARISON_EXIT="${{ steps.comparison.outputs.comparison_exit_code }}"
           DATA_APPROVED="${{ steps.check-approval.outputs.approved }}"
-          
+          UPDATE_TYPE="${{ steps.update-type.outputs.update_type }}"
+          NEW_OPEN_ERRORS="${{ steps.annual-qc.outputs.new_open_errors }}"
+
           if [ -z "$CREDENTIAL_ISSUES" ]; then CREDENTIAL_ISSUES=0; fi
           if [ -z "$STRUCTURE_ISSUES" ]; then STRUCTURE_ISSUES=0; fi
           if [ -z "$TEST_STATUS" ]; then TEST_STATUS=unknown; fi
           if [ -z "$COMPARISON_EXIT" ]; then COMPARISON_EXIT=0; fi
           if [ -z "$DATA_APPROVED" ]; then DATA_APPROVED=false; fi
-          
+          if [ -z "$NEW_OPEN_ERRORS" ]; then NEW_OPEN_ERRORS=0; fi
+
           echo "Credential issues: $CREDENTIAL_ISSUES"
           echo "Structure issues: $STRUCTURE_ISSUES"
           echo "Test status: $TEST_STATUS"
           echo "Comparison exit code: $COMPARISON_EXIT"
           echo "Data approved: $DATA_APPROVED"
+          echo "Update type: $UPDATE_TYPE"
+          echo "New open QC errors: $NEW_OPEN_ERRORS"
           echo ""
-          
+
           FAILURES=0
-          
+
           if [ "$CREDENTIAL_ISSUES" != "0" ]; then
             echo "❌ Credential scan found issues"
             FAILURES=$((FAILURES + 1))
           fi
-          
+
           if [ "$STRUCTURE_ISSUES" != "0" ]; then
             echo "❌ Package structure has issues"
             FAILURES=$((FAILURES + 1))
           fi
-          
+
           if [ "$TEST_STATUS" = "failed" ]; then
             echo "❌ Tests failed"
             FAILURES=$((FAILURES + 1))
           fi
-          
+
           if [ "$COMPARISON_EXIT" != "0" ] && [ "$DATA_APPROVED" != "true" ]; then
             echo "❌ Data comparison failed and not approved"
             FAILURES=$((FAILURES + 1))
           fi
-          
+
+          if [ "$UPDATE_TYPE" != "biweekly" ] && [ "$NEW_OPEN_ERRORS" != "0" ]; then
+            echo "❌ Annual QC found $NEW_OPEN_ERRORS new open error(s) - see data-raw/qc/qc_log_errors.csv"
+            FAILURES=$((FAILURES + 1))
+          fi
+
           echo ""
           if [ "$FAILURES" -eq 0 ]; then
             echo "✅ All checks passed!"

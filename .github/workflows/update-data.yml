@@ -1,21 +1,35 @@
 name: "Update Script (reusable)"
 
-# Reusable workflow - does the actual data refresh work. Not triggered
-# directly; called from check-commit.yml (manual/PR path) and
+# Reusable workflow - runs data-raw/update_data.R, the single script that
+# pulls raw monitoring data (RST catch/trap/efficiency, flow, temperature,
+# genetics, survival, and - in January - adult) from jpe-db, the DataTackle
+# pilot database, EDI, and CDEC/USGS gages, then rebuilds every package data
+# object. Called from check-commit.yml (manual/PR path) and
 # scheduled-update.yml (automatic path) via `jobs.<id>.uses:`.
 #
-# Responsibilities:
-#   1. Work out which datasets to refresh for the given update-type.
-#   2. Run the corresponding data-raw/ update scripts.
-#   3. Commit + push the regenerated data objects back onto the working
-#      branch (the PR branch for manual runs, the bot branch for automatic
-#      runs) so check-data.yml validates the real diff.
+# There is no such thing as "run the adult script" vs "run the flow script" -
+# update_data.R always runs top to bottom in one pass. What changes between
+# update types is (a) whether adult-only sections run at all, and (b) what's
+# actually available to pull that day - not which script executes.
 #
-# TODO(SRJPE): the Rscript paths under "Run dataset update scripts" are
-# placeholders (data-raw/update_adult.R etc.) - point these at the real
-# script names/paths once confirmed. Same for the dependency-install step,
-# which assumes a standard DESCRIPTION-driven R package; swap in
-# renv::restore() if this repo pins deps with renv instead.
+# QC (run_annual_qc.R) and the stream-team review renders (render_reviews.R)
+# used to run automatically at the tail of update_data.R itself - that call
+# has been commented out there (see data-raw/update_data.R) and moved to
+# test-data.yml instead, so they run exactly once, as an explicit gate
+# against the data this step just produced, rather than unconditionally
+# inside this step every time regardless of what test-data.yml then does.
+#
+# IMPORTANT - update_data.R currently decides whether to pull adult data /
+# build the stock-recruit datasets with `if (month(Sys.Date()) == 1)`, a
+# wall-clock check - NOT the update_type resolved below. update_type is
+# exposed to the R process as the UPDATE_TYPE env var, but until that
+# hardcoded month check in update_data.R is changed to read it, triggering
+# update_type=annual by hand in, say, June will NOT pull adult data - only
+# an actual January run will. This is the exact "TODO: transition to
+# alert_type" the whole automation project started from, but changing
+# update_data.R's own pull logic is a behavior change to a script you own,
+# not a workflow-file change, so it's deliberately left alone here pending
+# an explicit go-ahead.
 
 on:
   workflow_call:
@@ -24,14 +38,6 @@ on:
         description: "annual | biweekly | manual"
         required: true
         type: string
-      datasets:
-        description: >
-          Comma-separated list of datasets to refresh (adult, temperature,
-          juvenile, flow). Leave blank to use the default mapping for
-          update_type (annual -> adult,temperature; biweekly -> juvenile,flow).
-        required: false
-        type: string
-        default: ""
       ref:
         description: "Branch to check out and push the regenerated data to."
         required: true
@@ -43,11 +49,8 @@ on:
         default: true
     outputs:
       data_changed:
-        description: "'true' if any data objects were regenerated with differences."
+        description: "'true' if update_data.R produced any file changes."
         value: ${{ jobs.update-data.outputs.data_changed }}
-      datasets_run:
-        description: "Resolved, comma-separated list of datasets that were refreshed."
-        value: ${{ jobs.update-data.outputs.datasets_run }}
 
 permissions:
   contents: write
@@ -57,7 +60,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       data_changed: ${{ steps.diff.outputs.data_changed }}
-      datasets_run: ${{ steps.resolve-datasets.outputs.datasets_run }}
     steps:
       - name: Checkout ${{ inputs.ref }}
         uses: actions/checkout@v4
@@ -65,64 +67,36 @@ jobs:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
 
-      - name: Resolve dataset list for update_type=${{ inputs.update_type }}
-        id: resolve-datasets
-        run: |
-          set -euo pipefail
-          if [ -n "${{ inputs.datasets }}" ]; then
-            datasets="${{ inputs.datasets }}"
-          else
-            case "${{ inputs.update_type }}" in
-              annual)   datasets="adult,temperature" ;;
-              biweekly) datasets="juvenile,flow" ;;
-              manual)   datasets="adult,temperature,juvenile,flow" ;; # TODO(SRJPE): confirm default scope for ad-hoc manual runs
-              *)
-                echo "::error::Unrecognized update_type '${{ inputs.update_type }}'"
-                exit 1
-                ;;
-            esac
-          fi
-          echo "Resolved datasets: ${datasets}"
-          echo "datasets_run=${datasets}" >> "$GITHUB_OUTPUT"
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      - name: Install R dependencies
+      - name: Install package + all Imports/Suggests/Remotes from DESCRIPTION
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
             any::devtools
-          # TODO(SRJPE): replace with renv::restore() here if this repo
-          # uses renv for dependency locking instead of DESCRIPTION deps.
 
-      - name: Run dataset update scripts
+      - name: Run data-raw/update_data.R
         env:
-          # TODO(SRJPE): wire up whatever secrets the data-raw scripts need
-          # to reach EDI and the Azure SRJPE database (connection string,
-          # API keys, etc.) - referenced here as placeholders.
-          AZURE_SRJPE_DB_CONNECTION_STRING: ${{ secrets.AZURE_SRJPE_DB_CONNECTION_STRING }}
-          EDI_API_TOKEN: ${{ secrets.EDI_API_TOKEN }}
-        run: |
-          set -euo pipefail
-          IFS=',' read -ra DATASETS <<< "${{ steps.resolve-datasets.outputs.datasets_run }}"
-          for dataset in "${DATASETS[@]}"; do
-            script="data-raw/update_${dataset}.R"
-            if [ ! -f "${script}" ]; then
-              echo "::error::Expected update script not found: ${script} (TODO: fix path/name mapping)"
-              exit 1
-            fi
-            echo "::group::Running ${script}"
-            Rscript "${script}"
-            echo "::endgroup::"
-          done
+          UPDATE_TYPE: ${{ inputs.update_type }}
+          # See data-raw/pull_data_scripts/pull_tables_from_database.R,
+          # pull_tables_from_data_tackle_database.R, and
+          # pull_functional_flows.R for exactly how these five are read -
+          # names below (left side) are case-sensitive and must match those
+          # Sys.getenv() calls exactly.
+          jpe_db_user_id: ${{ secrets.JPE_DB_USER_ID }}
+          jpe_db_password: ${{ secrets.JPE_DB_PASSWORD }}
+          pilot_db_user_id: ${{ secrets.PILOT_DB_USER_ID }}
+          pilot_db_password: ${{ secrets.PILOT_DB_PASSWORD }}
+          EFLOWS_TOKEN: ${{ secrets.EFLOWS_TOKEN }}
+        run: Rscript data-raw/update_data.R
 
-      - name: Regenerate package documentation
-        run: Rscript -e 'devtools::document()'
-
-      - name: Check for data changes
+      - name: Check for changes
         id: diff
         run: |
           set -euo pipefail
@@ -132,7 +106,7 @@ jobs:
             git status --porcelain
           else
             echo "data_changed=false" >> "$GITHUB_OUTPUT"
-            echo "No data changes produced by this run."
+            echo "No changes produced by this run."
           fi
 
       - name: Commit + push regenerated data
@@ -141,7 +115,6 @@ jobs:
           set -euo pipefail
           git config user.name "srjpe-data-bot"
           git config user.email "srjpe-data-bot@users.noreply.github.com"
-          git add data/ man/ NAMESPACE
-          git commit -m "chore(data): ${{ inputs.update_type }} update for ${{ steps.resolve-datasets.outputs.datasets_run }}" \
-                      -m "Update-Type: ${{ inputs.update_type }}"
+          git add -A
+          git commit -m "chore(data): ${{ inputs.update_type }} update" -m "Update-Type: ${{ inputs.update_type }}"
           git push origin "HEAD:${{ inputs.ref }}"
