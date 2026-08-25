@@ -34,7 +34,11 @@ name: "PR Data Update (check-commit -> update-data)"
 
 on:
   pull_request:
-    branches: [main]
+    # TODO(SRJPE): test-github-actions is here temporarily so Erin can test
+    # this workflow chain by opening a PR from testing_workflow into
+    # test-github-actions - remove it once that testing is done, leaving
+    # only [main].
+    branches: [main, test-github-actions]
     types: [opened, synchronize, reopened, edited]
 
 permissions:

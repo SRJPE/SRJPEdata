@@ -2,8 +2,13 @@ name: Data Quality and Package Checks
 
 on:
   pull_request:
+    # TODO(SRJPE): test-github-actions is here temporarily so Erin can test
+    # this workflow chain by opening a PR from testing_workflow into
+    # test-github-actions - remove it once that testing is done, leaving
+    # only main.
     branches:
       - main
+      - test-github-actions
     paths:
       - 'data/*.rda'
       - 'data/*.RData'
