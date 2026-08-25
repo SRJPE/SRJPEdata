@@ -136,33 +136,17 @@ battle_clear_recapture_edi <- recapture_edi |>
 
 # 2026 battle and clear recapture data is not yet on EDI -----------------------
 # Pull from XLSX files - currently in TEMP_data folder  
+# 2 spreadsheets (one for battle and one for clear) were emailed to ashley vizek on 8/7/2026 by natasha wingerter
+# These are not pushed to GitHub due to privacy around a raw datasheet
 
-# Check Release ID by pulling from DB
-con <- DBI::dbConnect(drv = RPostgres::Postgres(),
-                      host = "jpe-db.postgres.database.azure.com",
-                      dbname = "jpedb-prod",
-                      user = Sys.getenv("jpe_db_user_id"),
-                      password = Sys.getenv("jpe_db_password"),
-                      port = 5432)
-DBI::dbListTables(con)
-
-db_release <- DBI::dbGetQuery(con, "SELECT rs.date_released, rs.release_id, tl.stream, tl.site, 
-                                                tl.subsite, tl.site_group, rs.number_released, r.definition as run, 
-                                                rs.median_fork_length_released,
-                                                ls.definition as life_stage, o.definition as origin, rs.include_in_analysis
-                                                FROM release rs 
-                                                left join trap_location tl on rs.trap_location_id = tl.id 
-                                                left join run r on rs.run_id = r.id
-                                                left join lifestage ls on rs.lifestage_id = ls.id
-                                                left join origin o on rs.origin_id = o.id") 
-clear_max_id <-db_release |> 
+clear_max_id <- release |> 
   dplyr::filter(stream %in% c("clear creek")) |> 
   separate(release_id, into = c("stream_code", "id_num"), sep = 3) |> 
   pull(id_num) |> 
   as.numeric() |> 
   max()
 
-battle_max_id <-db_release |> 
+battle_max_id <- release |> 
   dplyr::filter(stream %in% c("battle creek")) |> 
   separate(release_id, into = c("stream_code", "id_num"), sep = 3) |> 
   pull(id_num) |> 
