@@ -1,18 +1,36 @@
-name: "PR Data Update (check-commit -> update-data -> check-data)"
+name: "PR Data Update (check-commit -> update-data)"
 
 # Entry point for the MANUAL / human-authored path:
 #   Any PR opened/updated against main
 #     -> lint-commit-messages  (fail fast on bad Conventional Commits syntax)
 #     -> update-data            (regenerate data objects, push back to PR branch)
-#     -> check-data              (QC; blocks merge + emails on failure)
+#
+# QC does NOT run as a job in this file. test-data.yml ("Data Quality and
+# Package Checks", job quality-checks) has its own `pull_request` trigger
+# filtered to data/*.rda, data/*.RData, R/**, tests/**, inst/** - exactly
+# the paths update_data.R changes - so the commit update-data.yml pushes
+# back to this PR's branch fires it automatically via `synchronize`. There
+# used to be a `check-data:` job here calling `./.github/workflows/check-data.yml`,
+# but that file never existed; it's removed rather than fixed, since
+# test-data.yml already covers the same ground on its own.
+#
+# NOTE: because update-data.yml's commit lands on this same PR branch, it
+# also re-triggers *this* workflow (synchronize). lint-commit-messages will
+# re-lint the bot's own "chore(data): ... update" commit (passes - it's
+# valid Conventional Commits), and update-data will re-run update_data.R;
+# if nothing new is available to pull, its "Check for changes" step reports
+# data_changed=false and skips committing, so this settles after one extra
+# no-op pass rather than looping.
 #
 # Release tagging + NEWS/article generation deliberately does NOT happen
 # here - that's handled by release-and-news.yml once this PR is actually
 # merged to main, so a version is only cut for code that's landed.
 #
-# Requires branch protection on `main` with "check-data / check-data" (and
-# optionally "lint-commit-messages") set as required status checks so this
-# genuinely blocks the merge button rather than just informing.
+# Requires branch protection on `main` with "Data Quality and Package Checks
+# / quality-checks" (test-data.yml's actual workflow/job name - not
+# "check-data / check-data") and, optionally, "lint-commit-messages" set as
+# required status checks so this genuinely blocks the merge button rather
+# than just informing.
 
 on:
   pull_request:
@@ -30,10 +48,6 @@ jobs:
     outputs:
       update_type: ${{ steps.lint.outputs.update_type }}
     steps:
-      # Pin the checkout to the PR's actual head commit. On pull_request
-      # events actions/checkout defaults to the synthetic merge ref
-      # (refs/pull/N/merge), whose own message is not the branch's last
-      # commit - we need the real tip commit here, not the merge ref.
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -51,13 +65,4 @@ jobs:
       update_type: ${{ needs.lint-commit-messages.outputs.update_type }}
       ref: ${{ github.head_ref }}
       commit_changes: true
-    secrets: inherit
-
-  check-data:
-    needs: update-data
-    uses: ./.github/workflows/check-data.yml
-    with:
-      update_type: ${{ needs.lint-commit-messages.outputs.update_type }}
-      ref: ${{ github.head_ref }}
-      pr_number: ${{ github.event.pull_request.number }}
     secrets: inherit
