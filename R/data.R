@@ -729,3 +729,18 @@
 #'
 #'
 'completed_genetic_samples'
+
+#' @title River Kilometer Lookup 
+#' @name river_km_lookup
+#' @description River km distance from RST sites to detection points. 
+#' @format A tibble with 29 rows and 7 columns
+#' \itemize{
+#'   \item \code{stream}: rst stream
+#'   \item \code{site}: rst site
+#'   \item \code{site_latitude}: Latitude of RST site
+#'   \item \code{site_longitude}: Longitude of RST site
+#'   \item \code{group}: Flow standardized across years and sites
+#'   \item \code{distance_to}: Log-transformed flow standardized across years within sites
+#'   \item \code{rkm_distance}: Weekly mean gage flow in cubic feet per second (cfs)
+#' @source Prepared using GIS based on coordinates of each site.
+'river_km_lookup'
