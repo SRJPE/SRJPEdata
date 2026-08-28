@@ -41,6 +41,7 @@ reference:
   desc: RST monitoring datasets compiled accross streams. 
 - contents:
   - site_lookup
+  - river_km_lookup
   - rst_catch
   - rst_trap
   - release

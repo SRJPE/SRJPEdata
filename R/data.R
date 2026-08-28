@@ -742,5 +742,6 @@
 #'   \item \code{group}: Flow standardized across years and sites
 #'   \item \code{distance_to}: Log-transformed flow standardized across years within sites
 #'   \item \code{rkm_distance}: Weekly mean gage flow in cubic feet per second (cfs)
+#' }
 #' @source Prepared using GIS based on coordinates of each site.
 'river_km_lookup'
