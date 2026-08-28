@@ -80,6 +80,8 @@ jobs:
         with:
           extra-packages: |
             any::devtools
+            any::DBI
+            any::RPostgres
 
       - name: Run data-raw/update_data.R
         env:
