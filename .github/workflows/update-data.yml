@@ -87,9 +87,9 @@ jobs:
         env:
           jpe_db_user_id: ${{ secrets.JPE_DB_USER_ID }}
           jpe_db_password: ${{ secrets.JPE_DB_PASSWORD }}
-          run: | 
-            echo “user length: ${#jpe_db_user_id}”
-            echo “password length: ${#jpe_db_password}”
+        run: |
+          echo "user length: ${#jpe_db_user_id}"
+          echo "password length: ${#jpe_db_password}"
 
       - name: Run data-raw/update_data.R
         env:
