@@ -83,6 +83,11 @@ jobs:
             any::DBI
             any::RPostgres
             any::EDIutils
+            any::RMark
+            any::data.table
+            any::leaflet
+            any::readr
+            any::pkgdown
             
       - name: Check DB env vars are set
         env:
