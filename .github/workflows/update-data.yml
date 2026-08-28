@@ -105,6 +105,7 @@ jobs:
           pilot_db_user_id: ${{ secrets.PILOT_DB_USER_ID }}
           pilot_db_password: ${{ secrets.PILOT_DB_PASSWORD }}
           EFLOWS_TOKEN: ${{ secrets.EFLOWS_TOKEN }}
+          EDI_API_KEY: ${{ secrets.EDI_API_KEY }}
         run: Rscript data-raw/update_data.R
 
       - name: Check for changes
