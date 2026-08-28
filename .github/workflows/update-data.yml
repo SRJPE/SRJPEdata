@@ -6,7 +6,7 @@ name: "Update Script (reusable)"
 # pilot database, EDI, and CDEC/USGS gages, then rebuilds every package data
 # object. Called from check-commit.yml (manual/PR path) and
 # scheduled-update.yml (automatic path) via `jobs.<id>.uses:`.
-#
+
 # There is no such thing as "run the adult script" vs "run the flow script" -
 # update_data.R always runs top to bottom in one pass. What changes between
 # update types is (a) whether adult-only sections run at all, and (b) what's
