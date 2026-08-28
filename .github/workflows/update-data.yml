@@ -82,6 +82,7 @@ jobs:
             any::devtools
             any::DBI
             any::RPostgres
+            any::EDIutils
             
       - name: Check DB env vars are set
         env:
