@@ -1,0 +1,458 @@
+---
+title: "Feather River Flow Data - Gage Sourcing Summary"
+author: "FlowWest"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 12,
+  fig.height = 6
+)
+
+library(tidyverse)
+library(dataRetrieval)
+library(CDECRetrieve)
+library(plotly)
+library(wesanderson)
+
+theme_set(
+  theme_minimal() +
+    theme(
+      plot.title = element_text(size = 16, face = "bold"),
+      axis.title.x = element_text(size = 14),
+      axis.title.y = element_text(size = 14),
+      legend.position = "bottom"
+    )
+)
+
+# Wes Anderson palette (Zissou1) used consistently across all plots below
+zissou <- wesanderson::wes_palette("Zissou1", 5, type = "discrete")
+```
+
+<div style="background-color: #F0EBCE; border-left: 6px solid #E1AF00; padding: 12px 18px; margin: 15px 0; border-radius: 4px;">
+<strong>Currently Feather River flow data is only publicly available through October 2025.</strong>
+</div>
+
+## Key takeaways
+
+- **No one gage can be used to represent the LFC or HFC** ORF, TFB, and TAO are needed
+to represent flow on the different channels. GRL underestimates combined HFC by
+~7-15% depending on flow level (worst at low flow). TFB alone tracks LFC almost
+perfectly (r ≈ 0.99999) since the missing ORF piece is close to a constant ~100 cfs
+offset rather than noise - useful for hydrograph shape, but still ~13% low on
+absolute magnitude without ORF added back in.
+- **A single-gage regression works for LFC~TFB but not HFC~GRL.** The TFB-only
+regression holds up out-of-sample (~1-2% MAPE) because the missing ORF term is a
+stable near-constant. The GRL-only regression does not generalize - its
+out-of-sample error is no better than using GRL directly, because the GRL/HFC
+relationship drifts year to year (ratio ranges ~0.7-1.05).
+- **TAO has no CDEC counterpart**, so it caps how current the HFC total can be, even
+  though its USGS record is otherwise the most reliable component.
+- **TFB is only available on CDEC through Oct 2025** creating a gap for both LFC
+and HFC
+
+## Overview
+
+Feather River flow used in the JPE is split into two reaches, following how the
+river is physically managed:
+
+- **Upper Feather - High Flow Channel (HFC)**: `ORF + TFB + TAO`
+- **Upper Feather - Low Flow Channel (LFC)**: `ORF + TFB`
+
+No single gage measures either channel directly, so each reach is reconstructed by
+summing component gages, per guidance from DWR staff (Kassie Henley, Casey Campos). 
+
+USGS only reports data through 2024-2025 for these locations. CDEC is used to fill
+the gaps. CDEC is not available for TAO and stops October 2025 for TFB.
+
+*The project's general default is to prefer USGS over CDEC because CDEC can contain 
+unreliable points and is often used as the "preliminary" repository for gage data.*  
+
+## Gage crosswalk
+
+```{r crosswalk-table}
+crosswalk <- tibble::tribble(
+  ~reach,               ~component, ~cdec_id, ~cdec_name,                                 ~usgs_id,     ~source_used,    ~notes,
+  "Upper Feather HFC/LFC",  "ORF",      "ORF",    "FR @ Oroville (hatchery diversion)",        "11406930",  "USGS + CDEC",   "USGS through 2025-09-30, then use CDEC",
+  "Upper Feather HFC/LFC", "TFB",   "TFB",    "Thermalito Diversion Dam Fish Barrier",      "11407000",  "USGS + CDEC",   "USGS through 2024-10-01, then use CDEC through 2025-10-21",
+  "Upper Feather HFC",  "TAO",      NA,       "Thermalito Outlet",                          "11406920",  "USGS only",     "USGS through 2025-09-30 and no CDEC"
+)
+
+knitr::kable(
+  crosswalk,
+  col.names = c("Reach", "Component", "CDEC ID", "CDEC station name", "USGS ID",
+                "Source used", "Notes"),
+  caption = "Feather River flow gage crosswalk"
+)
+```
+
+## Pulling the component series
+
+Each component below is pulled the same way the production script
+(`data-raw/pull_data_scripts/pull_flow_data.R`) does: USGS approved daily values,
+with CDEC provisional values appended for the current period where applicable.
+
+```{r pull-orf}
+orf_usgs <- read_waterdata_daily("USGS-11406930", "00060") |>
+  dplyr::select(date = time, value) |>
+  dplyr::as_tibble() |>
+  dplyr::select(-any_of("geometry")) |>
+  dplyr::mutate(date = as.Date(date), source = "USGS")
+
+orf_cdec <- cdec_query(station = "ORF", dur_code = "D", sensor_num = "41",
+                        start_date = as.character(max(orf_usgs$date) + 1)) |>
+  dplyr::select(date = datetime, value = parameter_value) |>
+  dplyr::mutate(date = as.Date(date), source = "CDEC")
+
+orf <- dplyr::bind_rows(orf_usgs, orf_cdec) |>
+  dplyr::mutate(component = "ORF")
+```
+
+```{r pull-tfb}
+tfb_usgs <- read_waterdata_daily("USGS-11407000", "00060") |>
+  dplyr::select(date = time, value) |>
+  dplyr::as_tibble() |>
+  dplyr::select(-any_of("geometry")) |>
+  dplyr::mutate(date = as.Date(date), source = "USGS")
+
+tfb_cdec <- cdec_query(station = "TFB", dur_code = "D", sensor_num = "41",
+                        start_date = as.character(max(tfb_usgs$date) + 1)) |>
+  dplyr::select(date = datetime, value = parameter_value) |>
+  dplyr::mutate(date = as.Date(date), source = "CDEC")
+
+tfb <- dplyr::bind_rows(tfb_usgs, tfb_cdec) |>
+  dplyr::mutate(component = "TFB")
+```
+
+```{r pull-tao}
+tao <- read_waterdata_daily("USGS-11406920", "00060") |>
+  dplyr::select(date = time, value) |>
+  dplyr::as_tibble() |>
+  dplyr::select(-any_of("geometry")) |>
+  dplyr::mutate(date = as.Date(date), source = "USGS", component = "TAO")
+```
+
+### Where USGS ends and CDEC picks up
+
+The vertical line marks the last USGS-approved date for each of ORF and TFB - CDEC
+data (lighter) fills in everything after it.
+
+```{r plot-usgs-cdec-handoff}
+handoff <- dplyr::bind_rows(orf, tfb, tao)
+
+usgs_cutoffs <- handoff |>
+  dplyr::filter(source == "USGS") |>
+  dplyr::group_by(component) |>
+  dplyr::summarise(cutoff = max(date))
+
+p1 <- handoff |>
+  dplyr::filter(date >= as.Date("2023-01-01")) |>
+  ggplot(aes(x = date, y = value, color = source)) +
+  geom_line(linewidth = 0.5) +
+  geom_vline(data = usgs_cutoffs, aes(xintercept = cutoff), linetype = "dashed") +
+  facet_wrap(~component, ncol = 1, scales = "free_y") +
+  scale_color_manual(values = c("USGS" = zissou[1], "CDEC" = zissou[5])) +
+  labs(title = "ORF and TFB: USGS (approved) handing off to CDEC (provisional)",
+       x = "Date", y = "Flow (cfs)", color = "Source")
+
+plotly::ggplotly(p1)
+```
+
+## Reach-level flow
+
+```{r combine-reaches}
+hfc <- orf |> dplyr::select(date, orf = value) |>
+  dplyr::full_join(tfb |> dplyr::select(date, tfb = value), by = "date") |>
+  dplyr::full_join(tao |> dplyr::select(date, tao = value), by = "date") |>
+  dplyr::mutate(value = orf + tfb + tao, site_group = "upper feather hfc")
+
+lfc <- orf |> dplyr::select(date, orf = value) |>
+  dplyr::full_join(tfb |> dplyr::select(date, tfb = value), by = "date") |>
+  dplyr::mutate(value = orf + tfb, site_group = "upper feather lfc")
+
+reaches <- dplyr::bind_rows(
+  hfc |> dplyr::select(date, value, site_group),
+  lfc |> dplyr::select(date, value, site_group)
+)
+```
+
+```{r plot-reaches}
+p3 <- reaches |>
+  dplyr::filter(date >= as.Date("2020-01-01")) |>
+  ggplot(aes(x = date, y = value, color = site_group)) +
+  geom_line(linewidth = 0.4) +
+  scale_color_manual(values = c("upper feather hfc" = zissou[1], "upper feather lfc" = zissou[5])) +
+  labs(title = "Feather River flow by reach, 2020-present",
+       x = "Date", y = "Flow (cfs)", color = "Reach")
+
+plotly::ggplotly(p3)
+```
+
+## Investigating using one gage
+
+### GRL for HFC
+
+Kassie Henley's guidance was to avoid GRL, especially at low flows, in favor of
+`ORF + TFB + TAO`. To quantify that, GRL is compared against the combined HFC value
+on days where both exist. 
+
+```{r pull-grl}
+grl <- cdec_query(station = "GRL", dur_code = "D", sensor_num = "41",
+                   start_date = "1997-01-01") |>
+  dplyr::transmute(date = as.Date(datetime), grl = parameter_value)
+```
+
+```{r compare-grl-hfc}
+grl_vs_hfc <- hfc |>
+  dplyr::select(date, hfc = value) |>
+  dplyr::inner_join(grl, by = "date") |>
+  dplyr::filter(!is.na(hfc), !is.na(grl)) |>
+  dplyr::mutate(
+    diff = grl - hfc,
+    pct_diff = 100 * diff / hfc,
+    flow_tercile = dplyr::ntile(hfc, 3),
+    flow_tercile = factor(flow_tercile, labels = c("Low flow", "Medium flow", "High flow"))
+  )
+
+grl_hfc_summary <- grl_vs_hfc |>
+  dplyr::group_by(flow_tercile) |>
+  dplyr::summarise(
+    n_days = dplyr::n(),
+    mean_hfc = mean(hfc),
+    mean_grl = mean(grl),
+    mean_diff_grl_minus_hfc = mean(diff),
+    mean_abs_pct_diff = mean(abs(pct_diff)),
+    correlation = cor(hfc, grl)
+  )
+
+knitr::kable(
+  grl_hfc_summary,
+  digits = 1,
+  col.names = c("Flow tercile (by HFC)", "Days", "Mean HFC (cfs)", "Mean GRL (cfs)",
+                "Mean diff, GRL - HFC (cfs)", "Mean abs % diff", "Correlation"),
+  caption = sprintf(
+    "GRL vs. combined HFC (ORF+TFB+TAO), %s to %s. Overall: r = %.2f, mean abs %% diff = %.1f%%.",
+    format(min(grl_vs_hfc$date)), format(max(grl_vs_hfc$date)),
+    cor(grl_vs_hfc$hfc, grl_vs_hfc$grl), mean(abs(grl_vs_hfc$pct_diff))
+  )
+)
+```
+
+GRL tracks HFC closely overall (r ≈ 0.98) but reads systematically **lower** than the
+combined HFC value, and the gap is worst at low flow. At low flow, GRL understates 
+HFC by roughly 15% on average; at high flow the gap narrows to under 10%.
+
+```{r plot-grl-hfc}
+p4 <- grl_vs_hfc |>
+  ggplot(aes(x = date, y = pct_diff)) +
+  geom_line(color = zissou[5]) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "GRL vs. combined HFC: percent difference over time",
+       subtitle = "Negative values mean GRL reads lower than ORF + TFB + TAO",
+       x = "Date", y = "% difference (GRL - HFC) / HFC")
+
+plotly::ggplotly(p4)
+```
+
+### ORF or TFB for LFC
+
+ORF alone is not a usable stand-in for LFC: ORF only represents the small hatchery
+diversion, averaging ~100 cfs, versus a combined LFC average of ~1,350 cfs - ORF
+alone captures well under 15% of LFC flow, with TFB making up the remaining ~85%+.
+
+TFB alone is nearly perfectly correlated with combined LFC (r ≈ 0.99999), because 
+the piece it's missing - ORF, the hatchery diversion - is close to a **constant offset** 
+(median ≈ 105 cfs, 90th percentile ≈ 113 cfs). That constant
+offset still means TFB alone understates LFC by ~13% on average (worse at low flow,
+~17%, better at high flow, ~9%, in *relative* terms - the *absolute* gap stays
+close to ~100 cfs throughout). So TFB alone is a good proxy for the *shape* of the
+LFC hydrograph, but not a substitute if the absolute LFC magnitude matters - ORF
+still needs to be added back in for that.
+
+```{r compare-orf-lfc}
+orf_vs_lfc <- lfc |>
+  dplyr::select(date, orf, lfc = value) |>
+  dplyr::filter(!is.na(orf), !is.na(lfc)) |>
+  dplyr::mutate(diff = orf - lfc, pct_diff = 100 * diff / lfc)
+
+orf_lfc_summary <- orf_vs_lfc |>
+  dplyr::summarise(
+    n_days = dplyr::n(),
+    mean_orf = mean(orf),
+    mean_lfc = mean(lfc),
+    mean_diff_orf_minus_lfc = mean(diff),
+    mean_pct_diff = mean(pct_diff)
+  )
+
+knitr::kable(
+  orf_lfc_summary,
+  digits = 1,
+  col.names = c("Days", "Mean ORF (cfs)", "Mean LFC (cfs)",
+                "Mean diff, ORF - LFC (cfs)", "Mean % diff"),
+  caption = sprintf("ORF alone vs. combined LFC (ORF+TFB), %s to %s.",
+                     format(min(orf_vs_lfc$date)), format(max(orf_vs_lfc$date)))
+)
+```
+
+
+```{r plot-orf-lfc}
+p5 <- dplyr::bind_rows(
+  orf_vs_lfc |> dplyr::transmute(date, value = orf, series = "ORF alone"),
+  orf_vs_lfc |> dplyr::transmute(date, value = lfc, series = "LFC (ORF + TFB)")
+) |>
+  dplyr::filter(date >= as.Date("2020-01-01")) |>
+  ggplot(aes(x = date, y = value, color = series)) +
+  geom_line(linewidth = 0.4) +
+  scale_color_manual(values = c("ORF alone" = zissou[5], "LFC (ORF + TFB)" = zissou[1])) +
+  labs(title = "ORF alone vs. combined LFC, 2020-present",
+       x = "Date", y = "Flow (cfs)", color = NULL)
+
+plotly::ggplotly(p5)
+```
+
+
+```{r compare-tfb-lfc}
+tfb_vs_lfc <- lfc |>
+  dplyr::select(date, tfb, lfc = value) |>
+  dplyr::filter(!is.na(tfb), !is.na(lfc)) |>
+  dplyr::mutate(
+    diff = tfb - lfc,
+    pct_diff = 100 * diff / lfc,
+    flow_tercile = dplyr::ntile(lfc, 3),
+    flow_tercile = factor(flow_tercile, labels = c("Low flow", "Medium flow", "High flow"))
+  )
+
+tfb_lfc_summary <- tfb_vs_lfc |>
+  dplyr::group_by(flow_tercile) |>
+  dplyr::summarise(
+    n_days = dplyr::n(),
+    mean_lfc = mean(lfc),
+    mean_tfb = mean(tfb),
+    mean_diff_tfb_minus_lfc = mean(diff),
+    mean_abs_pct_diff = mean(abs(pct_diff))
+  )
+
+knitr::kable(
+  tfb_lfc_summary,
+  digits = 1,
+  col.names = c("Flow tercile (by LFC)", "Days", "Mean LFC (cfs)", "Mean TFB (cfs)",
+                "Mean diff, TFB - LFC (cfs)", "Mean abs % diff"),
+  caption = sprintf(
+    "TFB alone vs. combined LFC (ORF+TFB), %s to %s. Overall: r = %.5f, mean diff = %.0f cfs, mean abs %% diff = %.1f%%.",
+    format(min(tfb_vs_lfc$date)), format(max(tfb_vs_lfc$date)),
+    cor(tfb_vs_lfc$tfb, tfb_vs_lfc$lfc), mean(tfb_vs_lfc$diff), mean(abs(tfb_vs_lfc$pct_diff))
+  )
+)
+```
+
+```{r plot-tfb-lfc}
+p6 <- tfb_vs_lfc |>
+  ggplot(aes(x = date, y = diff)) +
+  geom_line(color = zissou[1]) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(title = "TFB alone vs. combined LFC: absolute difference over time",
+       subtitle = "Difference stays close to a constant ~-100 cfs (the missing ORF contribution)",
+       x = "Date", y = "Difference (cfs): TFB - LFC")
+
+plotly::ggplotly(p6)
+```
+
+## Can a single-gage regression reconstruct absolute HFC/LFC?
+
+Rather than just comparing GRL/TFB directly to HFC/LFC, this checks whether fitting
+a simple linear regression (`combined ~ single gage`) can correct the single gage
+into a usable absolute-flow estimate - and whether that correction holds up
+**out-of-sample**, using a time-based split (fit on data through 2017, evaluate on
+2018-present) rather than just in-sample fit.
+
+```{r fit-regressions}
+rmse <- function(actual, predicted) sqrt(mean((actual - predicted)^2, na.rm = TRUE))
+mape <- function(actual, predicted) mean(abs((actual - predicted) / actual), na.rm = TRUE) * 100
+
+split_date <- as.Date("2018-01-01")
+
+# HFC ~ GRL
+hfc_train <- grl_vs_hfc |> dplyr::filter(date < split_date)
+hfc_test  <- grl_vs_hfc |> dplyr::filter(date >= split_date)
+hfc_model <- lm(hfc ~ grl, data = hfc_train)
+hfc_test <- hfc_test |> dplyr::mutate(predicted = predict(hfc_model, newdata = hfc_test))
+
+# LFC ~ TFB
+lfc_train <- tfb_vs_lfc |> dplyr::filter(date < split_date)
+lfc_test  <- tfb_vs_lfc |> dplyr::filter(date >= split_date)
+lfc_model <- lm(lfc ~ tfb, data = lfc_train)
+lfc_test <- lfc_test |> dplyr::mutate(predicted = predict(lfc_model, newdata = lfc_test))
+
+regression_summary <- tibble::tribble(
+  ~reach, ~model,               ~train_r2,                     ~test_rmse_naive,                ~test_rmse_regression,             ~test_mape_naive,                    ~test_mape_regression,
+  "HFC",  "hfc ~ grl",          summary(hfc_model)$r.squared,  rmse(hfc_test$hfc, hfc_test$grl), rmse(hfc_test$hfc, hfc_test$predicted), mape(hfc_test$hfc, hfc_test$grl), mape(hfc_test$hfc, hfc_test$predicted),
+  "LFC",  "lfc ~ tfb",          summary(lfc_model)$r.squared,  rmse(lfc_test$lfc, lfc_test$tfb), rmse(lfc_test$lfc, lfc_test$predicted), mape(lfc_test$lfc, lfc_test$tfb), mape(lfc_test$lfc, lfc_test$predicted)
+)
+
+knitr::kable(
+  regression_summary,
+  digits = c(0, 0, 3, 1, 1, 1, 1),
+  col.names = c("Reach", "Model", "Train R2", "Naive RMSE (cfs)", "Regression RMSE (cfs)",
+                "Naive MAPE (%)", "Regression MAPE (%)"),
+  caption = sprintf("Out-of-sample performance, fit on data before %s, tested on data after.",
+                     format(split_date))
+)
+```
+
+The two reaches behave completely differently once tested out-of-sample:
+
+- **LFC ~ TFB works well.** The fitted model is essentially
+  `LFC ≈ TFB + 99` (the ORF contribution folded in as a nearly-constant intercept),
+  and it holds up out-of-sample - regression MAPE stays near ~1-2%, far better than
+  using TFB alone (~13% MAPE). This is a case where a single-gage regression is a
+  legitimate way to reconstruct absolute LFC from TFB if ORF is ever unavailable.
+- **HFC ~ GRL does not generalize.** Although the in-sample fit looks reasonable
+  (R² ≈ 0.97), the regression's out-of-sample error is **no better, and sometimes
+  worse, than just using GRL directly** - the GRL/HFC relationship isn't stable
+  over time (see the yearly ratio below), so a regression fit on historical data
+  doesn't correct future years reliably.
+
+```{r plot-yearly-grl-ratio}
+yearly_ratio <- grl_vs_hfc |>
+  dplyr::mutate(year = lubridate::year(date)) |>
+  dplyr::group_by(year) |>
+  dplyr::summarise(ratio = mean(grl / hfc))
+
+p7 <- yearly_ratio |>
+  ggplot(aes(x = year, y = ratio)) +
+  geom_col(fill = zissou[5]) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  labs(title = "GRL / HFC ratio by year - the instability a regression can't fix",
+       subtitle = "A stable single-gage correction needs this ratio to hold still; it swings from ~0.7 to ~1.05",
+       x = "Year", y = "Mean GRL / HFC")
+
+plotly::ggplotly(p7)
+```
+
+```{r plot-yearly-tfb-offset}
+yearly_offset <- tfb_vs_lfc |>
+  dplyr::mutate(year = lubridate::year(date)) |>
+  dplyr::group_by(year) |>
+  dplyr::summarise(offset = mean(lfc - tfb))
+
+p8 <- yearly_offset |>
+  ggplot(aes(x = year, y = offset)) +
+  geom_col(fill = zissou[1]) +
+  labs(title = "LFC - TFB offset by year - stable enough for a regression to correct",
+       subtitle = "Mostly 80-115 cfs across 50+ years, consistent with a near-constant ORF diversion",
+       x = "Year", y = "Mean offset (cfs)")
+
+plotly::ggplotly(p8)
+```
+
+**Bottom line:** a single-gage regression is a good idea for **LFC from TFB**
+(the missing ORF term behaves like a stable, slowly-drifting constant, so a linear
+correction generalizes), but not a good idea for **HFC from GRL** (the missing
+TAO/relationship isn't stable enough for a regression to beat DWR's original
+guidance to just avoid GRL and sum ORF+TFB+TAO directly).
+
