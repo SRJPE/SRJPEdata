@@ -71,10 +71,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
 
-      - name: Install R packages
-        run: |
-          install.packages(c('padr','tidyverse', 'testthat', 'yaml', 'devtools', 'dplyr', 'remotes', 'roxygen2'))
-        shell: Rscript {0}
+      - name: Install package + all Imports/Suggests/Remotes from DESCRIPTION
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::devtools
+            any::yaml
+            any::remotes
+            any::roxygen2
 
       # ==========================================
       # CREDENTIAL SCANNING
@@ -234,7 +238,7 @@ jobs:
               cat('✓ Sourced', length(r_files), 'R file(s)\n')
             }
           }, error = function(e) {
-            cat('⚠️  Warning: Could not load package:', e\$message, '\n')
+            cat('⚠️  Warning: Could not load package:', conditionMessage(e), '\n')
           })
 
           cat('\nRunning tests...\n')
