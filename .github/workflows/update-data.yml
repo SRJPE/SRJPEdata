@@ -1,23 +1,29 @@
 name: "Update Script (reusable)"
- 
+
 # Reusable workflow - runs data-raw/update_data.R, the single script that
 # pulls raw monitoring data (RST catch/trap/efficiency, flow, temperature,
 # genetics, survival, and - in January - adult) from jpe-db, the DataTackle
 # pilot database, EDI, and CDEC/USGS gages, then rebuilds every package data
 # object. Called from check-commit.yml (manual/PR path) and
 # scheduled-update.yml (automatic path) via `jobs.<id>.uses:`.
-
+#
 # There is no such thing as "run the adult script" vs "run the flow script" -
 # update_data.R always runs top to bottom in one pass. What changes between
 # update types is (a) whether adult-only sections run at all, and (b) what's
 # actually available to pull that day - not which script executes.
 #
 # QC (run_annual_qc.R) and the stream-team review renders (render_reviews.R)
-# used to run automatically at the tail of update_data.R itself - that call
-# has been commented out there (see data-raw/update_data.R) and moved to
-# test-data.yml instead, so they run exactly once, as an explicit gate
-# against the data this step just produced, rather than unconditionally
-# inside this step every time regardless of what test-data.yml then does.
+# now run HERE, right after update_data.R and before the commit below, so
+# the data objects AND the QC/review outputs they depend on land in one
+# single commit. That commit is what triggers test-data.yml (via its
+# `pull_request` path filter) to run fresh against the fully-updated
+# branch - test-data.yml no longer regenerates anything itself; it just
+# compares this branch's committed .rda files and qc_log_errors.csv against
+# main and runs tests/checks. (Previously QC/review ran inside test-data.yml
+# instead, as a gate that only ran once test-data.yml itself fired - moved
+# here so "commit everything, then diff against the other branch" is a
+# clean two-step pipeline instead of test-data.yml generating and comparing
+# in the same run.)
 #
 # IMPORTANT - update_data.R currently decides whether to pull adult data /
 # build the stock-recruit datasets with `if (month(Sys.Date()) == 1)`, a
@@ -70,6 +76,9 @@ jobs:
       - name: Set up Pandoc
         uses: r-lib/actions/setup-pandoc@v2
 
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
@@ -88,7 +97,10 @@ jobs:
             any::leaflet
             any::readr
             any::pkgdown
-            
+            any::quarto
+            any::glue
+            any::DT
+
       - name: Check DB env vars are set
         env:
           jpe_db_user_id: ${{ secrets.JPE_DB_USER_ID }}
@@ -113,25 +125,56 @@ jobs:
           EDI_API_KEY: ${{ secrets.EDI_API_KEY }}
         run: Rscript data-raw/update_data.R
 
+      # ==========================================
+      # ANNUAL QC + STREAM TEAM REVIEW
+      # ==========================================
+      # Renders data-raw/qc/run_annual_qc.R (appends any newly-detected
+      # issues to data-raw/qc/qc_log_errors.csv / qc_log_warnings.csv) and
+      # data-raw/data-checks/stream_team_review/render_reviews.R (the
+      # per-stream reports emailed to stream teams), right after the data
+      # pull so their outputs get committed together with the data below.
+      #
+      # Skipped for biweekly runs: run_annual_qc.R's own header says "run
+      # this once per year after the RST season ends," and the stream team
+      # reports are described in the README as emailed once a year
+      # (July-September) - rendering nine Rmd/qmd reports on every
+      # biweekly sync would run against that intent. If that's wrong and
+      # you actually want these on every run, drop the `if:` below.
+      #
+      # continue-on-error so a rendering hiccup here doesn't block the data
+      # commit itself; test-data.yml's comparison against main is what
+      # actually surfaces new QC issues and gates the PR.
+      - name: Run annual QC + stream team review
+        if: ${{ inputs.update_type != 'biweekly' }}
+        continue-on-error: true
+        run: |
+          Rscript -e '
+            devtools::load_all(quiet = TRUE)
+            source("data-raw/data-checks/stream_team_review/render_reviews.R")
+            source("data-raw/qc/run_annual_qc.R")
+          '
+
       - name: Check for changes
         id: diff
         run: |
           set -euo pipefail
           if git status --porcelain | grep -q .; then
             echo "data_changed=true" >> "$GITHUB_OUTPUT"
-            echo "Changes detected:"
+            echo "Changes detected (data + QC/review outputs):"
             git status --porcelain
           else
             echo "data_changed=false" >> "$GITHUB_OUTPUT"
             echo "No changes produced by this run."
           fi
 
-      - name: Commit + push regenerated data
+      - name: Commit + push regenerated data + QC/review outputs
         if: ${{ inputs.commit_changes && steps.diff.outputs.data_changed == 'true' }}
         run: |
           set -euo pipefail
           git config user.name "srjpe-data-bot"
           git config user.email "srjpe-data-bot@users.noreply.github.com"
           git add -A
-          git commit -m "chore(data): ${{ inputs.update_type }} update" -m "Update-Type: ${{ inputs.update_type }}"
+          git commit -m "chore(data): ${{ inputs.update_type }} update" \
+                      -m "Includes regenerated data objects and, unless biweekly, rendered annual QC + stream team review outputs." \
+                      -m "Update-Type: ${{ inputs.update_type }}"
           git push origin "HEAD:${{ inputs.ref }}"
