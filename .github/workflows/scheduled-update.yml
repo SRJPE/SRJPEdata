@@ -7,8 +7,9 @@ name: "Automatic Data Update (schedule / manual dispatch)"
 #     -> update-data         (regenerate data objects, commit to bot branch)
 #     -> open-pr              (open a PR main <- bot branch, so there's
 #                              always a reviewable diff + a real place for
-#                              check-data's status check to block merge)
-#     -> check-data            (QC; blocks merge + emails on failure)
+#                              test-data.yml's status check to block merge)
+#     -> wait-for-qc            (watch the PR's own checks - see note below -
+#                                 and surface pass/fail as this job's output)
 #     -> auto-merge              (only if QC passed AND auto_merge=true)
 #
 # Why a bot PR instead of pushing straight to main (as the original sketch
@@ -18,6 +19,19 @@ name: "Automatic Data Update (schedule / manual dispatch)"
 # email. release-and-news.yml still fires normally once this PR merges
 # (auto or by a human), reading the `Update-Type:` trailer this workflow
 # stamps on its own commit.
+#
+# HOW QC ACTUALLY GETS INVOKED: there is no `check-data.yml` reusable
+# workflow (there never was one) - QC lives entirely in test-data.yml
+# ("Data Quality and Package Checks", job quality-checks), which is
+# triggered by `pull_request` and filtered to the exact paths
+# update_data.R changes (data/*.rda, data/*.RData, R/**, tests/**,
+# inst/**). Opening the PR in `open-pr` below fires that trigger on its
+# own - GitHub schedules the check the moment the PR is created, the same
+# way it would for a human's PR. `wait-for-qc` doesn't call test-data.yml
+# as a sub-job (that would run QC a second time, redundantly); it just
+# polls the PR's existing checks with `gh pr checks --watch` and reads
+# whether they passed, so auto-merge can act on the same result a human
+# reviewing this PR would see.
 #
 # TODO(SRJPE): the cron below is a PLACEHOLDER (1st and 15th of month,
 # 13:00 UTC / 6am PDT). Replace with the actual EDI RST-data publication
@@ -42,10 +56,6 @@ on:
         type: choice
         options: [annual, biweekly, manual]
         default: manual
-      datasets:
-        description: "Optional comma-separated dataset override (adult,temperature,juvenile,flow)"
-        type: string
-        default: ""
       auto_merge:
         description: "Automatically merge the generated PR if QC passes"
         type: boolean
@@ -93,7 +103,6 @@ jobs:
     uses: ./.github/workflows/update-data.yml
     with:
       update_type: ${{ needs.prepare.outputs.update_type }}
-      datasets: ${{ inputs.datasets || '' }}
       ref: ${{ needs.prepare.outputs.bot_branch }}
       commit_changes: true
     secrets: inherit
@@ -115,24 +124,55 @@ jobs:
           url=$(gh pr create \
             --base main \
             --head "${{ needs.prepare.outputs.bot_branch }}" \
-            --title "chore(data): automated ${{ needs.prepare.outputs.update_type }} update (${{ needs.update-data.outputs.datasets_run }})" \
-            --body "Automated data refresh. Update-Type: ${{ needs.prepare.outputs.update_type }}. Datasets: ${{ needs.update-data.outputs.datasets_run }}. This PR will auto-merge if Quality Control Checks pass.")
+            --title "chore(data): automated ${{ needs.prepare.outputs.update_type }} update" \
+            --body "Automated data refresh. Update-Type: ${{ needs.prepare.outputs.update_type }}. This PR will auto-merge if Quality Control Checks pass.")
           pr_number=$(basename "${url}")
           echo "pr_number=${pr_number}" >> "$GITHUB_OUTPUT"
 
-  check-data:
+  wait-for-qc:
     needs: [prepare, update-data, open-pr]
     if: ${{ needs.update-data.outputs.data_changed == 'true' }}
-    uses: ./.github/workflows/check-data.yml
-    with:
-      update_type: ${{ needs.prepare.outputs.update_type }}
-      ref: ${{ needs.prepare.outputs.bot_branch }}
-      pr_number: ${{ needs.open-pr.outputs.pr_number }}
-    secrets: inherit
+    runs-on: ubuntu-latest
+    outputs:
+      qc_passed: ${{ steps.wait.outputs.qc_passed }}
+    steps:
+      - name: Wait for "Data Quality and Package Checks" on the PR
+        id: wait
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          pr="${{ needs.open-pr.outputs.pr_number }}"
+
+          echo "Waiting for status checks to register on PR #${pr}..."
+          registered=false
+          for i in $(seq 1 10); do
+            if [ "$(gh pr checks "${pr}" --json name -q 'length')" != "0" ] 2>/dev/null; then
+              registered=true
+              break
+            fi
+            sleep 15
+          done
+          if [ "${registered}" != "true" ]; then
+            echo "::warning::No status checks ever registered on PR #${pr} - treating QC as not passed."
+            echo "qc_passed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          set +e
+          gh pr checks "${pr}" --watch --interval 30
+          result=$?
+          set -e
+
+          if [ "${result}" -eq 0 ]; then
+            echo "qc_passed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "qc_passed=false" >> "$GITHUB_OUTPUT"
+          fi
 
   auto-merge:
-    needs: [prepare, open-pr, check-data]
-    if: ${{ needs.check-data.outputs.qc_passed == 'true' && inputs.auto_merge != false }}
+    needs: [prepare, open-pr, wait-for-qc]
+    if: ${{ needs.wait-for-qc.outputs.qc_passed == 'true' && inputs.auto_merge != false }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

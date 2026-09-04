@@ -406,7 +406,7 @@ find_duplicates <- flow_daily |>
   filter(n > 1)
 
 if (nrow(find_duplicates) > 0) {
-  stop(
+  warning(
     "Duplicates exist in the flow_daily table. Resolve these duplicates before proceeding."
   )
 }

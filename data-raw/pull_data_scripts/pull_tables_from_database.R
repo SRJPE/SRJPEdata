@@ -11,7 +11,8 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       dbname = "jpedb-prod",
                       user = Sys.getenv("jpe_db_user_id"),
                       password = Sys.getenv("jpe_db_password"),
-                      port = 5432)
+                      port = 5432,
+                      sslmode = "require")
  DBI::dbListTables(con)
 
 # PULL IN HELPER TABLES 

@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   covariates_documentation: covariates_documentation.html
@@ -9,7 +9,7 @@ articles:
   trap_effort: trap_effort.html
   yearling_ruleset: yearling_ruleset.html
   years_to_include_analysis: years_to_include_analysis.html
-last_built: 2026-08-21T00:32Z
+last_built: 2026-09-04T21:36Z
 urls:
   reference: https://srjpe.github.io/SRJPEdata/reference
   article: https://srjpe.github.io/SRJPEdata/articles
