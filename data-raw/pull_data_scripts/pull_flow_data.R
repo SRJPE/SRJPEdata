@@ -3,97 +3,88 @@
 
 ### Pull Flow Data for each JPE tributary --------------------------------------
 
+# Recent continuous flow data ---------------------------------------------------
+# The full historical continuous (15-minute) record is pulled and cached separately in
+# cache_flow_data.R because dataRetrieval::read_waterdata_continuous() only allows 3 years of
+# data per request. Here we only pull the most recent two years (which fits within that limit),
+# summarize to daily mean/min/max, and bind it with the cached historical record below.
+recent_flow_start_date <- Sys.Date() - lubridate::years(2)
+recent_flow_end_date <- Sys.Date()
+
+# Pull the most recent continuous flow record for one gage and summarize to daily mean/min/max.
+pull_recent_continuous_flow_stats <- function(gage_number, stream, site_group = NA_character_) {
+  message(
+    "Pulling continuous flow for USGS-", gage_number, ": ",
+    recent_flow_start_date, " to ", recent_flow_end_date
+  )
+
+  continuous_query <- dataRetrieval::read_waterdata_continuous(
+    monitoring_location_id = paste0("USGS-", gage_number),
+    parameter_code = "00060",
+    time = paste0(recent_flow_start_date, "/", recent_flow_end_date)
+  )
+
+  continuous_query |>
+    dplyr::mutate(
+      date = as.Date(time),
+      value = ifelse(value < 0, NA_real_, value) # negative instantaneous readings are sensor noise
+    ) |>
+    dplyr::group_by(date) |>
+    dplyr::summarise(
+      mean = ifelse(all(is.na(value)), NA_real_, mean(value, na.rm = TRUE)),
+      min = ifelse(all(is.na(value)), NA_real_, min(value, na.rm = TRUE)),
+      max = ifelse(all(is.na(value)), NA_real_, max(value, na.rm = TRUE)),
+      .groups = "drop"
+    ) |>
+    tidyr::pivot_longer(c(mean, min, max), names_to = "statistic", values_to = "value") |>
+    dplyr::mutate(
+      stream = stream,
+      site_group = site_group,
+      gage_agency = "USGS",
+      gage_number = gage_number,
+      parameter = "flow"
+    )
+}
+
 ## Battle Creek ----------------------------------------------------------------
 ### Flow Data Pull
 #### Gage Agency (USGS, # 11376550)
-
-# Pull data
-battle_creek_data_query <- dataRetrieval::read_waterdata_daily(
-  "USGS-11376550",
-  "00060"
+battle_creek_daily_flows <- pull_recent_continuous_flow_stats(
+  "11376550",
+  stream = "battle creek",
+  site_group = "battle creek"
 )
-battle_creek_daily_flows <- battle_creek_data_query |> # rename to match new naming structure
-  dplyr::select(time, value) |> 
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    stream = "battle creek", # add additional columns for stream, gage info, and parameter
-    site_group = "battle creek",
-    gage_agency = "USGS",
-    gage_number = "11376550",
-    parameter = "flow",
-    statistic = "mean"
-  ) |> 
-  dplyr::select(-geometry)
 
 ## Butte Creek -----------------------------------------------------------------
 ### Flow Data Pull
 #### Gage Agency (USGS, BCK)
 
 # Grant Heneley at CDFW recommended using USGS instead of CDEC because CDEC will sometimes have weird datapoints
-# Pull data
-butte_creek_data_query <- dataRetrieval::read_waterdata_daily("USGS-11390000", "00060")
-butte_creek_daily_flows <- butte_creek_data_query %>%
-  dplyr::select(time, value) %>%
-  dplyr::as_tibble() %>%
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    value = ifelse(value < 0, NA_real_, value),
-    stream = "butte creek",
-    site_group = "butte creek",
-    gage_agency = "USGS",
-    gage_number = "11390000",
-    parameter = "flow",
-    statistic = "mean"
-  ) |> 
-  dplyr::select(-geometry)
+butte_creek_daily_flows <- pull_recent_continuous_flow_stats(
+  "11390000",
+  stream = "butte creek",
+  site_group = "butte creek"
+)
 
 ## Clear Creek -----------------------------------------------------------------
 ### Flow Data Pull
 #### Gage Agency (CDEC, IGO)
-# Pull data
-clear_creek_data_query <- dataRetrieval::read_waterdata_daily(
-  "USGS-11372000",
-  "00060"
+clear_creek_daily_flows <- pull_recent_continuous_flow_stats(
+  "11372000",
+  stream = "clear creek",
+  site_group = "clear creek"
 )
-clear_creek_daily_flows <- clear_creek_data_query |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    stream = "clear creek",
-    site_group = "clear creek",
-    gage_agency = "USGS",
-    gage_number = "11372000",
-    parameter = "flow",
-    statistic = "mean" # if query returns instantaneous data then report a min, mean, and max
-  ) |> 
-  dplyr::select(-geometry) 
 
 ## Deer Creek ------------------------------------------------------------------
 ### Flow Data Pull
 #### Gage Agency (USGS, 11383500)
-# Pull data
-deer_creek_data_query <- dataRetrieval::read_waterdata_daily(
-  "USGS-11383500",
-  "00060")
-
-deer_creek_daily_flows <- deer_creek_data_query |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    stream = "deer creek",
-    site_group = "deer creek",
-    gage_agency = "USGS",
-    gage_number = "11383500",
-    parameter = "flow",
-    statistic = "mean"
-  ) |> 
-  dplyr::select(-geometry)
+deer_creek_daily_flows <- pull_recent_continuous_flow_stats(
+  "11383500",
+  stream = "deer creek",
+  site_group = "deer creek"
+)
 
 ## Feather River ---------------------------------------------------------------
-#Pull data
 # Feather High Flow Channel
 
 # Guidance from Kassie Henley (DWR)
@@ -101,92 +92,109 @@ deer_creek_daily_flows <- deer_creek_data_query |>
 # Use ORF + TFB + TAO to represent HFC
 # See data-raw/analysis/feather-flow-qc for more details
 
-# ORF
-feather_orf_usgs_raw <- dataRetrieval::read_waterdata_daily(
-  "USGS-11406930",
-  "00060"
-)
-feather_orf_usgs <- feather_orf_usgs_raw |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |> 
-  dplyr::mutate(date = as.Date(date))
+# Compared to other locations Feather River follows a different workflow
+# USGS only includes data through ~2024 and does not have continuous data
+# CDEC is usually only available starting ~2019
+# This means we need to stitch these data sources together
 
-feather_orf_cdec <- CDECRetrieve::cdec_query(
-  station = "ORF",
-  dur_code = "D",
-  sensor_num = "41",
-  start_date = "2025-10-01"
+# (1) Pull the most up to date data from CDEC here and summarize as daily mean, min, max, bind with the daily mean from USGS
+# (2) Post processing step that involves adding together gages
+
+# Pull a Feather River gage's USGS daily mean flow, optionally stitched together with a CDEC
+# series. CDEC generally has a shorter period of record but better recent coverage, and can
+# report min/max (not just mean) depending on the sensor's duration code.
+build_feather_gage_flow <- function(usgs_id, gage_number,
+                                     usgs_min_date = NULL,
+                                     usgs_cutoff_date = NULL,
+                                     cdec_station = NULL,
+                                     cdec_dur_code = NULL,
+                                     cdec_sensor_num = NULL,
+                                     cdec_start_date = NULL) {
+  usgs_daily_mean <- dataRetrieval::read_waterdata_daily(usgs_id, "00060") |>
+    dplyr::select(time, value) |>
+    dplyr::as_tibble() |>
+    dplyr::rename(date = time) |>
+    dplyr::mutate(
+      date = as.Date(date),
+      gage_agency = "USGS",
+      gage_number = gage_number,
+      statistic = "mean"
+    ) |>
+    dplyr::select(-geometry)
+
+  if (!is.null(usgs_min_date)) usgs_daily_mean <- dplyr::filter(usgs_daily_mean, date >= usgs_min_date)
+  if (!is.null(usgs_cutoff_date)) usgs_daily_mean <- dplyr::filter(usgs_daily_mean, date < usgs_cutoff_date)
+
+  if (is.null(cdec_station)) {
+    return(usgs_daily_mean |> dplyr::mutate(parameter = "flow") |> dplyr::filter(!is.na(date)))
+  }
+
+  cdec_daily_stats <- CDECRetrieve::cdec_query(
+    station = cdec_station,
+    dur_code = cdec_dur_code,
+    sensor_num = cdec_sensor_num,
+    start_date = cdec_start_date
+  ) |>
+    dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
+    dplyr::rename(date = datetime, value = parameter_value) |>
+    dplyr::mutate(gage_agency = "CDEC", gage_number = cdec_station, date = as.Date(date)) |>
+    dplyr::group_by(date, gage_agency, gage_number) |>
+    dplyr::summarise(
+      mean = ifelse(all(is.na(value)), NA_real_, mean(value, na.rm = TRUE)),
+      min = ifelse(all(is.na(value)), NA_real_, min(value, na.rm = TRUE)),
+      max = ifelse(all(is.na(value)), NA_real_, max(value, na.rm = TRUE)),
+      .groups = "drop"
+    ) |>
+    tidyr::pivot_longer(c(mean, min, max), names_to = "statistic", values_to = "value")
+
+  dplyr::bind_rows(usgs_daily_mean, cdec_daily_stats) |>
+    dplyr::mutate(parameter = "flow") |>
+    dplyr::filter(!is.na(date))
+}
+
+### ORF ----------------------------
+# As of 08/28/26 there is not a lag in the CDEC data.
+feather_orf_usgs_cdec <- build_feather_gage_flow(
+  "USGS-11406930", "USGS-11406930",
+  usgs_cutoff_date = "2019-12-26",
+  cdec_station = "ORF", cdec_dur_code = "E", cdec_sensor_num = "20",
+  cdec_start_date = "2019-12-25" # earliest available as of 8/28/26
 )
 
-feather_orf_usgs_cdec <- feather_orf_usgs |>
-  dplyr::select(-geometry) |>
-  dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11406930") |>
-  dplyr::bind_rows(
-    feather_orf_cdec |>
-      dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
-      dplyr::rename(date = datetime, value = parameter_value) |>
-      dplyr::mutate(gage_agency = "CDEC", gage_number = "ORF", date = as.Date(date))
-  )
-# TFB
-feather_tfb_usgs_raw <- dataRetrieval::read_waterdata_daily(
-  "USGS-11407000",
-  "00060"
+### TFB ----------------------
+# As of 08/28/26 it appears that there is a lag in the CDEC data. Data posted through 8/22
+feather_tfb_usgs_cdec <- build_feather_gage_flow(
+  "USGS-11407000", "USGS-11407000",
+  usgs_min_date = "1988-01-01", usgs_cutoff_date = "2021-08-30",
+  cdec_station = "TFB", cdec_dur_code = "H", cdec_sensor_num = "20",
+  cdec_start_date = "2021-08-30" # earliest the data is available
 )
 
-feather_tfb_usgs <- feather_tfb_usgs_raw |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |> 
-  dplyr::mutate(date = as.Date(date))
-
-feather_tfb_cdec <- CDECRetrieve::cdec_query(
-  station = "TFB",
-  dur_code = "D",
-  sensor_num = "41",
-  start_date = "2024-10-01"
+### TAO -------------------
+# Only the daily mean is available on USGS and there is no CDEC series for this gage.
+# This gage stops 2025-09-30
+feather_tao_usgs <- build_feather_gage_flow(
+  "USGS-11406920", "USGS-11406920",
+  usgs_min_date = "1988-01-01"
 )
-
-feather_tfb_usgs_cdec <- feather_tfb_usgs |>
-  dplyr::select(-geometry) |>
-  dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11407000") |>
-  dplyr::bind_rows(
-    feather_tfb_cdec |>
-      dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
-      dplyr::rename(date = datetime, value = parameter_value) |>
-      dplyr::mutate(gage_agency = "CDEC", gage_number = "TFB", date = as.Date(date))
-  ) 
-# TAO
-feather_tao_usgs_raw <- dataRetrieval::read_waterdata_daily(
-  "USGS-11406920",
-  "00060"
-)
-feather_tao_usgs <- feather_tao_usgs_raw |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11406920") |>
-  dplyr::select(-geometry)
 
 # Combined HFC
 feather_hfc <- feather_orf_usgs_cdec |>
-  dplyr::select(date, orf = value) |>
+  dplyr::select(date, statistic, parameter, orf = value) |>
   dplyr::full_join(
     feather_tfb_usgs_cdec |>
-      dplyr::select(date, tfb = value)
+      dplyr::select(date, statistic, parameter, tfb = value)
   ) |>
   dplyr::full_join(
     feather_tao_usgs |>
-      dplyr::select(date, tao = value)
-  ) |> 
+      dplyr::select(date, statistic, parameter, tao = value)
+  ) |>
   dplyr::mutate(value = orf + tfb + tao,
                 date = as.Date(date),
                 stream = "feather river",
                 site_group = "upper feather hfc",
                 gage_agency = "USGS/CDEC",
-                gage_number = "11407000/TFB + 11406930/ORF + 11406920/TAO",
-                parameter = "flow",
-                statistic = "mean") |> 
+                gage_number = "11407000/TFB + 11406930/ORF + 11406920/TAO") |>
   dplyr::select(-c(tfb, orf, tao))
 
 # Feather Low Flow Channel
@@ -194,10 +202,10 @@ feather_hfc <- feather_orf_usgs_cdec |>
 # There’s no publicly available single source to get the total flow downstream of the hatchery.
 # You can use ORF + TFB to get the total LFC flow downstream of the hatchery.
 feather_lfc <- feather_orf_usgs_cdec |>
-  dplyr::select(date, orf = value) |>
+  dplyr::select(date, statistic, parameter, orf = value) |>
   dplyr::full_join(
     feather_tfb_usgs_cdec |>
-      dplyr::select(date, tfb = value)
+      dplyr::select(date, statistic, parameter, tfb = value)
   ) |>
   dplyr::mutate(
     date = as.Date(date),
@@ -205,9 +213,7 @@ feather_lfc <- feather_orf_usgs_cdec |>
     stream = "feather river",
     site_group = "upper feather lfc",
     gage_agency = "USGS/CDEC",
-    gage_number = "11407000/TFB + 11406930/ORF",
-    parameter = "flow",
-    statistic = "mean"
+    gage_number = "11407000/TFB + 11406930/ORF"
   ) |>
   dplyr::select(-c(tfb, orf))
 
@@ -261,108 +267,55 @@ lower_feather_river_daily_flows <- lower_feather_river_data_query |>
 ## Mill Creek ------------------------------------------------------------------
 ### Flow Data Pull
 #### Gage Agency (USGS, 11381500)
-
-#Pull data
-mill_creek_data_query <- dataRetrieval::read_waterdata_daily(
-  "USGS-11381500",
-  "00060"
+mill_creek_daily_flows <- pull_recent_continuous_flow_stats(
+  "11381500",
+  stream = "mill creek",
+  site_group = "mill creek"
 )
-
-mill_creek_daily_flows <- mill_creek_data_query |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    stream = "mill creek",
-    site_group = "mill creek",
-    gage_agency = "USGS",
-    gage_number = "11381500",
-    parameter = "flow",
-    statistic = "mean"
-  ) |> 
-  dplyr::select(-geometry) 
 
 ## Sacramento River ------------------------------------------------------------
 ### Flow Data Pull
 #### Gage Agency (USGS, 11381500)
-# Pull data
-sac_river_data_query <- dataRetrieval::read_waterdata_daily(
-  "USGS-11390500",
-  "00060"
+# site_group is added below when combining flow data, since this same gage represents both
+# the tisdale and knights landing site groups
+sac_river_daily_flows <- pull_recent_continuous_flow_stats(
+  "11390500",
+  stream = "sacramento river"
 )
-
-sac_river_daily_flows <- sac_river_data_query |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    stream = "sacramento river",
-    gage_agency = "USGS",
-    gage_number = "11390500",
-    parameter = "flow",
-    statistic = "mean"
-  ) |> 
-  dplyr::select(-geometry)
 
 # Red Bluff --------------------------------------------------------------------
 # but may be in the future
 
 ### Flow Data Pull
 #### Gage Agency (USGS, 11377100)
-rbdd_data_query <- dataRetrieval::read_waterdata_daily(
-  "USGS-11377100",
-  "00060"
+rbdd_daily_flows <- pull_recent_continuous_flow_stats(
+  "11377100",
+  stream = "sacramento river",
+  site_group = "red bluff diversion dam"
 )
-
-rbdd_daily_flows <- rbdd_data_query |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    stream = "sacramento river",
-    site_group = "red bluff diversion dam",
-    gage_agency = "USGS",
-    gage_number = "11377100",
-    parameter = "flow",
-    statistic = "mean"
-  ) |> 
-  dplyr::select(-geometry)
 
 ## Yuba River ------------------------------------------------------------------
 ### Flow Data Pull
 #### Gage Agency (USGS, 11421000)
-# Pull data
-yuba_river_data_query <- dataRetrieval::read_waterdata_daily(
-  "USGS-11421000",
-  "00060"
+yuba_river_daily_flows <- pull_recent_continuous_flow_stats(
+  "11421000",
+  stream = "yuba river",
+  site_group = "yuba river"
 )
-
-yuba_river_daily_flows <- yuba_river_data_query |>
-  dplyr::select(time, value) |>
-  dplyr::as_tibble() |>
-  dplyr::rename(date = time) |>
-  dplyr::mutate(
-    stream = "yuba river",
-    site_group = "yuba river",
-    gage_agency = "USGS",
-    gage_number = "11421000",
-    parameter = "flow",
-    statistic = "mean"
-  ) |> 
-  dplyr::select(-geometry)
 
 # Define the required object names
 required_objects <- c(
-  "battle_creek_data_query",
-  "butte_creek_data_query",
-  "clear_creek_data_query",
-  "deer_creek_data_query",
+  "battle_creek_daily_flows",
+  "butte_creek_daily_flows",
+  "clear_creek_daily_flows",
+  "deer_creek_daily_flows",
   "feather_hfc",
   "feather_lfc",
-  "lower_feather_river_data_query",
-  "mill_creek_data_query",
-  "sac_river_data_query",
-  "yuba_river_data_query"
+  "lower_feather_river_daily_flows",
+  "mill_creek_daily_flows",
+  "sac_river_daily_flows",
+  "rbdd_daily_flows",
+  "yuba_river_daily_flows"
 )
 
 # Check if all objects exist
@@ -378,7 +331,7 @@ print("All required objects exist. Proceeding...")
 # Combine all flow data from different streams
 # Created a site group variable so that the hfc and lfc will bind with the correct sites
 # so need to bind feather to the site lookup separately
-flow_daily <- data.table::rbindlist(
+recent_flow_daily <- data.table::rbindlist(
   list(
     battle_creek_daily_flows,
     butte_creek_daily_flows,
@@ -396,13 +349,21 @@ flow_daily <- data.table::rbindlist(
   ),
   use.names = TRUE,
   fill = TRUE
-) |> 
-  dplyr::filter(lubridate::year(date) > 1990) 
+) |>
+  dplyr::filter(lubridate::year(date) > 1990)
+
+# Bind the freshly pulled continuous data (most recent two years) with the full historical
+# record cached by cache_flow_data.R. The two windows can overlap as time passes since the
+# cache is a static snapshot, so duplicates are removed here, keeping the freshly pulled value.
+flow_data_cached <- readRDS("data-raw/pull_data_scripts/cached_data/flow_data_cached.rds")
+
+flow_daily <- dplyr::bind_rows(recent_flow_daily, flow_data_cached) |>
+  dplyr::distinct(date, stream, site_group, parameter, statistic, .keep_all = TRUE)
 
 # Check to make sure there are no duplicates because the reshaping with result in values of 0 and 1 if duplicates exist which is a major issue.
-find_duplicates <- flow_daily |> 
-  group_by(date, stream, site_group, parameter, statistic) |> 
-  tally() |> 
+find_duplicates <- flow_daily |>
+  group_by(date, stream, site_group, parameter, statistic) |>
+  tally() |>
   filter(n > 1)
 
 if (nrow(find_duplicates) > 0) {
