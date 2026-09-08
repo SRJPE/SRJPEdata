@@ -59,7 +59,10 @@ get_file_config <- function(file_path, config_file = NULL) {
     date_columns = c(),
     numeric_tolerance = 1e-6,
     check_attributes = TRUE,
-    allowed_attribute_changes = c("class", "row.names")
+    allowed_attribute_changes = c("class", "row.names"),
+    # Files with no config entry at all default to NOT reported - see the
+    # header comment in inst/config/data_comparison_config.yml.
+    report_differences = FALSE
   )
   
   # Find config file if not specified
@@ -106,14 +109,16 @@ get_file_config <- function(file_path, config_file = NULL) {
         c("class", "row.names")
       } else {
         unlist(config_data$allowed_attribute_changes)
-      }
+      },
+      report_differences = if (is.null(config_data$report_differences)) FALSE else isTRUE(config_data$report_differences)
     )
-    
+
     # Print configuration being used
     cat("Configuration loaded:\n")
     cat("  ID columns:", if (is.null(config$id_columns)) "NULL (using row numbers)" else paste(config$id_columns, collapse = ", "), "\n")
     cat("  Allowed to change:", paste(config$allowed_to_change, collapse = ", "), "\n")
     cat("  Date columns:", if (length(config$date_columns) == 0) "none" else paste(config$date_columns, collapse = ", "), "\n")
+    cat("  Report differences:", config$report_differences, "\n")
     
     return(config)
     
@@ -270,15 +275,18 @@ compare_data_files <- function(old_file, new_file) {
   NUMERIC_TOLERANCE <- config$numeric_tolerance
   CHECK_ATTRIBUTES <- config$check_attributes
   ALLOWED_ATTRIBUTE_CHANGES <- config$allowed_attribute_changes
-  
+  REPORT_DIFFERENCES <- config$report_differences
+
   results <- list(
     file_name = basename(new_file),
     comparison_date = Sys.time(),
     status = "PASS",
     issues = list(),
-    summary = list()
+    summary = list(),
+    unreported = FALSE
   )
   results$summary$id_columns <- ID_COLUMNS
+  results$summary$report_differences <- REPORT_DIFFERENCES
   
   # Check if old file exists
   if (!file.exists(old_file)) {
@@ -556,7 +564,59 @@ compare_data_files <- function(old_file, new_file) {
   if (length(new_ids) > 0) {
     results$summary$rows_added <- length(new_ids)
   }
-  
+
+  # ============================================
+  # APPLY REPORTING SCOPE (report_differences)
+  # ============================================
+  # Some files (covariates, hatchery/genetics/detection reference tables,
+  # and other raw pulled tables not in the reported list) are expected to
+  # change on every pull. We still ran the full comparison above so nothing
+  # goes unchecked, but for these files we don't let ordinary value/row
+  # changes fail the check or clutter the report - only genuine structural
+  # problems (a column disappearing, a load error, a type change) still do,
+  # since those mean something broke rather than "the data updated."
+  if (!REPORT_DIFFERENCES) {
+    is_content_issue <- function(issue) {
+      !is.null(issue$column) || (!is.null(issue$type) && issue$type == "DELETED_ROWS")
+    }
+    content_issues <- Filter(is_content_issue, results$issues)
+    structural_issues <- Filter(Negate(is_content_issue), results$issues)
+
+    if (length(content_issues) > 0) {
+      results$summary$unreported_changes <- length(content_issues)
+      # Drop the row-level issue entries (the specific rows/values that
+      # changed) so the collapsible detail section has nothing to list -
+      # but keep the summary counts (rows_deleted, n_modifications, etc.)
+      # set earlier, so the table row still shows THAT this file changed,
+      # just not which values.
+      results$issues <- structural_issues
+      results$unreported <- TRUE
+
+      if (length(structural_issues) == 0) {
+        # Nothing left but expected value/row churn - clear the FAIL, but
+        # keep status distinguishable from a file with zero changes at all
+        # (see the "changed" status_cell logic in format_report()).
+        results$status <- "PASS"
+        results$summary$message <- paste0(
+          "Changed but not detailed: ", length(content_issues),
+          " value/row change(s) were found. This file is configured as ",
+          "expected-to-change (report_differences: false in ",
+          "inst/config/data_comparison_config.yml), so the specific rows/",
+          "values are not listed and this does not fail the check - the ",
+          "counts above are shown so you can see that it changed."
+        )
+      } else {
+        # Structural issues remain - those still fail regardless of scope.
+        results$summary$message <- paste0(
+          length(content_issues), " value/row change(s) were also found ",
+          "(counts above) but are not listed in detail (report_differences: ",
+          "false) - the failure below is from a structural issue, not ",
+          "routine value churn."
+        )
+      }
+    }
+  }
+
   return(results)
 }
 
@@ -585,6 +645,21 @@ format_report <- function(results_list) {
   report_lines <- c(
     paste("**Overall Status:**", overall_status),
     paste("**Files Compared:**", length(results_list)),
+    "",
+    paste0(
+      "> **Note:** every file below is compared against `main`, and the ",
+      "table always shows whether a file changed. Only `weekly_*`, ",
+      "`*_model_years.rda`, and `annual_adult.rda` get the detailed ",
+      "row/column breakdown below and can fail this check for ordinary ",
+      "value changes. Covariates, hatchery/genetics/detection reference ",
+      "tables, and other raw pulled tables are expected to change on every ",
+      "pull, so those show up as \"\U0001F7E1 Changed (not detailed)\" with ",
+      "counts but no row-by-row listing, and don't fail the check for it. A ",
+      "structural problem (a column disappearing, a load error, a data ",
+      "type change) still fails regardless of this setting. See the ",
+      "`report_differences` field in `inst/config/data_comparison_config.yml` ",
+      "to change which files are in which group."
+    ),
     ""
   )
 
@@ -595,14 +670,18 @@ format_report <- function(results_list) {
   )
 
   for (result in results_list) {
-    status_cell <- switch(result$status,
-      "PASS"     = "✅ Pass",
-      "NEW_FILE" = "🆕 New file",
-      "FAIL"     = "❌ Fail",
-      "ERROR"    = "⚠️ Error",
-      "WARNING"  = "⚠️ Warning",
-      "❓"
-    )
+    status_cell <- if (isTRUE(result$unreported) && result$status == "PASS") {
+      "🟡 Changed (not detailed)"
+    } else {
+      switch(result$status,
+        "PASS"     = "✅ Pass",
+        "NEW_FILE" = "🆕 New file",
+        "FAIL"     = "❌ Fail",
+        "ERROR"    = "⚠️ Error",
+        "WARNING"  = "⚠️ Warning",
+        "❓"
+      )
+    }
     new_rows_val  <- result$summary$rows_added
     new_rows_cell <- if (!is.null(new_rows_val) && new_rows_val > 0) paste0("+", new_rows_val) else "—"
 
@@ -623,14 +702,18 @@ format_report <- function(results_list) {
   # ---- Per-file details (collapsible) ----
   for (result in results_list) {
     has_issues  <- result$status %in% c("FAIL", "WARNING", "ERROR")
-    status_icon <- switch(result$status,
-      "PASS"     = "✅",
-      "NEW_FILE" = "🆕",
-      "FAIL"     = "❌",
-      "ERROR"    = "⚠️",
-      "WARNING"  = "⚠️",
-      "❓"
-    )
+    status_icon <- if (isTRUE(result$unreported) && result$status == "PASS") {
+      "🟡"
+    } else {
+      switch(result$status,
+        "PASS"     = "✅",
+        "NEW_FILE" = "🆕",
+        "FAIL"     = "❌",
+        "ERROR"    = "⚠️",
+        "WARNING"  = "⚠️",
+        "❓"
+      )
+    }
 
     detail_lines <- c()
 

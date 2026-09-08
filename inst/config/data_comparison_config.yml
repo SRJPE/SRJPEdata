@@ -3,6 +3,24 @@
 # DATA FILE COMPARISON CONFIGURATION
 # ============================================
 # Define ID columns and allowed changes for each data file
+#
+# report_differences: controls whether inst/scripts/compare_data_files.R
+# surfaces this file's value/row-level changes in the PR comparison report
+# and lets them fail the check. Every file is still compared against main
+# either way (nothing goes unchecked) - this only controls whether ordinary
+# value changes are shown/failed on, versus compared silently.
+#   true  -> weekly_*, *_model_years.rda, annual_adult.rda: these are the
+#            tables stream teams actually review row-by-row, so real changes
+#            should show up and block the PR.
+#   false -> covariates, hatchery/genetics/detection reference tables, and
+#            other raw pulled tables not listed above: these are expected to
+#            change on every pull, so we don't want routine value churn
+#            reported or failing the check. Structural problems (a column
+#            disappearing, a load error, a data type change) still get
+#            reported/failed regardless of this setting, since those mean
+#            something broke rather than "the data updated."
+# Defaults to false (via the `default:` entry below) for any file not
+# listed here at all.
 
 # Annual adult data
 annual_adult.rda:
@@ -14,6 +32,7 @@ annual_adult.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: true
 
 # Priors for BTSPASX
 btspasx_special_priors_data.rda:
@@ -25,6 +44,7 @@ btspasx_special_priors_data.rda:
   date_columns:
   numeric_tolerance: 0.001  # 0.69-2.48 so shouldn't vary too much
   check_attributes: true
+  report_differences: false
 
 # Daily yearling ruleset
 daily_yearling_ruleset.rda:
@@ -36,6 +56,7 @@ daily_yearling_ruleset.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: false
 
 # Species reference list
 flow_data.rda:
@@ -52,7 +73,8 @@ flow_data.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
-  
+  report_differences: false
+
 temperature_data.rda:
   id_columns:
     - stream
@@ -67,6 +89,7 @@ temperature_data.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: false
 
 # Forecast covariates
 forecast_covariates.rda:
@@ -80,6 +103,7 @@ forecast_covariates.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: false
 
 # Recaptures
 recaptures.rda:
@@ -102,7 +126,8 @@ recaptures.rda:
     - date
   numeric_tolerance: 1
   check_attributes: true
-  
+  report_differences: false
+
 # Release
 release.rda:
   id_columns:
@@ -120,6 +145,7 @@ release.rda:
     - date_released
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: false
 
 # Catch
 rst_catch.rda:
@@ -144,6 +170,7 @@ rst_catch.rda:
     - date
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: false
 
 # Trap
 rst_trap.rda:
@@ -162,7 +189,8 @@ rst_trap.rda:
     - trap_stop_date
   numeric_tolerance: 1
   check_attributes: true
-  
+  report_differences: false
+
 # Stock recruit covariates
 stock_recruit_covariates.rda:
   id_columns:
@@ -175,7 +203,8 @@ stock_recruit_covariates.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
-  
+  report_differences: false
+
 # Survival model inputs
 survival_model_inputs.rda:
   id_columns:
@@ -185,6 +214,7 @@ survival_model_inputs.rda:
     - fish_release_date
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: false
 
 # Weekly efficiency
 weekly_efficiency.rda:
@@ -198,6 +228,7 @@ weekly_efficiency.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: true
 
 # Weekly hours fished
 weekly_hours_fished.rda:
@@ -211,7 +242,8 @@ weekly_hours_fished.rda:
   allowed_to_change:
   date_columns:
   numeric_tolerance: 1
-  check_attributes: true  
+  check_attributes: true
+  report_differences: true
 
 # Weekly juvenile abundance catch
 weekly_juvenile_abundance_catch_data.rda:
@@ -224,9 +256,13 @@ weekly_juvenile_abundance_catch_data.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
+  report_differences: true
 
 # Weekly juvenile abundance efficiency
-weekly_juvenile_abundance_efficiency.rda:
+# NOTE: this key was previously "weekly_juvenile_abundance_efficiency.rda"
+# (missing "_data"), which didn't match the real file name and so silently
+# fell back to the `default:` entry below - fixed to match data/weekly_juvenile_abundance_efficiency_data.rda.
+weekly_juvenile_abundance_efficiency_data.rda:
   id_columns:
     - year
     - run_year
@@ -237,7 +273,32 @@ weekly_juvenile_abundance_efficiency.rda:
   date_columns:
   numeric_tolerance: 1
   check_attributes: true
-  
+  report_differences: true
+
+# RST model years (inclusion/exclusion ruleset)
+rst_model_years.rda:
+  id_columns:
+    - stream
+    - site
+    - run_year
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  report_differences: true
+
+# Adult model years (inclusion/exclusion ruleset)
+adult_model_years.rda:
+  id_columns:
+    - year
+    - stream
+    - data_type
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  report_differences: true
+
 # Default
 default:
   id_columns: null  # Will use row numbers
@@ -245,4 +306,4 @@ default:
   date_columns: []
   numeric_tolerance: 1
   check_attributes: true
-
+  report_differences: false

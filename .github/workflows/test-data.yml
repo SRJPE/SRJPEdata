@@ -2,33 +2,37 @@ name: Data Quality and Package Checks
 
 # Runs purely as a check against what's already been committed to this PR
 # branch - it does NOT regenerate data or run QC/stream-team-review itself.
-# update-data.yml does that (data pull + QC/review render + one commit),
-# and that push is what triggers this workflow (via the `paths:` filter
-# below) to run fresh against the fully-updated branch. This job then just
-# compares that committed state to main (.rda files via
-# inst/scripts/compare_data_files.R, and data-raw/qc/qc_log_errors.csv via
-# the "Compare QC log against main" step) plus runs tests/credential/
-# structure checks.
+# update-data.yml does that (data pull + QC/review render + one commit).
+#
+# This is a `workflow_call` reusable workflow, not its own PR trigger -
+# check-commit.yml calls it directly as a job right after its `update-data`
+# job, in the SAME triggered run. It used to have its own `pull_request`
+# trigger (path-filtered), relying on update-data.yml's commit landing back
+# on the PR branch to fire a second, fresh `synchronize` run - but that
+# second run is a *new* triggered workflow run, and pushes authored by the
+# default GITHUB_TOKEN (which is what update-data.yml's commit step uses)
+# can require manual "Approve and run workflows" depending on repo/org
+# Actions settings, plus it redundantly re-ran lint-commit-messages and
+# update-data.yml a second time (a no-op, but still a wasted DB pull).
+# Chaining this as a job instead of a second event means everything -
+# lint, data pull + QC/review + commit, then this comparison - happens in
+# one PR-triggered run, in the right order, with no extra approval click
+# and no redundant re-run.
+#
+# NOTE: this job's check now posts to the PR under the context
+# "PR Data Update (check-commit -> update-data) / quality-checks" (check-
+# commit.yml's workflow name + this job's id) instead of the old
+# "Data Quality and Package Checks / quality-checks". If main's branch
+# protection lists the old name as a required status check, update it to
+# the new one or the PR will never show as mergeable.
 
 on:
-  pull_request:
-    # TODO(SRJPE): test-github-actions is here temporarily so Erin can test
-    # this workflow chain by opening a PR from testing_workflow into
-    # test-github-actions - remove it once that testing is done, leaving
-    # only main.
-    branches:
-      - main
-      - test-github-actions
-    paths:
-      - 'data/*.rda'
-      - 'data/*.RData'
-      - 'R/**'
-      - 'tests/**'
-      - 'inst/**'
-      - 'data-raw/qc/qc_log_errors.csv'
-      - 'data-raw/qc/qc_log_warnings.csv'
-      - 'data-raw/qc/reports/**'
-      - 'data-raw/data-checks/stream_team_review/stream_team_reports/**'
+  workflow_call:
+    inputs:
+      ref:
+        description: "PR branch to check out and compare against main."
+        required: true
+        type: string
 
 jobs:
   quality-checks:
@@ -39,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref }}
+          ref: ${{ inputs.ref }}
 
       - name: Fetch main branch
         run: |

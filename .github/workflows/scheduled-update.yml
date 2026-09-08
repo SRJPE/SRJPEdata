@@ -21,17 +21,21 @@ name: "Automatic Data Update (schedule / manual dispatch)"
 # stamps on its own commit.
 #
 # HOW QC ACTUALLY GETS INVOKED: there is no `check-data.yml` reusable
-# workflow (there never was one) - QC lives entirely in test-data.yml
-# ("Data Quality and Package Checks", job quality-checks), which is
-# triggered by `pull_request` and filtered to the exact paths
-# update_data.R changes (data/*.rda, data/*.RData, R/**, tests/**,
-# inst/**). Opening the PR in `open-pr` below fires that trigger on its
-# own - GitHub schedules the check the moment the PR is created, the same
-# way it would for a human's PR. `wait-for-qc` doesn't call test-data.yml
-# as a sub-job (that would run QC a second time, redundantly); it just
-# polls the PR's existing checks with `gh pr checks --watch` and reads
-# whether they passed, so auto-merge can act on the same result a human
-# reviewing this PR would see.
+# workflow (there never was one). QC/comparison lives in test-data.yml
+# ("Data Quality and Package Checks", job quality-checks), which is a
+# `workflow_call` reusable workflow chained as a job inside check-commit.yml
+# (lint-commit-messages -> update-data -> quality-checks), not its own
+# `pull_request` trigger. Opening the PR in `open-pr` below fires
+# check-commit.yml's own `pull_request: opened` trigger the same way it
+# would for a human's PR - lint-commit-messages and update-data both re-run
+# there too (a no-op update-data pass, since the `update-data` job above
+# already committed everything to bot_branch before this PR was even
+# opened), then quality-checks runs for real against main. `wait-for-qc`
+# doesn't call test-data.yml as a sub-job itself (that would run the
+# comparison a second time, redundantly); it just polls the PR's existing
+# checks with `gh pr checks --watch` and reads whether the quality-checks
+# job passed, so auto-merge can act on the same result a human reviewing
+# this PR would see.
 #
 # TODO(SRJPE): the cron below is a PLACEHOLDER (1st and 15th of month,
 # 13:00 UTC / 6am PDT). Replace with the actual EDI RST-data publication
