@@ -261,6 +261,25 @@ jobs:
           cat('\nRunning tests...\n')
           results <- test_dir('tests/testthat', reporter = 'summary')
 
+          # Per-test-block counts (one row per test_that() call), captured so
+          # the PR comment can show real numbers instead of just pass/fail -
+          # this comes for free from the same run, no second R invocation.
+          n_total   <- nrow(results)
+          n_failed  <- sum(results\$failed > 0)
+          n_skipped <- sum(results\$skipped > 0)
+          n_warned  <- sum(results\$warning > 0)
+          n_passed  <- n_total - n_failed - n_skipped
+
+          gh_out <- Sys.getenv('GITHUB_OUTPUT')
+          cat(sprintf('test_total=%d\n',   n_total),   file = gh_out, append = TRUE)
+          cat(sprintf('test_passed=%d\n',  n_passed),  file = gh_out, append = TRUE)
+          cat(sprintf('test_failed=%d\n',  n_failed),  file = gh_out, append = TRUE)
+          cat(sprintf('test_skipped=%d\n', n_skipped), file = gh_out, append = TRUE)
+          cat(sprintf('test_warned=%d\n',  n_warned),  file = gh_out, append = TRUE)
+
+          cat(sprintf('\nTest summary: %d total | %d passed | %d failed | %d skipped | %d with warnings\n',
+                      n_total, n_passed, n_failed, n_skipped, n_warned))
+
           if (any(results\$failed > 0)) {
             cat('\n❌ Some tests failed\n')
             quit(status = 1)
@@ -370,16 +389,26 @@ jobs:
           main_status <- attr(main_errors, "status")
           if (!is.null(main_status) && main_status != 0) main_errors <- character(0)
 
-          open_errors_this_branch <- read_open_ids(this_branch_errors)
-          open_errors_main        <- read_open_ids(main_errors)
-          open_warnings           <- read_open_ids(this_branch_warnings)
+          main_warnings <- suppressWarnings(
+            system2("git", c("show", "main:data-raw/qc/qc_log_warnings.csv"),
+                    stdout = TRUE, stderr = FALSE)
+          )
+          main_warnings_status <- attr(main_warnings, "status")
+          if (!is.null(main_warnings_status) && main_warnings_status != 0) main_warnings <- character(0)
 
-          new_open_errors <- setdiff(open_errors_this_branch, open_errors_main)
+          open_errors_this_branch   <- read_open_ids(this_branch_errors)
+          open_errors_main          <- read_open_ids(main_errors)
+          open_warnings_this_branch <- read_open_ids(this_branch_warnings)
+          open_warnings_main        <- read_open_ids(main_warnings)
+
+          new_open_errors   <- setdiff(open_errors_this_branch, open_errors_main)
+          new_open_warnings <- setdiff(open_warnings_this_branch, open_warnings_main)
 
           gh_out <- Sys.getenv("GITHUB_OUTPUT")
-          cat(sprintf("new_open_errors=%d\n",     length(new_open_errors)),        file = gh_out, append = TRUE)
-          cat(sprintf("total_open_errors=%d\n",   length(open_errors_this_branch)), file = gh_out, append = TRUE)
-          cat(sprintf("total_open_warnings=%d\n", length(open_warnings)),           file = gh_out, append = TRUE)
+          cat(sprintf("new_open_errors=%d\n",     length(new_open_errors)),           file = gh_out, append = TRUE)
+          cat(sprintf("total_open_errors=%d\n",   length(open_errors_this_branch)),   file = gh_out, append = TRUE)
+          cat(sprintf("new_open_warnings=%d\n",   length(new_open_warnings)),         file = gh_out, append = TRUE)
+          cat(sprintf("total_open_warnings=%d\n", length(open_warnings_this_branch)), file = gh_out, append = TRUE)
 
           cat(sprintf(
             "This branch open errors: %d | main open errors: %d | new vs main: %d\n",
@@ -388,6 +417,14 @@ jobs:
           if (length(new_open_errors) > 0) {
             cat("\nOpen error log_ids on this branch not already open on main:\n")
             print(new_open_errors)
+          }
+          cat(sprintf(
+            "This branch open warnings: %d | main open warnings: %d | new vs main: %d\n",
+            length(open_warnings_this_branch), length(open_warnings_main), length(new_open_warnings)
+          ))
+          if (length(new_open_warnings) > 0) {
+            cat("\nOpen warning log_ids on this branch not already open on main:\n")
+            print(new_open_warnings)
           }
           RSCRIPT
 
@@ -405,11 +442,19 @@ jobs:
             const credentialIssues = parseInt('${{ steps.credential-check.outputs.credential_issues }}') || 0;
             const structureIssues = parseInt('${{ steps.structure-check.outputs.structure_issues }}') || 0;
             const testStatus = '${{ steps.testthat.outputs.test_status }}' || 'unknown';
+            const testTotalRaw = parseInt('${{ steps.testthat.outputs.test_total }}');
+            const hasTestCounts = !isNaN(testTotalRaw);
+            const testTotal = hasTestCounts ? testTotalRaw : 0;
+            const testPassed = parseInt('${{ steps.testthat.outputs.test_passed }}') || 0;
+            const testFailed = parseInt('${{ steps.testthat.outputs.test_failed }}') || 0;
+            const testSkipped = parseInt('${{ steps.testthat.outputs.test_skipped }}') || 0;
+            const testWarned = parseInt('${{ steps.testthat.outputs.test_warned }}') || 0;
             const comparisonExitCode = '${{ steps.comparison.outputs.comparison_exit_code }}';
             const updateType = '${{ steps.update-type.outputs.update_type }}' || 'manual';
             const qcComparisonOutcome = '${{ steps.qc-comparison.outcome }}';
             const newOpenErrors = parseInt('${{ steps.qc-comparison.outputs.new_open_errors }}') || 0;
             const totalOpenErrors = parseInt('${{ steps.qc-comparison.outputs.total_open_errors }}') || 0;
+            const newOpenWarnings = parseInt('${{ steps.qc-comparison.outputs.new_open_warnings }}') || 0;
             const totalOpenWarnings = parseInt('${{ steps.qc-comparison.outputs.total_open_warnings }}') || 0;
 
             const owner = context.repo.owner;
@@ -444,9 +489,13 @@ jobs:
             }
 
             if (testStatus === 'passed') {
-              statusSummary += '✅ **Tests:** All tests passed\n';
+              statusSummary += hasTestCounts
+                ? `✅ **Tests:** ${testPassed} passed, ${testFailed} failed, ${testSkipped} skipped (${testTotal} total)${testWarned > 0 ? `, ${testWarned} with warnings` : ''}\n`
+                : '✅ **Tests:** All tests passed\n';
             } else if (testStatus === 'failed') {
-              statusSummary += '❌ **Tests:** Some tests failed\n';
+              statusSummary += hasTestCounts
+                ? `❌ **Tests:** ${testFailed} failed, ${testPassed} passed, ${testSkipped} skipped (${testTotal} total)\n`
+                : '❌ **Tests:** Some tests failed\n';
             } else if (testStatus === 'skipped') {
               statusSummary += '⚠️ **Tests:** No tests found (skipped)\n';
             } else {
@@ -462,12 +511,11 @@ jobs:
             if (updateType === 'biweekly') {
               statusSummary += '⏭️ **QC Log (vs main):** skipped (biweekly update)\n';
             } else if (qcComparisonOutcome === 'success' || qcComparisonOutcome === 'failure') {
-              if (newOpenErrors > 0) {
-                statusSummary += `❌ **QC Log (vs main):** ${newOpenErrors} new open error(s) not already open on main\n`;
-              } else {
-                statusSummary += '✅ **QC Log (vs main):** no new open errors vs main\n';
-              }
-              statusSummary += `   _(backlog: ${totalOpenErrors} open error(s), ${totalOpenWarnings} open warning(s) total on this branch — not blocking)_\n`;
+              const existingErrors = Math.max(totalOpenErrors - newOpenErrors, 0);
+              const existingWarnings = Math.max(totalOpenWarnings - newOpenWarnings, 0);
+              const qcIcon = newOpenErrors > 0 ? '❌' : '✅';
+              statusSummary += `${qcIcon} **QC Log (vs main):** ${newOpenErrors} new open error(s) (${existingErrors} existing) · ${newOpenWarnings} new open warning(s) (${existingWarnings} existing)\n`;
+              statusSummary += `   _(only new open errors block this PR - the existing backlog and all warnings are informational)_\n`;
             } else {
               statusSummary += '❓ **QC Log (vs main):** comparison did not run\n';
             }
