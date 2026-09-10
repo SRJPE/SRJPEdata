@@ -634,29 +634,39 @@ format_row_id <- function(row_id, id_columns) {
 
 format_report <- function(results_list) {
 
-  overall_status <- if (all(sapply(results_list, function(x) x$status %in% c("PASS", "NEW_FILE")))) {
-    "✅ PASS"
-  } else if (any(sapply(results_list, function(x) x$status == "FAIL"))) {
-    "❌ FAIL"
-  } else {
-    "⚠️ WARNING"
+  # Content vs. structural classification, shared with the REPORT_DIFFERENCES
+  # suppression logic above - kept as its own top-level helper here since
+  # format_report() needs it independently of compare_data_files() (a
+  # non-reportable file's structural issues survive the suppression above and
+  # still need to be told apart from content issues down here).
+  is_content_issue_type <- function(issue) {
+    !is.null(issue$column) || (!is.null(issue$type) && issue$type == "DELETED_ROWS")
   }
 
+  file_has_structural_issue <- function(result) {
+    length(result$issues) > 0 && any(!sapply(result$issues, is_content_issue_type))
+  }
+
+  # This report is purely informational now - a file showing up as "Changed"
+  # below does not fail this check or require any approval. The only thing
+  # that still fails the check is a structural problem (a column
+  # disappearing, a load error, a data type change) - see the
+  # struct_issues handling in the per-file detail loop below.
   report_lines <- c(
-    paste("**Overall Status:**", overall_status),
     paste("**Files Compared:**", length(results_list)),
     "",
     paste0(
-      "> **Note:** every file below is compared against `main`, and the ",
-      "table always shows whether a file changed. Only `weekly_*`, ",
-      "`*_model_years.rda`, and `annual_adult.rda` get the detailed ",
-      "row/column breakdown below and can fail this check for ordinary ",
-      "value changes. Covariates, hatchery/genetics/detection reference ",
-      "tables, and other raw pulled tables are expected to change on every ",
-      "pull, so those show up as \"\U0001F7E1 Changed (not detailed)\" with ",
-      "counts but no row-by-row listing, and don't fail the check for it. A ",
+      "> **Note:** every file below is compared against `main` and the ",
+      "table always shows whether it changed - this is informational and ",
+      "does not fail the check or require approval. `weekly_*`, ",
+      "`*_model_years.rda`, and `annual_adult.rda` get a detailed ",
+      "row/column breakdown you can expand below. Covariates, hatchery/",
+      "genetics/detection reference tables, and other raw pulled tables ",
+      "are expected to change on every pull, so those just show \"",
+      "\U0001F535 Changed\" in the table with no expandable detail. A ",
       "structural problem (a column disappearing, a load error, a data ",
-      "type change) still fails regardless of this setting. See the ",
+      "type change) is still called out and still fails the check, ",
+      "regardless of which group the file is in. See the ",
       "`report_differences` field in `inst/config/data_comparison_config.yml` ",
       "to change which files are in which group."
     ),
@@ -670,17 +680,17 @@ format_report <- function(results_list) {
   )
 
   for (result in results_list) {
-    status_cell <- if (isTRUE(result$unreported) && result$status == "PASS") {
-      "🟡 Changed (not detailed)"
+    has_structural <- file_has_structural_issue(result)
+    status_cell <- if (result$status == "NEW_FILE") {
+      "🆕 New file"
+    } else if (result$status == "ERROR") {
+      "⚠️ Error"
+    } else if (has_structural) {
+      "⚠️ Changed (structural issue - see below)"
+    } else if (isTRUE(result$unreported) || length(result$issues) > 0) {
+      "🔵 Changed"
     } else {
-      switch(result$status,
-        "PASS"     = "✅ Pass",
-        "NEW_FILE" = "🆕 New file",
-        "FAIL"     = "❌ Fail",
-        "ERROR"    = "⚠️ Error",
-        "WARNING"  = "⚠️ Warning",
-        "❓"
-      )
+      "✅ No changes"
     }
     new_rows_val  <- result$summary$rows_added
     new_rows_cell <- if (!is.null(new_rows_val) && new_rows_val > 0) paste0("+", new_rows_val) else "—"
@@ -700,19 +710,34 @@ format_report <- function(results_list) {
   report_lines <- c(report_lines, "")
 
   # ---- Per-file details (collapsible) ----
+  # Only files with something to actually show get a dropdown at all: a
+  # structural issue, or row/column detail on a reportable-group file. A
+  # non-reportable file whose only changes were ordinary value/row churn has
+  # nothing left in result$issues (cleared above) - it's shown as "🔵
+  # Changed" in the table and intentionally gets no dropdown here, so the
+  # comment isn't cluttered with a collapsed section that has nothing in it.
   for (result in results_list) {
-    has_issues  <- result$status %in% c("FAIL", "WARNING", "ERROR")
-    status_icon <- if (isTRUE(result$unreported) && result$status == "PASS") {
-      "🟡"
+    has_structural <- file_has_structural_issue(result)
+
+    # Skip the dropdown entirely for a file whose only changes are
+    # non-reportable content churn (the old "🟡 Changed (not detailed)"
+    # case) - there is nothing left to show once the row/value issues were
+    # cleared above, and rendering an empty collapsed section just to say
+    # "this changed" again (already visible in the table) is noise. A file
+    # with a structural issue always keeps its dropdown even when it's also
+    # in the non-reportable group, since that's the one thing that still
+    # fails the check and needs to be visible.
+    if (isTRUE(result$unreported) && !has_structural) next
+
+    has_issues  <- length(result$issues) > 0
+    status_icon <- if (result$status == "NEW_FILE") {
+      "🆕"
+    } else if (result$status == "ERROR") {
+      "⚠️"
+    } else if (has_structural) {
+      "⚠️"
     } else {
-      switch(result$status,
-        "PASS"     = "✅",
-        "NEW_FILE" = "🆕",
-        "FAIL"     = "❌",
-        "ERROR"    = "⚠️",
-        "WARNING"  = "⚠️",
-        "❓"
-      )
+      "🔵"
     }
 
     detail_lines <- c()
