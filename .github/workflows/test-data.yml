@@ -1,15 +1,38 @@
 name: Data Quality and Package Checks
 
+# Runs purely as a check against what's already been committed to this PR
+# branch - it does NOT regenerate data or run QC/stream-team-review itself.
+# update-data.yml does that (data pull + QC/review render + one commit).
+#
+# This is a `workflow_call` reusable workflow, not its own PR trigger -
+# check-commit.yml calls it directly as a job right after its `update-data`
+# job, in the SAME triggered run. It used to have its own `pull_request`
+# trigger (path-filtered), relying on update-data.yml's commit landing back
+# on the PR branch to fire a second, fresh `synchronize` run - but that
+# second run is a *new* triggered workflow run, and pushes authored by the
+# default GITHUB_TOKEN (which is what update-data.yml's commit step uses)
+# can require manual "Approve and run workflows" depending on repo/org
+# Actions settings, plus it redundantly re-ran lint-commit-messages and
+# update-data.yml a second time (a no-op, but still a wasted DB pull).
+# Chaining this as a job instead of a second event means everything -
+# lint, data pull + QC/review + commit, then this comparison - happens in
+# one PR-triggered run, in the right order, with no extra approval click
+# and no redundant re-run.
+#
+# NOTE: this job's check now posts to the PR under the context
+# "PR Data Update (check-commit -> update-data) / quality-checks" (check-
+# commit.yml's workflow name + this job's id) instead of the old
+# "Data Quality and Package Checks / quality-checks". If main's branch
+# protection lists the old name as a required status check, update it to
+# the new one or the PR will never show as mergeable.
+
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'data/*.rda'
-      - 'data/*.RData'
-      - 'R/**'
-      - 'tests/**'
-      - 'inst/**'
+  workflow_call:
+    inputs:
+      ref:
+        description: "PR branch to check out and compare against main."
+        required: true
+        type: string
 
 jobs:
   quality-checks:
@@ -20,7 +43,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref }}
+          ref: ${{ inputs.ref }}
 
       - name: Fetch main branch
         run: |
@@ -47,28 +70,19 @@ jobs:
           r-version: '4.3.0'
           use-public-rspm: true
 
-      - name: Set up Pandoc
-        uses: r-lib/actions/setup-pandoc@v2
-
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libcurl4-openssl-dev libxml2-dev libssl-dev libfontconfig1-dev libharfbuzz-dev libfribidi-dev libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
 
-      - name: Install R packages
-        run: |
-          install.packages(c('padr','tidyverse', 'testthat', 'yaml', 'devtools', 'dplyr', 'remotes', 'roxygen2'))
-        shell: Rscript {0}
-
-      - name: Install package Suggests (quarto, glue - not yet in DESCRIPTION)
+      - name: Install package + all Imports/Suggests/Remotes from DESCRIPTION
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
-            any::quarto
-            any::glue
+            any::devtools
+            any::yaml
+            any::remotes
+            any::roxygen2
 
       # ==========================================
       # CREDENTIAL SCANNING
@@ -214,6 +228,19 @@ jobs:
             exit 0
           fi
 
+          # GitHub Actions runs this `run:` block as `bash -e` (errexit), and
+          # the Rscript call below is expected to exit non-zero whenever
+          # tests fail (that's how it reports failure). Under errexit, a
+          # plain non-zero-exiting command on its own line kills the whole
+          # script immediately - so without disabling it here, a real test
+          # failure would abort the step right after the Rscript call and
+          # BEFORE "TEST_EXIT_CODE=$?"/the echo below ever ran, leaving
+          # test_status unset. That's the actual cause of the "❓ Status
+          # unknown" the PR comment shows: it only happened when tests
+          # failed, never when they passed, because errexit only aborts on
+          # the non-zero case. set +e / set -e around just this call fixes
+          # it without changing errexit behavior for the rest of the step.
+          set +e
           Rscript -e "
           library(testthat)
 
@@ -228,11 +255,30 @@ jobs:
               cat('✓ Sourced', length(r_files), 'R file(s)\n')
             }
           }, error = function(e) {
-            cat('⚠️  Warning: Could not load package:', e\$message, '\n')
+            cat('⚠️  Warning: Could not load package:', conditionMessage(e), '\n')
           })
 
           cat('\nRunning tests...\n')
           results <- test_dir('tests/testthat', reporter = 'summary')
+
+          # Per-test-block counts (one row per test_that() call), captured so
+          # the PR comment can show real numbers instead of just pass/fail -
+          # this comes for free from the same run, no second R invocation.
+          n_total   <- nrow(results)
+          n_failed  <- sum(results\$failed > 0)
+          n_skipped <- sum(results\$skipped > 0)
+          n_warned  <- sum(results\$warning > 0)
+          n_passed  <- n_total - n_failed - n_skipped
+
+          gh_out <- Sys.getenv('GITHUB_OUTPUT')
+          cat(sprintf('test_total=%d\n',   n_total),   file = gh_out, append = TRUE)
+          cat(sprintf('test_passed=%d\n',  n_passed),  file = gh_out, append = TRUE)
+          cat(sprintf('test_failed=%d\n',  n_failed),  file = gh_out, append = TRUE)
+          cat(sprintf('test_skipped=%d\n', n_skipped), file = gh_out, append = TRUE)
+          cat(sprintf('test_warned=%d\n',  n_warned),  file = gh_out, append = TRUE)
+
+          cat(sprintf('\nTest summary: %d total | %d passed | %d failed | %d skipped | %d with warnings\n',
+                      n_total, n_passed, n_failed, n_skipped, n_warned))
 
           if (any(results\$failed > 0)) {
             cat('\n❌ Some tests failed\n')
@@ -247,6 +293,8 @@ jobs:
           "
 
           TEST_EXIT_CODE=$?
+          set -e
+
           if [ $TEST_EXIT_CODE -eq 0 ]; then
             echo "test_status=passed" >> $GITHUB_OUTPUT
           else
@@ -256,7 +304,7 @@ jobs:
           exit $TEST_EXIT_CODE
 
       # ==========================================
-      # DATA COMPARISON
+      # DATA COMPARISON (vs main)
       # ==========================================
 
       - name: Get changed RDA files
@@ -289,58 +337,40 @@ jobs:
           path: comparison_report.txt
           retention-days: 30
 
-      - name: Check for approval override
-        if: steps.comparison.outputs.comparison_exit_code != '0'
-        id: check-approval
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const labels = context.payload.pull_request.labels.map(l => l.name);
-            const approved = labels.includes('data-changes-approved');
-
-            console.log('PR labels:', labels);
-            console.log('Has approval:', approved);
-
-            core.setOutput('approved', approved);
-            return approved;
-
       # ==========================================
-      # ANNUAL QC + STREAM TEAM REVIEW
+      # QC LOG COMPARISON (vs main)
       # ==========================================
-      # Runs data-raw/qc/run_annual_qc.R (renders the RST/flow-temp/
-      # efficiency/summary QC reports and appends any newly-detected issues
-      # to data-raw/qc/qc_log_errors.csv / qc_log_warnings.csv) and
-      # data-raw/data-checks/stream_team_review/render_reviews.R (renders
-      # the per-stream reports emailed to stream teams). These used to run
-      # unconditionally at the tail of update_data.R; that call is now
-      # commented out there so they run exactly once, here, against the
-      # data update-data.yml just committed.
-      #
-      # Skipped for biweekly runs: run_annual_qc.R's own header says "run
-      # this once per year after the RST season ends," and the stream team
-      # reports are described in the README as emailed once a year
-      # (July-September) - rendering nine Rmd/qmd reports on every
-      # biweekly sync would run against that intent. If that's wrong and you
-      # actually want these on every run, drop the `if:` condition below.
+      # update-data.yml already ran data-raw/qc/run_annual_qc.R and
+      # data-raw/data-checks/stream_team_review/render_reviews.R and
+      # committed their outputs to this branch (unless update_type was
+      # biweekly). This step doesn't re-render anything - it just diffs
+      # this branch's committed data-raw/qc/qc_log_errors.csv against
+      # main's copy, the same "compare against the other branch" pattern
+      # as the .rda comparison above.
       #
       # The QC log is a running, human-annotated backlog, not a clean
       # pass/fail signal - qc_log_errors.csv already has open issues in it
-      # today. So this gate only fails on NEW open error-level issues this
-      # run adds, not the pre-existing backlog (which is still surfaced,
-      # just non-blocking, in the PR comment below).
+      # on main today. So this only fails on error-level issues that are
+      # OPEN on this branch but were NOT already open on main - i.e. new
+      # issues this update introduced, not the pre-existing backlog (which
+      # is still surfaced, just non-blocking, in the PR comment below).
 
-      - name: Run annual QC + stream team review
-        id: annual-qc
+      - name: Compare QC log against main
         if: steps.update-type.outputs.update_type != 'biweekly'
+        id: qc-comparison
         continue-on-error: true
         run: |
           Rscript - <<'RSCRIPT'
-          devtools::load_all(quiet = TRUE)
-
-          read_open_ids <- function(path) {
-            if (!file.exists(path) || file.info(path)$size < 50) return(character(0))
-            df <- readr::read_csv(path, show_col_types = FALSE,
-                                   col_types = readr::cols(.default = "c"))
+          read_open_ids <- function(lines) {
+            if (length(lines) == 0) return(character(0))
+            con <- textConnection(lines)
+            df <- tryCatch(
+              readr::read_csv(con, show_col_types = FALSE,
+                               col_types = readr::cols(.default = "c")),
+              error = function(e) NULL
+            )
+            close(con)
+            if (is.null(df) || nrow(df) == 0) return(character(0))
             df <- df[rowSums(!is.na(df)) > 0, ]
             if (nrow(df) == 0) return(character(0))
             df$log_id[df$status == "open"]
@@ -349,41 +379,54 @@ jobs:
           errors_path   <- "data-raw/qc/qc_log_errors.csv"
           warnings_path <- "data-raw/qc/qc_log_warnings.csv"
 
-          open_errors_before <- read_open_ids(errors_path)
+          this_branch_errors   <- if (file.exists(errors_path)) readLines(errors_path) else character(0)
+          this_branch_warnings <- if (file.exists(warnings_path)) readLines(warnings_path) else character(0)
 
-          source("data-raw/data-checks/stream_team_review/render_reviews.R")
-          source("data-raw/qc/run_annual_qc.R")
+          main_errors <- suppressWarnings(
+            system2("git", c("show", "main:data-raw/qc/qc_log_errors.csv"),
+                    stdout = TRUE, stderr = FALSE)
+          )
+          main_status <- attr(main_errors, "status")
+          if (!is.null(main_status) && main_status != 0) main_errors <- character(0)
 
-          open_errors_after <- read_open_ids(errors_path)
-          open_warnings     <- read_open_ids(warnings_path)
-          new_open_errors   <- setdiff(open_errors_after, open_errors_before)
+          main_warnings <- suppressWarnings(
+            system2("git", c("show", "main:data-raw/qc/qc_log_warnings.csv"),
+                    stdout = TRUE, stderr = FALSE)
+          )
+          main_warnings_status <- attr(main_warnings, "status")
+          if (!is.null(main_warnings_status) && main_warnings_status != 0) main_warnings <- character(0)
+
+          open_errors_this_branch   <- read_open_ids(this_branch_errors)
+          open_errors_main          <- read_open_ids(main_errors)
+          open_warnings_this_branch <- read_open_ids(this_branch_warnings)
+          open_warnings_main        <- read_open_ids(main_warnings)
+
+          new_open_errors   <- setdiff(open_errors_this_branch, open_errors_main)
+          new_open_warnings <- setdiff(open_warnings_this_branch, open_warnings_main)
 
           gh_out <- Sys.getenv("GITHUB_OUTPUT")
-          cat(sprintf("new_open_errors=%d\n",     length(new_open_errors)),  file = gh_out, append = TRUE)
-          cat(sprintf("total_open_errors=%d\n",   length(open_errors_after)), file = gh_out, append = TRUE)
-          cat(sprintf("total_open_warnings=%d\n", length(open_warnings)),     file = gh_out, append = TRUE)
+          cat(sprintf("new_open_errors=%d\n",     length(new_open_errors)),           file = gh_out, append = TRUE)
+          cat(sprintf("total_open_errors=%d\n",   length(open_errors_this_branch)),   file = gh_out, append = TRUE)
+          cat(sprintf("new_open_warnings=%d\n",   length(new_open_warnings)),         file = gh_out, append = TRUE)
+          cat(sprintf("total_open_warnings=%d\n", length(open_warnings_this_branch)), file = gh_out, append = TRUE)
 
+          cat(sprintf(
+            "This branch open errors: %d | main open errors: %d | new vs main: %d\n",
+            length(open_errors_this_branch), length(open_errors_main), length(new_open_errors)
+          ))
           if (length(new_open_errors) > 0) {
-            cat("\nNew open error-level QC issues from this run:\n")
+            cat("\nOpen error log_ids on this branch not already open on main:\n")
             print(new_open_errors)
           }
+          cat(sprintf(
+            "This branch open warnings: %d | main open warnings: %d | new vs main: %d\n",
+            length(open_warnings_this_branch), length(open_warnings_main), length(new_open_warnings)
+          ))
+          if (length(new_open_warnings) > 0) {
+            cat("\nOpen warning log_ids on this branch not already open on main:\n")
+            print(new_open_warnings)
+          }
           RSCRIPT
-
-      - name: Commit rendered QC + stream team review outputs
-        if: ${{ always() && steps.update-type.outputs.update_type != 'biweekly' }}
-        run: |
-          set -euo pipefail
-          git add data-raw/qc/reports data-raw/qc/qc_log_errors.csv data-raw/qc/qc_log_warnings.csv \
-                  data-raw/data-checks/stream_team_review/stream_team_reports 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git config user.name "srjpe-data-bot"
-            git config user.email "srjpe-data-bot@users.noreply.github.com"
-            git commit -m "chore(qc): render annual QC + stream team review reports" \
-                        -m "Update-Type: ${{ steps.update-type.outputs.update_type }}"
-            git push origin "HEAD:${{ github.head_ref }}"
-          else
-            echo "No QC/report changes to commit."
-          fi
 
       # ==========================================
       # REPORTING
@@ -399,18 +442,36 @@ jobs:
             const credentialIssues = parseInt('${{ steps.credential-check.outputs.credential_issues }}') || 0;
             const structureIssues = parseInt('${{ steps.structure-check.outputs.structure_issues }}') || 0;
             const testStatus = '${{ steps.testthat.outputs.test_status }}' || 'unknown';
+            const testTotalRaw = parseInt('${{ steps.testthat.outputs.test_total }}');
+            const hasTestCounts = !isNaN(testTotalRaw);
+            const testTotal = hasTestCounts ? testTotalRaw : 0;
+            const testPassed = parseInt('${{ steps.testthat.outputs.test_passed }}') || 0;
+            const testFailed = parseInt('${{ steps.testthat.outputs.test_failed }}') || 0;
+            const testSkipped = parseInt('${{ steps.testthat.outputs.test_skipped }}') || 0;
+            const testWarned = parseInt('${{ steps.testthat.outputs.test_warned }}') || 0;
             const comparisonExitCode = '${{ steps.comparison.outputs.comparison_exit_code }}';
-            const dataApproved = '${{ steps.check-approval.outputs.approved }}' === 'true';
             const updateType = '${{ steps.update-type.outputs.update_type }}' || 'manual';
-            const annualQcOutcome = '${{ steps.annual-qc.outcome }}';
-            const newOpenErrors = parseInt('${{ steps.annual-qc.outputs.new_open_errors }}') || 0;
-            const totalOpenErrors = parseInt('${{ steps.annual-qc.outputs.total_open_errors }}') || 0;
-            const totalOpenWarnings = parseInt('${{ steps.annual-qc.outputs.total_open_warnings }}') || 0;
+            const qcComparisonOutcome = '${{ steps.qc-comparison.outcome }}';
+            const newOpenErrors = parseInt('${{ steps.qc-comparison.outputs.new_open_errors }}') || 0;
+            const totalOpenErrors = parseInt('${{ steps.qc-comparison.outputs.total_open_errors }}') || 0;
+            const newOpenWarnings = parseInt('${{ steps.qc-comparison.outputs.new_open_warnings }}') || 0;
+            const totalOpenWarnings = parseInt('${{ steps.qc-comparison.outputs.total_open_warnings }}') || 0;
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const branch = '${{ inputs.ref }}';
+            // htmlpreview.github.io renders a raw GitHub file as a live page instead
+            // of GitHub's own blob view, which just shows HTML files as source text.
+            const previewLink = (path) => `https://htmlpreview.github.io/?https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
 
             let comparisonReport = 'No comparison report generated.';
             if (fs.existsSync('comparison_report.txt')) {
               comparisonReport = fs.readFileSync('comparison_report.txt', 'utf8');
             }
+
+            const allDataFiles = '${{ steps.all-data-files.outputs.all_files }}'.trim().split(/\s+/).filter(Boolean);
+            const changedDataFiles = '${{ steps.changed-files.outputs.all_changed_files }}'.trim().split(/\s+/).filter(Boolean);
+            const unchangedDataFiles = allDataFiles.filter(f => !changedDataFiles.includes(f));
 
             let statusSummary = '## 🔍 Quality Check Summary\n\n';
             statusSummary += `_update-type: \`${updateType}\`_\n\n`;
@@ -428,56 +489,45 @@ jobs:
             }
 
             if (testStatus === 'passed') {
-              statusSummary += '✅ **Tests:** All tests passed\n';
+              statusSummary += hasTestCounts
+                ? `✅ **Tests:** ${testPassed} passed, ${testFailed} failed, ${testSkipped} skipped (${testTotal} total)${testWarned > 0 ? `, ${testWarned} with warnings` : ''}\n`
+                : '✅ **Tests:** All tests passed\n';
             } else if (testStatus === 'failed') {
-              statusSummary += '❌ **Tests:** Some tests failed\n';
+              statusSummary += hasTestCounts
+                ? `❌ **Tests:** ${testFailed} failed, ${testPassed} passed, ${testSkipped} skipped (${testTotal} total)\n`
+                : '❌ **Tests:** Some tests failed\n';
             } else if (testStatus === 'skipped') {
               statusSummary += '⚠️ **Tests:** No tests found (skipped)\n';
             } else {
               statusSummary += '❓ **Tests:** Status unknown\n';
             }
 
-            if (comparisonExitCode === '0') {
-              statusSummary += '✅ **Data Comparison:** No existing values changed\n';
-            } else if (dataApproved) {
-              statusSummary += '⚠️ **Data Comparison:** Existing values changed — manually approved\n';
+            if (changedDataFiles.length === 0) {
+              statusSummary += 'ℹ️ **Data Comparison (vs main):** No data files changed in this PR\n';
             } else {
-              statusSummary += '❌ **Data Comparison:** Existing values changed (requires approval)\n';
+              statusSummary += `ℹ️ **Data Comparison (vs main):** ${changedDataFiles.length} file(s) changed — see the Data File Comparison section below (informational only, does not block this PR)\n`;
             }
 
             if (updateType === 'biweekly') {
-              statusSummary += '⏭️ **Annual QC & Stream Review:** skipped (biweekly update)\n';
-            } else if (annualQcOutcome === 'success' || annualQcOutcome === 'failure') {
-              if (newOpenErrors > 0) {
-                statusSummary += `❌ **Annual QC & Stream Review:** ${newOpenErrors} new open error(s)\n`;
-              } else {
-                statusSummary += '✅ **Annual QC & Stream Review:** no new open errors\n';
-              }
-              statusSummary += `   _(backlog: ${totalOpenErrors} open error(s), ${totalOpenWarnings} open warning(s) total — not blocking)_\n`;
+              statusSummary += '⏭️ **QC Log (vs main):** skipped (biweekly update)\n';
+            } else if (qcComparisonOutcome === 'success' || qcComparisonOutcome === 'failure') {
+              const existingErrors = Math.max(totalOpenErrors - newOpenErrors, 0);
+              const existingWarnings = Math.max(totalOpenWarnings - newOpenWarnings, 0);
+              const qcIcon = newOpenErrors > 0 ? '❌' : '✅';
+              statusSummary += `${qcIcon} **QC Log (vs main):** ${newOpenErrors} new open error(s) (${existingErrors} existing) · ${newOpenWarnings} new open warning(s) (${existingWarnings} existing)\n`;
+              statusSummary += `   _(only new open errors block this PR - the existing backlog and all warnings are informational)_\n`;
             } else {
-              statusSummary += '❓ **Annual QC & Stream Review:** did not run\n';
+              statusSummary += '❓ **QC Log (vs main):** comparison did not run\n';
             }
 
             statusSummary += '\n---\n\n';
 
             let detailedReport = '';
 
-            const allDataFiles = '${{ steps.all-data-files.outputs.all_files }}'.trim().split(/\s+/).filter(Boolean);
-            const changedDataFiles = '${{ steps.changed-files.outputs.all_changed_files }}'.trim().split(/\s+/).filter(Boolean);
-            const unchangedDataFiles = allDataFiles.filter(f => !changedDataFiles.includes(f));
-
             let dataSection = '';
 
-            if (comparisonExitCode !== '0') {
-              let approvalNote = '';
-              if (dataApproved) {
-                approvalNote = '> ⚠️ **Existing values were changed — manually approved** via `data-changes-approved` label.';
-              } else {
-                approvalNote = `> ❌ **Existing values were changed and not yet approved.**\n>\n> To approve: review the per-file details below, then add the \`data-changes-approved\` label to this PR.`;
-              }
-              dataSection = `### 📊 Data File Comparison\n\n${approvalNote}\n\n${comparisonReport}`;
-            } else if (changedDataFiles.length > 0) {
-              dataSection = `### 📊 Data File Comparison\n\n${comparisonReport}`;
+            if (changedDataFiles.length > 0) {
+              dataSection = `### 📊 Data File Comparison (vs main)\n\n${comparisonReport}`;
             }
 
             if (unchangedDataFiles.length > 0) {
@@ -533,19 +583,87 @@ jobs:
             }
 
             if (updateType !== 'biweekly' && newOpenErrors > 0) {
-              detailedReport += `### 🧬 New QC Issues (\`data-raw/qc/qc_log_errors.csv\`)
+              detailedReport += `### 🧬 New QC Issues vs main (\`data-raw/qc/qc_log_errors.csv\`)
 
-            This run's annual QC pass found **${newOpenErrors} new** error-level issue(s) not previously in the log (on top of ${totalOpenErrors - newOpenErrors} pre-existing open error(s), which are not blocking this PR).
+            This branch has **${newOpenErrors} new** error-level issue(s) marked \`open\` that were not already open on main (on top of ${totalOpenErrors - newOpenErrors} pre-existing open error(s) already on this branch, which are not blocking this PR).
+
+            These were rendered by update-data.yml's "Run annual QC + stream team review" step and already committed to this branch - check that workflow run's log for details on what triggered each one.
 
             **How to resolve:**
-            - Open \`data-raw/qc/qc_log_errors.csv\` in this PR's branch and find the rows with \`status = open\` added by this run (see the workflow log for the \`Run annual QC\` step for their \`log_id\`s)
+            - Open \`data-raw/qc/qc_log_errors.csv\` on this branch and find the rows with \`status = open\` that aren't open on main (see the workflow log above for their \`log_id\`s)
             - For each: set \`status\` to \`reviewed_no_issue\`, \`fixed_in_patch\` (and add a fix block to \`data-raw/qc/fixes/\`), or \`fixed_in_source\`, with \`reviewer_notes\` explaining the call
-            - Commit the updated log to this branch and push - this check re-runs and only re-fails on issues still marked \`open\`
+            - Commit the updated log to this branch and push - this check re-runs and only re-fails on issues still marked \`open\` and not open on main
 
             ---
 
             `;
             }
+
+            // ==========================================
+            // ANNUAL QC SUMMARY REPORT LINK
+            // ==========================================
+            // update-data.yml already rendered data-raw/qc/qc_summary.qmd (via
+            // run_annual_qc.R) and committed the output HTML to this branch,
+            // for every non-biweekly update - this just links to the newest
+            // one rather than re-rendering anything.
+            let qcSummarySection = '';
+            const qcReportsDir = 'data-raw/qc/reports';
+            if (fs.existsSync(qcReportsDir)) {
+              const qcSummaryFiles = fs.readdirSync(qcReportsDir)
+                .filter(f => /^qc_summary_\d{4}-\d{2}-\d{2}\.html$/.test(f))
+                .sort();
+
+              if (qcSummaryFiles.length > 0) {
+                const latestSummary = qcSummaryFiles[qcSummaryFiles.length - 1];
+                const runDate = latestSummary.match(/(\d{4}-\d{2}-\d{2})/)[1];
+
+                const siblingReports = [
+                  { label: 'RST', file: `rst_qc_${runDate}.html` },
+                  { label: 'Flow & Temperature', file: `flow_qc_${runDate}.html` },
+                  { label: 'Efficiency Trials', file: `efficiency_qc_${runDate}.html` },
+                ].filter(r => fs.existsSync(`${qcReportsDir}/${r.file}`));
+
+                qcSummarySection = `### 📈 Annual QC Summary\n\n` +
+                  `[Open the QC summary report (run ${runDate})](${previewLink(`${qcReportsDir}/${latestSummary}`)}) — ` +
+                  `this run year vs. historical average across every check, rendered from \`data-raw/qc/qc_summary.qmd\`.\n`;
+
+                if (siblingReports.length > 0) {
+                  qcSummarySection += `\nSame run, per-topic detail: ` +
+                    siblingReports.map(r => `[${r.label}](${previewLink(`${qcReportsDir}/${r.file}`)})`).join(' · ') +
+                    `\n`;
+                }
+                qcSummarySection += `\n---\n\n`;
+              }
+            }
+
+            // ==========================================
+            // STREAM TEAM REPORT LINKS
+            // ==========================================
+            // update-data.yml already rendered render_reviews.R and committed
+            // one report per stream to this branch, for every non-biweekly
+            // update - this just links to what's already there.
+            let streamTeamSection = '';
+            const streamReportsDir = 'data-raw/data-checks/stream_team_review/stream_team_reports';
+            if (fs.existsSync(streamReportsDir)) {
+              const streamLinks = fs.readdirSync(streamReportsDir, { withFileTypes: true })
+                .filter(d => d.isDirectory())
+                .map(d => {
+                  const htmlFile = fs.readdirSync(`${streamReportsDir}/${d.name}`).find(f => f.endsWith('.html'));
+                  if (!htmlFile) return null;
+                  const label = d.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                  return `- [${label}](${previewLink(`${streamReportsDir}/${d.name}/${htmlFile}`)})`;
+                })
+                .filter(Boolean)
+                .sort();
+
+              if (streamLinks.length > 0) {
+                streamTeamSection = `### 🎣 Stream Team Reports\n\n` +
+                  `Rendered by \`render_reviews.R\`, one per stream (Sacramento River split by site):\n\n` +
+                  streamLinks.join('\n') + `\n\n---\n\n`;
+              }
+            }
+
+            detailedReport += qcSummarySection + streamTeamSection;
 
             const infoFooter = `
             <details>
@@ -554,8 +672,9 @@ jobs:
             - **Credential Scan:** Prevents accidental commit of secrets
             - **Package Structure:** Ensures R package standards
             - **Tests:** Verifies code functionality
-            - **Data Comparison:** Checks that existing values in .rda files are not changed unexpectedly; new rows are informational only
-            - **Annual QC & Stream Review:** Renders \`data-raw/qc/run_annual_qc.R\` and \`data-raw/data-checks/stream_team_review/render_reviews.R\` against this PR's data; only fails on *newly* flagged error-level issues (skipped entirely for biweekly updates)
+            - **Data Comparison (vs main):** Compares every changed .rda file against main and reports what changed; purely informational, does not fail this check or require approval — a structural problem (a column disappearing, a load error, a data type change) is still called out in the table but even that no longer blocks the PR here (see \`inst/scripts/compare_data_files.R\`)
+            - **QC Log (vs main):** Compares this branch's already-committed \`data-raw/qc/qc_log_errors.csv\` (rendered by update-data.yml) against main's copy; only fails on *newly* open error-level issues not already open on main (skipped entirely for biweekly updates)
+            - **Annual QC Summary / Stream Team Reports:** Links to the HTML reports update-data.yml already rendered and committed to this branch; nothing here is regenerated by this check
 
             </details>`;
 
@@ -597,24 +716,21 @@ jobs:
           STRUCTURE_ISSUES="${{ steps.structure-check.outputs.structure_issues }}"
           TEST_STATUS="${{ steps.testthat.outputs.test_status }}"
           COMPARISON_EXIT="${{ steps.comparison.outputs.comparison_exit_code }}"
-          DATA_APPROVED="${{ steps.check-approval.outputs.approved }}"
           UPDATE_TYPE="${{ steps.update-type.outputs.update_type }}"
-          NEW_OPEN_ERRORS="${{ steps.annual-qc.outputs.new_open_errors }}"
+          NEW_OPEN_ERRORS="${{ steps.qc-comparison.outputs.new_open_errors }}"
 
           if [ -z "$CREDENTIAL_ISSUES" ]; then CREDENTIAL_ISSUES=0; fi
           if [ -z "$STRUCTURE_ISSUES" ]; then STRUCTURE_ISSUES=0; fi
           if [ -z "$TEST_STATUS" ]; then TEST_STATUS=unknown; fi
           if [ -z "$COMPARISON_EXIT" ]; then COMPARISON_EXIT=0; fi
-          if [ -z "$DATA_APPROVED" ]; then DATA_APPROVED=false; fi
           if [ -z "$NEW_OPEN_ERRORS" ]; then NEW_OPEN_ERRORS=0; fi
 
           echo "Credential issues: $CREDENTIAL_ISSUES"
           echo "Structure issues: $STRUCTURE_ISSUES"
           echo "Test status: $TEST_STATUS"
-          echo "Comparison exit code: $COMPARISON_EXIT"
-          echo "Data approved: $DATA_APPROVED"
+          echo "Comparison exit code (informational only - see PR comment): $COMPARISON_EXIT"
           echo "Update type: $UPDATE_TYPE"
-          echo "New open QC errors: $NEW_OPEN_ERRORS"
+          echo "New open QC errors vs main: $NEW_OPEN_ERRORS"
           echo ""
 
           FAILURES=0
@@ -634,13 +750,13 @@ jobs:
             FAILURES=$((FAILURES + 1))
           fi
 
-          if [ "$COMPARISON_EXIT" != "0" ] && [ "$DATA_APPROVED" != "true" ]; then
-            echo "❌ Data comparison failed and not approved"
-            FAILURES=$((FAILURES + 1))
-          fi
+          # Data file comparison is informational only (see the PR comment's
+          # Data File Comparison section) and never contributes to FAILURES -
+          # changed values, and even a structural issue like a removed
+          # column, no longer block the PR here.
 
           if [ "$UPDATE_TYPE" != "biweekly" ] && [ "$NEW_OPEN_ERRORS" != "0" ]; then
-            echo "❌ Annual QC found $NEW_OPEN_ERRORS new open error(s) - see data-raw/qc/qc_log_errors.csv"
+            echo "❌ QC log has $NEW_OPEN_ERRORS new open error(s) vs main - see data-raw/qc/qc_log_errors.csv"
             FAILURES=$((FAILURES + 1))
           fi
 

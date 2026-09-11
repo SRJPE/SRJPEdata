@@ -106,7 +106,7 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <pre><code><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"SRJPE/SRJPEdata"</span><span class="op">)</span></span></code></pre>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"SRJPE/SRJPEdata"</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -155,7 +155,7 @@
 <ul>
 <li>Run <code>data-raw/update_data.R</code>. This script pulls raw monitoring data from jpe-db, EDI, and CDEC/USGS gages, rebuilds the covariate, RST, adult, genetics, and survival data objects, and regenerates package documentation and the pkgdown site.</li>
 <li>Run <code>data-raw/qc/run_annual_qc.R</code>. This script renders the RST, flow/temperature, efficiency, and summary reports. Flagged issues are logged to qc_log_errors.csv and qc_log_warnings.csv for review; see <code>data-raw/qc/qc_workflow.md</code> for the full QC workflow.</li>
-<li>Run <code>data-raw/data-checks/stream_team_review/render_reviews.R</code>. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized.</li>
+<li>Run <code>data-raw/data-checks/stream_team_review/render_reviews.R</code>. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized. These files are emailed to stream teams around July-September.</li>
 </ul>
 <p>NOTE: Annually, the <code>data-raw/pull_data_scripts/README.md</code> should be revisited to check whether we can update any “misfit” data sources to pull from pipelines that are still being refined.</p>
 </div>
@@ -208,7 +208,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer>
