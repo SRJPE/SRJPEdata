@@ -53,8 +53,10 @@ out-of-sample error is no better than using GRL directly, because the GRL/HFC
 relationship drifts year to year (ratio ranges ~0.7-1.05).
 - **TAO has no CDEC counterpart**, so it caps how current the HFC total can be, even
   though its USGS record is otherwise the most reliable component.
-- **TFB is only available on CDEC through Oct 2025** creating a gap for both LFC
-and HFC
+- **TFB's USGS record (gage 11406999) ends earlier than before (2023-09-30)**, but
+CDEC TFB now runs current through the present, so the combined USGS+CDEC series for
+both LFC and HFC is longer/more up to date than it was under the old TFB gage
+(11407000), which had a later USGS cutoff but a CDEC record that stopped in Oct 2025.
 
 ## Overview
 
@@ -67,8 +69,11 @@ river is physically managed:
 No single gage measures either channel directly, so each reach is reconstructed by
 summing component gages, per guidance from DWR staff (Kassie Henley, Casey Campos). 
 
-USGS only reports data through 2024-2025 for these locations. CDEC is used to fill
-the gaps. CDEC is not available for TAO and stops October 2025 for TFB.
+USGS only reports data through 2023-2025 for these locations (TFB's USGS record, now
+pulled from gage 11406999, ends earliest at 2023-09-30). CDEC is used to fill the
+gaps and, for ORF and TFB, now runs current through the present. CDEC is not
+available for TAO, so its USGS-only record (through 2025-09-30) is what caps how
+current the combined HFC total can be.
 
 *The project's general default is to prefer USGS over CDEC because CDEC can contain 
 unreliable points and is often used as the "preliminary" repository for gage data.*  
@@ -79,7 +84,7 @@ unreliable points and is often used as the "preliminary" repository for gage dat
 crosswalk <- tibble::tribble(
   ~reach,               ~component, ~cdec_id, ~cdec_name,                                 ~usgs_id,     ~source_used,    ~notes,
   "Upper Feather HFC/LFC",  "ORF",      "ORF",    "FR @ Oroville (hatchery diversion)",        "11406930",  "USGS + CDEC",   "USGS through 2025-09-30, then use CDEC",
-  "Upper Feather HFC/LFC", "TFB",   "TFB",    "Thermalito Diversion Dam Fish Barrier",      "11406999",  "USGS + CDEC",   "USGS through 2024-10-01, then use CDEC through 2025-10-21",
+  "Upper Feather HFC/LFC", "TFB",   "TFB",    "Thermalito Diversion Dam Fish Barrier",      "11406999",  "USGS + CDEC",   "USGS through 2023-09-30, then use CDEC (current through present)",
   "Upper Feather HFC",  "TAO",      NA,       "Thermalito Outlet",                          "11406920",  "USGS only",     "USGS through 2025-09-30 and no CDEC"
 )
 
