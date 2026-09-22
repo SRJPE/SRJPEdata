@@ -168,6 +168,28 @@ feather_tao_usgs <- feather_tao_usgs_raw |>
   dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11406920") |>
   dplyr::select(-geometry)
 
+# TAO has no CDEC counterpart, so unlike ORF/TFB there is normally no way to bring it
+# forward past the USGS-approved cutoff. DWR provided an Access database
+# (gauge ID 3 in the "Flow Data" table) that extends past that cutoff; it is only
+# used to fill the gap after the USGS record ends, never to override USGS values.
+# See data-raw/analysis/feather-flow-tao-gap-fill-exploration.Rmd for validation
+# (96.5% exact agreement with USGS on the ~21k overlapping days).
+feather_tao_db_path <- here::here("data-raw", "TEMP_data", "Feather River Flows Database.accdb")
+
+feather_tao_db_raw <- system2(
+  "mdb-export",
+  args = c("-T", shQuote("%Y-%m-%d %H:%M:%S"), shQuote(feather_tao_db_path), shQuote("Flow Data")),
+  stdout = TRUE
+)
+
+feather_tao_db <- readr::read_csv(I(paste(feather_tao_db_raw, collapse = "\n")), show_col_types = FALSE) |>
+  dplyr::filter(`Gauge/Station ID` == 3, !is.na(`Flow (CFS)`)) |>
+  dplyr::transmute(date = as.Date(Date), value = `Flow (CFS)`) |>
+  dplyr::filter(date > max(feather_tao_usgs$date)) |>
+  dplyr::mutate(gage_agency = "DWR", gage_number = "DWR flow database, TAO gauge")
+
+feather_tao <- dplyr::bind_rows(feather_tao_usgs, feather_tao_db)
+
 # Combined HFC
 feather_hfc <- feather_orf_usgs_cdec |>
   dplyr::select(date, orf = value) |>
@@ -176,17 +198,17 @@ feather_hfc <- feather_orf_usgs_cdec |>
       dplyr::select(date, tfb = value)
   ) |>
   dplyr::full_join(
-    feather_tao_usgs |>
+    feather_tao |>
       dplyr::select(date, tao = value)
-  ) |> 
+  ) |>
   dplyr::mutate(value = orf + tfb + tao,
                 date = as.Date(date),
                 stream = "feather river",
                 site_group = "upper feather hfc",
-                gage_agency = "USGS/CDEC",
-                gage_number = "11406999/TFB + 11406930/ORF + 11406920/TAO",
+                gage_agency = "USGS/CDEC/DWR",
+                gage_number = "11406999/TFB + 11406930/ORF + 11406920/TAO (USGS, DWR db after cutoff)",
                 parameter = "flow",
-                statistic = "mean") |> 
+                statistic = "mean") |>
   dplyr::select(-c(tfb, orf, tao))
 
 # Feather Low Flow Channel
