@@ -130,7 +130,7 @@ feather_orf_usgs_cdec <- feather_orf_usgs |>
   )
 # TFB
 feather_tfb_usgs_raw <- dataRetrieval::read_waterdata_daily(
-  "USGS-11407000",
+  "USGS-11406999",
   "00060"
 )
 
@@ -149,7 +149,7 @@ feather_tfb_cdec <- CDECRetrieve::cdec_query(
 
 feather_tfb_usgs_cdec <- feather_tfb_usgs |>
   dplyr::select(-geometry) |>
-  dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11407000") |>
+  dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11406999") |>
   dplyr::bind_rows(
     feather_tfb_cdec |>
       dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
@@ -184,7 +184,7 @@ feather_hfc <- feather_orf_usgs_cdec |>
                 stream = "feather river",
                 site_group = "upper feather hfc",
                 gage_agency = "USGS/CDEC",
-                gage_number = "11407000/TFB + 11406930/ORF + 11406920/TAO",
+                gage_number = "11406999/TFB + 11406930/ORF + 11406920/TAO",
                 parameter = "flow",
                 statistic = "mean") |> 
   dplyr::select(-c(tfb, orf, tao))
@@ -205,7 +205,7 @@ feather_lfc <- feather_orf_usgs_cdec |>
     stream = "feather river",
     site_group = "upper feather lfc",
     gage_agency = "USGS/CDEC",
-    gage_number = "11407000/TFB + 11406930/ORF",
+    gage_number = "11406999/TFB + 11406930/ORF",
     parameter = "flow",
     statistic = "mean"
   ) |>

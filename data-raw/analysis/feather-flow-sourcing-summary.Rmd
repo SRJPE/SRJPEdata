@@ -79,7 +79,7 @@ unreliable points and is often used as the "preliminary" repository for gage dat
 crosswalk <- tibble::tribble(
   ~reach,               ~component, ~cdec_id, ~cdec_name,                                 ~usgs_id,     ~source_used,    ~notes,
   "Upper Feather HFC/LFC",  "ORF",      "ORF",    "FR @ Oroville (hatchery diversion)",        "11406930",  "USGS + CDEC",   "USGS through 2025-09-30, then use CDEC",
-  "Upper Feather HFC/LFC", "TFB",   "TFB",    "Thermalito Diversion Dam Fish Barrier",      "11407000",  "USGS + CDEC",   "USGS through 2024-10-01, then use CDEC through 2025-10-21",
+  "Upper Feather HFC/LFC", "TFB",   "TFB",    "Thermalito Diversion Dam Fish Barrier",      "11406999",  "USGS + CDEC",   "USGS through 2024-10-01, then use CDEC through 2025-10-21",
   "Upper Feather HFC",  "TAO",      NA,       "Thermalito Outlet",                          "11406920",  "USGS only",     "USGS through 2025-09-30 and no CDEC"
 )
 
@@ -114,7 +114,7 @@ orf <- dplyr::bind_rows(orf_usgs, orf_cdec) |>
 ```
 
 ```{r pull-tfb}
-tfb_usgs <- read_waterdata_daily("USGS-11407000", "00060") |>
+tfb_usgs <- read_waterdata_daily("USGS-11406999", "00060") |>
   dplyr::select(date = time, value) |>
   dplyr::as_tibble() |>
   dplyr::select(-any_of("geometry")) |>
