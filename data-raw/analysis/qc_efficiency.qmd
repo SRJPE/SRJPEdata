@@ -97,8 +97,7 @@ knitr::kable(summary_stream_1)
 ```
 
 ```{r, include = F}
-flow <- SRJPEdata::environmental_data |>
-    filter(parameter == "flow") |>
+flow <- SRJPEdata::flow_data |>
     select(-c(gage_number, gage_agency, parameter)) |>
     pivot_wider(id_cols = c(week, year, stream, site_group), values_from = "value", names_from = "statistic")
 

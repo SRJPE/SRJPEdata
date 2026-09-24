@@ -1,0 +1,10 @@
+stream,year,data_type,reason_for_exclusion,exclude
+clear creek,2018,upstream passage,Missing march/april,TRUE
+clear creek,2019,upstream passage,Missing march/april,TRUE
+clear creek,2023,upstream passage,"Over a third of the year the weir was open due to high flows, data was deemed to be too poor to verify and enter in master database at this time.",TRUE
+clear creek,2011,carcass,"Missing reach 3, 4, and some of reach 5",TRUE
+clear creek,2016,carcass,"Missing reach 1, 3, 4, and some of reach 5",TRUE
+clear creek,2017,carcass,"Missing reach 1, 2, 4, and some of reach 5",TRUE
+clear creek,2018,carcass,"Missing reach 1, 2, 3, 4, and some of reach 5",TRUE
+clear creek,2000,redd,"missing reach 3, 6, and partial coverage on 5",TRUE
+clear creek,2020,redd,only sampling reach 6 and 7,TRUE

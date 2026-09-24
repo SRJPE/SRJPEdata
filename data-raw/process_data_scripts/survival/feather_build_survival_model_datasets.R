@@ -47,7 +47,7 @@ reach_metadata <- get_receiver_sites_metadata(feather_all_detections)
 
 # Manually select receiver locations to use and combine for Sac River study ----
 # Will need to go back in and remap if we want new 
-region_mapped_reach_metadata <- reach_metadata %>%
+region_mapped_reach_metadata_feather <- reach_metadata %>%
   filter(receiver_general_location %in% c("FR_Gridley_Rel","FR_Boyds_Rel","FR_Boyds_Rel_Rec",
                                           "I80-50_Br","TowerBridge", 
                                           "ToeDrainBase","Hwy84Ferry",
@@ -64,7 +64,7 @@ region_mapped_reach_metadata <- reach_metadata %>%
 # Looks like Flora is still using agregate detections sac for all
 # TODO confirm that this is the case
 aggregate_feather <- aggregate_detections_feather(detections = feather_all_detections, 
-                                                  receiver_metadata = region_mapped_reach_metadata) 
+                                                  receiver_metadata = region_mapped_reach_metadata_feather) 
 
 # feather Analysis 
 feather_all_aggregated <- aggregate_feather$detections

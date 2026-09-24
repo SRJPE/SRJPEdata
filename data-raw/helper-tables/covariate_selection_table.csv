@@ -1,0 +1,32 @@
+﻿Covariate,Type,Forecast ,Stock-Recruit,Survival,PLAD,In Season,BTSPASX,PROCESSING SCRIPT
+si_gdd_spawn,temperature,TRUE,Selected for Mill Creek,__,__,__,__,build_covariate.R
+si_above_13_temp_day,temperature,TRUE,tested,__,__,__,__,build_covariate.R
+si_above_13_temp_week,temperature,TRUE,Selected for Deer Creek and Yuba River,__,__,__,__,build_covariate.R
+si_weekly_max_temp_max,temperature,TRUE,tested,__,__,__,__,build_covariate.R
+si_weekly_max_temp_mean,temperature,TRUE,tested,__,__,__,__,build_covariate.R
+si_weekly_max_temp_median,temperature,TRUE,Selected for Clear Creek,__,__,__,__,build_covariate.R
+si_mean_flow,flow,TRUE,Selected for Battle Creek,__,__,__,__,build_covariate.R
+si_max_flow,flow,TRUE,tested,__,__,__,__,build_covariate.R
+si_min_flow,flow,TRUE,Selected for Butte Creek,__,__,__,__,build_covariate.R
+si_median_flow,flow,TRUE,tested,__,__,__,__,build_covariate.R
+rr_mean_flow,flow,FALSE,tested,__,__,__,__,build_covariate.R
+rr_max_flow,flow,FALSE,tested,__,__,__,__,build_covariate.R
+rr_min_flow,flow,FALSE,tested,__,__,__,__,build_covariate.R
+rr_median_flow,flow,FALSE,tested,__,__,__,__,build_covariate.R
+2-year water type,flow,TRUE,__,tested,__,__,__,build_survival_dataset.R
+3-category water year type,water year summary ,TRUE,tested,tested,__,__,__,build_covariate.R
+3-category flow exceedance year type,water year summary ,TRUE,tested,tested ,__,__,__,build_covariate.R
+monthly reservoir storage Keswick ,resevoir storage ,TRUE,tested,tested,__,__,__,build_covariate.R
+monthly reservoir storage Shasta,resevoir storage ,TRUE,tested,tested,__,__,__,build_covariate.R
+monthly peak flow,flow,TRUE,tested,Selected,__,__,__,build_covariate.R
+weight,physical ,FALSE,__,tested,__,__,__,build_survival_dataset.R
+fish_condition,physical ,FALSE,__,tested,__,__,__,build_survival_dataset.R
+fork_length,physical,FALSE,tested,Selected,Selected,__,tested,build_covariate.R
+mi_gdd_sacramento,temperature,TRUE,tested,__,__,__,__,build_covariate.R
+mi_above_13_temp_day,temperature,TRUE,tested,__,__,__,__,build_covariate.R
+mi_above_13_temp_week,temperature,TRUE,tested,__,__,__,__,build_covariate.R
+efficiency_flow,flow,FALSE,__,__,__,__,Selected ,build_rst_model_dataset.R
+weekly_flow,flow,FALSE,__,__,__,__,Selected ,build_rst_model_dataset.R
+peak_flow_prior_to_X (shifting dates),flow ,FALSE,__,__,__,tested,__,pull_flow_data.R
+hatchery_origin,physical ,FALSE,__,__,__,__,tested,build_rst_model_dataset.R
+null ,,,tested,tested,tested,Selected,tested,__

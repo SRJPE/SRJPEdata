@@ -13,6 +13,7 @@
 \item \code{species}: Chinook salmon
 \item \code{data_type}: Escapement estimates from GrandTab.
 }
+}
 \usage{
 escapement_estimates_all_runs
 }

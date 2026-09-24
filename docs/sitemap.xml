@@ -1,5 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://srjpe.github.io/SRJPEdata/404.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/articles/covariate_overview.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/articles/covariates_documentation.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/articles/flow_data_pull.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/articles/index.html</loc></url>
@@ -26,12 +28,17 @@
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/carcass_estimates.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/celsius_to_fahrenheit.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/chosen_site_years_to_model.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/completed_genetic_samples.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/daily_yearling_ruleset.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/detection_history_feather_butte.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/detection_history_sacramento.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/efficiency_summary.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/environmental_data.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/escapement_estimates_all_runs.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/fahrenheit_to_celsius.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/feather_hatchery_release.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/flow_data.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/forecast_covariates.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/get_receiver_sites_metadata.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/hatchery_release.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/holding.html</loc></url>
@@ -49,14 +56,21 @@
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/release_fish.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/rst_catch.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/rst_cwt_recaptures.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/rst_model_years.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/rst_trap.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/site_lookup.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/stock_recruit_covariates.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/survival_model_inputs.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/temperature_data.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/upstream_passage.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/upstream_passage_estimates.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/weekly_hours_fished.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/weekly_juvenile_abundance_catch_data.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/reference/weekly_juvenile_abundance_efficiency_data.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/years_to_exclude_adult.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/years_to_exclude_rst_data.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/years_to_include_rst_data.html</loc></url>
+<url><loc>https://srjpe.github.io/SRJPEdata/reference/years_to_include_rst_data_spring.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/sr_covariates.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/temp_regression.html</loc></url>
 <url><loc>https://srjpe.github.io/SRJPEdata/trap_effort.html</loc></url>

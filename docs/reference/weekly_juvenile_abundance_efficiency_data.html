@@ -18,7 +18,7 @@ for spring run tributaries modeled in BT-SPAS-X."><!-- mathjax --><script src="h
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -39,22 +39,16 @@ for spring run tributaries modeled in BT-SPAS-X."><!-- mathjax --><script src="h
       <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="../articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="../articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -94,8 +88,8 @@ for spring run tributaries modeled in BT-SPAS-X.</p>
 
     <div id="format">
     <h2>Format</h2>
-    <p>A tibble with 651 rows and 8 columns</p><ul><li><p><code>year</code>: year
- <code>week</code> : week</p></li>
+    <p>A tibble with 651 rows and 8 columns</p><ul><li><p><code>year</code>: year</p></li>
+<li><p><code>week</code> : week</p></li>
 <li><p><code>stream</code>: rst stream</p></li>
 <li><p><code>site</code>: rst site</p></li>
 <li><p><code>number_released</code>: Number of efficiency trial fish released</p></li>
@@ -106,8 +100,8 @@ for spring run tributaries modeled in BT-SPAS-X.</p>
     <div id="source">
     <h2>Source</h2>
     <p>Prepared using rotary screw trap catch data (see <code><a href="rst_catch.html">?SRJPEdata::rst_catch</a></code> for more information on raw data sources),
-environmental_data (see <code><a href="environmental_data.html">?SRJPEdata::environmental_data</a></code>), hours fished information
-(see <code>?SRJPEdata::weekly_hours_fished for more information</code>), and btspasx special priors (see <code><a href="btspasx_special_priors_data.html">?SRJPEdata::btspasx_special_priors_data</a></code> for more information).</p>
+flow_data (see <code><a href="flow_data.html">?SRJPEdata::flow_data</a></code>), hours fished information
+(see <code>?SRJPEdata::weekly_hours_fished for more information</code>).</p>
     </div>
 
   </div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
       </span>
     </div>
 
@@ -38,22 +38,16 @@
       <a href="articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -133,60 +127,60 @@
 <span><span class="co">##</span></span>
 <span><span class="co">## Residuals:</span></span>
 <span><span class="co">##     Min      1Q  Median      3Q     Max</span></span>
-<span><span class="co">## -4.9670 -0.8267  0.0326  0.7640  5.9684</span></span>
+<span><span class="co">## -5.0506 -0.8302  0.0161  0.7676  5.9535</span></span>
 <span><span class="co">##</span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">##               Estimate Std. Error t value Pr(&gt;|t|)</span></span>
-<span><span class="co">## (Intercept) -1.591e+00  6.897e-01  -2.307   0.0212 *</span></span>
-<span><span class="co">## date         4.626e-04  3.599e-05  12.853   &lt;2e-16 ***</span></span>
-<span><span class="co">## butte_temp   4.276e-01  5.130e-03  83.356   &lt;2e-16 ***</span></span>
+<span><span class="co">## (Intercept) -1.447e+00  6.278e-01  -2.306   0.0212 *</span></span>
+<span><span class="co">## date         4.535e-04  3.272e-05  13.861   &lt;2e-16 ***</span></span>
+<span><span class="co">## butte_temp   4.315e-01  4.959e-03  87.000   &lt;2e-16 ***</span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">##</span></span>
-<span><span class="co">## Residual standard error: 1.293 on 2148 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.7713, Adjusted R-squared:  0.7711</span></span>
-<span><span class="co">## F-statistic:  3622 on 2 and 2148 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## [1] 0.08173228</span></span></code></pre>
+<span><span class="co">## Residual standard error: 1.287 on 2291 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.7783, Adjusted R-squared:  0.7781</span></span>
+<span><span class="co">## F-statistic:  4022 on 2 and 2291 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.07592243</span></span></code></pre>
 <pre><code><span><span class="co">##</span></span>
 <span><span class="co">## Call:</span></span>
 <span><span class="co">## lm(formula = temp ~ date + butte_temp, data = train)</span></span>
 <span><span class="co">##</span></span>
 <span><span class="co">## Residuals:</span></span>
 <span><span class="co">##     Min      1Q  Median      3Q     Max</span></span>
-<span><span class="co">## -4.6647 -0.7968  0.0288  0.7378  6.3214</span></span>
+<span><span class="co">## -4.8369 -0.7880  0.0345  0.7211  6.2479</span></span>
 <span><span class="co">##</span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">##               Estimate Std. Error t value Pr(&gt;|t|)</span></span>
-<span><span class="co">## (Intercept) -3.816e-01  6.591e-01  -0.579    0.563</span></span>
-<span><span class="co">## date         4.020e-04  3.443e-05  11.677   &lt;2e-16 ***</span></span>
-<span><span class="co">## butte_temp   3.993e-01  5.441e-03  73.399   &lt;2e-16 ***</span></span>
+<span><span class="co">## (Intercept) -6.846e-01  5.965e-01  -1.148    0.251</span></span>
+<span><span class="co">## date         4.155e-04  3.113e-05  13.349   &lt;2e-16 ***</span></span>
+<span><span class="co">## butte_temp   4.059e-01  5.313e-03  76.405   &lt;2e-16 ***</span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">##</span></span>
-<span><span class="co">## Residual standard error: 1.246 on 2149 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.7243, Adjusted R-squared:  0.724</span></span>
-<span><span class="co">## F-statistic:  2822 on 2 and 2149 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## [1] 0.08391413</span></span></code></pre>
+<span><span class="co">## Residual standard error: 1.232 on 2292 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.7331, Adjusted R-squared:  0.7329</span></span>
+<span><span class="co">## F-statistic:  3148 on 2 and 2292 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.08363331</span></span></code></pre>
 <pre><code><span><span class="co">##</span></span>
 <span><span class="co">## Call:</span></span>
 <span><span class="co">## lm(formula = temp ~ date + butte_temp, data = train)</span></span>
 <span><span class="co">##</span></span>
 <span><span class="co">## Residuals:</span></span>
 <span><span class="co">##     Min      1Q  Median      3Q     Max</span></span>
-<span><span class="co">## -5.4976 -0.7909  0.0106  0.7900  6.1438</span></span>
+<span><span class="co">## -5.3164 -0.7628  0.0123  0.7711  6.1161</span></span>
 <span><span class="co">##</span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">##               Estimate Std. Error t value Pr(&gt;|t|)</span></span>
-<span><span class="co">## (Intercept) -2.768e+00  7.301e-01  -3.791 0.000154 ***</span></span>
-<span><span class="co">## date         5.133e-04  3.804e-05  13.494  &lt; 2e-16 ***</span></span>
-<span><span class="co">## butte_temp   4.570e-01  4.914e-03  92.998  &lt; 2e-16 ***</span></span>
+<span><span class="co">## (Intercept) -2.756e+00  6.389e-01  -4.314 1.67e-05 ***</span></span>
+<span><span class="co">## date         5.145e-04  3.328e-05  15.459  &lt; 2e-16 ***</span></span>
+<span><span class="co">## butte_temp   4.564e-01  4.626e-03  98.653  &lt; 2e-16 ***</span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">##</span></span>
-<span><span class="co">## Residual standard error: 1.371 on 2149 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.8061, Adjusted R-squared:  0.8059</span></span>
-<span><span class="co">## F-statistic:  4466 on 2 and 2149 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## [1] 0.07514299</span></span></code></pre>
+<span><span class="co">## Residual standard error: 1.32 on 2293 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.8183, Adjusted R-squared:  0.8181</span></span>
+<span><span class="co">## F-statistic:  5163 on 2 and 2293 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.07899826</span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="predictions">Predictions<a class="anchor" aria-label="anchor" href="#predictions"></a></h4>
@@ -202,16 +196,16 @@
 <ul><li>Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)</li>
 <li>Visualize combined data</li>
 </ul><p>The plot below shows how the mean, min, and max temperatures for the Feather River LFC over time. Interpolated values are seamlessly integrated where observed data is missing, ensuring a continuous temperature dataset. Each water temperature type (mean, min, max) is represented with a different color to help in distinguishing the temperature trends and understanding the temperature fluctuations.</p>
-<pre><code><span><span class="co">## Rows: 29,886</span></span>
+<pre><code><span><span class="co">## Rows: 30,429</span></span>
 <span><span class="co">## Columns: 7</span></span>
-<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [29,886]</span></span>
-<span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-…</span></span>
-<span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather r…</span></span>
-<span><span class="co">## $ site_group  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather …</span></span>
-<span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"…</span></span>
-<span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"…</span></span>
-<span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max…</span></span>
-<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 9.786750<span style="color: #949494;">, </span>10.390582<span style="color: #949494;">, </span>9.230607<span style="color: #949494;">, </span>9.573410<span style="color: #949494;">, </span>9.705569<span style="color: #949494;">, </span>9.430676<span style="color: #949494;">, </span>9.466972<span style="color: #949494;">, </span>9.93459…</span></span></code></pre>
+<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [30,429]</span></span>
+<span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>19…</span></span>
+<span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather ri…</span></span>
+<span><span class="co">## $ site_group  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"in…</span></span>
+<span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"in…</span></span>
+<span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 9.894450<span style="color: #949494;">, </span>10.404392<span style="color: #949494;">, </span>9.158445<span style="color: #949494;">, </span>9.679169<span style="color: #949494;">, </span>9.720344<span style="color: #949494;">, </span>9.361829<span style="color: #949494;">, </span>9.571756<span style="color: #949494;">, </span>9.949046<span style="color: #949494;">, </span>8.956307<span style="color: #949494;">, </span>9.032874<span style="color: #949494;">, </span>9.493185<span style="color: #949494;">, </span>8.347816<span style="color: #949494;">, </span>8.925461<span style="color: #949494;">, </span>9.493700<span style="color: #949494;">, </span>8.1452…</span></span></code></pre>
 <div class="float">
 <img src="figure/unnamed-chunk-12-1.png" alt="plot of chunk unnamed-chunk-12"><div class="figcaption">plot of chunk unnamed-chunk-12</div>
 </div>
@@ -248,16 +242,16 @@
 <ul><li>Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)</li>
 <li>Visualize combined data</li>
 </ul><p>The plot below shows how the mean, min, and max temperatures for the Feather River HFC over time. Interpolated values are seamlessly integrated where observed data is missing, ensuring a continuous temperature dataset. Each water temperature type (mean, min, max) is represented with a different color to help in distinguishing the temperature trends and understanding the temperature fluctuations.</p>
-<pre><code><span><span class="co">## Rows: 29,904</span></span>
+<pre><code><span><span class="co">## Rows: 30,447</span></span>
 <span><span class="co">## Columns: 7</span></span>
-<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [29,904]</span></span>
-<span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-…</span></span>
-<span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather r…</span></span>
-<span><span class="co">## $ site_group  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather …</span></span>
-<span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"…</span></span>
-<span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"…</span></span>
-<span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max…</span></span>
-<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 16.81301<span style="color: #949494;">, </span>17.55419<span style="color: #949494;">, </span>16.05114<span style="color: #949494;">, </span>16.46214<span style="color: #949494;">, </span>16.55047<span style="color: #949494;">, </span>16.41788<span style="color: #949494;">, </span>16.28656<span style="color: #949494;">, </span>16.88485…</span></span></code></pre>
+<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [30,447]</span></span>
+<span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>19…</span></span>
+<span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather ri…</span></span>
+<span><span class="co">## $ site_group  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"in…</span></span>
+<span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"in…</span></span>
+<span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 16.65823<span style="color: #949494;">, </span>17.68067<span style="color: #949494;">, </span>16.09134<span style="color: #949494;">, </span>16.30968<span style="color: #949494;">, </span>16.67818<span style="color: #949494;">, </span>16.45603<span style="color: #949494;">, </span>16.13529<span style="color: #949494;">, </span>17.01208<span style="color: #949494;">, </span>15.72552<span style="color: #949494;">, </span>15.26422<span style="color: #949494;">, </span>16.34369<span style="color: #949494;">, </span>14.62995<span style="color: #949494;">, </span>15.08983<span style="color: #949494;">, </span>16.34349<span style="color: #949494;">, </span>14.2645…</span></span></code></pre>
 <div class="float">
 <img src="figure/unnamed-chunk-22-1.png" alt="plot of chunk unnamed-chunk-22"><div class="figcaption">plot of chunk unnamed-chunk-22</div>
 </div>
@@ -305,15 +299,15 @@
 <ul><li>Join with original data (merge combined predictions with the original dataset that includes gage agency and gage number)</li>
 <li>Visualize combined data</li>
 </ul><p>The plot below shows how the mean, min, and max temperatures for the Yuba River over time. Interpolated values are seamlessly integrated where observed data is missing, ensuring a continuous temperature dataset. Each water temperature type (mean, min, max) is represented with a different color to help in distinguishing the temperature trends and understanding the temperature fluctuations.</p>
-<pre><code><span><span class="co">## Rows: 29,871</span></span>
+<pre><code><span><span class="co">## Rows: 30,417</span></span>
 <span><span class="co">## Columns: 6</span></span>
-<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number [29,871]</span></span>
-<span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-…</span></span>
-<span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba ri…</span></span>
-<span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"…</span></span>
-<span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"…</span></span>
-<span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max…</span></span>
-<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 19.48167<span style="color: #949494;">, </span>20.94388<span style="color: #949494;">, </span>17.77589<span style="color: #949494;">, </span>19.18803<span style="color: #949494;">, </span>19.98373<span style="color: #949494;">, </span>18.04217<span style="color: #949494;">, </span>19.04096<span style="color: #949494;">, </span>20.30317…</span></span></code></pre>
+<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number [30,417]</span></span>
+<span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-03<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>1998-10-04<span style="color: #949494;">, </span>19…</span></span>
+<span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba r…</span></span>
+<span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"in…</span></span>
+<span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"in…</span></span>
+<span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 16.65230<span style="color: #949494;">, </span>17.94823<span style="color: #949494;">, </span>14.95321<span style="color: #949494;">, </span>16.34812<span style="color: #949494;">, </span>16.96209<span style="color: #949494;">, </span>15.23097<span style="color: #949494;">, </span>16.19595<span style="color: #949494;">, </span>17.29068<span style="color: #949494;">, </span>14.67497<span style="color: #949494;">, </span>15.43573<span style="color: #949494;">, </span>16.63322<span style="color: #949494;">, </span>13.84104<span style="color: #949494;">, </span>15.28356<span style="color: #949494;">, </span>16.63313<span style="color: #949494;">, </span>13.5629…</span></span></code></pre>
 <div class="float">
 <img src="figure/unnamed-chunk-33-1.png" alt="plot of chunk unnamed-chunk-33"><div class="figcaption">plot of chunk unnamed-chunk-33</div>
 </div>
