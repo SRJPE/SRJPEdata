@@ -132,7 +132,35 @@ battle_clear_recapture_edi <- recapture_edi |>
          dead, fork_length, weight, species) |> 
  # QC fix. Natasha notified 7/24/2025 and this has still not been resolved on their end
   mutate(count = case_when(date == "2018-02-15" & count == 1180 ~ 11,
-                            T ~ count))
+                            T ~ count)) |> 
+ # QC fix. These are from the data review Sep 2026
+  mutate(count = case_when(release_id == "BAT303" ~ 40,
+                           release_id == "BAT345" ~ 43,
+                           release_id == "BAT372" ~ 33,
+                           release_id == "CLR261" ~ 32,
+                           release_id == "CLR265" ~ 43,
+                           release_id == "CLR320" ~ 50,
+                           release_id == "CLR367" ~ 55,
+                           release_id == "CLR372" ~ 11,
+                           release_id == "CLR463" ~ 18,
+                           release_id == "CLR467" ~ 9,
+                           release_id == "CLR477" ~ 19,
+                           release_id == "CLR538" ~ 18,
+                           release_id == "CLR567" ~ 16,
+                           release_id == "CLR570" ~ 35,
+                           release_id == "CLR576" ~ 18,
+                           release_id == "CLR585" ~ 37,
+                           release_id == "CLR586" ~ 56,
+                           release_id == "CLR589" ~ 21,
+                           release_id == "CLR612" ~ 82,
+                           release_id == "CLR631" ~ 44,
+                           release_id == "CLR706" ~ 38,
+                           release_id == "CLR734" ~ 14,
+                           release_id == "CLR745" ~ 6,
+                           release_id == "CLR736" ~ 7,
+                           release_id == "CLR744" ~ 20,
+                           release_id == "CLR747" ~ 11,
+                           T ~ count))
 
 # 2026 battle and clear recapture data is not yet on EDI -----------------------
 # Pull from XLSX files - currently in TEMP_data folder  
