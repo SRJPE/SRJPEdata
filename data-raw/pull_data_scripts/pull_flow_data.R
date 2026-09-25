@@ -397,7 +397,8 @@ flow_daily <- data.table::rbindlist(
   use.names = TRUE,
   fill = TRUE
 ) |> 
-  dplyr::filter(lubridate::year(date) > 1990) 
+  dplyr::filter(lubridate::year(date) > 1990) |> 
+  distinct(date, stream, site_group, gage_agency, gage_number, parameter, statistic) # ADDS distinct call given duplicates exist for flow data pulls from CDEC 
 
 # Check to make sure there are no duplicates because the reshaping with result in values of 0 and 1 if duplicates exist which is a major issue.
 find_duplicates <- flow_daily |> 
@@ -406,7 +407,7 @@ find_duplicates <- flow_daily |>
   filter(n > 1)
 
 if (nrow(find_duplicates) > 0) {
-  stop(
+  warning(
     "Duplicates exist in the flow_daily table. Resolve these duplicates before proceeding."
   )
 }

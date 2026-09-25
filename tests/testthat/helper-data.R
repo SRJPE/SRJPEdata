@@ -8,4 +8,5 @@ load("../../data/recaptures.rda")
 load("../../data/annual_adult.rda")
 load("../../data/rst_model_years.rda")
 load("../../data/weekly_juvenile_abundance_catch_data.rda")
+load("../../data/weekly_juvenile_abundance_efficiency_data.rda")
 

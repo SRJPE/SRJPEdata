@@ -11,7 +11,8 @@ con <- DBI::dbConnect(drv = RPostgres::Postgres(),
                       dbname = "postgres",
                       user = Sys.getenv("pilot_db_user_id"),
                       password = Sys.getenv("pilot_db_password"),
-                      port = 5432)
+                      port = 5432,
+                      sslmode = "require")
 DBI::dbListTables(con)
 
 # catch 
