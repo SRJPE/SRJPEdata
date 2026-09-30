@@ -152,19 +152,6 @@ build_feather_gage_flow <- function(usgs_id, gage_number,
     dplyr::filter(!is.na(date))
 }
 
-feather_orf_usgs_cdec <- feather_orf_usgs |>
-  dplyr::select(-geometry) |>
-  dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11406930") |>
-  dplyr::bind_rows(
-    feather_orf_cdec |>
-      dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
-      dplyr::rename(date = datetime, value = parameter_value) |>
-      dplyr::mutate(gage_agency = "CDEC", gage_number = "ORF", date = as.Date(date))
-  )
-# TFB
-feather_tfb_usgs_raw <- dataRetrieval::read_waterdata_daily(
-  "USGS-11406999",
-  "00060"
 ### ORF ----------------------------
 # As of 08/28/26 there is not a lag in the CDEC data.
 feather_orf_usgs_cdec <- build_feather_gage_flow(
@@ -177,25 +164,12 @@ feather_orf_usgs_cdec <- build_feather_gage_flow(
 ### TFB ----------------------
 # As of 08/28/26 it appears that there is a lag in the CDEC data. Data posted through 8/22
 feather_tfb_usgs_cdec <- build_feather_gage_flow(
-  "USGS-11407000", "USGS-11407000",
+  "USGS-11406999", "USGS-11406999",
   usgs_min_date = "1988-01-01", usgs_cutoff_date = "2021-08-30",
   cdec_station = "TFB", cdec_dur_code = "H", cdec_sensor_num = "20",
   cdec_start_date = "2021-08-30" # earliest the data is available
 )
 
-feather_tfb_usgs_cdec <- feather_tfb_usgs |>
-  dplyr::select(-geometry) |>
-  dplyr::mutate(gage_agency = "USGS", gage_number = "USGS-11406999") |>
-  dplyr::bind_rows(
-    feather_tfb_cdec |>
-      dplyr::select(-c(agency_cd, location_id, parameter_cd)) |>
-      dplyr::rename(date = datetime, value = parameter_value) |>
-      dplyr::mutate(gage_agency = "CDEC", gage_number = "TFB", date = as.Date(date))
-  ) 
-# TAO
-feather_tao_usgs_raw <- dataRetrieval::read_waterdata_daily(
-  "USGS-11406920",
-  "00060"
 ### TAO -------------------
 # Only the daily mean is available on USGS and there is no CDEC series for this gage.
 # This gage stops 2025-09-30
@@ -221,8 +195,11 @@ feather_tao_db_raw <- system2(
 feather_tao_db <- readr::read_csv(I(paste(feather_tao_db_raw, collapse = "\n")), show_col_types = FALSE) |>
   dplyr::filter(`Gauge/Station ID` == 3, !is.na(`Flow (CFS)`)) |>
   dplyr::transmute(date = as.Date(Date), value = `Flow (CFS)`) |>
-  dplyr::filter(date > max(feather_tao_usgs$date)) |>
-  dplyr::mutate(gage_agency = "DWR", gage_number = "DWR flow database, TAO gauge")
+  dplyr::filter(date > max(feather_tao_usgs$date)) |> 
+  dplyr::mutate(gage_agency = "DWR", 
+                gage_number = "DWR flow database, TAO gauge",
+                parameter = "flow",
+                statistic = "mean")
 
 feather_tao <- dplyr::bind_rows(feather_tao_usgs, feather_tao_db)
 
@@ -232,11 +209,9 @@ feather_hfc <- feather_orf_usgs_cdec |>
   dplyr::full_join(
     feather_tfb_usgs_cdec |>
       dplyr::select(date, statistic, parameter, tfb = value)
-  ) |>
+  ) |> 
   dplyr::full_join(
     feather_tao |>
-      dplyr::select(date, tao = value)
-    feather_tao_usgs |>
       dplyr::select(date, statistic, parameter, tao = value)
   ) |>
   dplyr::mutate(value = orf + tfb + tao,
@@ -245,10 +220,7 @@ feather_hfc <- feather_orf_usgs_cdec |>
                 site_group = "upper feather hfc",
                 gage_agency = "USGS/CDEC/DWR",
                 gage_number = "11406999/TFB + 11406930/ORF + 11406920/TAO (USGS, DWR db after cutoff)",
-                parameter = "flow",
-                statistic = "mean") |>
-                gage_agency = "USGS/CDEC",
-                gage_number = "11407000/TFB + 11406930/ORF + 11406920/TAO") |>
+                parameter = "flow") |> 
   dplyr::select(-c(tfb, orf, tao))
 
 # Feather Low Flow Channel
@@ -268,9 +240,7 @@ feather_lfc <- feather_orf_usgs_cdec |>
     site_group = "upper feather lfc",
     gage_agency = "USGS/CDEC",
     gage_number = "11406999/TFB + 11406930/ORF",
-    parameter = "flow",
-    statistic = "mean"
-    gage_number = "11407000/TFB + 11406930/ORF"
+    parameter = "flow"
   ) |>
   dplyr::select(-c(tfb, orf))
 
