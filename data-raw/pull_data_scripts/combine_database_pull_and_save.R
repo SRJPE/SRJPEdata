@@ -10,6 +10,12 @@ source("data-raw/pull_data_scripts/pull_misfit_rst_data.R") # Battle and Clear r
 # "standard-format-data/standard_recapture.csv"
 standard_release <- read_csv("data-raw/helper-tables/standard_release.csv")
 
+# QC fix. Battle/Clear provided a number of efficiency trials that are not valid due to being incomplete or an error with the equipment
+trials_to_remove <- c("BAT102", "BAT111", "BAT114", "BAT140",
+                      "BAT156", "BAT157", "BAT159", "BAT158", 
+                      "BAT221", "BAT340", "BAT368", "CLR227",
+                      "CLR228", "CLR229", "CLR255", "CLR369")
+
 # rst_trap ----------------------------------------------------------------
 
 # processing code to assign the trap_visit_time_start for data from datatackle
@@ -164,7 +170,14 @@ release <- bind_rows(release_db,
   left_join(standard_release |>
               select(site, release_id, origin_released) |>
               rename(origin = origin_released) |> 
-              distinct())  # try to fill in any missing origin information
+              distinct()) |>  # try to fill in any missing origin information
+  # QC fix. These are from 2026 data review.
+  mutate(number_released = case_when(release_id == "CLR409" ~ 404,
+                                     release_id == "CLR703" ~ 532,
+                                     release_id == "CLR723" ~ 411,
+                                     T ~ number_released)) |> 
+  filter(!release_id %in% trials_to_remove)
+                      
 
 # recaptures --------------------------------------------------------------
 
@@ -174,7 +187,8 @@ recaptures <- bind_rows(
     mutate(release_id = as.character(release_id)) |> 
     filter(stream %in% c("mill creek", "deer creek")), # TODO Mill and Deer are the only streams on production for DataTackle. Add other streams when needed.
   edi_recapture
-) |> glimpse()
+) |> 
+    filter(!release_id %in% trials_to_remove)
 
 ## SAVE TO DATA PACKAGE ---
 usethis::use_data(rst_catch, overwrite = TRUE)
