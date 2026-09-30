@@ -75,6 +75,10 @@ pkgdown::build_site()
 source("data-raw/data-checks/stream_team_review/render_reviews.R")
 source("data-raw/qc/run_annual_qc.R")
 
+# FINAL UPDATES
+# Rename Okie Dam to Butte Creek
+source("data-raw/process_data_scripts/rename_okie_dam_site.R")
+devtools::build()
 
 message("Update complete! Check the stream team reports and QC folders to see helpful summary reports")
 
