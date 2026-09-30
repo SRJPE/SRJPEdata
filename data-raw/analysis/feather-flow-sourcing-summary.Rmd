@@ -38,6 +38,26 @@ zissou <- wesanderson::wes_palette("Zissou1", 5, type = "discrete")
 <strong>Currently Feather River flow data is only publicly available through October 2025.</strong>
 </div>
 
+## Overview
+
+Feather River flow used in the JPE is split into two reaches, following how the
+river is physically managed:
+
+- **Upper Feather - High Flow Channel (HFC)**: `ORF + TFB + TAO`
+- **Upper Feather - Low Flow Channel (LFC)**: `ORF + TFB`
+
+No single gage measures either channel directly, so each reach is reconstructed by
+summing component gages, per guidance from DWR staff (Kassie Henley, Casey Campos). 
+
+USGS only reports data through 2023-2025 for these locations (TFB's USGS record, now
+pulled from gage 11406999, ends earliest at 2023-09-30). CDEC is used to fill the
+gaps and, for ORF and TFB, now runs current through the present. CDEC is not
+available for TAO, so its USGS-only record (through 2025-09-30) is what caps how
+current the combined HFC total can be. DWR maintains an internal database of flows that include more up to date values for TAO. We received and integrated this database to fill the gap.
+
+*The project's general default is to prefer USGS over CDEC because CDEC can contain 
+unreliable points and is often used as the "preliminary" repository for gage data.*  
+
 ## Key takeaways
 
 - **No one gage can be used to represent the LFC or HFC** ORF, TFB, and TAO are needed
@@ -57,26 +77,6 @@ relationship drifts year to year (ratio ranges ~0.7-1.05).
 CDEC TFB now runs current through the present, so the combined USGS+CDEC series for
 both LFC and HFC is longer/more up to date than it was under the old TFB gage
 (11407000), which had a later USGS cutoff but a CDEC record that stopped in Oct 2025.
-
-## Overview
-
-Feather River flow used in the JPE is split into two reaches, following how the
-river is physically managed:
-
-- **Upper Feather - High Flow Channel (HFC)**: `ORF + TFB + TAO`
-- **Upper Feather - Low Flow Channel (LFC)**: `ORF + TFB`
-
-No single gage measures either channel directly, so each reach is reconstructed by
-summing component gages, per guidance from DWR staff (Kassie Henley, Casey Campos). 
-
-USGS only reports data through 2023-2025 for these locations (TFB's USGS record, now
-pulled from gage 11406999, ends earliest at 2023-09-30). CDEC is used to fill the
-gaps and, for ORF and TFB, now runs current through the present. CDEC is not
-available for TAO, so its USGS-only record (through 2025-09-30) is what caps how
-current the combined HFC total can be.
-
-*The project's general default is to prefer USGS over CDEC because CDEC can contain 
-unreliable points and is often used as the "preliminary" repository for gage data.*  
 
 ## Gage crosswalk
 
