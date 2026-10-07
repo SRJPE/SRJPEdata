@@ -11,6 +11,8 @@ source("data-raw/pull_data_scripts/pull_misfit_rst_data.R") # Battle and Clear r
 standard_release <- read_csv("data-raw/helper-tables/standard_release.csv")
 
 # QC fix. Battle/Clear provided a number of efficiency trials that are not valid due to being incomplete or an error with the equipment
+# Chelsey Hand provided these via email to Ashley Vizek 9/18/2026. The QC was at the weekly level and Ashley manually traced these to individual
+# release trials. Ideally these will be fixed in the EDI data.
 trials_to_remove <- c("BAT102", "BAT111", "BAT114", "BAT140",
                       "BAT156", "BAT157", "BAT159", "BAT158", 
                       "BAT221", "BAT340", "BAT368", "CLR227",
@@ -171,7 +173,7 @@ release <- bind_rows(release_db,
               select(site, release_id, origin_released) |>
               rename(origin = origin_released) |> 
               distinct()) |>  # try to fill in any missing origin information
-  # QC fix. These are from 2026 data review.
+  # QC fix. These are from 2026 data review. See description above.
   mutate(number_released = case_when(release_id == "CLR409" ~ 404,
                                      release_id == "CLR703" ~ 532,
                                      release_id == "CLR723" ~ 411,

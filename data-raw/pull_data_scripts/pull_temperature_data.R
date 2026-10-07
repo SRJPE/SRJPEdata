@@ -25,9 +25,9 @@ battle_creek_daily_temp <- read_csv(
   ) |>
   dplyr::mutate(
     stream = "battle creek",
-    site_group = "battle creek",
+    site_group = "battle creek", 
     gage_agency = "USFWS",
-    gage_number = "UBC",
+    gage_number = "UBC", # site is not included in the temperature data object
     parameter = "temperature"
   )
 
@@ -81,7 +81,7 @@ upperclear_creek_daily_temp <- read_csv(
     stream = "clear creek",
     site_group = "clear creek",
     gage_agency = "USFWS",
-    gage_number = "UCC",
+    gage_number = "UCC", # site is not included in the temperature data object and is added in covariate prep as needed
     parameter = "temperature"
   )
 
@@ -107,7 +107,7 @@ lowerclear_creek_daily_temp <- read_csv(
     stream = "clear creek",
     site_group = "clear creek",
     gage_agency = "USFWS",
-    gage_number = "LCC",
+    gage_number = "LCC", # site is not included in the temperature data object and is added in covariate prep as needed
     parameter = "temperature"
   )
 
