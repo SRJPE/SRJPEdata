@@ -3,6 +3,12 @@
 
 ### Pull Temperature Data for each JPE tributary -------------------------------
 
+# function to ensure that missing values produce a NA result in max() 
+# instead of Inf/-Inf, which was causing issues in the rolling mean calculations 
+# in build_covariates.R
+safe_max <- function(x) if (all(is.na(x))) NA_real_ else max(x, na.rm = T)
+safe_min <- function(x) if (all(is.na(x))) NA_real_ else min(x, na.rm = T)
+
 ## Battle Creek ----------------------------------------------------------------
 ### Temp Data Pull
 #### Gage UBC
@@ -15,8 +21,8 @@ battle_creek_daily_temp <- read_csv(
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(TEMP_C, na.rm = TRUE),
-    max = max(TEMP_C, na.rm = TRUE),
-    min = min(TEMP_C, na.rm = TRUE)
+    max = safe_max(TEMP_C),
+    min = safe_min(TEMP_C)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -69,8 +75,8 @@ upperclear_creek_daily_temp <- read_csv(
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(TEMP_C, na.rm = TRUE),
-    max = max(TEMP_C, na.rm = TRUE),
-    min = min(TEMP_C, na.rm = TRUE)
+    max = safe_max(TEMP_C),
+    min = safe_min(TEMP_C)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -95,8 +101,8 @@ lowerclear_creek_daily_temp <- read_csv(
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(TEMP_C, na.rm = TRUE),
-    max = max(TEMP_C, na.rm = TRUE),
-    min = min(TEMP_C, na.rm = TRUE)
+    max = safe_max(TEMP_C),
+    min = safe_min(TEMP_C)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -134,8 +140,8 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(temp_degC, na.rm = TRUE),
-    max = max(temp_degC, na.rm = TRUE),
-    min = min(temp_degC, na.rm = TRUE)
+    max = safe_max(temp_degC),
+    min = safe_min(temp_degC)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -202,8 +208,8 @@ feather_lfc_river_daily_temp <- feather_lfc_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(parameter_value, na.rm = TRUE),
-    max = max(parameter_value, na.rm = TRUE),
-    min = min(parameter_value, na.rm = TRUE)
+    max = safe_max(parameter_value),
+    min = safe_min(parameter_value)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -242,8 +248,8 @@ feather_hfc_river_daily_temp <- feather_hfc_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(parameter_value, na.rm = TRUE),
-    max = max(parameter_value, na.rm = TRUE),
-    min = min(parameter_value, na.rm = TRUE)
+    max = safe_max(parameter_value),
+    min = safe_min(parameter_value)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -281,8 +287,8 @@ mill_creek_daily_temp <- mill_creek_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(temp_degC, na.rm = TRUE),
-    max = max(temp_degC, na.rm = TRUE),
-    min = min(temp_degC, na.rm = TRUE)
+    max = safe_max(temp_degC),
+    min = safe_min(temp_degC)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -356,8 +362,8 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(parameter_value, na.rm = TRUE),
-    max = max(parameter_value, na.rm = TRUE),
-    min = min(parameter_value, na.rm = TRUE)
+    max = safe_max(parameter_value),
+    min = safe_min(parameter_value)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -433,9 +439,9 @@ reshaped_temp<- data.table::dcast(
 # Group by week and year, and perform the summarization
 updated_temp_data <- reshaped_temp[,
                                             .(
-                                              max = max(max, na.rm = TRUE),
+                                              max = safe_max(max),
                                               mean = mean(mean, na.rm = TRUE),
-                                              min = min(min, na.rm = TRUE)
+                                              min = safe_min(min)
                                             ),
                                             by = .(
                                               week = lubridate::week(date),
