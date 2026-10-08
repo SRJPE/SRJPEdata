@@ -11,8 +11,11 @@ scope = "edi"
 
 # Battle/Clear -----------------------------------------------------------------
 # Upstream passage and redd data
-# These data will be published on EDI but currently are not
-# In the interim we will pull from the standard format datasets which originally were saved on GCP - "standard-format-data/standard_daily_redd.csv"
+# These data are not published. We work with the USFWS Battle/Clear team to get estimates.
+# Data were checked and updated by the USFWS team in Sep 2026. The proofed data are saved
+# in the helper data folder and manually updated in the csvs read in below.
+# TODO ideally we would migrate to a system where estimates are generated through scripts
+# raw data -> qc script -> estimates for greater transparency
 
 # Instruction for updating - when Battle and Clear provided an updated value, open the csv, add the new value and save.
 battle_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |> 
@@ -73,7 +76,7 @@ data_from_ryan <- data_from_ryan_raw |>
 # Th table shows the number of spring-run tagged for broodstock, number returning to the Hatchery in the fall, the number of over summer mortalities during the same period, and includes the corrected count at the weir for 2024.
 
 # Casey provided updated data in Dec 2025 that includes data dating back to 2004 to expand the adult dataset
-feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_data_for_stock_recruit_dec_2025.csv"))
+feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_data_for_stock_recruit_sep_2026.csv"))
 
 feather_spring_spawner <- feather_adult_raw |> 
   filter(!is.na(`Hallprint Tagged1`)) |> 
@@ -91,17 +94,38 @@ feather_spring_spawner <- feather_adult_raw |>
 
 # Uncomment these lines when transition back to using EDI
 identifier = "1707"
-revision = list_data_package_revisions(scope, identifier, filter = "newest")
+
+# The Yuba package is no longer public, so it requires an authenticated
+# request. EDIutils::list_data_package_revisions()/read_data_entity_names()/
+# read_data_entity() don't support passing credentials, so call PASTA
+# directly with Basic Auth using the srjpe EDI account (see .Renviron).
+edi_auth <- httr::authenticate(
+  paste0("uid=", Sys.getenv("EDI_USER_ID"), ",o=EDI,dc=edirepository,dc=org"),
+  Sys.getenv("EDI_PASSWORD"),
+  type = "basic"
+)
+
+revision <- httr::content(
+  httr::GET(paste0("https://pasta.lternet.edu/package/eml/", scope, "/", identifier, "?filter=newest"), edi_auth),
+  as = "text", encoding = "UTF-8"
+) |> trimws()
 package_id <- paste(scope, identifier, revision, sep = ".")
 
 # List data entities of the data package
-res <- read_data_entity_names(package_id)
+res_raw <- httr::content(
+  httr::GET(paste0("https://pasta.lternet.edu/package/name/eml/", scope, "/", identifier, "/", revision), edi_auth),
+  as = "text", encoding = "UTF-8"
+)
+res <- read.csv(text = res_raw, header = FALSE, col.names = c("entityId", "entityName"))
 
 # Download the daily corrected passage
 name <- "yuba_daily_corrected_passage.csv"
 entity_id <- res$entityId[res$entityName == name]
-raw <- read_data_entity(package_id, entity_id)
-data <- read_csv(file = raw)
+raw <- httr::content(
+  httr::GET(paste0("https://pasta.lternet.edu/package/data/eml/", scope, "/", identifier, "/", revision, "/", entity_id), edi_auth),
+  as = "raw"
+)
+data <- read_csv(raw)
 
 # process into format as previously defined by database
 yuba_spring_passage_estimates <- data |> 
@@ -125,7 +149,7 @@ annual_adult_raw <- bind_rows(battle_redd,
 # Apply years to exclude
 
 adult_years_exclude <- adult_model_years |> 
-  filter(exclude == TRUE)
+  filter(exclude == TRUE) |> 
   select(-reason_for_exclusion) |> 
   mutate(data_type = case_when(data_type == "carcass" ~ "carcass_estimate",
                                data_type == "upstream passage" ~ "upstream_estimate",
