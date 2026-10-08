@@ -1,0 +1,267 @@
+---
+title: "Knights Landing Zero Recaptures"
+format:
+  html:
+    toc: true
+    embed-resources: true
+---
+
+**Question:** When a Knights Landing (KL) release has 0 recaptures, is it a true zero, or is it missing/unprocessed data coded as 0?
+
+Two pipelines can produce a 0:
+
+1. **Efficiency trials:** `release` + `recaptures` → `weekly_efficiency` → `weekly_juvenile_abundance_efficiency_data`. The 0 is created inside SRJPEdata.
+2. **Hatchery CWT recoveries:** `hatchery_release` + `rst_cwt_recaptures` → survival analysis. SRJPEdata has no rows for these groups; the 0 is created downstream when recoveries are counted by release group.
+
+This may be intentional as no recaptures were received from stream teams or processed.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+library(tidyverse)
+devtools::load_all(here::here(), quiet = TRUE)
+```
+
+## 1. Efficiency trials
+
+### Step 1: source files
+
+Pre-2004 KL data come from standard-format CSVs (read in `pull_misfit_rst_data.R`). These contain recapture rows explicitly entered as 0.
+
+```{r}
+knl_recap_src <- read_csv(here::here("data-raw/helper-tables/google_bucket/knl_recapture_standard.csv"))
+
+knl_recap_src |> filter(count == 0)
+```
+
+2004 onward come from the database (`pull_tables_from_database.R`), so there is no local file to check. Step 2 checks the saved objects.
+
+### Step 2: `release` and `recaptures`
+
+Releases with no recapture rows at all (`n_rows` is NA) vs releases with recapture rows that sum to 0.
+
+```{r}
+kl_recaps <- recaptures |>
+  filter(site == "knights landing") |>
+  group_by(release_id) |>
+  summarise(n_rows = n(), recaptured = sum(count, na.rm = TRUE))
+
+kl_releases <- release |>
+  filter(site == "knights landing") |>
+  left_join(kl_recaps, by = "release_id") |>
+  mutate(status = case_when(is.na(n_rows) ~ "no recapture rows",
+                            recaptured == 0 ~ "explicit 0",
+                            TRUE ~ "recaptures > 0"))
+
+count(kl_releases, status)
+```
+
+Recaptures whose `release_id` is not in `release`. These recaptures are dropped from the efficiency data, which is the opposite problem.
+
+```{r}
+recaptures |>
+  filter(site == "knights landing") |>
+  anti_join(filter(release, site == "knights landing"), by = "release_id") |>
+  count(release_id, year = year(date), wt = count)
+```
+
+### Step 3: `weekly_efficiency`
+
+Recreate the join from `build_rst_model_datasets.R`. Releases with no recapture rows get `NA`, then `sum(na.rm = TRUE)` turns that into 0.
+
+```{r}
+release |>
+  filter(site == "knights landing") |>
+  left_join(kl_recaps, by = "release_id") |>
+  filter(is.na(n_rows)) |>
+  summarise(n_releases = n(),
+            recaptured_after_sum = sum(recaptured, na.rm = TRUE))
+```
+
+### Step 4: final object
+
+Check that those releases appear in `weekly_juvenile_abundance_efficiency_data` with 0 recaptures.
+
+```{r}
+no_recap_rows <- kl_releases |>
+  filter(status == "no recapture rows") |>
+  mutate(year = year(date_released), week = week(date_released))
+
+final_check <- no_recap_rows |>
+  left_join(weekly_juvenile_abundance_efficiency_data |>
+              filter(site == "knights landing") |>
+              select(year, week, final_released = number_released, final_recaptured = number_recaptured),
+            by = c("year", "week")) |>
+  select(release_id, date_released, number_released, include_in_analysis, final_released, final_recaptured) |>
+  arrange(date_released)
+
+final_check
+```
+
+```{r}
+releases_to_check <- kl_releases  |> 
+  filter(status == "no recapture rows")  |> 
+  pull(release_id)
+
+no_recaps <- release |> 
+  filter(release_id %in% releases_to_check,
+  site == "knights landing")  |> 
+  mutate(week = week(date_released),
+  year = year(date_released)) |> 
+    select(week, year, number_released) |> 
+    mutate(has_no_recaps = T) |> 
+    glimpse()
+
+weekly_juvenile_abundance_efficiency_data |> 
+  filter(site == "knights landing") |> 
+  left_join(no_recaps) |> 
+  filter(has_no_recaps) |> 
+  select(year, week, site, number_released, number_recaptured, has_no_recaps)
+```
+
+## 2. Hatchery CWT recoveries
+
+### Step 1: source file vs ad-clipped catch
+
+`rst_cwt_recaptures` is built from `KL.CWT.Data.1999-2024.UPDATED.1.xlsx` (`pull_cwt_release.R`). Compare tags read per year to the number of ad-clipped fish caught at KL (`rst_catch`). A low fraction means the tags were not fully processed.
+
+Not every ad-clipped fish carries a CWT, so the fraction is approximate. `rst_catch` has no ad-clip data before 2004, and in 2004–2006 the recorded ad-clipped catch is lower than the number of tags read (incomplete catch data), so the comparison starts in 2007.
+
+```{r}
+ad_clipped <- rst_catch |>
+  filter(site == "knights landing", adipose_clipped) |>
+  group_by(year = year(date)) |>
+  summarise(ad_clipped_caught = sum(count, na.rm = TRUE))
+
+tags_read <- rst_cwt_recaptures |>
+  filter(str_detect(tag_code, "^\\d+$")) |>
+  count(year = year(date), name = "tags_read")
+
+processing <- full_join(ad_clipped, tags_read, by = "year") |>
+  filter(year >= 2007) |>
+  mutate(fraction_processed = round(tags_read / ad_clipped_caught, 2)) |>
+  arrange(year)
+
+processing |>
+  ggplot(aes(x = year, y = fraction_processed)) +
+  geom_col() +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  theme_minimal() +
+  labs(x = "Year", y = "Tags read / ad-clipped caught")
+```
+
+### Step 2: 2023 by month
+
+```{r}
+full_join(
+  rst_catch |>
+    filter(site == "knights landing", adipose_clipped, year(date) == 2023) |>
+    count(month = month(date), wt = count, name = "ad_clipped_caught"),
+  rst_cwt_recaptures |>
+    filter(year(date) == 2023, str_detect(tag_code, "^\\d+$")) |>
+    count(month = month(date), name = "tags_read"),
+  by = "month") |>
+  arrange(month)
+```
+
+### Step 3: release groups with zero KL recoveries
+
+There is no 0 in SRJPEdata here. Release groups with no rows in `rst_cwt_recaptures` become 0 when the survival analysis counts recoveries. Some of these are true zeros (e.g. small or distant releases), so compare against the processing fraction above.
+
+```{r}
+recoveries <- count(rst_cwt_recaptures, release_group_id, name = "kl_recoveries")
+
+hatchery_release |>
+  left_join(recoveries, by = "release_group_id") |>
+  group_by(year) |>
+  summarise(release_groups = n(), zero_kl_recoveries = sum(is.na(kl_recoveries))) |>
+  filter(year >= 1999)
+```
+
+## Summary
+
+### Where this lives
+
+| Pipeline | Source | Intermediate objects | Where 0 is created | Final object |
+|---|---|---|---|---|
+| Efficiency trials | `knl_*_standard.csv` (pre-2004); database `release` / `recaptured_fish` (2004+) | `release`, `recaptures` | `build_rst_model_datasets.R` (`weekly_efficiency`) | `weekly_juvenile_abundance_efficiency_data` |
+| Hatchery CWT | `KL.CWT.Data.1999-2024.UPDATED.1.xlsx`; RMIS `CWT_releases*.csv` | `rst_cwt_recaptures`, `hatchery_release` | Downstream survival analysis (join by `release_group_id`) | n/a in SRJPEdata |
+
+### KL efficiency releases with no recapture rows (become 0)
+
+```{r}
+final_check |>
+  count(year = year(date_released), name = "releases_with_no_recapture_rows") |>
+  knitr::kable()
+```
+
+### KL efficiency releases with recaptures explicitly entered as 0
+
+```{r}
+kl_releases |>
+  filter(status == "explicit 0") |>
+  count(year = year(date_released), name = "releases_with_explicit_0") |>
+  knitr::kable()
+```
+
+### CWT processing fraction by year
+
+```{r}
+knitr::kable(processing)
+```
+
+### Code where this is caused
+
+**`data-raw/process_data_scripts/build_rst_model_datasets.R` (lines 114–150).** The left join leaves `count` as `NA` for releases with no recapture rows, and `sum(count, na.rm = TRUE)` turns that into 0.
+
+```{r}
+#| eval: false
+weekly_efficiency <-
+  left_join(
+    release,
+    recaptures |>
+      group_by(stream, site, release_id) |>
+      summarize(count = sum(count, na.rm = T)),
+    by = c("release_id", "stream", "site")
+  ) |>
+  # ...
+  group_by(stream, site, site_group, week_released, year_released) |>
+  summarize(
+    # ...
+    number_released = sum(number_released, na.rm = TRUE),
+    number_recaptured = sum(count, na.rm = TRUE), # NA -> 0
+    # ...
+  )
+```
+
+**`data-raw/process_data_scripts/build_rst_model_datasets.R` (line 431).** This filter only removes `NA`s, so the zeros created above pass through to the final object.
+
+```{r}
+#| eval: false
+weekly_juvenile_abundance_efficiency_data_raw <- weekly_juvenile_abundance_model_data |>
+  # ...
+  filter(!is.na(number_released) & !is.na(number_recaptured))
+```
+
+**`data-raw/pull_data_scripts/combine_database_pull_and_save.R` (line 157).** Releases without `number_released` are dropped, so their recaptures have no matching release.
+
+```{r}
+#| eval: false
+release <- bind_rows(release_db, ..., edi_release) |>
+  filter(!is.na(number_released)) # there should not be any NAs
+```
+
+**`data-raw/pull_data_scripts/pull_cwt_release.R` (lines 291–330).** `rst_cwt_recaptures` only contains tags that were read. Unprocessed heads have no row, so a release group with unprocessed recoveries looks identical to one with no recoveries.
+
+```{r}
+#| eval: false
+rst_cwt_recaptures <- recaptures_raw |>
+  # ...
+  select(date = date_parsed, forklength = fl, weight = wt, tag_code = cwt) |>
+  filter(!is.na(tag_code)) |>
+  filter(tag_code != "N/A") |>
+  # ...
+  left_join(cwt_release_group_lookup)
+```
+
