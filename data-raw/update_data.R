@@ -72,9 +72,17 @@ pkgdown::build_site()
 
 # DATA QUALITY REPORTS 
 # Build stream team reports and QC 
-source("data-raw/data-checks/stream_team_review/render_reviews.R")
-source("data-raw/qc/run_annual_qc.R")
+# NOTE (2026-08-25): these two now run from test-data.yml in CI instead of
+# here, as an explicit gate against the data this script just produced,
+# rather than unconditionally every time this script runs. Uncomment for a
+# local/manual run if you want them rendered as part of this script too.
+# source("data-raw/data-checks/stream_team_review/render_reviews.R")
+# source("data-raw/qc/run_annual_qc.R")
 
+# FINAL UPDATES
+# Rename Okie Dam to Butte Creek
+source("data-raw/process_data_scripts/rename_okie_dam_site.R")
+devtools::build()
 
 message("Update complete! Check the stream team reports and QC folders to see helpful summary reports")
 

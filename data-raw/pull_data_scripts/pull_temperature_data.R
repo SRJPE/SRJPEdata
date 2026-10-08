@@ -3,28 +3,26 @@
 
 ### Pull Temperature Data for each JPE tributary -------------------------------
 
+# function to ensure that missing values produce a NA result in max() 
+# instead of Inf/-Inf, which was causing issues in the rolling mean calculations 
+# in build_covariates.R
+safe_max <- function(x) if (all(is.na(x))) NA_real_ else max(x, na.rm = T)
+safe_min <- function(x) if (all(is.na(x))) NA_real_ else min(x, na.rm = T)
+
 ## Battle Creek ----------------------------------------------------------------
 ### Temp Data Pull
-#### Gage #UBC
-ubc_temp_raw <- readxl::read_excel(
-  here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"),
-  sheet = 4
-)
+#### Gage UBC
+# Data are provided by USFWS Battle/Clear team. Data were checked Sep 2026.
 
-ubc_temp_raw2 <- readxl::read_excel(
-  here::here("data-raw", "temperature-data", "battle_clear_2022_2026.xlsx"),
-  sheet = 3
-) |> 
-  dplyr::rename(TEMP_C = `Temp C`)
-
-battle_creek_daily_temp <- dplyr::bind_rows(ubc_temp_raw, ubc_temp_raw2) |>
-  dplyr::rename(date = DT, temp_degC = TEMP_C) |>
-  dplyr::mutate(date = as_date(date, tz = "UTC")) |>
+battle_creek_daily_temp <- read_csv(
+  here::here("data-raw", "temperature-data", "UBC_RST_ALL_Ashley_FlowWest_2026.csv")
+)|> 
+  dplyr::mutate(date = as_date(mdy_hm(DT, tz = "UTC"))) |>
   dplyr::group_by(date) |>
   dplyr::summarise(
-    mean = mean(temp_degC, na.rm = TRUE),
-    max = max(temp_degC, na.rm = TRUE),
-    min = min(temp_degC, na.rm = TRUE)
+    mean = mean(TEMP_C, na.rm = TRUE),
+    max = safe_max(TEMP_C),
+    min = safe_min(TEMP_C)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -33,9 +31,9 @@ battle_creek_daily_temp <- dplyr::bind_rows(ubc_temp_raw, ubc_temp_raw2) |>
   ) |>
   dplyr::mutate(
     stream = "battle creek",
-    site_group = "battle creek",
+    site_group = "battle creek", 
     gage_agency = "USFWS",
-    gage_number = "UBC",
+    gage_number = "UBC", # site is not included in the temperature data object
     parameter = "temperature"
   )
 
@@ -70,33 +68,15 @@ butte_creek_daily_temp <- butte_creek_temp_query |>
 ## Clear Creek ----------------------------------------------------------------
 ### Temp Data Pull
 # Upper Clear Creek
-upperclear_temp_raw <- readxl::read_excel(
-  here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"),
-  sheet = 2
-)
-
-upperclear_temp_raw2 <- readxl::read_excel(
-  here::here("data-raw", "temperature-data", "battle_clear_2022_2026.xlsx"),
-  sheet = 1
-)
-
-upperclear_temp_raw3 <- readxl::read_excel(
-  here::here("data-raw", "temperature-data", "clear_2022.xlsx"),
-  sheet = 1,
-  skip = 2,
-  col_types = c("date", "numeric", "skip", "skip", "date", "numeric"), 
-  col_names = c("lcc_date", "lcc_temp", "blank", "blank2", "ucc_date", "ucc_temp")) |> # SKIP FIRST ROW STATING LCC and UCC 
-  select(DT = "ucc_date", TEMP_C = "ucc_temp") |> 
-  filter(!is.na(DT))
-
-upperclear_creek_daily_temp <- dplyr::bind_rows(upperclear_temp_raw, upperclear_temp_raw2, upperclear_temp_raw3) |>
-  dplyr::rename(date = DT, temp_degC = TEMP_C) |>
-  dplyr::mutate(date = as_date(date, tz = "UTC")) |>
+upperclear_creek_daily_temp <- read_csv(
+  here::here("data-raw", "temperature-data", "ClearCreek_UCC_2003_2025_09012026.csv")
+) |> 
+  dplyr::mutate(date = as_date(mdy(DT, tz = "UTC"))) |>
   dplyr::group_by(date) |>
   dplyr::summarise(
-    mean = mean(temp_degC, na.rm = TRUE),
-    max = max(temp_degC),
-    min = min(temp_degC)
+    mean = mean(TEMP_C, na.rm = TRUE),
+    max = safe_max(TEMP_C),
+    min = safe_min(TEMP_C)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -106,31 +86,23 @@ upperclear_creek_daily_temp <- dplyr::bind_rows(upperclear_temp_raw, upperclear_
   dplyr::mutate(
     stream = "clear creek",
     site_group = "clear creek",
-    site = "ucc",
     gage_agency = "USFWS",
-    gage_number = "UCC",
+    gage_number = "UCC", # site is not included in the temperature data object and is added in covariate prep as needed
     parameter = "temperature"
   )
+
 
 #Lower Clear Creek
-lowerclear_temp_raw <- readxl::read_excel(
-  here::here("data-raw", "temperature-data", "battle_clear_temp.xlsx"),
-  sheet = 3
-)
-
-lowerclear_temp_raw2 <- readxl::read_excel(
-  here::here("data-raw", "temperature-data", "battle_clear_2022_2026.xlsx"),
-  sheet = 2
-)
-
-lowerclear_creek_daily_temp <- dplyr::bind_rows(lowerclear_temp_raw, lowerclear_temp_raw2) |>
-  dplyr::rename(date = DT, temp_degC = TEMP_C) |>
-  dplyr::mutate(date = as_date(date, tz = "UTC")) |>
+lowerclear_creek_daily_temp <- read_csv(
+  here::here("data-raw", "temperature-data", "ClearCreek_LCC_2001_2025_09012026.csv")
+) |> 
+  dplyr::filter(!is.na(DT)) |> 
+  dplyr::mutate(date = as_date(mdy(DT, tz = "UTC"))) |>
   dplyr::group_by(date) |>
   dplyr::summarise(
-    mean = mean(temp_degC, na.rm = TRUE),
-    max = max(temp_degC),
-    min = min(temp_degC)
+    mean = mean(TEMP_C, na.rm = TRUE),
+    max = safe_max(TEMP_C),
+    min = safe_min(TEMP_C)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -140,11 +112,13 @@ lowerclear_creek_daily_temp <- dplyr::bind_rows(lowerclear_temp_raw, lowerclear_
   dplyr::mutate(
     stream = "clear creek",
     site_group = "clear creek",
-    site = "lcc",
     gage_agency = "USFWS",
-    gage_number = "LCC",
+    gage_number = "LCC", # site is not included in the temperature data object and is added in covariate prep as needed
     parameter = "temperature"
   )
+
+
+
 
 ## Deer Creek ------------------------------------------------------------------
 ### Temp Data Pull
@@ -166,8 +140,8 @@ deer_creek_daily_temp <- deer_creek_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(temp_degC, na.rm = TRUE),
-    max = max(temp_degC, na.rm = TRUE),
-    min = min(temp_degC, na.rm = TRUE)
+    max = safe_max(temp_degC),
+    min = safe_min(temp_degC)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -234,8 +208,8 @@ feather_lfc_river_daily_temp <- feather_lfc_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(parameter_value, na.rm = TRUE),
-    max = max(parameter_value, na.rm = TRUE),
-    min = min(parameter_value, na.rm = TRUE)
+    max = safe_max(parameter_value),
+    min = safe_min(parameter_value)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -274,8 +248,8 @@ feather_hfc_river_daily_temp <- feather_hfc_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(parameter_value, na.rm = TRUE),
-    max = max(parameter_value, na.rm = TRUE),
-    min = min(parameter_value, na.rm = TRUE)
+    max = safe_max(parameter_value),
+    min = safe_min(parameter_value)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -313,8 +287,8 @@ mill_creek_daily_temp <- mill_creek_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(temp_degC, na.rm = TRUE),
-    max = max(temp_degC, na.rm = TRUE),
-    min = min(temp_degC, na.rm = TRUE)
+    max = safe_max(temp_degC),
+    min = safe_min(temp_degC)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -388,8 +362,8 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
   dplyr::group_by(date) |>
   dplyr::summarise(
     mean = mean(parameter_value, na.rm = TRUE),
-    max = max(parameter_value, na.rm = TRUE),
-    min = min(parameter_value, na.rm = TRUE)
+    max = safe_max(parameter_value),
+    min = safe_min(parameter_value)
   ) |>
   tidyr::pivot_longer(
     mean:min,
@@ -411,7 +385,6 @@ yuba_river_daily_temp <- yuba_river_temp_query |>
 # Define the required object names
 required_objects <- c(
   "butte_creek_temp_query",
-  "clear_creek_data_query",
   "deer_creek_temp_query",
   "feather_lfc_temp_query",
   "feather_hfc_temp_query",
@@ -449,8 +422,8 @@ temp <- data.table::rbindlist(
   ),
   use.names = TRUE,
   fill = TRUE
-) |>
-  dplyr::select(-site)
+) |> 
+  filter(!is.na(date))
 
 data.table::setDT(temp)
 
@@ -466,9 +439,9 @@ reshaped_temp<- data.table::dcast(
 # Group by week and year, and perform the summarization
 updated_temp_data <- reshaped_temp[,
                                             .(
-                                              max = max(max, na.rm = TRUE),
+                                              max = safe_max(max),
                                               mean = mean(mean, na.rm = TRUE),
-                                              min = min(min, na.rm = TRUE)
+                                              min = safe_min(min)
                                             ),
                                             by = .(
                                               week = lubridate::week(date),
