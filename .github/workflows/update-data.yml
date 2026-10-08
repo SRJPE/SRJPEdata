@@ -102,6 +102,9 @@ jobs:
             any::DT
             local::.
 
+      - name: Install mdbtools (mdb-export, used to read the Feather River Access db)
+        run: sudo apt-get update && sudo apt-get install -y mdbtools
+
       - name: Check DB env vars are set
         env:
           jpe_db_user_id: ${{ secrets.JPE_DB_USER_ID }}
