@@ -76,7 +76,7 @@ data_from_ryan <- data_from_ryan_raw |>
 # Th table shows the number of spring-run tagged for broodstock, number returning to the Hatchery in the fall, the number of over summer mortalities during the same period, and includes the corrected count at the weir for 2024.
 
 # Casey provided updated data in Dec 2025 that includes data dating back to 2004 to expand the adult dataset
-feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_data_for_stock_recruit_dec_2025.csv"))
+feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_data_for_stock_recruit_sep_2026.csv"))
 
 feather_spring_spawner <- feather_adult_raw |> 
   filter(!is.na(`Hallprint Tagged1`)) |> 
