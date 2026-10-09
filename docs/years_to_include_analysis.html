@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -76,127 +76,139 @@
 
 
 <p>The Spring Run Juvenile Production Estimate uses historical rotary screw trap and adult survey data. In order to improve model performance the modeling team worked with the stream teams to filter out data that is too incomplete to use for modeling. This article describes the process for selecting RST years to include and adult years to include.</p>
+<p>Historically this process differed for each tributary and was based on the rules below. This ruleset was complicated and difficult to maintain. In April 2026 we decided to transition to a consistent ruleset to apply across all years and streams. We compared a number of thresholds and determined that a rule where at least 60% of the weeks (45:53, 1:22) were sampled was appropriate - it was not too stringent and did not include too many gaps. In addition, any sites that do not have any mark-recapture efficiency trials are removed.</p>
 <div class="section level2">
-<h2 id="rst-data---years-to-include-in-model">RST Data - Years to Include in Model<a class="anchor" aria-label="anchor" href="#rst-data---years-to-include-in-model"></a></h2>
+<h2 id="rst-data---historical-ruleset">RST Data - Historical Ruleset<a class="anchor" aria-label="anchor" href="#rst-data---historical-ruleset"></a></h2>
 <p>The modeling team hosted a modeling windows workshop where we discussed approaches to defining the time window that should be included in the juvenile abundance model. At the workshop we decided to use the full sampling season of data for each tributary, site, and year but to exclude years where we were concerned about data completeness. We came up with the following approach to determine excluded years:</p>
 <ol style="list-style-type: decimal"><li>First exclude years with lots of missing data from cumulative catch curves. See <code>data-raw/years_to_exclude.csv</code> (exclusion_type = “really low sampling”).</li>
 <li>Exclude yearlings from cumulative catch curves.</li>
 <li>Use updated cumulative catch curves to determine the critical window (average window over all historical years that captures 75% percent of catch).</li>
 <li>Remove additional years where there is no sampling for 4 consecutive weeks within the critical window. See <code>data-raw/years_to_exclude.csv</code> (exclusion_type = “missing four consecutive weeks in critical window”).</li>
 </ol><div class="section level3">
-<h3 id="cumulative-catch-curves">Cumulative catch curves<a class="anchor" aria-label="anchor" href="#cumulative-catch-curves"></a></h3>
-<p>The cumulative catch curve below shows cumulative catch over time for Battle Creek. This plot shows that in 2007 there was only sampling through mid January on Battle Creek. We used similar plots for each tributary to exclude years where there is very limited sampling.</p>
-<pre><code><span><span class="co">#&gt; Error in loadNamespace(name): there is no package called 'webshot'</span></span></code></pre>
-</div>
-<div class="section level3">
 <h3 id="heat-map-of-all-tributaries">Heat map of all tributaries<a class="anchor" aria-label="anchor" href="#heat-map-of-all-tributaries"></a></h3>
 <p>The heat map below shows when sampling occurs for all streams. It shows that sampling is more complete across traps from 2004 - 2009 and from mid November to July. Some traps have continued sampling throughout the season. Some years there are gaps within season for specific traps or across multiple traps.</p>
-<pre><code><span><span class="co">#&gt; Error in loadNamespace(name): there is no package called 'webshot'</span></span></code></pre>
+<pre><code><span><span class="co">#&gt; Error in `loadNamespace()`:</span></span>
+<span><span class="co">#&gt; ! there is no package called 'webshot'</span></span></code></pre>
 </div>
-<div class="section level3">
-<h3 id="years-to-exclude">Years to exclude<a class="anchor" aria-label="anchor" href="#years-to-exclude"></a></h3>
-<p>We utilized the above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling. See a section of the “years to exclude” table below.</p>
-<p>For ongoing data collection and more recent seasons, we applied an automatic check as a first pass to determine if a year should be excluded. Any automatic exclusion records will be reviewed manually before being excluded from data. We use the following criteria to asses if a recent RST season should be excluded from analysis:</p>
-<ul><li>If 25% of the weeks are missing (this test is used in place of the original criteria of “exclude years with lots of missing data from cumulative catch curves”)</li>
-</ul><p>We check this list against our original method annually after it is run to confirm that it is making the correct exclusion decisions.</p>
-<div class="section level4">
-<h4 id="years-to-exclude-table">Years to Exclude Table<a class="anchor" aria-label="anchor" href="#years-to-exclude-table"></a></h4>
-<table class="table"><colgroup><col width="11%"><col width="8%"><col width="7%"><col width="44%"><col width="27%"></colgroup><thead><tr><th align="left">Stream</th>
+</div>
+<div class="section level2">
+<h2 id="rst-data---current-ruleset">RST Data - Current Ruleset<a class="anchor" aria-label="anchor" href="#rst-data---current-ruleset"></a></h2>
+<p>Ruleset defined as “at least 19 weeks included within a run year (week 45-53 and 1-22) for a given site” or 60% of weeks sampled. Sites that do not have any (across all years) mark-repcature efficiency trials are also excluded. Additionally, years with less than 3 weeks with catch &gt; 0 are excluded.</p>
+<table class="table"><thead><tr><th align="left">Stream</th>
 <th align="left">Site</th>
 <th align="right">Run Year</th>
 <th align="left">Exclusion Type</th>
-<th align="left">Notes</th>
 </tr></thead><tbody><tr><td align="left">battle creek</td>
 <td align="left">lbc</td>
-<td align="right">1998</td>
-<td align="left">automatic</td>
-<td align="left">less than 75% of weeks sampled</td>
+<td align="right">1999</td>
+<td align="left">60% of weeks sampled</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">2000</td>
+<td align="left">60% of weeks sampled</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">2001</td>
+<td align="left">60% of weeks sampled</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">2002</td>
+<td align="left">60% of weeks sampled</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">2003</td>
+<td align="left">60% of weeks sampled</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">2004</td>
+<td align="left">60% of weeks sampled</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">lbc</td>
+<td align="right">2005</td>
+<td align="left">60% of weeks sampled</td>
 </tr><tr><td align="left">battle creek</td>
 <td align="left">lbc</td>
 <td align="right">2006</td>
-<td align="left">automatic</td>
-<td align="left">less than 75% of weeks sampled</td>
+<td align="left">60% of weeks sampled</td>
 </tr><tr><td align="left">battle creek</td>
 <td align="left">lbc</td>
 <td align="right">2016</td>
-<td align="left">automatic</td>
-<td align="left">less than 75% of weeks sampled</td>
+<td align="left">60% of weeks sampled</td>
 </tr><tr><td align="left">battle creek</td>
 <td align="left">ubc</td>
-<td align="right">2007</td>
-<td align="left">really low sampling</td>
-<td align="left">only 12 week of data</td>
-</tr><tr><td align="left">butte creek</td>
-<td align="left">adams dam</td>
-<td align="right">1997</td>
-<td align="left">automatic</td>
-<td align="left">less than 75% of weeks sampled</td>
-</tr><tr><td align="left">butte creek</td>
-<td align="left">adams dam</td>
-<td align="right">1998</td>
-<td align="left">automatic</td>
-<td align="left">less than 75% of weeks sampled</td>
-</tr><tr><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">2019</td>
-<td align="left">really low sampling</td>
-<td align="left">only 10 weeks of data</td>
-</tr><tr><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">2005</td>
-<td align="left">really low sampling</td>
-<td align="left">only 6 weeks of data</td>
-</tr><tr><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">1997</td>
-<td align="left">missing four consecutive weeks in critical window</td>
-<td align="left">NA</td>
-</tr><tr><td align="left">butte creek</td>
-<td align="left">okie dam</td>
-<td align="right">1998</td>
-<td align="left">missing four consecutive weeks in critical window</td>
-<td align="left">NA</td>
-</tr></tbody></table><p><em>… with 63 more rows</em></p>
-</div>
+<td align="right">2001</td>
+<td align="left">60% of weeks sampled</td>
+</tr></tbody></table><p><em>… with 48 more rows</em></p>
+<div class="section level3">
+<h3 id="spring-run-specific-ruleset">Spring run specific ruleset<a class="anchor" aria-label="anchor" href="#spring-run-specific-ruleset"></a></h3>
+<p>Although the focus of this effort is on spring run Chinook salmon, the SR JPE modeling was designed to be applicable for modeling all runs as PLAD run designations are available for all runs. The “years to exclude” ruleset is broadly applicable, however, there are some specific cases where there may be site/years beyond those identified in the “years to exclude ruleset” that are not expected for perform well, specifically for spring run. This may happen when the number of weeks sampling is met but there is a large gap in sampling during the peak of spring run outmigration. We developed an additional list to track these cases and apply to modeling.</p>
+<table class="table"><colgroup><col width="12%"><col width="12%"><col width="6%"><col width="9%"><col width="52%"><col width="6%"></colgroup><thead><tr><th align="left">stream</th>
+<th align="left">site</th>
+<th align="right">run_year</th>
+<th align="right">number_weeks</th>
+<th align="left">exclusion_type</th>
+<th align="left">apply_to</th>
+</tr></thead><tbody><tr><td align="left">sacramento river</td>
+<td align="left">tisdale</td>
+<td align="right">2013</td>
+<td align="right">20</td>
+<td align="left">spring run specific - 11 consecutive weeks not sampled Dec 16 to Feb 19</td>
+<td align="left">spring</td>
+</tr><tr><td align="left">feather river</td>
+<td align="left">herringer riffle</td>
+<td align="right">2008</td>
+<td align="right">21</td>
+<td align="left">spring run specific - 9 weeks missing Nov 04 to Jan 01</td>
+<td align="left">spring</td>
+</tr></tbody></table></div>
+<div class="section level3">
+<h3 id="years_to_exclude_rst_data-object">years_to_exclude_rst_data object<a class="anchor" aria-label="anchor" href="#years_to_exclude_rst_data-object"></a></h3>
+<p>We combine the “years to exclude” ruleset and the spring run specific ruleset into one data object <code>years_to_exclude_rst_data</code> and add a column called <code>apply_to</code>. This column will be <code>all runs</code> for the broad ruleset or could be specific to a particular run (e.g. will be <code>spring</code> for spring run specific cases)</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_data.html" class="external-link">use_data</a></span><span class="op">(</span><span class="va">years_to_exclude_rst_data</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="applying-to-modeling-datasets">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets"></a></h3>
-<p>In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, site, year that should be included in the SR JPE modeling.</p>
-<p>The table below shows a section of this table:</p>
+<h3 id="years_to_include_rst_data-object">years_to_include_rst_data object<a class="anchor" aria-label="anchor" href="#years_to_include_rst_data-object"></a></h3>
+<p>In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, site, year that should be included in the SR JPE modeling. There are two versions of this table depending on if a list of site/years for all runs or spring run specific are needed.</p>
+<ul><li>
+<code>years_to_include_rst_data</code> use when want to apply ruleset broadly, applicable for all runs</li>
+<li>
+<code>years_to_include_rst_data_spring</code> use when want to apply ruleset specifically to spring run</li>
+</ul><p>The table below shows a section of this table applicable to all runs:</p>
 <table class="table"><thead><tr><th align="left">stream</th>
 <th align="left">site</th>
 <th align="right">run_year</th>
-</tr></thead><tbody><tr><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">1999</td>
-</tr><tr><td align="left">battle creek</td>
-<td align="left">lbc</td>
+</tr></thead><tbody><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
 <td align="right">1999</td>
 </tr><tr><td align="left">battle creek</td>
 <td align="left">ubc</td>
-<td align="right">1999</td>
-</tr><tr><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">2018</td>
-</tr><tr><td align="left">clear creek</td>
-<td align="left">ucc</td>
-<td align="right">2018</td>
+<td align="right">2000</td>
 </tr><tr><td align="left">battle creek</td>
 <td align="left">ubc</td>
-<td align="right">2000</td>
-</tr><tr><td align="left">clear creek</td>
-<td align="left">ucc</td>
+<td align="right">2002</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2003</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2004</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2005</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
 <td align="right">2006</td>
-</tr><tr><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">2006</td>
-</tr><tr><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">2000</td>
-</tr><tr><td align="left">clear creek</td>
-<td align="left">lcc</td>
-<td align="right">2001</td>
-</tr></tbody></table><p><em>… with 201 more rows</em></p>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2008</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2009</td>
+</tr><tr><td align="left">battle creek</td>
+<td align="left">ubc</td>
+<td align="right">2010</td>
+</tr></tbody></table><p><em>… with 212 more rows</em></p>
 </div>
 </div>
 <div class="section level2">
@@ -228,7 +240,7 @@
 <li>Exclude year if flows exceed a threshold value on each tributary (overpass weir etc..). Threshold determined by monitoring program.</li>
 </ul><p>We used these rules as preliminary way to identify potentially incomplete years and then conducted outreach to stream teams to review our list and highlight any other years that should be excluded or not.</p>
 <div class="section level3">
-<h3 id="years-to-exclude-1">Years to exclude<a class="anchor" aria-label="anchor" href="#years-to-exclude-1"></a></h3>
+<h3 id="years-to-exclude">Years to exclude<a class="anchor" aria-label="anchor" href="#years-to-exclude"></a></h3>
 <p>We utilized above cumulative catch curves and heatmaps to come up with a list of years to exclude from modeling for adult data. See a section of the “years to exclude” table below.</p>
 <table class="table"><thead><tr><th align="left">Stream</th>
 <th align="right">Year</th>
@@ -274,10 +286,10 @@
 <td align="right">2017</td>
 <td align="left">redd</td>
 <td align="left">Missing reaches 2, 3, 5, and 6</td>
-</tr></tbody></table><p><em>… with 49 more rows</em></p>
+</tr></tbody></table><p><em>… with 47 more rows</em></p>
 </div>
 <div class="section level3">
-<h3 id="applying-to-modeling-datasets-1">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets-1"></a></h3>
+<h3 id="applying-to-modeling-datasets">Applying to Modeling Datasets<a class="anchor" aria-label="anchor" href="#applying-to-modeling-datasets"></a></h3>
 <p>In order to apply the years to exclude information to the modeling datasets we did some additional processing to create a table describing the stream, year by data type that should be included in the SR JPE modeling.</p>
 <p>The table below shows a section of this table:</p>
 <table class="table"><colgroup><col width="5%"><col width="13%"><col width="6%"><col width="10%"><col width="22%"><col width="22%"><col width="18%"></colgroup><thead><tr><th align="right">year</th>
@@ -357,7 +369,7 @@
 <td align="right">NA</td>
 <td align="right">NA</td>
 <td align="right">NA</td>
-</tr></tbody></table><p><em>… with 240 more rows</em></p>
+</tr></tbody></table><p><em>… with 252 more rows</em></p>
 </div>
 </div>
 

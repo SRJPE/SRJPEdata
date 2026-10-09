@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -134,13 +134,13 @@
 <div class="section level4">
 <h4 id="genetics-data">Genetics Data<a class="anchor" aria-label="anchor" href="#genetics-data"></a>
 </h4>
-<p>Genetics monitoring data is also included in this data package to prepare data inputs for a probabilistic length at date (PLAD) model. Genetics data is pulled directly from the SR JPE genetics database into this data package.</p>
+<p>Genetics monitoring data is also included in this data package to prepare data inputs for a probabilistic length at date (PLAD) model. Genetics data is pulled directly from <a href="https://portal.edirepository.org/nis/mapbrowse?packageid=edi.2335.2" class="external-link">EDI</a> into this data package.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="explore-datasets">Explore datasets<a class="anchor" aria-label="anchor" href="#explore-datasets"></a>
 </h2>
-<p>Explore model datasets on the SRJPEdashboard shiny app. (Add link)</p>
+<p>Explore model datasets on the SRJPEdashboard shiny app. (Coming soon!)</p>
 </div>
 <div class="section level2">
 <h2 id="updating-data">Updating data<a class="anchor" aria-label="anchor" href="#updating-data"></a>
@@ -155,7 +155,7 @@
 <ul>
 <li>Run <code>data-raw/update_data.R</code>. This script pulls raw monitoring data from jpe-db, EDI, and CDEC/USGS gages, rebuilds the covariate, RST, adult, genetics, and survival data objects, and regenerates package documentation and the pkgdown site.</li>
 <li>Run <code>data-raw/qc/run_annual_qc.R</code>. This script renders the RST, flow/temperature, efficiency, and summary reports. Flagged issues are logged to qc_log_errors.csv and qc_log_warnings.csv for review; see <code>data-raw/qc/qc_workflow.md</code> for the full QC workflow.</li>
-<li>Run <code>data-raw/data-checks/stream_team_review/render_reviews.R</code>. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized.</li>
+<li>Run <code>data-raw/data-checks/stream_team_review/render_reviews.R</code>. This script renders a per-stream report and CSVs for stream teams to review before the update is finalized. These files are emailed to stream teams around July-September.</li>
 </ul>
 <p>NOTE: Annually, the <code>data-raw/pull_data_scripts/README.md</code> should be revisited to check whether we can update any “misfit” data sources to pull from pipelines that are still being refined.</p>
 </div>
