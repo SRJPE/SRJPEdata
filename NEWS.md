@@ -7,6 +7,9 @@ Data Updates
 - Updates survival data objects to stay current with the survival model updates
 - Adds genetics data pulled from EDI and creates a new genetic data object
 - Updates Yuba adult data to pull from EDI
+- Updates Feather River 2025 adult estimate per guidance from DWR
+- Updates Battle and Clear 2025/2026 efficiency data
+- Implements end of 2025/2026 RST season QC
 - Pulls updated RST and environmental data objects to get most recent available data
 
 Logic Updates
