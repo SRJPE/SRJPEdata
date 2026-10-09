@@ -36,11 +36,11 @@ NOAA collects acoustic tagging data as part of the Central Valley Enhanced Acous
 
 #### Genetics Data
 
-Genetics monitoring data is also included in this data package to prepare data inputs for a probabilistic length at date (PLAD) model. Genetics data is pulled directly from the SR JPE genetics database into this data package. 
+Genetics monitoring data is also included in this data package to prepare data inputs for a probabilistic length at date (PLAD) model. Genetics data is pulled directly from [EDI](https://portal.edirepository.org/nis/mapbrowse?packageid=edi.2335.2) into this data package. 
 
 ## Explore datasets 
 
-Explore model datasets on the SRJPEdashboard shiny app. (Add link)
+Explore model datasets on the SRJPEdashboard shiny app. (Coming soon!)
 
 ## Updating data
 

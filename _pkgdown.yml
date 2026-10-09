@@ -69,6 +69,10 @@ reference:
 - contents:
   - daily_yearling_ruleset
   - weekly_hours_fished
+- subtitle: Helper Datasets
+  desc: Helper datasets used in analysis
+- contents:
+  - river_km_lookup
 - title: Helper Functions
   desc: Functions used to generate model data
 - contents:

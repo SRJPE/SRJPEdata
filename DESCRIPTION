@@ -1,6 +1,6 @@
 Package: SRJPEdata
 Title: Stores Monitoring Data to Be Used in the Spring Run Juvenile Production Estimate Model 
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: c(person("Ashley", "Vizek", , "avizek@flowwest.com", role = c("aut", "cre")),
              person("Erin", "Cain", , "ecain@flowwest.com", role = c("aut")),
              person("Liz", "Stebbins", , "lstebbins@flowwest.com", role = c("aut")))
@@ -46,3 +46,4 @@ Remotes:
 VignetteBuilder: knitr
 URL: https://srjpe.github.io/SRJPEdata/
 Config/roxygen2/version: 8.0.0
+RoxygenNote: 7.3.3
