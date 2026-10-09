@@ -8,25 +8,27 @@
 A tibble with 10,890 rows and 14 columns
 \itemize{
 \item \code{year}: year
-\week \code{week} : week
+\item \code{week} : week
 \item \code{stream}: rst stream
 \item \code{site}: rst site
 \item \code{count}: weekly count of number of
 \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish
 \item \code{hours_fished}: Hours fished on a stream
 \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
+\item \code{log_flow_cfs}: Weekly mean gage flow, log-transformed
 \item \code{life_stage}: Life stage of juvenile fish
 \item \code{average_stream_hours_fished}: Average hours fished on a given stream, used to standardize
-\item \code{standardized_flow}: Flow standardized across years and sites
+\item \code{standardized_flow}: Flow standardized across years within sites
+\item \code{log_standardized_flow}: Log-transformed flow standardized across years within sites
 \item \code{run_year}: Run year
 \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week
-\item \code{lgN_prior}: log normalized special prior abundance cap, for more info search \code{?SRJPEdata::btspasx_special_priors_data}
+\item \code{lgN_prior}: log normalized special prior abundance cap
 }
 }
 \source{
 Prepared using rotary screw trap catch data (see \code{?SRJPEdata::rst_catch} for more information on raw data sources),
-environmental_data (see \code{?SRJPEdata::environmental_data}), hours fished information
-(see \verb{?SRJPEdata::weekly_hours_fished for more information}), and btspasx special priors (see \code{?SRJPEdata::btspasx_special_priors_data} for more information).
+flow_data (see \code{?SRJPEdata::flow_data}), hours fished information
+(see \verb{?SRJPEdata::weekly_hours_fished for more information}).
 }
 \usage{
 weekly_juvenile_abundance_catch_data

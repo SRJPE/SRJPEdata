@@ -47,7 +47,7 @@ reach_metadata <- get_receiver_sites_metadata(butte_all_detections)
 
 # Manually select receiver locations to use and combine for Sac River study ----
 # Will need to go back in and remap if we want new 
-region_mapped_reach_metadata <- reach_metadata %>%
+region_mapped_reach_metadata_butte <- reach_metadata %>%
   filter(receiver_general_location %in% c("UpperButte_RST_Rel","UpperButte_RST","UpperButte_SKWY",
                                           "SutterBypass_Weir2_RST_Rel","SutterBypass Weir2 RST",
                                           "Butte_Blw_Sanborn_Rel","Sanborn_Slough_Rel","North_Weir_Rel","Laux Rd",
@@ -67,7 +67,7 @@ region_mapped_reach_metadata <- reach_metadata %>%
 # Looks like Flora is still using agregate detections sac for all
 # TODO confirm that this is the case
 aggregate_butte <- aggregate_detections_butte(detections = butte_all_detections, 
-                                                        receiever_metadata = region_mapped_reach_metadata) 
+                                                        receiver_metadata = region_mapped_reach_metadata_butte) 
 
 # butte Analysis 
 butte_all_aggregated <- aggregate_butte$detections

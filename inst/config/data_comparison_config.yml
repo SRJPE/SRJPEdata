@@ -38,7 +38,22 @@ daily_yearling_ruleset.rda:
   check_attributes: true
 
 # Species reference list
-environmental_data.rda:
+flow_data.rda:
+  id_columns:
+    - stream
+    - week
+    - year
+    - gage_number
+    - gage_agency
+    - site_group
+    - parameter
+    - statistic
+  allowed_to_change:
+  date_columns:
+  numeric_tolerance: 1
+  check_attributes: true
+  
+temperature_data.rda:
   id_columns:
     - stream
     - week
@@ -61,17 +76,6 @@ forecast_covariates.rda:
     - water_year
     - stream
     - month
-  allowed_to_change:
-  date_columns:
-  numeric_tolerance: 1
-  check_attributes: true
-
-# P2S covariates
-p2s_model_covariates.rda:
-  id_columns:
-    - year
-    - stream
-    - wy_type
   allowed_to_change:
   date_columns:
   numeric_tolerance: 1

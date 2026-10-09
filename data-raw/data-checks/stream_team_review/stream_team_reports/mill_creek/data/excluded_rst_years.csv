@@ -1,0 +1,8 @@
+stream,site,run_year,number_weeks,exclusion_type,apply_to,exclude
+mill creek,mill creek,1997,3,60% of weeks sampled,all runs,TRUE
+mill creek,mill creek,1998,4,60% of weeks sampled,all runs,TRUE
+mill creek,mill creek,1999,14,60% of weeks sampled,all runs,TRUE
+mill creek,mill creek,2004,18,60% of weeks sampled,all runs,TRUE
+mill creek,mill creek,2009,18,60% of weeks sampled,all runs,TRUE
+mill creek,mill creek,2021,1,low catch; 60% of weeks sampled,all runs,TRUE
+mill creek,mill creek,2025,21,low catch,all runs,TRUE

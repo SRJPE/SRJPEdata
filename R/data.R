@@ -1,101 +1,76 @@
-#' @title Passage to Spawner Model Covariates Standard
-#' @name p2s_model_covariates_standard
-#' @description The passage to spawner model covariates standard table contains environmental
-#' covariates for use in the Passage to Spawner (P2S) model. The environmental variables are 
-#' standardized within a column to center around 0. Selection and preparation of the 
-#' covariates are detailed in \code{vignette("prep_environmental_covariates.Rmd", package = "SRJPEdata")}.
-#' @format A tibble with 192 rows and 7 columns 
-#' \itemize{
-#'   \item \code{year}: year 
-#'   \item \code{stream}: stream associated with covariate data
-#'   \item \code{wy_type}: water year type, binary variable describing wet(1) or dry(0)
-#'   \item \code{max_flow_std}: standardized maximum flow data for adult migration period (March - August) 
-#'   \item \code{gdd_std}: standardized cumulative degree days above 20 degrees Celsius 
-#'   for adult migration (Sacramento March - May) and holding (Tributaries May - August)
-#'   \item \code{passage_index}: standardized total adult returns (not currently utilized by model)
-#'   \item \code{median_passage_timing_std}: standardized median return week (not currently utilized by model)
-#'   }
-'p2s_model_covariates_standard'
-
-
 #' @title Weekly BT-SPAS-X Model Efficency Data
 #' @name weekly_juvenile_abundance_efficiency_data
-#' @description Weekly Rotary Screw Trap (RST) efficiency data and weekly standardized flow, 
+#' @description Weekly Rotary Screw Trap (RST) efficiency data and weekly standardized flow,
 #' for spring run tributaries modeled in BT-SPAS-X.
-#' @format A tibble with 651 rows and 8 columns 
+#' @format A tibble with 651 rows and 8 columns
 #' \itemize{
-#'   \item \code{year}: year 
-#'   \week \code{week} : week 
-#'   \item \code{stream}: rst stream 
-#'   \item \code{site}: rst site 
+#'   \item \code{year}: year
+#'   \item \code{run_year}: Run year
+#'   \item \code{week} : week
+#'   \item \code{stream}: rst stream
+#'   \item \code{site}: rst site
 #'   \item \code{number_released}: Number of efficiency trial fish released
 #'   \item \code{number_recaptured}: Number of efficiency trial fish recaptured
-#'   \item \code{standardized_efficiency_flow}: Flow standardized across years and sites 
-#'   \item \code{run_year}: Run year 
+#'   \item \code{standardized_efficiency_flow}: Flow standardized across years and sites
+#'   \item \code{standardized_log_efficiency_flow}: Log-transformed flow standardized across years within sites
+#'   \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
+#'   \item \code{log_flow_cfs}: Weekly mean gage flow, log-transformed
+#'   \item \code{hours_fished}: Weekly hours fished for a site
+#'   \item \code{average_hours_fished_during_efficiency_trials}: Average hours a trap was fished during efficiency trials
 #'   }
-#' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
-#'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
-#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
-'weekly_juvenile_abundance_model_data'
+#' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources),
+#'   flow_data (see `?SRJPEdata::flow_data`), hours fished information
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`).
+'weekly_juvenile_abundance_efficiency_data'
 
 #' @title Weekly BT-SPAS-X Catch Data
 #' @name weekly_juvenile_abundance_catch_data
-#' @description Weekly Rotary Screw Trap (RST) catch summaries, weekly RST effort effort, and weekly standardized flow, 
+#' @description Weekly Rotary Screw Trap (RST) catch summaries, weekly RST effort effort, and weekly standardized flow,
 #' for spring run tributaries modeled in BT-SPAS-X.
-#' @format A tibble with 10,890 rows and 14 columns 
+#' @format A tibble with 10,890 rows and 14 columns
 #' \itemize{
-#'   \item \code{year}: year 
-#'   \week \code{week} : week 
-#'   \item \code{stream}: rst stream 
-#'   \item \code{site}: rst site 
-#'   \item \code{count}: weekly count of number of 
-#'   \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish 
-#'   \item \code{hours_fished}: Hours fished on a stream 
+#'   \item \code{year}: year
+#'   \item \code{week} : week
+#'   \item \code{stream}: rst stream
+#'   \item \code{site}: rst site
+#'   \item \code{count}: weekly count of number of
+#'   \item \code{mean_fork_length}: Mean fork length of released efficiency trial fish
+#'   \item \code{hours_fished}: Hours fished on a stream
 #'   \item \code{flow_cfs}: Weekly mean gage flow in cubic feet per second (cfs)
-#'   \item \code{life_stage}: Life stage of juvenile fish 
-#'   \item \code{average_stream_hours_fished}: Average hours fished on a given stream, used to standardize 
-#'   \item \code{standardized_flow}: Flow standardized across years and sites 
-#'   \item \code{run_year}: Run year 
-#'   \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week 
-#'   \item \code{lgN_prior}: log normalized special prior abundance cap, for more info search `?SRJPEdata::btspasx_special_priors_data`
+#'   \item \code{log_flow_cfs}: Weekly mean gage flow, log-transformed
+#'   \item \code{life_stage}: Life stage of juvenile fish
+#'   \item \code{average_stream_hours_fished}: Average hours fished on a given stream, used to standardize
+#'   \item \code{standardized_flow}: Flow standardized across years within sites
+#'   \item \code{log_standardized_flow}: Log-transformed flow standardized across years within sites
+#'   \item \code{run_year}: Run year
+#'   \item \code{catch_standardized_by_hours_fished}: Catch standardized by hours fished in a given week
+#'   \item \code{lgN_prior}: log normalized special prior abundance cap
 #'   }
-#' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources), 
-#'   environmental_data (see `?SRJPEdata::environmental_data`), hours fished information 
-#'   (see `?SRJPEdata::weekly_hours_fished for more information`), and btspasx special priors (see `?SRJPEdata::btspasx_special_priors_data` for more information).
+#' @source Prepared using rotary screw trap catch data (see `?SRJPEdata::rst_catch` for more information on raw data sources),
+#'   flow_data (see `?SRJPEdata::flow_data`), hours fished information
+#'   (see `?SRJPEdata::weekly_hours_fished for more information`).
 'weekly_juvenile_abundance_catch_data'
 
-#' @title Special Priors for BT-SPAS-X Abundance Model 
-#' @name btspasx_special_priors_data
-#' @description A dataframe containing special priors to fine tune model 
-#' @format A dataframe with 71 rows and 4 columns 
-#' \itemize{
-#'   \item \code{site}: site
-#'   \item \code{run_year}: run year
-#'   \item \code{week}: week 
-#'   \item \code{special_prior}: log normalized special prior abundance cap
-#'   }
-#' @source Special priors were developed by the lead SR JPE modeler, Josh Korman.
-'btspasx_special_priors_data'
 
-#' @title RST Catch Data 
+#' @title RST Catch Data
 #' @name rst_catch
-#' @description Dataset containing rst catch monitoring data for all SR JPE tribuatary and mainstem monitoring programs. 
-#' @format A dataframe with 511,961 rows and 14 columns 
+#' @description Dataset containing rst catch monitoring data for all SR JPE tribuatary and mainstem monitoring programs.
+#' @format A dataframe with 511,961 rows and 14 columns
 #' \itemize{
-#'   \item \code{date}: date 
-#'   \item \code{stream}: Stream RST is located on  
-#'   \item \code{site}: Site RST is located on   
-#'   \item \code{subsite}: Specific trap site   
+#'   \item \code{date}: date
+#'   \item \code{stream}: Stream RST is located on
+#'   \item \code{site}: Site RST is located on
+#'   \item \code{subsite}: Specific trap site
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
-#'   \item \code{count}: Number of fish caught  
-#'   \item \code{run}: Run of catch  
-#'   \item \code{life_stage}: Life Stage of catch, standardized based on FL (fork lenght < 45mm = "fry", fork length > 45mm and < yearling cutoff == "smolt")  
-#'   \item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch  
-#'   \item \code{dead}: Mortality status of catch  
-#'   \item \code{fork_length}: Fork length measure of catch in mm  
-#'   \item \code{weight}: Weight of catch in grams  
-#'   \item \code{actual_count}: Boolean Value describing if count is actual value or interpolated  
-#'   \item \code{species}: Species of catch  
+#'   \item \code{count}: Number of fish caught
+#'   \item \code{run}: Run of catch
+#'   \item \code{life_stage}: Life Stage of catch, standardized based on FL (fork lenght < 45mm = "fry", fork length > 45mm and < yearling cutoff == "smolt")
+#'   \item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch
+#'   \item \code{dead}: Mortality status of catch
+#'   \item \code{fork_length}: Fork length measure of catch in mm
+#'   \item \code{weight}: Weight of catch in grams
+#'   \item \code{actual_count}: Boolean Value describing if count is actual value or interpolated
+#'   \item \code{species}: Species of catch
 #'   }
 #' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below.
 #'  \itemize{
@@ -115,34 +90,34 @@
 #'   }
 'rst_catch'
 
-#' @title RST Trap Data 
+#' @title RST Trap Data
 #' @name rst_trap
 #' @description Dataset containing rst trap operations monitoring data for all SR JPE tribuatary and mainstem monitoring programs
-#' @format 
+#' @format
 #' \itemize{
-#'   \item \code{trap_start_date}: Date that trap was visited. This field is included because in some cases a visit will not have a start/stop time (e.g. if trap was cleaned/serviced or just checked)                
+#'   \item \code{trap_start_date}: Date that trap was visited. This field is included because in some cases a visit will not have a start/stop time (e.g. if trap was cleaned/serviced or just checked)
 #'   \item \code{visit_type}:
 #'   \item \code{trap_stop_date}: Date that trap was started prior to being sampled. trap_start_date and trap_stop_date are meant to describe the sampling period.
 #'   \item \code{trap_start_time}: Time that trap was visited.
 #'   \item \code{trap_stop_time}:  Time that trap was sampled.
-#'   \item \code{stream}: Which stream the RST is located on                 
-#'   \item \code{site}: Site name  
-#'   \item \code{subsite}: Name of trap       
+#'   \item \code{stream}: Which stream the RST is located on
+#'   \item \code{site}: Site name
+#'   \item \code{subsite}: Name of trap
 #'   \item \code{site_group}: Site group, used to seperate traps within the same stream that have unique environmental conditions.
-#'   \item \code{trap_functioning}: Describes how well trap is functioning. Categories: trap functioning normally, trap stopped functioning, trap not in service, trap functioning but not normally. If trap_functioning not used, "not recorded" is entered. 
+#'   \item \code{trap_functioning}: Describes how well trap is functioning. Categories: trap functioning normally, trap stopped functioning, trap not in service, trap functioning but not normally. If trap_functioning not used, "not recorded" is entered.
 #'   \item \code{in_half_cone_configuration}: Boolean to describe if trap fished in half cone configuration. If not recorded, then assumed to be FALSE.
 #'   \item \code{fish_processed}: Describes if fish were processed. Categories: processed fish; no fish caught; no catch data, fish released; no catch data, fish left in live box. If fish_processed not used, "not recorded" is entered.
 #'   \item \code{rpm_start}: Revolutions per minute at the start of the trap visit before trap is cleaned. If not recorded, then NA.
 #'   \item \code{rpm_end}:  Revolutions per minute at the end of the trap visit after trap is cleaned. If not recorded, then NA.
-#'   \item \code{total_revolutions}: Total revolutions during sample period. If not recorded, then NA. 
-#'   \item \code{debris_volume}: Volume of debris emptied from trap (gallons). If not recorded, then NA. 
+#'   \item \code{total_revolutions}: Total revolutions during sample period. If not recorded, then NA.
+#'   \item \code{debris_volume}: Volume of debris emptied from trap (gallons). If not recorded, then NA.
 #'   \item \code{discharge}: Flow at trap in cfs
-#'   \item \code{water_velocity}: Velocity at trap in feet per second 
+#'   \item \code{water_velocity}: Velocity at trap in feet per second
 #'   \item \code{water_temp}: Temperature at trap in degrees C
 #'   \item \code{include}: Boolean to describe if sample should be included in data for analysis. If false then data or visit is determined to be of poor quality by data steward and should not be included in analysis. If not recorded, then assumed to be TRUE.
 #'   \item \code{turbidity}: Turbidity at trap in NTUs
 #'   }
-#' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. 
+#' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below.
 #'  \itemize{
 #'   \item \strong{Battle Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1509.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/battle-creek/battle_creek_rst_environmental_qc.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
 #'   \item \strong{Butte Creek}: \href{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1497.1}{Data on EDI}, \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/qc-markdowns/rst/butte-creek/butte-creek-rst-qc-checklist.md}{Original Data Exploration Script}. Additional data exploration scripts are located in GitHub.
@@ -163,22 +138,22 @@
 
 #' @title RST efficiency trial recaptures
 #' @name recaptures
-#' @description Dataset containing recapture for efficiency monitoring  
-#' @format 
+#' @description Dataset containing recapture for efficiency monitoring
+#' @format
 #' \itemize{
-#'   \item \code{date}: date 
-#'   \item \code{stream}: Stream RST is located on  
-#'   \item \code{site}: Site RST is located on   
-#'   \item \code{subsite}: Specific trap site   
+#'   \item \code{date}: date
+#'   \item \code{stream}: Stream RST is located on
+#'   \item \code{site}: Site RST is located on
+#'   \item \code{subsite}: Specific trap site
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
-#'   \item \code{count}: Number of fish caught 
-#'   \item \code{release_id}: The unique identifier for each release trial  
-#'   \item \code{fork_length}: Fork length measure of catch in mm   
-#'   \item \code{dead}: Mortality status of catch   
-#'   \item \code{weight}: Weight of catch in grams   
-#'   \item \code{run}: Run of catch   
-#'   \item \code{life_stage}: Life Stage of catch   
-#'   \item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch 
+#'   \item \code{count}: Number of fish caught
+#'   \item \code{release_id}: The unique identifier for each release trial
+#'   \item \code{fork_length}: Fork length measure of catch in mm
+#'   \item \code{dead}: Mortality status of catch
+#'   \item \code{weight}: Weight of catch in grams
+#'   \item \code{run}: Run of catch
+#'   \item \code{life_stage}: Life Stage of catch
+#'   \item \code{adipose_clipped}: Boolean value describing if adipose is clipped on catch
 #'   }
 #' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. Data is combined \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/mark_recapture_standard_format.Rmd}{here}
 #'  \itemize{
@@ -199,19 +174,19 @@
 
 #' @title RST efficiency trial releases
 #' @name release
-#' @description Dataset containing releases for efficiency monitoring  
-#' @format 
+#' @description Dataset containing releases for efficiency monitoring
+#' @format
 #' \itemize{
-#'   \item \code{date_released}: date 
-#'   \item \code{release_id}: id associated with release trial 
-#'   \item \code{stream}: Stream RST is located on  
-#'   \item \code{site}: Site RST is located on   
-#'   \item \code{subsite}: Specific trap site   
+#'   \item \code{date_released}: date
+#'   \item \code{release_id}: id associated with release trial
+#'   \item \code{stream}: Stream RST is located on
+#'   \item \code{site}: Site RST is located on
+#'   \item \code{subsite}: Specific trap site
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
-#'   \item \code{number_released}: Number of fish released 
-#'   \item \code{run}: Run of released fish   
-#'   \item \code{life_stage}: Life Stage of catch   
-#'   \item \code{origin}: Origin of catch   
+#'   \item \code{number_released}: Number of fish released
+#'   \item \code{run}: Run of released fish
+#'   \item \code{life_stage}: Life Stage of catch
+#'   \item \code{origin}: Origin of catch
 #'   }
 #' @source Raw datasets and original documentation of data processing and QC process can be found for each stream using the links below. Data is combined \href{https://github.com/SRJPE/JPE-datasets/blob/main/data-raw/standard-format-data-prep/mark_recapture_standard_format.Rmd}{here}
 #'  \itemize{
@@ -232,191 +207,269 @@
 
 #' @title Annual adult estimates
 #' @name upstream_passage_estimates
-#' @description Annual adult estimates by data type provided by monitoring programs. 
-#' @format 
+#' @description Annual adult estimates by data type provided by monitoring programs.
+#' @format
 #' \itemize{
 #'   \item \code{year}: year data were collected (calendar year)
-#'   \item \code{stream}: stream data were collected on 
+#'   \item \code{stream}: stream data were collected on
 #'   \item \code{count}: annual estimate
 #'   \item \code{data_type}: type of data (redd, carcass estimate, holding, passage estimate)
 #'   \item \code{lower_bound_estimate}: if confidence intervals are available, value for the lower bound estimate
 #'   \item \code{upper_bound_estimate}: if confidence intervals are available, value for the upper bound estimate
 #'   \item \code{confidence_level}: if confidence intervals are available, level of confidence provided
 #'   }
-#' @source Annual adult estimates were provided by monitoring programs. 
-#' These data are currently being uploaded to EDI. 
+#' @source Annual adult estimates were provided by monitoring programs.
+#' These data are currently being uploaded to EDI.
 'annual_adult'
 
-#' @title Daily Yearling Rulesets 
+#' @title Daily Yearling Rulesets
 #' @name daily_yearling_ruleset
-#' @description Datasets containing the daily yearling rulesets. 
+#' @description Datasets containing the daily yearling rulesets.
 #' See \code{vignette("yearling_ruleset", package = "SRJPEdata")} for more details.
 #' @format Dataframe with 2,565 rows and 4 columns (stream, month, day, cutoff)
 #' \itemize{
-#'   \item \code{stream}: Stream RST is located on   
-#'   \item \code{month}: Month to apply yearling ruleset to 
-#'   \item \code{day}: Day to apply yearling ruleset to  
-#'   \item \code{cutoff}: Fork length cutoff value in mm 
+#'   \item \code{stream}: Stream RST is located on
+#'   \item \code{month}: Month to apply yearling ruleset to
+#'   \item \code{day}: Day to apply yearling ruleset to
+#'   \item \code{cutoff}: Fork length cutoff value in mm
 #'   }
 #' @source Expert opinion. See \code{vignette("yearling_ruleset", package = "SRJPEdata")} for more details.
 'daily_yearling_ruleset'
 
 #' @title Weekly Hours Fished
 #' @name weekly_hours_fished
-#' @description Datasets containing the hours fished for each stream, site, and week. 
+#' @description Datasets containing the hours fished for each stream, site, and week.
 #' See \code{vignette("trap_effort", package = "SRJPEdata")} for more details.
 #' @format Dataframe containing 7 columns (stream, site, subsite, site_group, week, year, hours_fished)
 #' \itemize{
-#'  \item \code{year}: year 
-#'   \item \code{stream}: Stream RST is located on  
-#'   \item \code{site}: Site RST is located on   
+#'  \item \code{year}: year
+#'   \item \code{stream}: Stream RST is located on
+#'   \item \code{site}: Site RST is located on
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
-#'   \item \code{week}: Week 
-#'   \item \code{hours_fished}: Number of hours that a trap was operated in a given week. Capped at 168. 
+#'   \item \code{week}: Week
+#'   \item \code{hours_fished}: Number of hours that a trap was operated in a given week. Capped at 168.
 #'   }
 'weekly_hours_fished'
 
-#' @title Environmental Gage Data
-#' @name environmental_data
-#' @description Environmental gage data for each tributary in the SR JPE. 
-#' Data includes flow and temperature measurements from gages located on tributaries and the Sacramento River mainstem. 
-#' Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type. 
-#' Interpolation was performed to fill in data gaps where temperature data were missing or the time series was incomplete. 
-#' For the Feather River and Yuba River, temperature values were interpolated using regression models based on nearby gages and historical data, allowing for consistent estimation across incomplete records.
-#' The temporal coverage of flow data ranges from 1930 to 2025, and temperature data ranges from 1994 to 2025.
+#' @title Environmental Gage Data - Flow
+#' @name flow_data
+#' @description Flow gage data for each tributary in the SR JPE.
+#' Data includes flow measurements from gages located on tributaries and the Sacramento River mainstem.
+#' Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type.
+#' The temporal coverage of flow data ranges from 1930 to 2025.
 #' @format
 #' \itemize{
-#'   \item \code{year}: Year associated with environmental measure 
-#'   \item \code{week}: Week associated with environmental measure 
-#'   \item \code{statistic}: Summary static used to summarize flow and temperature measures into a single daily reccord (min, mean, max)
-#'   \item \code{value}: Flow or temperature measurements 
-#'   \item \code{stream}: Stream environmental data is collected on  
-#'   \item \code{gage_agency}: Agency providing flow or temperature data, most data pulled from CDEC or USGS
-#'   \item \code{gage_number}: Unique identifier of gage used to query flow and temperature data
-#'   \item \code{parameter}: Parameter measured, includes "flow" and "temperature"
+#'   \item \code{year}: Year associated with environmental measure
+#'   \item \code{week}: Week associated with environmental measure
+#'   \item \code{statistic}: Summary static used to summarize flow measures into a single daily reccord (min, mean, max)
+#'   \item \code{value}: Flow measurements
+#'   \item \code{stream}: Stream environmental data is collected on
+#'   \item \code{gage_agency}: Agency providing flow data, most data pulled from CDEC or USGS
+#'   \item \code{gage_number}: Unique identifier of gage used to query flow data
+#'   \item \code{parameter}: Parameter measured, "flow"
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 #'   }
-#'   #' @details
+#' @details
 #'  Gage Information
-#'   \strong Deer creek
+#'   \strong{Deer creek}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1986 - 2025
 #'   \item USGS - 11383500
 #'   \item CDEC - DCV
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
-#'   \item CDEC - DCV
 #'   }
-#'   }
-#'   \strong Sacramento River 
+#'   \strong{Sacramento River}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1994 - 2025
 #'   \item USGS - 11383500
 #'   \item USGS - 11377100
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1994 - 2023
-#'   \item USGS - 11383500
 #'   }
-#'   }
-#'   \strong Battle Creek 
+#'   \strong{Battle Creek}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1995 - 2025
 #'   \item USGS - 11376550
 #'   \item USFWS - UBC
 #'   }
-#'   \itemize{Temperature gages  - Temporal coverage: 2003 - 2021
-#'   \item USFWS - UBC
 #'   }
-#'   }
-#'   \strong Butte Creek 
+#'   \strong{Butte Creek}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1930 - 2025
 #'   \item USGS - 11376550
 #'   \item USGS - BCK
 #'   }
 #'   }
-#'   \strong Clear Creek 
+#'   \strong{Clear Creek}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1995 - 2025
 #'   \item USFWS - UCC
 #'   \item USGS - 11372000
 #'   \item USFWS - LCC
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 2001 - 2021
-#'   \item USFWS - UCC
-#'   \item USFWS - LCC
 #'   }
-#'   }
-#'   \strong Mill Creek  
+#'   \strong{Mill Creek}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1995 - 2025
 #'   \item USGS - 11381500
 #'   \item CDEC - MLM
 #'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
-#'   \item CDEC - MLM
 #'   }
-#'   }
-#'   \strong Feather River 
+#'   \strong{Feather River}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1969 - 2025
 #'   \item USGS - 11407000
-#'   \item CDEC - TFB 
+#'   \item CDEC - TFB
 #'   \item CDEC - GRL
-#'   \item CDEC - FSB  
+#'   \item CDEC - FSB
 #'   \item CDEC - FRA
-#'   \item interpolated 
-#'   }
-#'   \itemize{Temperature gages - Temporal coverage: 1999 - 2025
-#'   \item CDEC - GRL
-#'   \item CDEC - FRA 
-#'   \item interpolated 
+#'   \item interpolated
 #'   }
 #'   }
-#'   \strong Yuba River 
+#'   \strong{Yuba River}
 #'   \itemize{
 #'   \itemize{Flow gages - Temporal coverage: 1999 - 2025
 #'   \item USGS - 11421000
 #'   \item CDEC - YR7
-#'   \item interpolated 
+#'   \item interpolated
 #'   }
+#'   }
+#' @source USGS/CDEC/FWS. See `data-raw/pull_data_scripts/pull_flow_data.R` for more details.
+'flow_data'
+
+
+#' @title Environmental Gage Data - Temperature
+#' @name temperature_data
+#' @description Temperature gage data for each tributary in the SR JPE.
+#' Data includes temperature measurements from gages located on tributaries and the Sacramento River mainstem.
+#' Data were compiled from CDEC, USGS, and USFWS sources and are summarized by week and statistic type.
+#' Interpolation was performed to fill in data gaps where temperature data were missing or the time series was incomplete.
+#' For the Feather River and Yuba River, temperature values were interpolated using regression models based on nearby gages and historical data, allowing for consistent estimation across incomplete records.
+#' The temporal coverage of temperature data ranges from 1994 to 2025.
+#' @format
+#' \itemize{
+#'   \item \code{year}: Year associated with environmental measure
+#'   \item \code{week}: Week associated with environmental measure
+#'   \item \code{statistic}: Summary static used to summarize temperature measures into a single daily reccord (min, mean, max)
+#'   \item \code{value}: Temperature measurements
+#'   \item \code{stream}: Stream environmental data is collected on
+#'   \item \code{gage_agency}: Agency providing temperature data, most data pulled from CDEC or USGS
+#'   \item \code{gage_number}: Unique identifier of gage used to query temperature data
+#'   \item \code{parameter}: Parameter measured, "temperature"
+#'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+#'   }
+#' @details
+#'  Gage Information
+#'   \strong{Deer creek}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
+#'   \item CDEC - DCV
+#'   }
+#'   }
+#'   \strong{Sacramento River}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1994 - 2023
+#'   \item USGS - 11383500
+#'   }
+#'   }
+#'   \strong{Battle Creek}
+#'   \itemize{
+#'   \itemize{Temperature gages  - Temporal coverage: 2003 - 2021
+#'   \item USFWS - UBC
+#'   }
+#'   }
+#'   \strong{Clear Creek}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 2001 - 2021
+#'   \item USFWS - UCC
+#'   \item USFWS - LCC
+#'   }
+#'   }
+#'   \strong{Mill Creek}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
+#'   \item CDEC - MLM
+#'   }
+#'   }
+#'   \strong{Feather River}
+#'   \itemize{
+#'   \itemize{Temperature gages - Temporal coverage: 1999 - 2025
+#'   \item CDEC - GRL
+#'   \item CDEC - FRA
+#'   \item interpolated
+#'   }
+#'   }
+#'   \strong{Yuba River}
+#'   \itemize{
 #'   \itemize{Temperature gages - Temporal coverage: 1998 - 2025
 #'   \item CDEC - YR7
-#'   \item interpolated 
+#'   \item interpolated
 #'   }
 #'   }
-#' @source USGS/CDEC/FWS. See `data-raw/pull_environmental_data.R` for more details.
-'environmental_data'
+#' @source USGS/CDEC/FWS. See `data-raw/pull_data_scripts/pull_temperature_data.R` for more details.
+'temperature_data'
 
 #' @title Survival Model Data
 #' @name survival_model_inputs
-#' @description Acoustic tagging data used to model survival for the SR JPE 
+#' @description Acoustic tagging data used to model survival for the SR JPE
 #' @format
 #' \itemize{
-#'   \item \code{fish_id}: Unique identifier associated with each released fish 
-#'   \item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected 
-#'   \item \code{study_id}: Unique identifier associated with each release group 
-#'   \item \code{fish_length}: Fork length of fish in mm 
-#'   \item \code{fish_weight}: Weight of fish in grams 
-#'   \item \code{fish_type}: Type of fish used in release trial, typically indicated where that fish came from and species of fish 
-#'   \item \code{fish_release_date}: Date of release 
-#'   \item \code{release_location}: Location of release 
-#'   \item \code{year}: Year of release 
+#'   \item \code{fish_id}: Unique identifier associated with each released fish
+#'   \item \code{ch}: Capture history of each fish describing detection at receiver location, 0 indicated not detected, 1 indicates detected
+#'   \item \code{study_id}: Unique identifier associated with each release group
+#'   \item \code{fish_length}: Fork length of fish in mm
+#'   \item \code{fish_weight}: Weight of fish in grams
+#'   \item \code{fish_type}: Type of fish used in release trial, typically indicated where that fish came from and species of fish
+#'   \item \code{fish_release_date}: Date of release
+#'   \item \code{release_location}: Location of release
+#'   \item \code{year}: Year of release
 #'   }
-#'   @source Central Valley Enhanced Acoustic Tagging Project. 
+#'   @source Central Valley Enhanced Acoustic Tagging Project.
 #'   This data package queries tagging data from many studies using the ERDDAP data server.
 #'   See `data-raw/pull_acoustic_tagging_data.R` for more details.
 'survival_model_inputs'
 
-#' @title Site Lookup
-#' @name site_lookup
-#' @description Site lookup table for linking subsite, sites, site_groups, and streams in the SR JPE 
+#' @title Travel Time Model Data - Sacramento
+#' @name detection_history_sacramento
+#' @description Acoustic tagging data used to model travel time as part of the survival model for the SR JPE
 #' @format
 #' \itemize{
-#'   \item \code{stream}: Stream RST is located on  
-#'   \item \code{site}: Site RST is located on   
-#'   \item \code{subsite}: Specific trap site   
+#'   \item \code{fish_id}: Unique identifier associated with each released fish
+#'   \item \code{TTfR1}: Time in days from detection at the release point to Woodson Bridge.
+#'   \item \code{TTfR2}: Time in days from detection at the release point to Butte Bridge.
+#'   \item \code{TTfR3}: Time in days from detection at the release point to the Sacramento River.
+#'   \item \code{TTfR4}: Time in days from detection at the release point to the Endpoint.
+#'   \item \code{stream}: Stream associated with the study IDs, here is `sacramento`.
+#'   }
+#'   @source Central Valley Enhanced Acoustic Tagging Project.
+#'   This data package queries tagging data from many studies using the ERDDAP data server.
+#'   See `data-raw/pull_acoustic_tagging_data.R` and `data-raw/create_detection_history.R` for more details.
+'detection_history_sacramento'
+
+#' @title Travel Time Model Data - Feather River and Butte Creek
+#' @name detection_history_feather_butte
+#' @description Acoustic tagging data used to model travel time as part of the survival model for the SR JPE
+#' @format
+#' \itemize{
+#'   \item \code{fish_id}: Unique identifier associated with each released fish
+#'   \item \code{TTfR1}: Time in days from detection at the release point to the Sacramento River.
+#'   \item \code{TTfR2}: Time in days from detection at the release point to the Endpoint.
+#'   \item \code{stream}: Stream associated with the study IDs, either `feather` or `butte`.
+#'   }
+#'   @source Central Valley Enhanced Acoustic Tagging Project.
+#'   This data package queries tagging data from many studies using the ERDDAP data server.
+#'   See `data-raw/pull_acoustic_tagging_data.R` and `data-raw/create_detection_history.R` for more details.
+'detection_history_feather_butte'
+
+#' @title Site Lookup
+#' @name site_lookup
+#' @description Site lookup table for linking subsite, sites, site_groups, and streams in the SR JPE
+#' @format
+#' \itemize{
+#'   \item \code{stream}: Stream RST is located on
+#'   \item \code{site}: Site RST is located on
+#'   \item \code{subsite}: Specific trap site
 #'   \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
+#'   }
 'site_lookup'
 
 #' @title Feather Hatchery Release
@@ -426,7 +479,7 @@
 #' \itemize{
 #'   \item \code{release_location_name}: Name of the location where fish were released ("FEATHER AT GRIDLEY", "FEATHER AT LIVE OAK", "FEATHER AT YUBA CITY", "FEATHER BEL THRM HI FLOW", "FEATHER BOYDS PUMP RAMP", "FEATHER R HATCHERY")
 #'   \item \code{avg_weight}: Average weight of fish released
-#'   \item \code{avg_length}: Average length of fish released  
+#'   \item \code{avg_length}: Average length of fish released
 #'   \item \code{species}: Species of fish released ("chinook salmon")
 #'   \item \code{run}: Run of fish released ("fall", "late fall", "spring", "winter")
 #'   \item \code{first_release_data}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
@@ -446,11 +499,12 @@
 #'   \item \code{year}: Water year (Oct-Sep) of first release date used to join environmental covariates
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+#'   }
 'feather_hatchery_release'
 
 #' @title Hatchery Release
 #' @name hatchery_release
-#' @description This table summarizes coded wire tag (CWT) data from release location to RST site of recapture (knights landing) by release group. Data source: Regional Mark Processing Center: https://www.rmpc.org/ 
+#' @description This table summarizes coded wire tag (CWT) data from release location to RST site of recapture (knights landing) by release group. Data source: Regional Mark Processing Center: https://www.rmpc.org/
 #' @format
 #' \itemize{
 #'   \item \code{release_location_name}: Name of the location where fish were released (COLEMAN NFH, BATTLE CREEK BELOW CNFH, BATTLE CREEK NFK WILDCAT, BALDWIN CONST. YARD, SAC R LAKE REDDING PARK, SAC R BEL RBDD, SAC R RED BLUFF DIV DAM, SAC R COLUSA TO RBDD, SAC R BONNYVIEW BOAT RAMP, SAC R AT BUTTE CITY)
@@ -458,7 +512,7 @@
 #'   \item \code{species}: Species of fish released ("chinook salmon")
 #'   \item \code{run}: Run of fish released ("fall", "late fall", "spring", "winter")
 #'   \item \code{avg_weight}: Average weight of fish released
-#'   \item \code{avg_length}: Average length of fish released  
+#'   \item \code{avg_length}: Average length of fish released
 #'   \item \code{first_release_date}: First date of release. Typically first and last release date are the same though some releases happen over days/weeks
 #'   \item \code{last_release_date}: Last date of release
 #'   \item \code{date_span}: Number of days between the first and last release date
@@ -477,6 +531,7 @@
 #'   \item \code{stream}: Stream of release location (relevant to SR JPE streams, some may be NA) used for joining the covariates
 #'   \item \code{exceedance_flow_year_type}: Exceedance year type. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
 #'   \item \code{monthly_max_flow}: Monthly max flow. This covariate is available in forecast_covariates (https://srjpe.github.io/SRJPEdata/articles/forecast_covariates.html)
+#'   }
 'hatchery_release'
 
 #' @title Escapement estimates all runs
@@ -484,15 +539,16 @@
 #' @description This table makes escapement data from GrandTab (https://wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Anadromous-Assessment) available for use. Currently only fall run are included.
 #' @format
 #' \itemize{
-#'   \item \code{run_year}: Year that salmon returned to the tributary. 
+#'   \item \code{run_year}: Year that salmon returned to the tributary.
 #'   \item \code{stream}: Stream that salmon returned to. This has been filtered to SR JPE tributaries. See GrandTab for a full list of locations.
 #'   \item \code{estimates}: Escapement estimate. Note that these values are generated through a variety of methods.
 #'   \item \code{run}: Run of Chinook salmon. Currently only fall are included. See `annual_adult` for the best spring run estimates
 #'   \item \code{species}: Chinook salmon
 #'   \item \code{data_type}: Escapement estimates from GrandTab.
+#'   }
 'escapement_estimates_all_runs'
 
-#' @title RST Recaptures 
+#' @title RST Recaptures
 #' @name rst_cwt_recaptures
 #' @description Table of recaptures from Knights Landing RST
 #' @format
@@ -508,9 +564,10 @@
 #'   \item \code{run_year}: Run year of recapture (where week >= 45 are year + 1)
 #'   \item \code{week_index}: Week index (aligns with btspasx model where week for is week 1, etc.)
 #'   \item \code{release_group_id}: Id variable created to group releases that have the same characteristics together. This can be used to join with the hatchery_release table.
+#'   }
 'rst_cwt_recaptures'
 
-#' @title Forecast covariates 
+#' @title Forecast covariates
 #' @name forecast_covariates
 #' @description Table of potential forecast covariates
 #' @format
@@ -518,66 +575,172 @@
 #'   \item \code{name}: Name of the covariate
 #'   \item \code{year}: Calendar year. Not all variables are summarized by calendar year and may be NA.
 #'   \item \code{water_year}: Water year. Not all variables are summarized by water year and may be NA.
-#'   \item \code{stream}: Stream 
+#'   \item \code{stream}: Stream
 #'   \item \code{value}: Numeric covariate value
 #'   \item \code{month}: Month. Not all variables are available at the monthly level.
 #'   \item \code{text_value}: Text value for categorical variables.
 #'   \item \code{site_group}: Site group that the value applies to. Only used for the "monthly_max_flow" parameter. For some streams there are multiple gages and this variable is used to differentiate.
+#'   }
 'forecast_covariates'
 
-#' @title Stock recruit covariates 
+#' @title Stock recruit covariates
 #' @name stock_recruit_covariates
 #' @description Table of covariates used in stock recruit modeling
 #' @format
 #' \itemize{
-#'   \item \code{year}: Calendar year. 
-#'   \item \code{stream}: Stream 
+#'   \item \code{year}: Calendar year.
+#'   \item \code{stream}: Stream
 #'   \item \code{lifestage}: Lifestage that the covariate applies to
 #'   \item \code{covariate_type}: Describes the type of covariate (temperature or flow)
-#'   \item \code{covariate_structure}: Describes the structure of the covariate. 
+#'   \item \code{covariate_structure}: Describes the structure of the covariate.
 #'   \item \code{value}: Numeric value
+#'   }
 'stock_recruit_covariates'
 
-#' @title Years to exclude - Adult 
+#' @title Adult Modeling Years
 #' @name years_to_exclude_adult
-#' @description Years for adult data that were identified as incomplete and not used in modeling
+#' @description Dataframe to compile all years, streams, & sites of adult data and indicate if a year should be used for modeling.
 #' @format
 #' \itemize{
 #'   \item \code{year}: Calendar year
-#'   \item \code{stream}: Stream 
+#'   \item \code{stream}: Stream
 #'   \item \code{data_type}: Type of adult data
 #'   \item \code{reason_for_exclusion}: Provides reason for exclusion
-'years_to_exclude_adult'
+#'   \item \code{exclude}: Boolean value to describe if a year should be excluded or not
+#'   }
+'adult_model_years'
 
-#' @title Years to exclude - RST data 
-#' @name years_to_exclude_rst_data
-#' @description Years for RST data that were identified as incomplete and not used in modeling
+#' @title RST Modeling Years
+#' @name rst_model_years
+#' @description Dataframe to compile all years, streams, & sites of RST data and indicate if a year should be used for modeling.
 #' @format
 #' \itemize{
-#'   \item \code{stream}: Stream 
+#'   \item \code{stream}: Stream
 #'   \item \code{site}: RST monitoring site
 #'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
 #'   \item \code{number_weeks}: Number of weeks sampled in the run_year, for reference
 #'   \item \code{exclusion_type}: Provides the exclusion ruleset applied
 #'   \item \code{apply_to}: Differentiates between years that can be excluded broadly ("all runs") or those specific to spring run ("spring")
-'years_to_exclude_rst_data'
+#'   \item \code{exclude}: Boolean value to describe if a year should be excluded or not
+#'   }
+'rst_model_years'
 
-#' @title Years to include - RST data, applies to all runs
-#' @name years_to_include_rst_data
-#' @description Years for RST data that can be included in modeling (inverse of years to exclude where apply_to == "all runs")
-#' @format
-#' \itemize{
-#'   \item \code{stream}: Stream 
-#'   \item \code{site}: RST monitoring site
-#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
-'years_to_include_rst_data'
+#' Completed Genetic Samples
+#'
+#' Results of rapid genetic identification of outmigrating juvenile Chinook
+#' salmon (*Oncorhynchus tshawytscha*) collected at RST sites
+#' across the Sacramento River Basin (water years 2022–2026). Run assignments
+#' are derived from SHERLOCK and GT-seq analyses, with associated capture metadata and length-at-date
+#' (LAD)-based field assignments.
+#'
+#' @format A data frame with 7,477 rows and 24 variables:
+#' \describe{
+#'   \item{sample_id}{character. Unique identifier of the sample processed.
+#'     Composed of location code, season, sample event, sample bin (size class),
+#'     and sample number separated by an underscore.}
+#'
+#'   \item{datetime_collected}{POSIXct. Date and time of sample collection
+#'     (format: \code{YYYY-MM-DD hh:mm:ss}). Range: 2022-01-10 to 2025-05-11.}
+#'
+#'   \item{fork_length_mm}{numeric. Fork length of the sampled fish, in
+#'     millimeters. Range: 23–176.}
+#'
+#'   \item{field_run_type}{character. Run type assigned in the field using
+#'     length-at-date (LAD) criteria. One of: \code{FALL}, \code{LATEFALL},
+#'     \code{SPRING}, \code{WINTER}, \code{UNKNOWN}, \code{NA}.}
+#'
+#'   \item{final_run_designation}{character. Final run type assigned via
+#'     combined SHERLOCK and GT-seq analysis. One of: \code{FALL OR LATE FALL},
+#'     \code{SPRING}, \code{GREB1L HETEROZYGOTE}, \code{WINTER}.}
+#'
+#'   \item{shlk_chr28_genotype}{character. SHERLOCK genotype result at the
+#'     \emph{Greb1L} locus on chromosome 28 (OTS28), indicating early- vs.
+#'     late-migration timing. One of: \code{EARLY}, \code{LATE},
+#'     \code{HETEROZYGOTE}, \code{NA}.}
+#'
+#'   \item{shlk_chr16_genotype}{character. SHERLOCK genotype result at the
+#'     OTS16 locus on chromosome 16, used to differentiate spring-run and
+#'     winter-run individuals among early-migrating fish. One of: \code{SPRING},
+#'     \code{WINTER}, \code{INDETERMINATE}, \code{NA}.}
+#'
+#'   \item{shlk_run_designation}{character. Run designation derived from
+#'     SHERLOCK genetic assay results and decision logic. One of:
+#'     \code{SPRING}, \code{EARLY/LATE HETEROZYGOUS}, \code{SPRING/WINTER},
+#'     \code{FALL/LATEFALL}, \code{WINTER}, \code{NA}.}
+#'
+#'   \item{gtseq_chr28_geno}{character. GT-seq genotype at the \emph{Greb1L}
+#'     locus on chromosome 28, indicating early- vs. late-migration timing.
+#'     One of: \code{EARLY}, \code{LATE}, \code{HETEROZYGOTE}, \code{NA}.}
+#'
+#'   \item{pop_structure_id}{character. Central Valley salmonid population
+#'     structure assignment from GT-seq (RUBIAS). One of: \code{FALL},
+#'     \code{LATEFALL}, \code{SPRING}, \code{WINTER}, \code{NA}.}
+#'
+#'   \item{cv_fall}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_late_fall}{numeric. Summed posterior assignment probability
+#'     (PofZ) to the Central Valley Late Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_spring}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{cv_winter}{numeric. Summed posterior assignment probability (PofZ)
+#'     to the Central Valley (Sacramento River) Winter reporting unit.
+#'     Range: 0–1.}
+#'
+#'   \item{tributary}{character. Spring-run tributary assignment from RUBIAS.
+#'     One of: \code{ButteSp}, \code{Feather River Lineage Spring},
+#'     \code{MillDeerSp}, \code{NA}.}
+#'
+#'   \item{buttefall}{numeric. Posterior assignment probability (PofZ) to the
+#'     Butte River Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{frh_fall}{numeric. Posterior assignment probability (PofZ) to the
+#'     Feather River Hatchery Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{frh_sp}{numeric. Posterior assignment probability (PofZ) to the
+#'     Feather River Hatchery Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{mill_deer_fall}{numeric. Posterior assignment probability (PofZ)
+#'     to the Mill/Deer Fall reporting unit. Range: 0–0.999.}
+#'
+#'   \item{san_joaquin_fall}{numeric. Posterior assignment probability (PofZ)
+#'     to the San Joaquin Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{butte_sp}{numeric. Posterior assignment probability (PofZ) to the
+#'     Butte River Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{mill_deer_sp}{numeric. Posterior assignment probability (PofZ) to
+#'     the Mill/Deer Spring reporting unit. Range: 0–1.}
+#'
+#'   \item{coleman_f}{numeric. Posterior assignment probability (PofZ) to the
+#'     Coleman Hatchery Fall reporting unit. Range: 0–1.}
+#'
+#'   \item{sac_win}{numeric. Posterior assignment probability (PofZ) to the
+#'     Sacramento River Winter reporting unit. Range: 0–1.}
+#' }
+#'
+#'
+#' @source
+#' California Department of Water Resources (DWR) and partners. EDI Data
+#' Package \code{edi.2335.1}.
+#' \url{https://portal.edirepository.org/nis/mapbrowse?packageid=edi.2335.1}
+#'
+#'
+'completed_genetic_samples'
 
-#' @title Years to include - RST data, applies to spring run
-#' @name years_to_include_rst_data_spring
-#' @description Years for RST data that can be included in modeling spring run (inverse of years to exclude where apply_to == "spring")
-#' @format
+#' @title River Kilometer Lookup 
+#' @name river_km_lookup
+#' @description River km distance from RST sites to detection points. 
+#' @format A tibble with 29 rows and 7 columns
 #' \itemize{
-#'   \item \code{stream}: Stream 
-#'   \item \code{site}: RST monitoring site
-#'   \item \code{run_year}: Run year (week >= 45 is included in the following calendar year; e.g. Dec 1995 would be included in run_year 1996)
-'years_to_include_rst_data_spring'
+#'   \item \code{stream}: rst stream
+#'   \item \code{site}: rst site
+#'   \item \code{site_latitude}: Latitude of RST site
+#'   \item \code{site_longitude}: Longitude of RST site
+#'   \item \code{group}: Flow standardized across years and sites
+#'   \item \code{distance_to}: Log-transformed flow standardized across years within sites
+#'   \item \code{rkm_distance}: Weekly mean gage flow in cubic feet per second (cfs)
+#' @source Prepared using GIS based on coordinates of each site.
+'river_km_lookup'

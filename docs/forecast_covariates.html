@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -38,22 +38,16 @@
       <a href="articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -188,28 +182,31 @@
 </div>
 <div class="section level2">
 <h2 id="combine-and-save-data">Combine and save data<a class="anchor" aria-label="anchor" href="#combine-and-save-data"></a></h2>
-<pre><code><span><span class="co">#&gt; Rows: 6,130</span></span>
-<span><span class="co">#&gt; Columns: 7</span></span>
-<span><span class="co">#&gt; $ name       &lt;chr&gt; "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_min_flow", "si_…</span></span>
-<span><span class="co">#&gt; $ year       &lt;dbl&gt; 1930, 1931, 1932, 1933, 1934, 1935, 1936, 1937, 1938, 1939, 1940, 1941, 1942, 1…</span></span>
-<span><span class="co">#&gt; $ water_year &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
-<span><span class="co">#&gt; $ stream     &lt;chr&gt; "butte creek", "butte creek", "butte creek", "butte creek", "butte creek", "but…</span></span>
-<span><span class="co">#&gt; $ value      &lt;dbl&gt; 81, 44, 70, 63, 64, 62, 80, 84, 102, 60, 101, 124, 113, 90, 87, 96, 76, 66, 100…</span></span>
-<span><span class="co">#&gt; $ month      &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span>
-<span><span class="co">#&gt; $ text_value &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,…</span></span></code></pre>
-<table class="table"><thead><tr><th align="left">name</th>
+<pre><code><span><span class="co">#&gt; Rows: 6,924</span></span>
+<span><span class="co">#&gt; Columns: 8</span></span>
+<span><span class="co">#&gt; $ name       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "si_min_flow"<span style="color: #949494;">, </span>"si_min_flow"<span style="color: #949494;">, </span>"si_min_flow"<span style="color: #949494;">, </span>"si_min_flo…</span></span>
+<span><span class="co">#&gt; $ year       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1930<span style="color: #949494;">, </span>1931<span style="color: #949494;">, </span>1932<span style="color: #949494;">, </span>1933<span style="color: #949494;">, </span>1934<span style="color: #949494;">, </span>1935<span style="color: #949494;">, </span>1936<span style="color: #949494;">, </span>1937<span style="color: #949494;">, </span>1938<span style="color: #949494;">, </span>19…</span></span>
+<span><span class="co">#&gt; $ water_year <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ stream     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "butte creek"<span style="color: #949494;">, </span>"butte creek"<span style="color: #949494;">, </span>"butte creek"<span style="color: #949494;">, </span>"butte cree…</span></span>
+<span><span class="co">#&gt; $ value      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 81<span style="color: #949494;">, </span>44<span style="color: #949494;">, </span>70<span style="color: #949494;">, </span>63<span style="color: #949494;">, </span>64<span style="color: #949494;">, </span>62<span style="color: #949494;">, </span>80<span style="color: #949494;">, </span>84<span style="color: #949494;">, </span>102<span style="color: #949494;">, </span>60<span style="color: #949494;">, </span>101<span style="color: #949494;">, </span>124<span style="color: #949494;">, </span>113<span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ month      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ text_value <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span>…</span></span>
+<span><span class="co">#&gt; $ site_group <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span><span style="color: #BB0000;">NA</span><span style="color: #949494;">, </span>…</span></span></code></pre>
+<table style="width:100%;" class="table"><colgroup><col width="16%"><col width="6%"><col width="14%"><col width="16%"><col width="8%"><col width="8%"><col width="14%"><col width="14%"></colgroup><thead><tr><th align="left">name</th>
 <th align="right">year</th>
 <th align="right">water_year</th>
 <th align="left">stream</th>
 <th align="right">value</th>
 <th align="right">month</th>
 <th align="left">text_value</th>
+<th align="left">site_group</th>
 </tr></thead><tbody><tr><td align="left">si_min_flow</td>
 <td align="right">1930</td>
 <td align="right">NA</td>
 <td align="left">butte creek</td>
 <td align="right">81</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1931</td>
@@ -218,12 +215,14 @@
 <td align="right">44</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1932</td>
 <td align="right">NA</td>
 <td align="left">butte creek</td>
 <td align="right">70</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1933</td>
@@ -232,12 +231,14 @@
 <td align="right">63</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1934</td>
 <td align="right">NA</td>
 <td align="left">butte creek</td>
 <td align="right">64</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1935</td>
@@ -246,12 +247,14 @@
 <td align="right">62</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1936</td>
 <td align="right">NA</td>
 <td align="left">butte creek</td>
 <td align="right">80</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1937</td>
@@ -260,6 +263,7 @@
 <td align="right">84</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1938</td>
 <td align="right">NA</td>
@@ -267,12 +271,14 @@
 <td align="right">102</td>
 <td align="right">NA</td>
 <td align="left">NA</td>
+<td align="left">NA</td>
 </tr><tr><td align="left">si_min_flow</td>
 <td align="right">1939</td>
 <td align="right">NA</td>
 <td align="left">butte creek</td>
 <td align="right">60</td>
 <td align="right">NA</td>
+<td align="left">NA</td>
 <td align="left">NA</td>
 </tr></tbody></table></div>
 
