@@ -11,9 +11,9 @@ test_that("years_to_include_rst_data includes all streams", {
 test_that("years_to_include_rst_data includes all sites", {
   current_coverage <- rst_model_years |> filter(exclude == F) |> pull(site) |> unique() |> sort()
   # TODO confirm that we do not want adams dam in there at all
-  expected_coverage <- c("deer creek", "eye riffle", "gateway riffle", 
+  expected_coverage <- c("butte creek","deer creek", "eye riffle", "gateway riffle", 
                          "hallwood", "herringer riffle", "knights landing",  
-                         "lcc", "live oak", "mill creek", "okie dam",
+                         "lcc", "live oak", "mill creek", 
                         "steep riffle", "sunset pumps", 
                          "tisdale", "ubc", "ucc")
   expect_equal(current_coverage, expected_coverage)
