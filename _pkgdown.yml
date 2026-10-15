@@ -28,7 +28,7 @@ reference:
   - forecast_covariates
 - subtitle: Survival and Travel Time Datasets
   desc: Data used as inputs to survival model
-- contents: 
+- contents:
   - survival_model_inputs
   - detection_history_feather_butte
   - detection_history_sacramento
@@ -36,9 +36,9 @@ reference:
   desc: Data used as inputs to PLAD model
 - contents: completed_genetic_samples
 - title: Monitoring Data
-  desc: Salmonid and environmental datasets used to generate model datasets. 
+  desc: Salmonid and environmental datasets used to generate model datasets.
 - subtitle: RST Datasets
-  desc: RST monitoring datasets compiled accross streams. 
+  desc: RST monitoring datasets compiled across streams.
 - contents:
   - site_lookup
   - rst_catch
@@ -54,13 +54,13 @@ reference:
   - feather_hatchery_release
 - subtitle: Adult Datasets
   desc: Adult passage and survey monitoring datasets
-- contents: 
+- contents:
   - annual_adult
   - escapement_estimates_all_runs
 - subtitle: Environmental Datasets
-  desc: Environmental gage data provided by stream teams or pulled from USGS/CDEC and used as covatiates
+  desc: Environmental gage data provided by stream teams or pulled from USGS/CDEC and used as covariates
     to models
-- contents: 
+- contents:
   - flow_data
   - temperature_data
 - subtitle: Modeling Ruleset Datasets
@@ -100,7 +100,7 @@ navbar:
     href: reference/index.html
   - text: Articles
     menu:
-    - text: 'Summary of Data for Modeling '
+    - text: 'Summary of Data for Modeling'
       href: articles/summary_of_data_for_modeling.html
     - text: Yearling Ruleset
       href: articles/yearling_ruleset.html
