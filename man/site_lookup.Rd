@@ -11,6 +11,7 @@
 \item \code{subsite}: Specific trap site
 \item \code{site_group}: Site group, used to separate traps within the same stream that have unique environmental conditions.
 }
+}
 \usage{
 site_lookup
 }

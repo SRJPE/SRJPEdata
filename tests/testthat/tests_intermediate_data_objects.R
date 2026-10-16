@@ -1,7 +1,7 @@
 # The goal of this script is to test intermediate data objects like `chosen_site_years_to_model`
 # Test that `chosen_site_years_to_model` includes all streams
 test_that("years_to_include_rst_data includes all streams", {
-  current_coverage <- years_to_include_rst_data$stream |> unique() |> sort()
+  current_coverage <- rst_model_years |> filter(exclude == F) |> pull(stream) |> unique() |> sort()
   expected_coverage <- c("battle creek", "butte creek", "clear creek", "deer creek", 
                          "feather river", "mill creek", "sacramento river", "yuba river")
   expect_equal(current_coverage, expected_coverage)
@@ -9,11 +9,11 @@ test_that("years_to_include_rst_data includes all streams", {
 # Test that `chosen_site_years_to_model` includes all sites
 
 test_that("years_to_include_rst_data includes all sites", {
-  current_coverage <- years_to_include_rst_data$site |> unique() |> sort()
+  current_coverage <- rst_model_years |> filter(exclude == F) |> pull(site) |> unique() |> sort()
   # TODO confirm that we do not want adams dam in there at all
-  expected_coverage <- c("deer creek", "eye riffle", "gateway riffle", 
+  expected_coverage <- c("butte creek","deer creek", "eye riffle", "gateway riffle", 
                          "hallwood", "herringer riffle", "knights landing",  
-                         "lcc", "live oak", "mill creek", "okie dam",
+                         "lcc", "live oak", "mill creek", 
                         "steep riffle", "sunset pumps", 
                          "tisdale", "ubc", "ucc")
   expect_equal(current_coverage, expected_coverage)

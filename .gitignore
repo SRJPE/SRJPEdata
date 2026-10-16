@@ -23,3 +23,4 @@ config.yml
 *.md
 !db-edi-data-checks.html
 docs
+figure

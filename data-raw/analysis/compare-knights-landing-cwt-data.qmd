@@ -1,0 +1,499 @@
+---
+title: "Untitled"
+format: html
+---
+
+## Compare Knights Landing Efficiency Trials with SRJPEdata
+
+Brett sent Knights Landing CWT data via e-mail on September 25, 2026. It was originally sent to Brett by Corey Fernandez (CDFW) on August 11, 2025. The purpose of this comparison is to see whether these data have any additional or conflicting information with CWT data already in `SRJPEdata` objects including `hatchery_release`, `rst_cwt_recaptures`, and `feather_hatchery_release`.
+
+Context come from the e-mail:
+
+*"We have 1999-2024 entered in an excel sheet for Knights Landing, we are not caught up on extracting most recent CWT samples from this past season (24-25). I’m still looking around for 2021-2022 season CWT digital/hard copy data. 2021-2024 CWT’s do not have a hatchery release associated with it, I am currently working on getting that updated, as well as getting CWT’s extracted from 24-25 season."*
+
+```{r, setup, echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(readxl)
+library(SRJPEdata)
+library(here)
+
+compare <- read_xlsx(here("data-raw", "analysis", "KL CWT Data 1999-2024 UPDATED .xlsx"),
+sheet = "1qry_CS_KL_CWT") |> 
+    janitor::clean_names()
+
+glimpse(compare)
+```
+
+## QA/QC
+
+### Columns
+
+#### coll_year
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+range(compare$coll_year)
+```
+
+#### archive_id
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare$archive_id)[1:20]
+```
+
+### date
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# function to parse mixed formats cleanly
+parse_excel_dates <- function(x) {
+  # If it's a numeric Excel serial date, convert using origin
+  num_dates <- suppressWarnings(as.numeric(x))
+  parsed_num <- as_date(num_dates, origin = "1899-12-30")
+  
+  # If it's a character date string, parse with lubridate
+  parsed_str <- parse_date_time(x, orders = c("mdy", "ymd", "dmy", "Ymd"))
+  
+  # Combine results (prefer string parse if numeric failed)
+  coalesce(parsed_num, as_date(parsed_str))
+}
+
+compare_clean <- compare |> 
+  mutate(date = parse_excel_dates(date))
+
+compare_clean |> 
+    mutate(year = as.factor(year(date))) |> 
+    ggplot(aes(x = year)) + 
+    geom_col(stat = "count") +
+    theme_minimal() +
+    labs(x = "Year", y = "Count of CWT recaptured") +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+
+summary(compare_clean$date)
+
+cat("Does year of date column match coll_year column?")
+
+compare_clean |> 
+    mutate(year = year(date), 
+match = ifelse(coll_year == year, TRUE, FALSE)) |> 
+    select(year, date, coll_year, match) |> 
+    filter(!match)
+
+cat(paste0(round(2 / nrow(compare_clean), 4) * 100), "% do not match")
+
+```
+
+### spp_name (now species)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$spp_name)
+compare_clean <- compare_clean |> 
+    mutate(species = str_to_lower(spp_name)) |> 
+    select(-spp_name)
+
+compare_clean |> 
+    group_by(species) |> 
+    tally()
+
+compare_clean |> 
+    mutate(year = as.factor(year(date))) |> 
+    ggplot(aes(x = year, fill = species)) + 
+    geom_col(stat = "count") +
+    theme_minimal() +
+    labs(x = "Year", y = "Count of CWT recaptured") +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+### meth_name (now method)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$meth_name)
+compare_clean <- compare_clean |> 
+    mutate(method = ifelse(meth_name == "Rotary Screw Trap", "RST", str_to_lower(meth_name))) |> 
+    select(-meth_name)
+
+compare_clean |> 
+    group_by(method) |> 
+    tally()
+
+compare_clean |> 
+    mutate(year = as.factor(year(date))) |> 
+    ggplot(aes(x = year, fill = method)) + 
+    geom_col(stat = "count") +
+    theme_minimal() +
+    labs(x = "Year", y = "Count of CWT recaptured") +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+### loc_descr (now site)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$loc_descr)
+compare_clean <- compare_clean |> 
+    mutate(site = ifelse(loc_descr == "KNIGHTS LANDING", "knights landing", loc_descr)) |> 
+    select(-loc_descr)
+
+compare_clean |> 
+    group_by(site) |> 
+    tally()
+
+compare_clean |> 
+    mutate(year = as.factor(year(date))) |> 
+    ggplot(aes(x = year, fill = site)) + 
+    geom_col(stat = "count") +
+    theme_minimal() +
+    labs(x = "Year", y = "Count of CWT recaptured") +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+### geo_unit
+
+Not sure what this column means.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$geo_unit)
+
+compare_clean |> 
+    group_by(geo_unit) |> 
+    tally()
+
+compare_clean |> 
+    group_by(coll_year, geo_unit) |> 
+    tally() |> 
+    arrange(coll_year)
+```
+
+### ht_id
+
+Head tag (?) ID
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+summary(compare_clean$ht_id)
+```
+
+### fl (now forklength)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+summary(compare_clean$fl)
+compare_clean <- compare_clean |> 
+    rename(forklength = fl)
+```
+
+### fl unk
+
+Is TRUE when there is no fork length recorded, but is not consistent. Removing.
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+summary(compare_clean$fl_unk)
+
+compare_clean |> 
+    filter(fl_unk) |> 
+    distinct(forklength)
+
+compare_clean |> 
+    filter(is.na(forklength)) |> 
+    distinct(fl_unk)
+
+compare_clean <- compare_clean |> 
+    select(-fl_unk)
+```
+
+### wt (now weight)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+summary(compare_clean$wt)
+
+compare_clean <- compare_clean |> 
+    rename(weight = wt)
+```
+
+### wt unk
+
+Is TRUE when there is no weight recorded, but is not consistent. Removing.
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+summary(compare_clean$wt_unk)
+unique(compare_clean$wt_unk)
+
+compare_clean |> 
+    filter(!is.na(wt_unk)) |> 
+    distinct(weight)
+
+compare_clean |> 
+    filter(is.na(wt_unk)) |> 
+    distinct(weight)
+
+compare_clean <- compare_clean |> 
+    select(-wt_unk)
+```
+
+### sex
+
+Only encoded as 1, 2, or 9 and am missing codes. Removing.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$sex)
+compare_clean <- compare_clean |> 
+    select(-sex)
+```
+
+### race_id (now run_id)
+
+These are inconsistently coded as W, LF, S, F, U or in numbers (1, 2, 3, 4). There is no lookup for the numbers, so correcting the letters and leaving the numbers as is for now.
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$race_id)
+compare_clean <- compare_clean |> 
+    mutate(run_id = case_when(race_id == "W" ~ "winter",
+    race_id == "LF" ~ "late fall",
+    race_id == "S" ~ "spring",
+    race_id == "F" ~ "fall",
+    race_id == "U" ~ "unknown",
+    race_id == "N/A" ~ NA_character_,
+    TRUE ~ race_id)) |> 
+        select(-race_id)
+
+unique(compare_clean$run_id)
+```
+
+### l_stage_id (now lifestage_id)
+
+Assume this is life stage, but is encoded as numbers with no lookup. Leaving in for now.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$l_stage_id)
+compare_clean <- compare_clean |> 
+    rename(lifestage_id = l_stage_id)
+```
+
+### mort
+
+Mortality encoded as numbers (1, 2, 9). No lookup; leaving in for now.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$mort)
+```
+
+### ad_clpd (now adipose_clipped)
+
+adipose_clipped encoded as numbers (1, 2, 9). No lookup; leaving in for now.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$ad_clpd)
+compare_clean <- compare_clean |> 
+    rename(adipose_clipped = ad_clpd)
+```
+
+### cwt (now tag_code)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+summary(compare_clean$cwt)
+unique(compare_clean$cwt)[1:20]
+
+compare_clean <- compare_clean |> 
+    mutate(tag_code = case_when(cwt == "N/A" ~ NA_character_,
+    # cwt %in% c("056306 or 056293", "056524 / 056586") ~ "unknown",
+    # cwt == "no tag" ~ NA_character_,
+    TRUE ~ cwt))
+```
+
+### releaseorigin (now release_location_name)
+
+Standardized to match `feather_hatchery_release` and `hatchery_release` where possible.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$releaseorigin)
+
+compare_clean <- compare_clean |> 
+    mutate(releaseorigin = str_to_upper(releaseorigin),
+    release_location_name = case_when(releaseorigin %in% c( "COLEMA NFH", "COLEMAN NATIONAL FISH HATCHERY") ~ "COLEMAN NFH",
+releaseorigin %in% c("BATTLE CREEK AT CNFH", "*PROPOSED - BATTLE CREEK AT CNFH", "BATTLE CREEK AT COLEMAN NFH") ~ "BATTLE CREEK BELOW CNFH",
+releaseorigin %in% c("CALDWELL PARK (RM 300)", "CALDWELL PARK, REDDING, CA", "SACRAMENTO RIVER, CALDWELL PARK, REDDING, CA") ~ "SAC R CALDWELL PARK RM 300",
+releaseorigin == "SACRAMENTO RIVER, REDDING, CA" ~ "SACRAMENTO RIVER REDDING CA",
+releaseorigin == "NORTH FORK BATTLE CREEK MANTON, CA" ~ "NORTH FORK BATTLE CREEK MANTON CA",
+releaseorigin == "CLARKSBURG, CA (RM 42.5)" ~ "CLARKSBURG CA RM 42.5",
+releaseorigin == "SAC R BEL RBDD" ~ "SAC R RED BLUFF DIV DAM",
+releaseorigin == "FEATHER BOYD'S PUMP RAMP" ~ "FEATHER BOYDS PUMP RAMP",
+releaseorigin == "RED BLUFF, CA (RM 243)" ~ "RED BLUFF CA RM 243",
+TRUE ~ releaseorigin)) |> 
+    select(-releaseorigin)
+
+sort(unique(compare_clean$release_location_name))
+```
+
+### releasedate (now first_release_date)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+compare_clean <- compare_clean |> 
+    mutate(last_release_date = ifelse(releasedate == "2/17-18/2016", "2016-02-18", NA_character_),
+releasedate = case_when(releasedate == "2/17-18/2016" ~ "2/17/2016", 
+releasedate == "17999" ~ "4/11/19", # mistyped as 4/11/49
+TRUE ~ releasedate),
+    first_release_date = parse_excel_dates(releasedate)) |> 
+    select(-releasedate)
+
+range(compare_clean$first_release_date, na.rm = T)
+```
+
+### cw_trun
+
+run type. Not clear how this intersects with run_id column. keeping both for now.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$cw_trun)
+compare_clean <- compare_clean |> 
+    mutate(cwt_run = str_to_lower(str_replace(cw_trun, "\\-", " "))) |> 
+    select(-cw_trun)
+```
+
+### comment
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+unique(compare_clean$comment)[1:10]
+
+compare_clean <- compare_clean |> 
+    mutate(comment = str_to_lower(comment),
+    weight = ifelse(comment %in% c("weight may have been recorded incorrectly", "weight not recorded. scale not functioning.", "wt is probably incorrect"), NA_real_, weight),
+    forklength = ifelse(comment %in% c("? on fl", "fl is approximate", "id duplicated but wrong fl"), NA_real_, forklength),
+    comment = case_when(comment %in% c("lost tag possible recovery", "lost before verification", "lost cwt", "lost tag before confirmed", "tag lost before verification", "tag lost after reading") ~ "lost tag",
+    comment %in% c("no cwt card", "no cwt card/entry", "no cwt entry match", "no second read on cwt", "no tag", "no tag present", "cwt is not present because of natural origin", "cwt lost", "cwt not detected", "cwt not found", "cwt not present", "cwt recorded but lost", "cwt was recorded but lost", "cannot read tag") ~ "no cwt detected",
+    TRUE ~ comment))
+
+unique(compare_clean$comment)[1:10]
+```
+
+
+## Compare against SRJPEdata
+
+Check if the data provided overlaps with what we have in SRJPEdata objects `feather_hatchery_release`, `hatchery_release`, and `rst_cwt_recaptures`.
+
+Tag codes in `rst_cwt_recaptures` are sometimes missing leading zeros (e.g. "55140"), so pad numeric codes to 6 digits before comparing.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+pad_tag <- function(x) ifelse(str_detect(x, "^\\d+$"), str_pad(x, 6, pad = "0"), x)
+
+kl_recaps <- compare_clean |> 
+    filter(!is.na(tag_code)) |> 
+    mutate(tag_code = pad_tag(tag_code))
+
+og_recaps <- rst_cwt_recaptures |> 
+    mutate(tag_code = pad_tag(tag_code))
+
+cat(sum(is.na(compare_clean$tag_code)), "KL records have no tag code and are excluded")
+```
+
+### tag overlap
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+tibble(
+  both = length(intersect(kl_recaps$tag_code, og_recaps$tag_code)),
+  kl_only = length(setdiff(kl_recaps$tag_code, og_recaps$tag_code)),
+  srjpedata_only = length(setdiff(og_recaps$tag_code, kl_recaps$tag_code))
+)
+```
+
+### record overlap
+
+Compare number of recaptures by tag code and date.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+record_compare <- full_join(
+  count(kl_recaps, tag_code, date, name = "n_kl"),
+  count(og_recaps, tag_code, date, name = "n_srjpedata"),
+  by = c("tag_code", "date")) |> 
+  mutate(status = case_when(is.na(n_srjpedata) ~ "KL only",
+                            is.na(n_kl) ~ "SRJPEdata only",
+                            n_kl == n_srjpedata ~ "match",
+                            TRUE ~ "different count"))
+
+count(record_compare, status)
+
+record_compare |> 
+  filter(status != "match")
+
+record_compare |> 
+  ggplot(aes(x = as.factor(year(date)), fill = status)) + 
+  geom_bar() +
+  theme_minimal() +
+  labs(x = "Year", y = "Tag code x date combinations", fill = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+### fork length and weight
+
+For records matching on tag code and date, check whether fork length and weight agree.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+attr_compare <- full_join(
+  count(kl_recaps, tag_code, date, forklength, weight, name = "n_kl"),
+  count(og_recaps, tag_code, date, forklength, weight, name = "n_srjpedata"),
+  by = c("tag_code", "date", "forklength", "weight")) |> 
+  semi_join(filter(record_compare, status == "match"), by = c("tag_code", "date"))
+
+attr_compare |> 
+  filter(is.na(n_kl) | is.na(n_srjpedata) | n_kl != n_srjpedata) |> 
+  arrange(tag_code, date)
+```
+
+### release information
+
+`hatchery_release` and `feather_hatchery_release` do not contain tag codes, so link KL tag codes to releases using `release_group_id` from `rst_cwt_recaptures`. Release location names differ between sources (e.g. hatchery vs release site), so release date is the more reliable comparison.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+og_releases <- bind_rows(hatchery_release, feather_hatchery_release) |> 
+  select(release_group_id, og_location = release_location_name, og_first_release_date = first_release_date)
+
+release_compare <- kl_recaps |> 
+  distinct(tag_code, coll_year, release_location_name, first_release_date) |> 
+  left_join(distinct(og_recaps, tag_code, release_group_id) |> filter(!is.na(release_group_id)), by = "tag_code") |> 
+  left_join(og_releases, by = "release_group_id") |> 
+  mutate(status = case_when(is.na(first_release_date) & is.na(og_first_release_date) ~ "no release info",
+                            is.na(og_first_release_date) ~ "KL only",
+                            is.na(first_release_date) ~ "SRJPEdata only",
+                            first_release_date == og_first_release_date ~ "same date",
+                            TRUE ~ "different date"))
+
+count(release_compare, status)
+
+release_compare |> 
+  ggplot(aes(x = as.factor(coll_year), fill = status)) + 
+  geom_bar() +
+  theme_minimal() +
+  labs(x = "Collection year", y = "Tag codes", fill = "") +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+Tag codes where KL has release information not in SRJPEdata (potential additions):
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+release_compare |> 
+  filter(status == "KL only")
+```
+
+Tag codes where release dates conflict:
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+release_compare |> 
+  filter(status == "different date") |> 
+  mutate(days_diff = as.numeric(first_release_date - og_first_release_date)) |> 
+  select(tag_code, release_location_name, og_location, first_release_date, og_first_release_date, days_diff) |> 
+  arrange(desc(abs(days_diff)))
+```
+
+Release location name pairs (to check whether "different" names refer to the same place):
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+release_compare |> 
+  filter(!is.na(release_location_name), !is.na(og_location)) |> 
+  count(release_location_name, og_location) |> 
+  filter(release_location_name != og_location)
+```
+
+## Summary
+
+- **Recaptures:** The KL data and `rst_cwt_recaptures` contain the same tag codes (864) and the same records: all 3,989 tag code x date combinations match. 846 KL records have no tag code and were excluded.
+- **Fork length and weight:** Only 4 matched records disagree. In each case one source is missing a value the other has (3 missing in KL, 1 missing in SRJPEdata).
+- **Release information** (by tag code):
+    - 648 have the same release date in both sources.
+    - 81 have different release dates.
+    - 162 have release info only in SRJPEdata.
+    - 15 have release info only in KL. These are potential additions; several are out-of-basin hatcheries (Warm Springs, Icicle Creek, Abernathy Creek), plus a few 2019 Coleman releases.
+    - 38 have no release info in either source.
+- **Release location names** often differ even when release dates match (e.g. "BATTLE CREEK BELOW CNFH" vs "COLEMAN NFH"), so they need review rather than being treated as conflicts.
+- **2021-2024:** No 2021-2024 tags have release info in the KL data, consistent with the e-mail. The KL data does not add new information for these years.
