@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SRJPEdata</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -50,28 +50,22 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling </a>
+      <a href="../articles/summary_of_data_for_modeling.html">Summary of Data for Modeling</a>
     </li>
     <li>
       <a href="../articles/yearling_ruleset.html">Yearling Ruleset</a>
     </li>
     <li>
-      <a href="../articles/site_overview.html">Site Selection for Stock Recruit Modeling</a>
+      <a href="../articles/site_overview.html">Overview of RST Sites</a>
     </li>
     <li>
       <a href="../articles/trap_effort.html">Hours Fished Analysis</a>
     </li>
     <li>
-      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Include</a>
+      <a href="../articles/years_to_include_analysis.html">Monitoring Years to Model</a>
     </li>
     <li>
-      <a href="../articles/prep_environmental_covariates.html">Passage to Spawner Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/sr_covariates.html">Stock Recruit Model Covariate Prep</a>
-    </li>
-    <li>
-      <a href="../articles/forecast_covariates.html">Forecast and Scenario Model Covariate Prep</a>
+      <a href="../articles/covariates_documentation.html">Covariates Overview</a>
     </li>
     <li>
       <a href="../articles/temp_regression.html">Filling Temperature Data Gaps</a>
@@ -223,60 +217,60 @@ predictions are off by about 7.78% on average.</li>
 <span><span class="co">## </span></span>
 <span><span class="co">## Residuals:</span></span>
 <span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
-<span><span class="co">## -4.9790 -0.8328  0.0207  0.7879  5.9990 </span></span>
+<span><span class="co">## -4.8923 -0.8245  0.0377  0.7735  6.0108 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">##               Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept) -2.0825834  0.6357805  -3.276  0.00107 ** </span></span>
-<span><span class="co">## date         0.0004866  0.0000331  14.703  &lt; 2e-16 ***</span></span>
-<span><span class="co">## butte_temp   0.4297805  0.0050608  84.923  &lt; 2e-16 ***</span></span>
+<span><span class="co">## (Intercept) -2.048e+00  6.035e-01  -3.394    7e-04 ***</span></span>
+<span><span class="co">## date         4.851e-04  3.151e-05  15.396   &lt;2e-16 ***</span></span>
+<span><span class="co">## butte_temp   4.280e-01  4.953e-03  86.397   &lt;2e-16 ***</span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 1.287 on 2265 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.7715, Adjusted R-squared:  0.7713 </span></span>
-<span><span class="co">## F-statistic:  3825 on 2 and 2265 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## [1] 0.07330034</span></span></code></pre>
+<span><span class="co">## Residual standard error: 1.278 on 2337 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.7772, Adjusted R-squared:  0.777 </span></span>
+<span><span class="co">## F-statistic:  4076 on 2 and 2337 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.07420217</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
 <span><span class="co">## lm(formula = temp ~ date + butte_temp, data = train)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Residuals:</span></span>
 <span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
-<span><span class="co">## -4.7990 -0.8028  0.0202  0.7300  6.2940 </span></span>
+<span><span class="co">## -7.0581 -0.7907  0.0288  0.7406  6.0651 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
-<span><span class="co">##               Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept) -3.402e-02  6.197e-01  -0.055    0.956    </span></span>
-<span><span class="co">## date         3.830e-04  3.225e-05  11.877   &lt;2e-16 ***</span></span>
-<span><span class="co">## butte_temp   4.024e-01  5.396e-03  74.580   &lt;2e-16 ***</span></span>
+<span><span class="co">##              Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">## (Intercept) 0.2093272  0.5789716   0.362    0.718    </span></span>
+<span><span class="co">## date        0.0003705  0.0000302  12.265   &lt;2e-16 ***</span></span>
+<span><span class="co">## butte_temp  0.4008385  0.0052207  76.778   &lt;2e-16 ***</span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 1.253 on 2265 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.7208, Adjusted R-squared:  0.7205 </span></span>
-<span><span class="co">## F-statistic:  2923 on 2 and 2265 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## [1] 0.08229283</span></span></code></pre>
+<span><span class="co">## Residual standard error: 1.223 on 2338 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.7311, Adjusted R-squared:  0.7309 </span></span>
+<span><span class="co">## F-statistic:  3178 on 2 and 2338 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.08546232</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Call:</span></span>
 <span><span class="co">## lm(formula = temp ~ date + butte_temp, data = train)</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Residuals:</span></span>
 <span><span class="co">##     Min      1Q  Median      3Q     Max </span></span>
-<span><span class="co">## -5.4613 -0.7601  0.0157  0.7896  6.1149 </span></span>
+<span><span class="co">## -5.3539 -0.7639  0.0020  0.7987  6.5862 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">##               Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span><span class="co">## (Intercept) -3.077e+00  6.703e-01  -4.591 4.65e-06 ***</span></span>
-<span><span class="co">## date         5.336e-04  3.486e-05  15.305  &lt; 2e-16 ***</span></span>
-<span><span class="co">## butte_temp   4.526e-01  4.779e-03  94.692  &lt; 2e-16 ***</span></span>
+<span><span class="co">## (Intercept) -2.937e+00  6.428e-01  -4.568 5.17e-06 ***</span></span>
+<span><span class="co">## date         5.237e-04  3.348e-05  15.642  &lt; 2e-16 ***</span></span>
+<span><span class="co">## butte_temp   4.556e-01  4.716e-03  96.611  &lt; 2e-16 ***</span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Residual standard error: 1.356 on 2267 degrees of freedom</span></span>
-<span><span class="co">## Multiple R-squared:  0.8061, Adjusted R-squared:  0.806 </span></span>
-<span><span class="co">## F-statistic:  4714 on 2 and 2267 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
-<pre><code><span><span class="co">## [1] 0.0759164</span></span></code></pre>
+<span><span class="co">## Residual standard error: 1.358 on 2340 degrees of freedom</span></span>
+<span><span class="co">## Multiple R-squared:  0.8102, Adjusted R-squared:  0.8101 </span></span>
+<span><span class="co">## F-statistic:  4996 on 2 and 2340 DF,  p-value: &lt; 2.2e-16</span></span></code></pre>
+<pre><code><span><span class="co">## [1] 0.07411694</span></span></code></pre>
 </div>
 <div class="section level5">
 <h5 id="predictions">Predictions<a class="anchor" aria-label="anchor" href="#predictions"></a>
@@ -307,16 +301,16 @@ integrated where observed data is missing, ensuring a continuous
 temperature dataset. Each water temperature type (mean, min, max) is
 represented with a different color to help in distinguishing the
 temperature trends and understanding the temperature fluctuations.</p>
-<pre><code><span><span class="co">## Rows: 30,330</span></span>
+<pre><code><span><span class="co">## Rows: 30,603</span></span>
 <span><span class="co">## Columns: 7</span></span>
-<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [30,330]</span></span>
+<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [30,603]</span></span>
 <span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-0…</span></span>
 <span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feathe…</span></span>
 <span><span class="co">## $ site_group  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "upper feather lfc"<span style="color: #949494;">, </span>"upper feather lfc"<span style="color: #949494;">, </span>"upper feather l…</span></span>
 <span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpola…</span></span>
 <span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpola…</span></span>
 <span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 9.580777<span style="color: #949494;">, </span>10.219047<span style="color: #949494;">, </span>9.420049<span style="color: #949494;">, </span>9.366373<span style="color: #949494;">, </span>9.540728<span style="color: #949494;">, </span>9.62164…</span></span></code></pre>
+<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 9.572169<span style="color: #949494;">, </span>10.306886<span style="color: #949494;">, </span>9.510457<span style="color: #949494;">, </span>9.358672<span style="color: #949494;">, </span>9.624022<span style="color: #949494;">, </span>9.71124…</span></span></code></pre>
 <p><img src="temp_regression_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
@@ -384,16 +378,16 @@ integrated where observed data is missing, ensuring a continuous
 temperature dataset. Each water temperature type (mean, min, max) is
 represented with a different color to help in distinguishing the
 temperature trends and understanding the temperature fluctuations.</p>
-<pre><code><span><span class="co">## Rows: 30,348</span></span>
+<pre><code><span><span class="co">## Rows: 30,621</span></span>
 <span><span class="co">## Columns: 7</span></span>
-<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [30,348]</span></span>
+<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number, site_group [30,621]</span></span>
 <span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-0…</span></span>
 <span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feather river"<span style="color: #949494;">, </span>"feathe…</span></span>
 <span><span class="co">## $ site_group  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "upper feather hfc"<span style="color: #949494;">, </span>"upper feather hfc"<span style="color: #949494;">, </span>"upper feather h…</span></span>
 <span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpola…</span></span>
 <span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpola…</span></span>
 <span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 16.79498<span style="color: #949494;">, </span>17.47539<span style="color: #949494;">, </span>16.25469<span style="color: #949494;">, </span>16.44786<span style="color: #949494;">, </span>16.47148<span style="color: #949494;">, </span>16.61635…</span></span></code></pre>
+<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 16.78068<span style="color: #949494;">, </span>17.87636<span style="color: #949494;">, </span>16.04222<span style="color: #949494;">, </span>16.43163<span style="color: #949494;">, </span>16.87409<span style="color: #949494;">, </span>16.40525…</span></span></code></pre>
 <p><img src="temp_regression_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
@@ -490,15 +484,15 @@ where observed data is missing, ensuring a continuous temperature
 dataset. Each water temperature type (mean, min, max) is represented
 with a different color to help in distinguishing the temperature trends
 and understanding the temperature fluctuations.</p>
-<pre><code><span><span class="co">## Rows: 30,315</span></span>
+<pre><code><span><span class="co">## Rows: 30,588</span></span>
 <span><span class="co">## Columns: 6</span></span>
-<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number [30,315]</span></span>
+<span><span class="co">## Groups: stream, date, statistic, gage_agency, gage_number [30,588]</span></span>
 <span><span class="co">## $ date        <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-01<span style="color: #949494;">, </span>1998-10-02<span style="color: #949494;">, </span>1998-10-0…</span></span>
 <span><span class="co">## $ stream      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"yuba river"<span style="color: #949494;">, </span>"y…</span></span>
 <span><span class="co">## $ gage_agency <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpola…</span></span>
 <span><span class="co">## $ gage_number <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpolated"<span style="color: #949494;">, </span>"interpola…</span></span>
 <span><span class="co">## $ statistic   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">, </span>"min"<span style="color: #949494;">, </span>"mean"<span style="color: #949494;">, </span>"max"<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 16.98662<span style="color: #949494;">, </span>18.76429<span style="color: #949494;">, </span>15.54357<span style="color: #949494;">, </span>16.68644<span style="color: #949494;">, </span>17.78316<span style="color: #949494;">, </span>15.81097…</span></span></code></pre>
+<span><span class="co">## $ value       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 15.56555<span style="color: #949494;">, </span>16.84433<span style="color: #949494;">, </span>14.03495<span style="color: #949494;">, </span>15.26001<span style="color: #949494;">, </span>15.84811<span style="color: #949494;">, </span>14.31248…</span></span></code></pre>
 <p><img src="temp_regression_files/figure-html/unnamed-chunk-33-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
