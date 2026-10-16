@@ -44,17 +44,30 @@ Butte Creek is used to build the regression models because the time series is co
 5. Visualize the predicted and actual temperature over time to asses model performance trends
 
 ```{r, include = F}
-butte <- dataRetrieval::readNWISdv(11390000, "00010", statCd = c("00001","00002"), startDate = "1994-01-01")
-butte_format <- butte |> 
-  select(Date, max =  X_00010_00001, min = X_00010_00002) %>%
-  as_tibble() %>% 
-  mutate(mean = (max + min) /2) |> 
-  pivot_longer(max:mean, names_to = "statistic", values_to = "value") |> 
-  rename(date = Date) %>% 
-  mutate(stream = "butte creek",
-         gage_agency = "USGS",
-         gage_number = "11390000",
-         parameter = "temperature")
+butte_creek_temp_query <- dataRetrieval::read_waterdata_daily(
+  "USGS-11390000",
+  "00010",
+  time = c("1994-01-01", NA)
+)
+butte_format <- butte_creek_temp_query |>
+  dplyr::select(time, value, statistic_id) |> 
+  dplyr::as_tibble() |> 
+  dplyr::select(-geometry) |> 
+  tidyr::pivot_wider(names_from = "statistic_id", values_from = "value") |> 
+  dplyr::rename(max = `00001`, min = `00002`, date = time) |> 
+  dplyr::select(-c(`00008`,`00003`)) |> 
+  dplyr::mutate(mean = (max + min) / 2) |>
+  tidyr::pivot_longer(
+    max:mean,
+    names_to = "statistic",
+    values_to = "value"
+  ) |>
+  dplyr::mutate(
+    stream = "butte creek",
+    gage_agency = "USGS",
+    gage_number = "11390000",
+    parameter = "temperature"
+  )
 
 ```
 
