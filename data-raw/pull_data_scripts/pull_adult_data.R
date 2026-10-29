@@ -3,11 +3,11 @@ library(EDIutils)
 
 # COMPILE ADULT DATASETS =======================================================
 # MOST DATA IS PULLED DIRECTLY FROM CSVs VALIDATED BY STREAM TEAMS
-# SOME DATA FROM EDI, PLANT TO MIGRATE ALL DATA PULLS FROM EDI ONCE EDI DATA IS 
+# SOME DATA FROM EDI, PLANT TO MIGRATE ALL DATA PULLS FROM EDI ONCE EDI DATA IS
 # AS DESIRED BY STREAM TEAMS
 
 # Set the scope for script to use API to download data from EDI
-scope = "edi"
+scope <- "edi"
 
 # Battle/Clear -----------------------------------------------------------------
 # Upstream passage and redd data
@@ -18,13 +18,19 @@ scope = "edi"
 # raw data -> qc script -> estimates for greater transparency
 
 # Instruction for updating - when Battle and Clear provided an updated value, open the csv, add the new value and save.
-battle_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |> 
+battle_redd <- read_csv(
+  "data-raw/helper-tables/battle_clear_redd_historical.csv"
+) |>
   filter(stream == "battle creek")
 
-clear_redd <- read_csv("data-raw/helper-tables/battle_clear_redd_historical.csv") |>  
+clear_redd <- read_csv(
+  "data-raw/helper-tables/battle_clear_redd_historical.csv"
+) |>
   filter(stream == "clear creek")
 
-battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_estimates_historical.csv")
+battle_clear_passage <- read_csv(
+  "data-raw/helper-tables/battle_clear_passage_estimates_historical.csv"
+)
 
 # Butte ------------------------------------------------------------------------
 # Carcass estimates
@@ -34,8 +40,10 @@ battle_clear_passage <- read_csv("data-raw/helper-tables/battle_clear_passage_es
 
 # New years for Butte
 # The process for updating years for Butte will be to read in a csv or manually add the data to the csv
-butte_carcass <- read_csv("data-raw/helper-tables/butte_carcass_historical.csv") |> 
-  rename(count = carcass_estimate) |> 
+butte_carcass <- read_csv(
+  "data-raw/helper-tables/butte_carcass_historical.csv"
+) |>
+  rename(count = carcass_estimate) |>
   mutate(data_type = "carcass_estimate")
 
 # Deer/Mill  -------------------------------------------------------------------
@@ -45,25 +53,34 @@ butte_carcass <- read_csv("data-raw/helper-tables/butte_carcass_historical.csv")
 # When doing a data check with Ryan May 2025 we found a few discrepancies
 # in the video passage data and all the redd data were off. Until
 # this is fixed on EDI we will pull data from the spreadsheet Ryan provided
+# In 2026 Ryan provided spreadsheets for adult data. We used the totals from the redd data
+# and the "above video salmon estimate" from the SUMMARY tab of the upstream passage xlsx
+# and manually added to the mill_deer_adult_historical
+data_from_ryan_raw <- read_csv(
+  "data-raw/helper-tables/mill_deer_adult_historical.csv"
+)
 
-data_from_ryan_raw <- read_csv("data-raw/helper-tables/mill_deer_adult_historical.csv")
-
-# Interpolate Mill Redd data based on 
+# Interpolate Mill Redd data based on
 # adult-holding-redd-and-carcass-surveys_mill-creek_data-raw_Mill Creek SRCS Redd Counts by Section 1997-2020 Reformatted.xlsx
-# See data-raw/analysis/mill-redd-analysis.Rmd for methodology 
-redd_interpolation_data <- read_csv(here::here("data-raw", "analysis", "mill_redd_fill_table.csv"))
+# See data-raw/analysis/mill-redd-analysis.Rmd for methodology
+redd_interpolation_data <- read_csv(here::here(
+  "data-raw",
+  "analysis",
+  "mill_redd_fill_table.csv"
+))
 
-mill_redd <- data_from_ryan_raw |> 
-  filter(data_type == "redd",
-         stream == "mill creek") |>  
-  left_join(redd_interpolation_data) |> 
-  mutate(redd_multiplier = ifelse(is.na(redd_multiplier), 1, redd_multiplier), # for years 2021-2024 where we don't have a multiplier. these are expected to be complete surveys
-         new_count = round(count * redd_multiplier, 0)) |> 
-  select(year, count = new_count, data_type, stream) |> 
+mill_redd <- data_from_ryan_raw |>
+  filter(data_type == "redd", stream == "mill creek") |>
+  left_join(redd_interpolation_data) |>
+  mutate(
+    redd_multiplier = ifelse(is.na(redd_multiplier), 1, redd_multiplier), # for years 2021-2024 where we don't have a multiplier. these are expected to be complete surveys
+    new_count = round(count * redd_multiplier, 0)
+  ) |>
+  select(year, count = new_count, data_type, stream) |>
   glimpse()
 
-data_from_ryan <- data_from_ryan_raw |> 
-  filter(!(data_type == "redd" & stream == "mill creek")) |> 
+data_from_ryan <- data_from_ryan_raw |>
+  filter(!(data_type == "redd" & stream == "mill creek")) |>
   bind_rows(mill_redd)
 
 
@@ -76,24 +93,29 @@ data_from_ryan <- data_from_ryan_raw |>
 # Th table shows the number of spring-run tagged for broodstock, number returning to the Hatchery in the fall, the number of over summer mortalities during the same period, and includes the corrected count at the weir for 2024.
 
 # Casey provided updated data in Dec 2025 that includes data dating back to 2004 to expand the adult dataset
-feather_adult_raw <- read_csv(here::here("data-raw","helper-tables","feather_adult_data_for_stock_recruit_sep_2026.csv"))
+feather_adult_raw <- read_csv(here::here(
+  "data-raw",
+  "helper-tables",
+  "feather_adult_data_for_stock_recruit_sep_2026.csv"
+))
 
-feather_spring_spawner <- feather_adult_raw |> 
-  filter(!is.na(`Hallprint Tagged1`)) |> 
-  rename(count = `Estimated in-river spring-run`,
-         year = Year) |> 
-  select(year, count) |> 
-  mutate(stream = "feather river",
-         data_type = "broodstock_tag",
-         year = as.numeric(year))
+feather_spring_spawner <- feather_adult_raw |>
+  filter(!is.na(`Hallprint Tagged1`)) |>
+  rename(count = `Estimated in-river spring-run`, year = Year) |>
+  select(year, count) |>
+  mutate(
+    stream = "feather river",
+    data_type = "broodstock_tag",
+    year = as.numeric(year)
+  )
 
 # Yuba  ------------------------------------------------------------------------
 # Upstream passage data
 # These data are on EDI and should be updated following the EDI workflow
-# https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1707.1 
+# https://portal.edirepository.org/nis/mapbrowse?packageid=edi.1707.1
 
 # Uncomment these lines when transition back to using EDI
-identifier = "1707"
+identifier <- "1707"
 
 # The Yuba package is no longer public, so it requires an authenticated
 # request. EDIutils::list_data_package_revisions()/read_data_entity_names()/
@@ -106,58 +128,103 @@ edi_auth <- httr::authenticate(
 )
 
 revision <- httr::content(
-  httr::GET(paste0("https://pasta.lternet.edu/package/eml/", scope, "/", identifier, "?filter=newest"), edi_auth),
-  as = "text", encoding = "UTF-8"
-) |> trimws()
+  httr::GET(
+    paste0(
+      "https://pasta.lternet.edu/package/eml/",
+      scope,
+      "/",
+      identifier,
+      "?filter=newest"
+    ),
+    edi_auth
+  ),
+  as = "text",
+  encoding = "UTF-8"
+) |>
+  trimws()
 package_id <- paste(scope, identifier, revision, sep = ".")
 
 # List data entities of the data package
 res_raw <- httr::content(
-  httr::GET(paste0("https://pasta.lternet.edu/package/name/eml/", scope, "/", identifier, "/", revision), edi_auth),
-  as = "text", encoding = "UTF-8"
+  httr::GET(
+    paste0(
+      "https://pasta.lternet.edu/package/name/eml/",
+      scope,
+      "/",
+      identifier,
+      "/",
+      revision
+    ),
+    edi_auth
+  ),
+  as = "text",
+  encoding = "UTF-8"
 )
-res <- read.csv(text = res_raw, header = FALSE, col.names = c("entityId", "entityName"))
+res <- read.csv(
+  text = res_raw,
+  header = FALSE,
+  col.names = c("entityId", "entityName")
+)
 
 # Download the daily corrected passage
 name <- "yuba_daily_corrected_passage.csv"
 entity_id <- res$entityId[res$entityName == name]
 raw <- httr::content(
-  httr::GET(paste0("https://pasta.lternet.edu/package/data/eml/", scope, "/", identifier, "/", revision, "/", entity_id), edi_auth),
+  httr::GET(
+    paste0(
+      "https://pasta.lternet.edu/package/data/eml/",
+      scope,
+      "/",
+      identifier,
+      "/",
+      revision,
+      "/",
+      entity_id
+    ),
+    edi_auth
+  ),
   as = "raw"
 )
 data <- read_csv(raw)
 
 # process into format as previously defined by database
-yuba_spring_passage_estimates <- data |> 
-  mutate(run = ifelse(run %in% c("early spring", "late spring"), "spring", run)) |> 
-  filter(run == "spring") |> 
-  group_by(year = biological_year, run) |> 
-  dplyr::summarize(passage_estimate = sum(count, na.rm = T)) |> 
-  mutate(stream = "yuba river",
-         data_type = "upstream_estimate") |> 
+yuba_spring_passage_estimates <- data |>
+  mutate(
+    run = ifelse(run %in% c("early spring", "late spring"), "spring", run)
+  ) |>
+  filter(run == "spring") |>
+  group_by(year = biological_year, run) |>
+  dplyr::summarize(passage_estimate = sum(count, na.rm = T)) |>
+  mutate(stream = "yuba river", data_type = "upstream_estimate") |>
   rename(count = "passage_estimate")
 
 # Combine and save
-annual_adult_raw <- bind_rows(battle_redd,
-                          clear_redd,
-                          battle_clear_passage,
-                          butte_carcass,
-                          data_from_ryan,
-                          feather_spring_spawner,
-                          yuba_spring_passage_estimates)
+annual_adult_raw <- bind_rows(
+  battle_redd,
+  clear_redd,
+  battle_clear_passage,
+  butte_carcass,
+  data_from_ryan,
+  feather_spring_spawner,
+  yuba_spring_passage_estimates
+)
 
 # Apply years to exclude
 
-adult_years_exclude <- adult_model_years |> 
-  filter(exclude == TRUE) |> 
-  select(-reason_for_exclusion) |> 
-  mutate(data_type = case_when(data_type == "carcass" ~ "carcass_estimate",
-                               data_type == "upstream passage" ~ "upstream_estimate",
-                               T ~ data_type))
-  
-annual_adult <- annual_adult_raw |> 
-  left_join(adult_years_exclude) |> 
-  filter(is.na(exclude)) |> 
+adult_years_exclude <- adult_model_years |>
+  filter(exclude == TRUE) |>
+  select(-reason_for_exclusion) |>
+  mutate(
+    data_type = case_when(
+      data_type == "carcass" ~ "carcass_estimate",
+      data_type == "upstream passage" ~ "upstream_estimate",
+      T ~ data_type
+    )
+  )
+
+annual_adult <- annual_adult_raw |>
+  left_join(adult_years_exclude) |>
+  filter(is.na(exclude)) |>
   select(-exclude)
 
 usethis::use_data(annual_adult, overwrite = TRUE)
