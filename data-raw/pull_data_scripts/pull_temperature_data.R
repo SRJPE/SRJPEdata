@@ -3,8 +3,8 @@
 
 ### Pull Temperature Data for each JPE tributary -------------------------------
 
-# function to ensure that missing values produce a NA result in max() 
-# instead of Inf/-Inf, which was causing issues in the rolling mean calculations 
+# function to ensure that missing values produce a NA result in max()
+# instead of Inf/-Inf, which was causing issues in the rolling mean calculations
 # in build_covariates.R
 safe_max <- function(x) if (all(is.na(x))) NA_real_ else max(x, na.rm = T)
 safe_min <- function(x) if (all(is.na(x))) NA_real_ else min(x, na.rm = T)
@@ -15,8 +15,12 @@ safe_min <- function(x) if (all(is.na(x))) NA_real_ else min(x, na.rm = T)
 # Data are provided by USFWS Battle/Clear team. Data were checked Sep 2026.
 
 battle_creek_daily_temp <- read_csv(
-  here::here("data-raw", "temperature-data", "UBC_RST_ALL_Ashley_FlowWest_2026.csv")
-)|> 
+  here::here(
+    "data-raw",
+    "temperature-data",
+    "UBC_RST_ALL_Ashley_FlowWest_2026.csv"
+  )
+) |>
   dplyr::mutate(date = as_date(mdy_hm(DT, tz = "UTC"))) |>
   dplyr::group_by(date) |>
   dplyr::summarise(
@@ -31,7 +35,7 @@ battle_creek_daily_temp <- read_csv(
   ) |>
   dplyr::mutate(
     stream = "battle creek",
-    site_group = "battle creek", 
+    site_group = "battle creek",
     gage_agency = "USFWS",
     gage_number = "UBC", # site is not included in the temperature data object
     parameter = "temperature"
@@ -45,12 +49,12 @@ butte_creek_temp_query <- dataRetrieval::read_waterdata_daily(
   "00010"
 )
 butte_creek_daily_temp <- butte_creek_temp_query |>
-  dplyr::select(time, value, statistic_id) |> 
-  dplyr::as_tibble() |> 
-  dplyr::select(-geometry) |> 
-  tidyr::pivot_wider(names_from = "statistic_id", values_from = "value") |> 
-  dplyr::rename(max = `00001`, min = `00002`, date = time) |> 
-  dplyr::select(-c(`00008`,`00003`)) |> 
+  dplyr::select(time, value, statistic_id) |>
+  dplyr::as_tibble() |>
+  dplyr::select(-geometry) |>
+  tidyr::pivot_wider(names_from = "statistic_id", values_from = "value") |>
+  dplyr::rename(max = `00001`, min = `00002`, date = time) |>
+  dplyr::select(-c(`00008`, `00003`)) |>
   dplyr::mutate(mean = (max + min) / 2) |>
   tidyr::pivot_longer(
     max:mean,
@@ -69,8 +73,12 @@ butte_creek_daily_temp <- butte_creek_temp_query |>
 ### Temp Data Pull
 # Upper Clear Creek
 upperclear_creek_daily_temp <- read_csv(
-  here::here("data-raw", "temperature-data", "ClearCreek_UCC_2003_2025_09012026.csv")
-) |> 
+  here::here(
+    "data-raw",
+    "temperature-data",
+    "ClearCreek_UCC_2003_2025_09012026.csv"
+  )
+) |>
   dplyr::mutate(date = as_date(mdy(DT, tz = "UTC"))) |>
   dplyr::group_by(date) |>
   dplyr::summarise(
@@ -94,9 +102,13 @@ upperclear_creek_daily_temp <- read_csv(
 
 #Lower Clear Creek
 lowerclear_creek_daily_temp <- read_csv(
-  here::here("data-raw", "temperature-data", "ClearCreek_LCC_2001_2025_09012026.csv")
-) |> 
-  dplyr::filter(!is.na(DT)) |> 
+  here::here(
+    "data-raw",
+    "temperature-data",
+    "ClearCreek_LCC_2001_2025_09012026.csv"
+  )
+) |>
+  dplyr::filter(!is.na(DT)) |>
   dplyr::mutate(date = as_date(mdy(DT, tz = "UTC"))) |>
   dplyr::group_by(date) |>
   dplyr::summarise(
@@ -116,8 +128,6 @@ lowerclear_creek_daily_temp <- read_csv(
     gage_number = "LCC", # site is not included in the temperature data object and is added in covariate prep as needed
     parameter = "temperature"
   )
-
-
 
 
 ## Deer Creek ------------------------------------------------------------------
@@ -312,12 +322,12 @@ sac_river_temp_query <- dataRetrieval::read_waterdata_daily(
 )
 
 sac_river_daily_temp_raw <- sac_river_temp_query |>
-  dplyr::select(time, value, statistic_id) |> 
-  dplyr::as_tibble() |> 
-  dplyr::select(-geometry) |> 
-  tidyr::pivot_wider(names_from = "statistic_id", values_from = "value") |> 
-  dplyr::rename(max = `00001`, min = `00002`, date = time) |> 
-  dplyr::select(-c(`00003`)) |> 
+  dplyr::select(time, value, statistic_id) |>
+  dplyr::as_tibble() |>
+  dplyr::select(-geometry) |>
+  tidyr::pivot_wider(names_from = "statistic_id", values_from = "value") |>
+  dplyr::rename(max = `00001`, min = `00002`, date = time) |>
+  dplyr::select(-c(`00003`)) |>
   dplyr::mutate(mean = (max + min) / 2) |>
   tidyr::pivot_longer(
     max:mean,
@@ -329,7 +339,7 @@ sac_river_daily_temp_raw <- sac_river_temp_query |>
     gage_agency = "USGS",
     gage_number = "11390500",
     parameter = "temperature"
-  ) 
+  )
 
 sac_river_daily_temp <- sac_river_daily_temp_raw
 
@@ -422,14 +432,14 @@ temp <- data.table::rbindlist(
   ),
   use.names = TRUE,
   fill = TRUE
-) |> 
+) |>
   filter(!is.na(date))
 
 data.table::setDT(temp)
 
 
 # Reshape the data to 'wider' format (like pivot_wider)
-reshaped_temp<- data.table::dcast(
+reshaped_temp <- data.table::dcast(
   temp,
   ... ~ statistic,
   value.var = "value"
@@ -438,20 +448,20 @@ reshaped_temp<- data.table::dcast(
 
 # Group by week and year, and perform the summarization
 updated_temp_data <- reshaped_temp[,
-                                            .(
-                                              max = safe_max(max),
-                                              mean = mean(mean, na.rm = TRUE),
-                                              min = safe_min(min)
-                                            ),
-                                            by = .(
-                                              week = lubridate::week(date),
-                                              year = lubridate::year(date),
-                                              stream,
-                                              gage_number,
-                                              gage_agency,
-                                              site_group,
-                                              parameter
-                                            )
+  .(
+    max = safe_max(max),
+    mean = mean(mean, na.rm = TRUE),
+    min = safe_min(min)
+  ),
+  by = .(
+    week = lubridate::week(date),
+    year = lubridate::year(date),
+    stream,
+    gage_number,
+    gage_agency,
+    site_group,
+    parameter
+  )
 ]
 
 # Display the final result
@@ -513,7 +523,7 @@ temperature_data <- longer_updated_temp_data |>
     )
   ) |>
   dplyr::filter(rm != "remove" | is.na(rm), year >= 1990) |>
-  dplyr::filter(value <= 35) |> 
+  dplyr::filter(value <= 35) |>
   dplyr::select(-rm) |>
   # add on knights landing temperature where gaps have been filled in
   dplyr::bind_rows(kl_temp)
