@@ -16,6 +16,7 @@ scope <- "edi"
 # in the helper data folder and manually updated in the csvs read in below.
 # TODO ideally we would migrate to a system where estimates are generated through scripts
 # raw data -> qc script -> estimates for greater transparency
+# Battle 2026 escapement provided by Melody Scarborough 11/16/2026
 
 # Instruction for updating - when Battle and Clear provided an updated value, open the csv, add the new value and save.
 battle_redd <- read_csv(
