@@ -1,33 +1,35 @@
-if (requireNamespace("devtools", quietly = TRUE)) devtools::load_all(".", quiet = TRUE)
+if (requireNamespace("devtools", quietly = TRUE)) {
+  devtools::load_all(".", quiet = TRUE)
+}
 library(SRJPEdata)
 library(tidyverse)
 library(lubridate)
 
-### Script to run and cache all helper tables 
+### Script to run and cache all helper tables
 
 ### RST DATA -------------------------------------------------------------------
 stream_site_with_efficiency_data <- weekly_efficiency |>
-  ungroup() |> 
+  ungroup() |>
   distinct(stream, site) |>
   mutate(if_efficiency_data = T)
 
 # Find years where less than 3 weeks with catch > 0 are excluded
 low_catch_years <- weekly_juvenile_abundance_catch_data |>
-  filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX 
-  filter(count > 0) |> 
-  group_by(run_year, site) |> 
-  tally() |> 
-  filter(n < 3) |> 
-  mutate(if_low_catch = T) |> 
+  filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
+  filter(count > 0) |>
+  group_by(run_year, site) |>
+  tally() |>
+  filter(n < 3) |>
+  mutate(if_low_catch = T) |>
   select(-n)
 
 # Assign stream/site/year as exclude or not based on criteria
 exclusion_catch <- weekly_juvenile_abundance_catch_data |>
   filter(week %in% c(45:53, 1:22)) |> # select to the week window used in BTSPASX
-  select(stream, site, week, run_year, count) |> 
+  select(stream, site, week, run_year, count) |>
   # distinct(stream, site, week, run_year) |>
-  group_by(stream, site, run_year) |> 
-  summarise(number_weeks =sum(!is.na(count))) |> 
+  group_by(stream, site, run_year) |>
+  summarise(number_weeks = sum(!is.na(count))) |>
   # other exclusion rules are included in case this changes in the future
   mutate(
     exclude_20 = ifelse(number_weeks < 6, TRUE, FALSE),
@@ -36,24 +38,32 @@ exclusion_catch <- weekly_juvenile_abundance_catch_data |>
     exclude_65 = ifelse(number_weeks < 21, TRUE, FALSE),
     exclude_70 = ifelse(number_weeks < 22, TRUE, FALSE),
     exclude_75 = ifelse(number_weeks < 24, TRUE, FALSE)
-  ) |> 
-  left_join(stream_site_with_efficiency_data) |> 
-  left_join(low_catch_years) |> 
-  mutate(if_low_catch = ifelse(is.na(if_low_catch), F, T)) |> 
-  mutate(if_efficiency_data = if_else(is.na(if_efficiency_data), F, T)) 
+  ) |>
+  left_join(stream_site_with_efficiency_data) |>
+  left_join(low_catch_years) |>
+  mutate(if_low_catch = ifelse(is.na(if_low_catch), F, T)) |>
+  mutate(if_efficiency_data = if_else(is.na(if_efficiency_data), F, T))
 
 years_to_exclude_rst_data_all <- exclusion_catch |>
   filter(exclude_60 == T | if_efficiency_data == F | if_low_catch == T) |>
   rowwise() |>
   mutate(
     exclusion_type = paste(
-      c("no efficiency data for site across all years", "low catch", "60% of weeks sampled")[
-        c(!if_efficiency_data, if_low_catch, exclude_60)], collapse = "; "),
-    apply_to = "all runs") |>
+      c(
+        "no efficiency data for site across all years",
+        "low catch",
+        "60% of weeks sampled"
+      )[
+        c(!if_efficiency_data, if_low_catch, exclude_60)
+      ],
+      collapse = "; "
+    ),
+    apply_to = "all runs"
+  ) |>
   ungroup() |>
   select(stream, site, run_year, number_weeks, exclusion_type, apply_to)
 
-# ADD spring specific row 
+# ADD spring specific row
 years_to_exclude_rst_data <- years_to_exclude_rst_data_all |>
   ungroup() |>
   add_row(
@@ -61,42 +71,62 @@ years_to_exclude_rst_data <- years_to_exclude_rst_data_all |>
     site = "tisdale",
     run_year = 2013,
     number_weeks = 20,
-    exclusion_type = "spring run specific - 11 consecutive weeks not sampled Dec 16 to Feb 19",
-    apply_to = "spring"
+    exclusion_type = "spring run specific - 11 consecutive weeks not sampled Dec 16 to Feb 19"
   ) |>
   add_row(
     stream = "feather river",
     site = "herringer riffle",
     run_year = 2008,
     number_weeks = 21,
-    exclusion_type = "spring run specific - 9 weeks missing Nov 04 to Jan 01",
-    apply_to = "spring"
-  ) |> 
-  mutate(exclude = TRUE)
+    exclusion_type = "spring run specific - 9 weeks missing Nov 04 to Jan 01"
+  ) |>
+  mutate(exclude = TRUE, apply_to = "spring")
 
 # Add years to include
-years_to_include_rst_data <- exclusion_catch |>
-  filter(exclude_60 == F & if_efficiency_data == T) |>
-  select(stream, site, run_year)  |> 
-  mutate(exclude = FALSE)
+years_to_include_rst_data_all <- exclusion_catch |>
+  filter(exclude_60 == F & if_efficiency_data == T & if_low_catch == F) |>
+  select(stream, site, run_year) |>
+  mutate(exclude = FALSE, apply_to = "all runs")
 
-# Combine for overall table 
-rst_model_years <- bind_rows(years_to_exclude_rst_data, years_to_include_rst_data)
+years_to_include_rst_data_spring <- exclusion_catch |>
+  filter(exclude_60 == F & if_efficiency_data == T & if_low_catch == F) |> # filter for years that are not excluded
+  filter(
+    !(site == "tisdale" & run_year == 2013) &
+      !(site == "herringer riffle" & run_year == 2008)
+  ) |> # do not include the spring years
+  select(stream, site, run_year) |>
+  mutate(exclude = FALSE, apply_to = "spring")
 
-# Save data object 
+# Combine for overall table
+rst_model_years <- bind_rows(
+  years_to_exclude_rst_data_all,
+  years_to_include_rst_data_all,
+  years_to_include_rst_data_spring,
+  years_to_exclude_rst_data
+)
+
+# Save data object
 usethis::use_data(rst_model_years, overwrite = TRUE)
 
 ### ADULT DATA -----------------------------------------------------------------
 # years to exclude already applied to pull_adult_data.R
 
-years_to_exclude_adult <- read_csv(here::here("data-raw", "helper-tables", "years_to_exclude_adult_datasets.csv")) |> 
+years_to_exclude_adult <- read_csv(here::here(
+  "data-raw",
+  "helper-tables",
+  "years_to_exclude_adult_datasets.csv"
+)) |>
   mutate(exclude = TRUE)
 
-years_to_include_adult <- annual_adult |> 
-  mutate(data_type = case_when(data_type == "upstream_estimate" ~ "upstream passage",
-                               data_type == "carcass_estimate" ~ "carcass",
-                               T ~ data_type)) |> 
-  select(year, stream, data_type) |> 
+years_to_include_adult <- annual_adult |>
+  mutate(
+    data_type = case_when(
+      data_type == "upstream_estimate" ~ "upstream passage",
+      data_type == "carcass_estimate" ~ "carcass",
+      T ~ data_type
+    )
+  ) |>
+  select(year, stream, data_type) |>
   mutate(exclude = FALSE)
 
 adult_model_years <- bind_rows(years_to_exclude_adult, years_to_include_adult)
